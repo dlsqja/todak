@@ -1,6 +1,6 @@
 stages:
-  - build
-  - deploy
+  - build 
+  - deploy 
 
 variables:
   DOCKER_IMAGE: dlsqja3436/todak-backend
