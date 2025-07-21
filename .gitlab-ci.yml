@@ -19,7 +19,7 @@ build-docker-image:
     - ./gradlew clean build
     - docker build -t $DOCKER_IMAGE:$TAG .
     - docker push $DOCKER_IMAGE:$TAG
-  rules:
+  only:
     - dev/backend
 
 deploy-to-ec2:
@@ -38,5 +38,5 @@ deploy-to-ec2:
         docker pull $DOCKER_IMAGE:$TAG
         docker run --name $CONTAINER_NAME -d -p 8080:8080 $DOCKER_IMAGE:$TAG
       EOF
-  rules:
+  only:
     - dev/backend
