@@ -39,4 +39,4 @@ deploy-to-ec2:
         docker run --name $CONTAINER_NAME -d -p 8080:8080 $DOCKER_IMAGE:$TAG
       EOF
   only:
-    - dev/backend
+    - dev/backend 
