@@ -26,7 +26,7 @@ pipeline {
     }
 
     stage('Build and Push Docker Image') {
-      agent any  // Jenkins 호스트에서 실행 (Docker 사용 가능)
+      agent any
       steps {
         withCredentials([
           usernamePassword(
@@ -38,8 +38,8 @@ pipeline {
           sh '''
             cd ./backend/
             echo "${DOCKERHUB_PASSWORD}" | docker login -u "${DOCKERHUB_USERNAME}" --password-stdin
-            docker build -t $DOCKER_IMAGE:$TAG .
-            docker push $DOCKER_IMAGE:$TAG
+            docker build -t ${DOCKER_IMAGE}:${TAG} .
+            docker push ${DOCKER_IMAGE}:${TAG}
           '''
         }
       }
@@ -62,13 +62,13 @@ pipeline {
         ]) {
           sh '''
             chmod 600 "$KEYFILE"
-            ssh -i "$KEYFILE" -o StrictHostKeyChecking=no $EC2_USERNAME@$EC2_HOST << 'EOF'
-              echo "${DOCKERHUB_PASSWORD}" | docker login -u "${DOCKERHUB_USERNAME}" --password-stdin
-              docker stop $CONTAINER_NAME || true
-              docker rm $CONTAINER_NAME || true
-              docker pull $DOCKER_IMAGE:$TAG
-              docker run --name $CONTAINER_NAME -d -p 8081:8080 $DOCKER_IMAGE:$TAG
-            EOF
+            ssh -o StrictHostKeyChecking=no -i "$KEYFILE" $EC2_USERNAME@$EC2_HOST '
+              echo "'${DOCKERHUB_PASSWORD}'" | docker login -u "'${DOCKERHUB_USERNAME}'" --password-stdin
+              docker stop "'${CONTAINER_NAME}'" || true
+              docker rm "'${CONTAINER_NAME}'" || true
+              docker pull "'${DOCKER_IMAGE}:${TAG}'"
+              docker run --name "'${CONTAINER_NAME}'" -d -p 8081:8080 "'${DOCKER_IMAGE}:${TAG}'"
+            '
           '''
         }
       }
