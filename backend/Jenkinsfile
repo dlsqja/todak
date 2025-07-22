@@ -53,6 +53,7 @@ pipeline {
         }
       }
       steps {
+        agent any
         withCredentials([
           sshUserPrivateKey(
             credentialsId: 'ec2-ssh-key',
@@ -66,7 +67,6 @@ pipeline {
           )
         ]) {
           sh '''
-            apk add --no-cache openssh
             chmod 600 $KEYFILE
             ssh -i $KEYFILE -o StrictHostKeyChecking=no $EC2_USERNAME@$EC2_HOST << EOF
               echo "${DOCKERHUB_PASSWORD}" | docker login -u "${DOCKERHUB_USERNAME}" --password-stdin
