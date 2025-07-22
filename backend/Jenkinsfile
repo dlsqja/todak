@@ -67,7 +67,7 @@ pipeline {
               docker stop $CONTAINER_NAME || true
               docker rm $CONTAINER_NAME || true
               docker pull $DOCKER_IMAGE:$TAG
-              docker run --name $CONTAINER_NAME -d -p 8080:8080 $DOCKER_IMAGE:$TAG
+              docker run --name $CONTAINER_NAME -d -p 8081:8081 $DOCKER_IMAGE:$TAG
             EOF
           '''
         }
