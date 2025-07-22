@@ -21,7 +21,6 @@ pipeline {
           chmod +x ./gradlew
           ./gradlew clean build
         '''
-        // 빌드 결과물 보관
         archiveArtifacts artifacts: 'backend/build/libs/*.jar', fingerprint: true
       }
     }
@@ -62,7 +61,6 @@ pipeline {
           )
         ]) {
           sh '''
-            apk add --no-cache openssh
             chmod 600 $KEYFILE
             ssh -i $KEYFILE -o StrictHostKeyChecking=no $EC2_USERNAME@$EC2_HOST << EOF
               echo "${DOCKERHUB_PASSWORD}" | docker login -u "${DOCKERHUB_USERNAME}" --password-stdin
