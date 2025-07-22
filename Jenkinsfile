@@ -1,0 +1,72 @@
+pipeline {
+  agent any
+
+  environment {
+    DOCKER_IMAGE = 'dlsqja3436/todak-backend'
+    TAG = 'latest'
+    CONTAINER_NAME = 'todak-backend'
+    EC2_HOST = 'i13a409.p.ssafy.io'
+  }
+
+  stages {
+    stage('Build Docker Image') {
+      agent {
+        docker {
+          image 'gradle:7.6-jdk17'
+        }
+      }
+      steps {
+        withCredentials([
+          usernamePassword(
+            credentialsId: 'dockerhub-creds',
+            usernameVariable: 'DOCKERHUB_USERNAME',
+            passwordVariable: 'DOCKERHUB_PASSWORD'
+          )
+        ]) {
+          sh '''
+            cd ./backend/
+            chmod +x ./gradlew
+            ./gradlew clean build
+            echo "${DOCKERHUB_PASSWORD}" | docker login -u "${DOCKERHUB_USERNAME}" --password-stdin
+            docker build -t $DOCKER_IMAGE:$TAG .
+            docker push $DOCKER_IMAGE:$TAG
+          '''
+        }
+      }
+    }
+
+    stage('Deploy to EC2') {
+      agent {
+        docker {
+          image 'alpine:latest'
+        }
+      }
+      steps {
+        withCredentials([
+          sshUserPrivateKey(
+            credentialsId: 'ec2-ssh-key',
+            keyFileVariable: 'KEYFILE',
+            usernameVariable: 'EC2_USERNAME'
+          ),
+          usernamePassword( // DockerHub creds 다시 사용
+            credentialsId: 'dockerhub-creds',
+            usernameVariable: 'DOCKERHUB_USERNAME',
+            passwordVariable: 'DOCKERHUB_PASSWORD'
+          )
+        ]) {
+          sh '''
+            apk add --no-cache openssh
+            chmod 600 $KEYFILE
+            ssh -i $KEYFILE -o StrictHostKeyChecking=no $EC2_USERNAME@$EC2_HOST << EOF
+              echo "${DOCKERHUB_PASSWORD}" | docker login -u "${DOCKERHUB_USERNAME}" --password-stdin
+              docker stop $CONTAINER_NAME || true
+              docker rm $CONTAINER_NAME || true
+              docker pull $DOCKER_IMAGE:$TAG
+              docker run --name $CONTAINER_NAME -d -p 8080:8080 $DOCKER_IMAGE:$TAG
+            EOF
+          '''
+        }
+      }
+    }
+  }
+}
