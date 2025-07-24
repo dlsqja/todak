@@ -70,8 +70,8 @@ pipeline {
 
             # EC2에서 실행
             ssh -i "$KEYFILE" -o StrictHostKeyChecking=no $EC2_USERNAME@$EC2_HOST '
-              cd /home/$EC2_USERNAME
-              echo "${DOCKERHUB_PASSWORD}" | docker login -u "${DOCKERHUB_USERNAME}" --password-stdin
+              cd /home/$USER
+              echo '$DOCKERHUB_PASSWORD' | docker login -u '$DOCKERHUB_USERNAME' --password-stdin
               docker compose down || true
               docker compose pull
               docker compose up -d --remove-orphans
