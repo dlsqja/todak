@@ -23,7 +23,7 @@ pipeline {
             npm run build
           '''
         }
-        archiveArtifacts artifacts: 'dist/**', fingerprint: true
+        archiveArtifacts artifacts: 'frontend/dist/**', fingerprint: true
       }
     }
 
