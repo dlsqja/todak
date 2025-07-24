@@ -16,10 +16,11 @@ pipeline {
         }
       }
       steps {
-        sh '''
-          npm install
-          npm run build
-        '''
+        dir('frontend') {
+          sh '''
+            npm install
+            npm run build
+          '''
         archiveArtifacts artifacts: 'dist/**', fingerprint: true
       }
     }
