@@ -7,10 +7,6 @@ services:
     depends_on:
       my-db:
         condition: service_healthy
-    environment:
-      - SPRING_DATASOURCE_URL=jdbc:mysql://my-db:3306/todak
-      - SPRING_DATASOURCE_USERNAME=root
-      - SPRING_DATASOURCE_PASSWORD=1234
 
   my-db:
     image: mysql:8.0
