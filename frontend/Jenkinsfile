@@ -1,9 +1,5 @@
 pipeline {
-  agent {
-    docker {
-      image 'node:20.19.1'
-    }
-  }
+  agent any  // 전역 agent
 
   environment {
     DOCKER_IMAGE = 'dlsqja3436/frontend'
@@ -14,8 +10,13 @@ pipeline {
 
   stages {
     stage('Build Frontend') {
+      agent {
+        docker {
+          image 'node:20.19.1'  // npm 빌드용
+        }
+      }
       steps {
-        dir('frontend') {  // frontend 디렉토리로 이동
+        dir('frontend') {
           sh '''
             npm install
             npm run build
@@ -26,8 +27,9 @@ pipeline {
     }
 
     stage('Build and Push Docker Image') {
+      agent any  // Jenkins 호스트에서 Docker 명령어 실행
       steps {
-        dir('frontend') {  // Docker 빌드도 frontend 디렉토리에서
+        dir('frontend') {
           withCredentials([
             usernamePassword(
               credentialsId: 'dockerhub-creds',
@@ -46,6 +48,7 @@ pipeline {
     }
 
     stage('Deploy to EC2') {
+      agent any
       steps {
         withCredentials([
           sshUserPrivateKey(
