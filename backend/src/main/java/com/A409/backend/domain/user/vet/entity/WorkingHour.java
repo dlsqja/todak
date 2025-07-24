@@ -1,4 +1,4 @@
-package com.A409.backend.domain.vet.entity;
+package com.A409.backend.domain.user.vet.entity;
 
 import jakarta.persistence.*;
 import lombok.*;

@@ -1,9 +1,9 @@
 package com.A409.backend.domain.reservation.entity;
 
 import com.A409.backend.domain.hospital.entity.Hospital;
-import com.A409.backend.domain.owner.entity.Owner;
+import com.A409.backend.domain.user.owner.entity.Owner;
 import com.A409.backend.domain.pet.entity.Pet;
-import com.A409.backend.domain.vet.entity.Vet;
+import com.A409.backend.domain.user.vet.entity.Vet;
 import jakarta.persistence.*;
 import lombok.*;
 

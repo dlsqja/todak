@@ -1,4 +1,4 @@
-package com.A409.backend.domain.staff.entity;
+package com.A409.backend.domain.user.staff.entity;
 
 import com.A409.backend.domain.hospital.entity.Hospital;
 import com.A409.backend.global.security.entity.Auth;

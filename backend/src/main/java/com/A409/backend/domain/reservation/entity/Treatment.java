@@ -1,7 +1,7 @@
 package com.A409.backend.domain.reservation.entity;
 
 import com.A409.backend.domain.pet.entity.Pet;
-import com.A409.backend.domain.vet.entity.Vet;
+import com.A409.backend.domain.user.vet.entity.Vet;
 import jakarta.persistence.*;
 import lombok.*;
 
