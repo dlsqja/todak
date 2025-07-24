@@ -1,4 +1,4 @@
-package com.A409.backend.domain.hospital;
+package com.A409.backend.domain.hospital.entity;
 
 
 import jakarta.persistence.*;

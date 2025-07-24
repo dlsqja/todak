@@ -1,6 +1,6 @@
 package com.A409.backend.domain.staff.entity;
 
-import com.A409.backend.domain.hospital.Hospital;
+import com.A409.backend.domain.hospital.entity.Hospital;
 import com.A409.backend.global.security.entity.Auth;
 import jakarta.persistence.*;
 import lombok.*;
