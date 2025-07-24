@@ -12,9 +12,10 @@ pipeline {
     stage('Build Frontend') {
       agent {
         docker {
-          image 'node:18'
+          image 'node:20.19.1'
         }
       }
+
       steps {
         dir('frontend') {
           sh '''

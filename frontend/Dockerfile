@@ -1,7 +1,7 @@
 # ===============================
 # 1단계: Build 단계 (Node.js 환경)
 # ===============================
-FROM node:18 AS builder
+FROM node:20-bullseye AS builder
 
 # 작업 디렉토리 설정
 WORKDIR /app
