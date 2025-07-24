@@ -3,7 +3,7 @@ pipeline {
 
   environment {
     DOCKER_IMAGE = 'dlsqja3436/todak-backend'
-    TAG = 'latest'
+    TAG = 'goguma'
     EC2_HOST = 'i13a409.p.ssafy.io'
     CONTAINER_NAME = 'my-server'
     COMPOSE_DIR = './backend' 
