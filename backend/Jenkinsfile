@@ -6,7 +6,7 @@ pipeline {
     TAG = 'latest'
     EC2_HOST = 'i13a409.p.ssafy.io'
     CONTAINER_NAME = 'my-server'
-    COMPOSE_DIR = './backend/docker' 
+    COMPOSE_DIR = './backend' 
   }
 
   stages {
