@@ -1,5 +1,9 @@
 pipeline {
-  agent any
+  agent {
+    docker {
+      image 'node:20.19.1'
+    }
+  }
 
   environment {
     DOCKER_IMAGE = 'dlsqja3436/frontend'
@@ -10,20 +14,12 @@ pipeline {
 
   stages {
     stage('Build Frontend') {
-      agent {
-        docker {
-          image 'node:20.19.1'
-        }
-      }
-
       steps {
-        dir('frontend') {
-          sh '''
-            npm install
-            npm run build
-          '''
-        }
-        archiveArtifacts artifacts: 'frontend/dist/**', fingerprint: true
+        sh '''
+          npm install
+          npm run build
+        '''
+        archiveArtifacts artifacts: 'dist/**', fingerprint: true
       }
     }
 
