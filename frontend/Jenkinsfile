@@ -21,6 +21,7 @@ pipeline {
             npm install
             npm run build
           '''
+        }
         archiveArtifacts artifacts: 'dist/**', fingerprint: true
       }
     }
