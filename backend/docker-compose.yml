@@ -25,7 +25,7 @@ services:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 5s
       retries: 10
-      timeout: 3s
+      timeout: 3s 
 
 volumes:
   mysql_data:
