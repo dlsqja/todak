@@ -1,0 +1,13 @@
+# Node.js 관련
+node_modules/
+
+# 공통 캐시/OS 파일
+*.log
+.env
+.DS_Store
+Thumbs.db
+
+# IDE 관련
+.vscode/
+.idea/
+*.iml
