@@ -1,4 +1,4 @@
-package com.A409.backend.global.security.entity;
+package com.A409.backend.domain.user.auth.entity;
 
 import jakarta.persistence.*;
 import lombok.*;

@@ -1,6 +1,6 @@
 package com.A409.backend.domain.user.owner.entity;
 
-import com.A409.backend.global.security.entity.Auth;
+import com.A409.backend.domain.user.auth.entity.Auth;
 import jakarta.persistence.*;
 import lombok.*;
 
