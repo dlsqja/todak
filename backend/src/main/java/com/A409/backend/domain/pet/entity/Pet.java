@@ -9,7 +9,6 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@EqualsAndHashCode(of = "petId")
 public class Pet {
     public enum Species {
         DOG, CAT, OTHER
