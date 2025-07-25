@@ -8,18 +8,13 @@ services:
       my-db:
         condition: service_healthy
     environment:
-      # Spring Boot에게 올바른 DB 정보 전달
-      - SPRING_DATASOURCE_URL=jdbc:mysql://my-db:3306/todak
-      - SPRING_DATASOURCE_USERNAME=root
-      - SPRING_DATASOURCE_PASSWORD=1234
-      # 기타 필요한 설정들
-      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
-      - SPRING_JPA_SHOW_SQL=true
+      - SPRING_DATASOURCE_URL=jdbc:mysql://my-db:3306/todak?serverTimezone=Asia/Seoul&useSSL=false&allowPublicKeyRetrieval=true
+      - SPRING_DATASOURCE_PASSWORD=${MYSQL_PASSWORD}
       
   my-db:
     image: mysql:8.0
     environment:
-      MYSQL_ROOT_PASSWORD: 1234
+      MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD}
       MYSQL_DATABASE: todak
     volumes:
       - mysql_data:/var/lib/mysql

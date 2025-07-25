@@ -23,7 +23,6 @@ pipeline {
           ./gradlew clean build
         '''
         stash name: 'built-jar', includes: 'backend/build/libs/*.jar'
-        //archiveArtifacts artifacts: 'backend/build/libs/*.jar', fingerprint: true
       }
     }
 
@@ -31,7 +30,7 @@ pipeline {
       steps {
 
         unstash 'built-jar'
-        
+
         withCredentials([
           usernamePassword(
             credentialsId: 'dockerhub-creds',
@@ -61,6 +60,11 @@ pipeline {
             credentialsId: 'dockerhub-creds',
             usernameVariable: 'DOCKERHUB_USERNAME',
             passwordVariable: 'DOCKERHUB_PASSWORD'
+          ),
+          mysqlPassword(
+            credentialsId: 'mysql_secret',
+            usernameVariable: 'MYSQL_USERNAME',
+            passwordVariable: 'MYSQL_PASSWORD'
           )
         ]) {
           sh '''
@@ -70,6 +74,7 @@ pipeline {
             scp -i "$KEYFILE" -o StrictHostKeyChecking=no ${COMPOSE_DIR}/docker-compose.yml $EC2_USERNAME@$EC2_HOST:/home/$EC2_USERNAME/
             echo "DOCKER_IMAGE=${DOCKER_IMAGE}" > ${COMPOSE_DIR}/.env
             echo "TAG=${TAG}" >> ${COMPOSE_DIR}/.env
+            echo "MYSQL_PASSWORD=$MYSQL_PASSWORD" >> ${COMPOSE_DIR}/.env
             scp -i "$KEYFILE" -o StrictHostKeyChecking=no ${COMPOSE_DIR}/.env $EC2_USERNAME@$EC2_HOST:/home/$EC2_USERNAME/
 
             # EC2에서 실행
