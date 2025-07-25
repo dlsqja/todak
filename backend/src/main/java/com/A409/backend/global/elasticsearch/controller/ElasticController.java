@@ -1,9 +1,7 @@
-package com.A409.backend.global.util.elasticsearch.controller;
+package com.A409.backend.global.elasticsearch.controller;
 
-import com.A409.backend.domain.hospital.entity.Hospital;
-import com.A409.backend.global.util.elasticsearch.Entity.HospitalDocument;
-import com.A409.backend.global.util.elasticsearch.repository.HospitalElasticRepository;
-import com.A409.backend.global.util.elasticsearch.service.ElasticService;
+import com.A409.backend.global.elasticsearch.Entity.HospitalDocument;
+import com.A409.backend.global.elasticsearch.service.ElasticService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;

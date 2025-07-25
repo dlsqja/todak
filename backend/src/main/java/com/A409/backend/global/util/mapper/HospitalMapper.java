@@ -1,7 +1,7 @@
 package com.A409.backend.global.util.mapper;
 
 import com.A409.backend.domain.hospital.entity.Hospital;
-import com.A409.backend.global.util.elasticsearch.Entity.HospitalDocument;
+import com.A409.backend.global.elasticsearch.Entity.HospitalDocument;
 
 public class HospitalMapper {
 

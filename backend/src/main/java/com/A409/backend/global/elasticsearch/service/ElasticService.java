@@ -1,15 +1,13 @@
-package com.A409.backend.global.util.elasticsearch.service;
+package com.A409.backend.global.elasticsearch.service;
 
 import com.A409.backend.domain.hospital.entity.Hospital;
 import com.A409.backend.domain.hospital.repository.HospitalRepository;
-import com.A409.backend.global.util.elasticsearch.Entity.HospitalDocument;
-import com.A409.backend.global.util.elasticsearch.repository.HospitalElasticRepository;
+import com.A409.backend.global.elasticsearch.Entity.HospitalDocument;
+import com.A409.backend.global.elasticsearch.repository.HospitalElasticRepository;
 import com.A409.backend.global.util.mapper.HospitalMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.elasticsearch.client.elc.NativeQuery;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
-import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

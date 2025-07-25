@@ -1,4 +1,4 @@
-package com.A409.backend.global.util.elasticsearch.Entity;
+package com.A409.backend.global.elasticsearch.Entity;
 
 import lombok.*;
 import org.springframework.data.annotation.Id;

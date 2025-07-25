@@ -1,6 +1,6 @@
-package com.A409.backend.global.util.elasticsearch.repository;
+package com.A409.backend.global.elasticsearch.repository;
 
-import com.A409.backend.global.util.elasticsearch.Entity.HospitalDocument;
+import com.A409.backend.global.elasticsearch.Entity.HospitalDocument;
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
 
 import java.util.List;
