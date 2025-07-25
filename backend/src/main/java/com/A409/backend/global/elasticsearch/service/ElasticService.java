@@ -26,18 +26,13 @@ public class ElasticService {
     @Transactional(readOnly = true)
     public void syncAllHospitalsToElasticsearch() {
         log.info("병원 데이터 동기화 시작...");
-
-        // 1. 기존 Elasticsearch 데이터 삭제
+        
         hospitalElasticRepository.deleteAll();
         log.info("기존 Elasticsearch 데이터 삭제 완료");
-
-        // 2. 데이터베이스에서 모든 병원 데이터 조회
+        
         List<Hospital> hospitals = hospitalRepository.findAll();
         log.info("데이터베이스에서 {} 개의 병원 데이터 조회", hospitals.size());
-
-
-
-        // 3. Elasticsearch에 저장
+        
         if (!hospitals.isEmpty()) {
             List<HospitalDocument> documents = hospitals.stream()
                     .map(HospitalMapper::toDocument)
@@ -47,7 +42,7 @@ public class ElasticService {
             log.info("Elasticsearch에 {} 개의 병원 데이터 저장 완료", documents.size());
         }
 
-        log.info("병원 데이터 동기화 완료!");
+        log.info("병원 데이터 동기화 끝");
     }
 
     public List<HospitalDocument> autocompleteByName(String keyword) {
