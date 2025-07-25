@@ -11,7 +11,7 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:mysql://my-db:3306/todak?serverTimezone=Asia/Seoul&useSSL=false&allowPublicKeyRetrieval=true
       - SPRING_DATASOURCE_USERNAME=${MYSQL_USERNAME}
       - SPRING_DATASOURCE_PASSWORD=${MYSQL_PASSWORD}
-      - SPRING_PROFILES_ACTIVE=""
+      - SPRING_PROFILES_ACTIVE=
       
   my-db:
     image: mysql:8.0
