@@ -61,7 +61,7 @@ pipeline {
             usernameVariable: 'DOCKERHUB_USERNAME',
             passwordVariable: 'DOCKERHUB_PASSWORD'
           ),
-          mysqlPassword(
+          usernamePassword(
             credentialsId: 'mysql_secret',
             usernameVariable: 'MYSQL_USERNAME',
             passwordVariable: 'MYSQL_PASSWORD'
