@@ -9,7 +9,6 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@EqualsAndHashCode(of = "workingId")
 public class WorkingHour {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

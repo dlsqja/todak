@@ -11,7 +11,6 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@EqualsAndHashCode(of = "vetId")
 public class Vet {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -9,7 +9,6 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@EqualsAndHashCode(of = "rejectionId")
 public class Rejection {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

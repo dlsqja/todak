@@ -15,7 +15,6 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@EqualsAndHashCode(of = "reservationId")
 public class Reservation {
     public enum Subject {
         치과, 피부과, 골절, 안과

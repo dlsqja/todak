@@ -8,14 +8,13 @@ import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
 @Entity
-@Document(indexName = "hospital")
 @Table(name = "hospital")
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@EqualsAndHashCode(of = "hospitalId")
 public class Hospital {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "hospital_id")
@@ -25,7 +24,6 @@ public class Hospital {
     private String hospitalCode;
 
     @Column(length = 100, nullable = false)
-    @Field(type = FieldType.Text, analyzer = "autocomplete", searchAnalyzer = "autocomplete_search")
     private String name;
 
     @Column(length = 30, nullable = false)

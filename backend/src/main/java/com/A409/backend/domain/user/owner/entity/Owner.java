@@ -13,7 +13,6 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@EqualsAndHashCode(of = "ownerId")
 public class Owner {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

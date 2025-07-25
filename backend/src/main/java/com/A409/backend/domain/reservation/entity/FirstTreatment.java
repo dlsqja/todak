@@ -12,7 +12,6 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@EqualsAndHashCode(of = "firstTreatmentId")
 public class FirstTreatment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -2,7 +2,9 @@ package com.A409.backend.global.util.elasticsearch.service;
 
 import com.A409.backend.domain.hospital.entity.Hospital;
 import com.A409.backend.domain.hospital.repository.HospitalRepository;
+import com.A409.backend.global.util.elasticsearch.Entity.HospitalDocument;
 import com.A409.backend.global.util.elasticsearch.repository.HospitalElasticRepository;
+import com.A409.backend.global.util.mapper.HospitalMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
@@ -35,20 +37,26 @@ public class ElasticService {
         List<Hospital> hospitals = hospitalRepository.findAll();
         log.info("데이터베이스에서 {} 개의 병원 데이터 조회", hospitals.size());
 
+
+
         // 3. Elasticsearch에 저장
         if (!hospitals.isEmpty()) {
-            hospitalElasticRepository.saveAll(hospitals);
-            log.info("Elasticsearch에 {} 개의 병원 데이터 저장 완료", hospitals.size());
+            List<HospitalDocument> documents = hospitals.stream()
+                    .map(HospitalMapper::toDocument)
+                    .collect(Collectors.toList());
+
+            hospitalElasticRepository.saveAll(documents);
+            log.info("Elasticsearch에 {} 개의 병원 데이터 저장 완료", documents.size());
         }
 
         log.info("병원 데이터 동기화 완료!");
     }
 
-    public List<Hospital> autocompleteByName(String keyword) {
+    public List<HospitalDocument> autocompleteByName(String keyword) {
         if (keyword == null || keyword.trim().isEmpty()) {
             return List.of();
         }
-        
+
         return hospitalElasticRepository.findByNameContaining(keyword.trim());
     }
 }

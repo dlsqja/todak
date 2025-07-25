@@ -9,7 +9,6 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@EqualsAndHashCode(of = "authId")
 public class Auth {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

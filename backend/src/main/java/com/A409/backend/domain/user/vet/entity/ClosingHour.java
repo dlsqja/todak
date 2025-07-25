@@ -9,7 +9,6 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@EqualsAndHashCode(of = "closingId")
 public class ClosingHour {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

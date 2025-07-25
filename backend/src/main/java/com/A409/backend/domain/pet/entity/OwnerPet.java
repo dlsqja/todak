@@ -10,7 +10,6 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@EqualsAndHashCode(of = "ownerPetId")
 public class OwnerPet {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
