@@ -3,8 +3,12 @@ package com.A409.backend.domain.hospital.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.elasticsearch.annotations.Document;
+import org.springframework.data.elasticsearch.annotations.Field;
+import org.springframework.data.elasticsearch.annotations.FieldType;
 
 @Entity
+@Document(indexName = "hospital")
 @Table(name = "hospital")
 @Getter
 @NoArgsConstructor
@@ -21,6 +25,7 @@ public class Hospital {
     private String hospitalCode;
 
     @Column(length = 100, nullable = false)
+    @Field(type = FieldType.Text, analyzer = "autocomplete", searchAnalyzer = "autocomplete_search")
     private String name;
 
     @Column(length = 30, nullable = false)
