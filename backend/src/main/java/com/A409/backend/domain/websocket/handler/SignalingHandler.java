@@ -18,30 +18,92 @@ public class SignalingHandler extends TextWebSocketHandler {
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) {
-        // 연결 성공 후 초기화 가능
+        System.out.println("WebSocket 연결 성공: " + session.getId());
+    }
+
+    private void handleJoin(WebSocketSession session, JSONObject msg) throws Exception {
+        String roomId = msg.getString("roomId");
+        String userId = msg.getString("userId");
+
+        // 방이 없으면 생성
+        roomMap.putIfAbsent(roomId, new ConcurrentHashMap<>());
+        Map<String, WebSocketSession> room = roomMap.get(roomId);
+
+        // 사용자를 방에 추가
+        room.put(userId, session);
+
+        System.out.println(userId + "가 방 " + roomId + "에 입장. 현재 인원: " + room.size());
+
+        // 방에 2명이 되면 WebRTC 연결 시작 신호 보내기
+        if (room.size() == 2) {
+            // 먼저 들어온 사람을 caller로, 나중에 들어온 사람을 callee로 설정
+            String[] userIds = room.keySet().toArray(new String[0]);
+            String callerId = userIds[0].equals(userId) ? userIds[1] : userIds[0]; // 먼저 들어온 사람
+            String calleeId = userId; // 방금 들어온 사람
+
+            // caller에게 연결 시작 신호 보내기
+            JSONObject startCall = new JSONObject();
+            startCall.put("type", "start-call");
+            startCall.put("calleeId", calleeId);
+
+            WebSocketSession callerSession = room.get(callerId);
+            if (callerSession != null && callerSession.isOpen()) {
+                callerSession.sendMessage(new TextMessage(startCall.toString()));
+                System.out.println("연결 시작 신호를 " + callerId + "에게 전송");
+            }
+        }
     }
 
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         JSONObject msg = new JSONObject(message.getPayload());
+        String type = msg.getString("type");
 
-        String type = msg.getString("type");       // offer / answer / ice 등
-        String roomId = msg.getString("roomId");   // 방 ID
-        String senderId = msg.getString("senderId");
-        String targetId = msg.getString("targetId");
-
-        roomMap.putIfAbsent(roomId, new ConcurrentHashMap<>());
-        roomMap.get(roomId).put(senderId, session);
-
-        // 상대방이 존재하면 메시지 전달
-        WebSocketSession targetSession = roomMap.get(roomId).get(targetId);
-        if (targetSession != null && targetSession.isOpen()) {
-            targetSession.sendMessage(new TextMessage(msg.toString()));
+        switch (type) {
+            case "join":
+                handleJoin(session, msg);
+                break;
+            case "offer":
+            case "answer":
+            case "ice-candidate":
+            case "leave":
+                handleSignalingMessage(msg);
+                break;
         }
     }
 
+    private void handleSignalingMessage(JSONObject msg) throws Exception {
+        String roomId = msg.getString("roomId");
+        String targetId = msg.getString("targetId");
+        String type = msg.getString("type");
+
+        Map<String, WebSocketSession> room = roomMap.get(roomId);
+        if (room != null) {
+            WebSocketSession targetSession = room.get(targetId);
+            if (targetSession != null && targetSession.isOpen()) {
+                targetSession.sendMessage(new TextMessage(msg.toString()));
+            }
+
+            if (type.equals("leave")) {
+                // 상대방에게 peer-left 알림
+                JSONObject peerLeft = new JSONObject();
+                peerLeft.put("type", "peer-left");
+                peerLeft.put("senderId", msg.getString("senderId"));
+                targetSession.sendMessage(new TextMessage(peerLeft.toString()));
+            }
+        }
+    }
+
+
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
-        // 세션 정리 로직 (선택)
+        // 연결이 끊어진 세션을 모든 방에서 제거
+        roomMap.forEach((roomId, room) -> {
+            room.entrySet().removeIf(entry -> entry.getValue().equals(session));
+            if (room.isEmpty()) {
+                roomMap.remove(roomId);
+            }
+        });
+        System.out.println("WebSocket 연결 종료: " + session.getId());
     }
 }
