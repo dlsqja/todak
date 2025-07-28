@@ -1,9 +1,13 @@
+import React from 'react';
+import { RouterProvider } from 'react-router-dom';
+import router from '@/router'; // index 생략 가능
+
 function App() {
   return (
-    <>
-     <h1>A409팀 토닥 프로젝트 입니다.</h1>
-    </>
-  )
+    <div className="App">
+      <RouterProvider router={router} />
+    </div>
+  );
 }
 
-export default App
+export default App;

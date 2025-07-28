@@ -1,7 +1,7 @@
-/* @theme {
+:root {
   --spacing: 0.25rem;
 
-  --color-*: initial;
+  /* --color-*: initial; */
   --color-black: #000000;
   --color-white: #ffffff;
   --color-gray-100: #ffffff;
@@ -52,7 +52,7 @@
   --font-body: 'PretendardVariable', sans-serif;
 
   --shadow-menu-bar: 0px 0px 10px 5px rgba(0, 0, 0, 0.1);
-} */
+}
 
 @font-face {
   font-family: 'PretendardVariable';
