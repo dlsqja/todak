@@ -12,10 +12,14 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class Vet {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "vet_id")
-    private Long vetId;
+    private Long id;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "vet_id", nullable = false, unique = true)
+    private Auth vetId;
 
     @Column(name = "vet_code", length = 6, nullable = false, unique = true)
     private String vetCode;
@@ -23,10 +27,6 @@ public class Vet {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "hospital_id", nullable = false)
     private Hospital hospital;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "auth_id", nullable = false)
-    private Auth auth;
 
     @Column(length = 20, nullable = false)
     private String name;
