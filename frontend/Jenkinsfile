@@ -1,0 +1,79 @@
+pipeline {
+  agent any  // 전역 agent
+
+  environment {
+    DOCKER_IMAGE = 'dlsqja3436/frontend'
+    TAG = 'latest'
+    CONTAINER_NAME = 'frontend'
+    EC2_HOST = 'i13a409.p.ssafy.io'
+  }
+
+  stages {
+    stage('Build Frontend') {
+      agent {
+        docker {
+          image 'node:20.19.1'  // npm 빌드용
+        }
+      }
+      steps {
+        dir('frontend') {
+          sh '''
+            npm install
+            npm run build
+          '''
+          archiveArtifacts artifacts: 'dist/**', fingerprint: true
+        }
+      }
+    }
+
+    stage('Build and Push Docker Image') {
+      agent any  // Jenkins 호스트에서 Docker 명령어 실행
+      steps {
+        dir('frontend') {
+          withCredentials([
+            usernamePassword(
+              credentialsId: 'dockerhub-creds',
+              usernameVariable: 'DOCKERHUB_USERNAME',
+              passwordVariable: 'DOCKERHUB_PASSWORD'
+            )
+          ]) {
+            sh '''
+              echo "${DOCKERHUB_PASSWORD}" | docker login -u "${DOCKERHUB_USERNAME}" --password-stdin
+              docker build -t ${DOCKER_IMAGE}:${TAG} .
+              docker push ${DOCKER_IMAGE}:${TAG}
+            '''
+          }
+        }
+      }
+    }
+
+    stage('Deploy to EC2') {
+      agent any
+      steps {
+        withCredentials([
+          sshUserPrivateKey(
+            credentialsId: 'ec2-ssh-key',
+            keyFileVariable: 'KEYFILE',
+            usernameVariable: 'EC2_USERNAME'
+          ),
+          usernamePassword(
+            credentialsId: 'dockerhub-creds',
+            usernameVariable: 'DOCKERHUB_USERNAME',
+            passwordVariable: 'DOCKERHUB_PASSWORD'
+          )
+        ]) {
+          sh '''
+            chmod 600 "$KEYFILE"
+            ssh -o StrictHostKeyChecking=no -i "$KEYFILE" $EC2_USERNAME@$EC2_HOST '
+              echo "'${DOCKERHUB_PASSWORD}'" | docker login -u "'${DOCKERHUB_USERNAME}'" --password-stdin
+              docker stop "'${CONTAINER_NAME}'" || true
+              docker rm "'${CONTAINER_NAME}'" || true
+              docker pull "'${DOCKER_IMAGE}:${TAG}'"
+              docker run --name "'${CONTAINER_NAME}'" -d -p 80:80 "'${DOCKER_IMAGE}:${TAG}'"
+            '
+          '''
+        }
+      }
+    }
+  }
+}
