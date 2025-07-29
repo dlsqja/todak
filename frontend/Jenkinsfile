@@ -17,7 +17,10 @@ pipeline {
       }
       steps {
         dir('frontend') {
+          // EC2에서 저장해둔 frontend.env 파일을 가져와서 .env로 복사
           sh '''
+            cp /home/ubuntu/frontend.env .env
+            echo "✅ Copied frontend.env to .env for Vite build"
             npm install
             npm run build
           '''
@@ -27,7 +30,7 @@ pipeline {
     }
 
     stage('Build and Push Docker Image') {
-      agent any  // Jenkins 호스트에서 Docker 명령어 실행
+      agent any
       steps {
         dir('frontend') {
           withCredentials([
@@ -69,14 +72,11 @@ pipeline {
               docker stop "'${CONTAINER_NAME}'" || true
               docker rm "'${CONTAINER_NAME}'" || true
               docker pull "'${DOCKER_IMAGE}:${TAG}'"
-              docker run --name "'${CONTAINER_NAME}'" \
-                --env-file /home/ubuntu/frontend.env \
-                -d -p 3000:80 "'${DOCKER_IMAGE}:${TAG}'"
+              docker run --name "'${CONTAINER_NAME}'" -d -p 3000:80 "'${DOCKER_IMAGE}:${TAG}'"
             '
           '''
         }
       }
     }
-
   }
 }
