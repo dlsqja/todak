@@ -50,6 +50,7 @@ const VideoCall = () => {
     };
 
     pc.ontrack = (event) => {
+      addLog("상대방 스트림 수신!");
       if (remoteVideoRef.current) {
         remoteVideoRef.current.srcObject = event.streams[0];
       }
@@ -105,7 +106,10 @@ const VideoCall = () => {
           await receiveAnswer(msg);
           break;
         case "ice-candidate":
-          if (pcRef.current) await pcRef.current.addIceCandidate(msg.candidate);
+          if (pcRef.current) {
+            await pcRef.current.addIceCandidate(msg.candidate);
+            addLog("ICE candidate 추가됨");
+          }
           break;
         case "peer-left":
           handlePeerLeft();
@@ -117,11 +121,16 @@ const VideoCall = () => {
   };
 
   const startCaller = async () => {
-    const pc = createPeerConnection(); // 이미 트랙이 추가됨
-    pcRef.current = pc;
+    // start-call을 받았을 때 PeerConnection 생성
+    if (!pcRef.current) {
+      const pc = createPeerConnection();
+      pcRef.current = pc;
+      addLog("Caller PeerConnection 생성");
+    }
 
-    const offer = await pc.createOffer();
-    await pc.setLocalDescription(offer);
+    addLog("Offer 생성 중...");
+    const offer = await pcRef.current.createOffer();
+    await pcRef.current.setLocalDescription(offer);
 
     wsRef.current?.send(
       JSON.stringify({
@@ -132,15 +141,23 @@ const VideoCall = () => {
         offer,
       })
     );
+    addLog("Offer 전송 완료");
   };
 
   const receiveOffer = async (msg: any) => {
-    const pc = createPeerConnection(); // 이미 트랙이 추가됨
-    pcRef.current = pc;
+    // offer를 받았을 때 PeerConnection 생성
+    if (!pcRef.current) {
+      const pc = createPeerConnection();
+      pcRef.current = pc;
+      addLog("Callee PeerConnection 생성");
+    }
 
-    await pc.setRemoteDescription(new RTCSessionDescription(msg.offer));
-    const answer = await pc.createAnswer();
-    await pc.setLocalDescription(answer);
+    addLog("Offer 수신, Answer 생성 중...");
+    await pcRef.current.setRemoteDescription(
+      new RTCSessionDescription(msg.offer)
+    );
+    const answer = await pcRef.current.createAnswer();
+    await pcRef.current.setLocalDescription(answer);
 
     wsRef.current?.send(
       JSON.stringify({
@@ -151,6 +168,7 @@ const VideoCall = () => {
         answer,
       })
     );
+    addLog("Answer 전송 완료");
   };
 
   const receiveAnswer = async (msg: any) => {
@@ -158,6 +176,7 @@ const VideoCall = () => {
       await pcRef.current.setRemoteDescription(
         new RTCSessionDescription(msg.answer)
       );
+      addLog("Answer 수신 완료, 연결 성공!");
     }
   };
 
