@@ -18,14 +18,14 @@ pipeline {
       steps {
         dir('frontend') {
           // .env 내용 주입
-          withCredentials([string(credentialsId: 'frontend-env', variable: 'FRONT_ENV')]) {
-            sh '''
-              echo "$FRONT_ENV" > .env
-              echo "✅ .env 파일 생성 완료"
-              npm install
-              npm run build
-            '''
-          }
+          withCredentials([file(credentialsId: 'frontend-env', variable: 'FRONT_ENV_FILE')]) {
+          sh '''
+            cp "$FRONT_ENV_FILE" .env
+            echo "✅ .env 파일 복사 완료"
+            npm install
+            npm run build
+          '''
+        }
           archiveArtifacts artifacts: 'dist/**', fingerprint: true
         }
       }
