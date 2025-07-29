@@ -1,5 +1,9 @@
 {
   "compilerOptions": {
+    "baseUrl": ".", // 모듈 해석을 위한 기본 디렉토리
+    "paths": {
+      "@/*": ["src/*"] // '@/' 경로를 'src/' 디렉토리로 매핑
+    },
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo", // TypeScript 빌드 정보 저장할 위치. 빠른 재빌드를 위한 캐시 파일
     "target": "ES2022", // 컴파일 된 JavasScript가 어떤 ECMAScript버전 사용할 지
     "useDefineForClassFields": true, // 클래스 필드를 Object.defineProperty() 대신 직접 할당으로 처리. 최신 JS표준과 일치시키기 위함
