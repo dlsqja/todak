@@ -14,9 +14,9 @@ public class ApiResponse<T> extends ResponseEntity<ApiBody<T>> {
         return new ApiResponse<>(HttpStatus.OK, new ApiBody<>( "성공", data));
     }
 
-    public static <T> ApiResponse<T> ofFail(ErrorCode errorCode, T data) {
+    public static <T> ApiResponse<T> ofFail(ErrorCode errorCode) {
         return new ApiResponse<>(errorCode.getStatus(),
-                new ApiBody<>(errorCode.getMessage(), data));
+                new ApiBody<>(errorCode.getMessage(), null));
     }
 }
 

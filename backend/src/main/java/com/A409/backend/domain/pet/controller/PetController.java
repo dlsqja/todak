@@ -29,7 +29,6 @@ public class PetController {
     @GetMapping("/{pet_id}")
     public ApiResponse<?> getMyPetDetail(@AuthenticationPrincipal User user, @PathVariable("pet_id") Long petId) {
 
-
         Pet petDetail = petService.getMyPetDetail(user.getId(), petId);
 
         return ApiResponse.ofSuccess(petDetail);

@@ -6,6 +6,8 @@ import com.A409.backend.domain.pet.entity.Pet;
 import com.A409.backend.domain.pet.repository.OwnerPetRepository;
 import com.A409.backend.domain.pet.repository.PetRepository;
 import com.A409.backend.domain.user.owner.entity.Owner;
+import com.A409.backend.global.enums.ErrorCode;
+import com.A409.backend.global.exceptin.CustomException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -24,10 +26,10 @@ public class PetService {
     public Pet getMyPetDetail(Long ownerId,Long petId){
 
         //동물의 실 보호자인지 확인
-        ownerPetRepository.findOwnerPetByOwner_OwnerIdAndPet_PetId(ownerId,petId).orElseThrow(() -> new RuntimeException("권한이 없습니다"));
+        ownerPetRepository.findOwnerPetByOwner_OwnerIdAndPet_PetId(ownerId,petId).orElseThrow(() -> new CustomException(ErrorCode.ACCESS_DENIED));
 
         //펫 상세정보
-        return petRepository.findById(petId).orElseThrow(() -> new RuntimeException("펫이 존재하지 않습니다"));
+        return petRepository.findById(petId).orElseThrow(() -> new CustomException(ErrorCode.RESOURCE_NOT_FOUND));
     }
 
     public List<Pet> getMyPets(Long ownerId){
