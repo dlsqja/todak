@@ -17,19 +17,6 @@ public class OwnerController {
     private final OwnerService ownerService;
     private final PetService petService;
 
-    @GetMapping("/pets")
-    public ApiResponse<?> getMyPets() {
-
-        return ApiResponse.ofSuccess(null);
-    }
-
-    @PostMapping("/pets")
-    public String registerPet(@AuthenticationPrincipal User user, @RequestBody PetRequest petRequest) {
-
-        petService.registerPet(user.getId(),petRequest);
-        return "owner get";
-    }
-
 
 
 
