@@ -41,7 +41,7 @@ public class PetController {
         return ApiResponse.ofSuccess(null);
     }
 
-    @PostMapping("/")
+    @PostMapping("/code")
     public ApiResponse<?> registerPetByCode(@AuthenticationPrincipal User user, @RequestBody String petCode) {
         petService.registerPetByCode(user.getId(),petCode);
 
