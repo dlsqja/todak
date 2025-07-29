@@ -15,8 +15,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(authz -> authz
-                        .requestMatchers("/ws/**").permitAll()  // WebSocket 허용
-                        .anyRequest().authenticated()
+                        .anyRequest().permitAll()  // 모든 요청 허용
                 )
                 .csrf(csrf -> csrf
                         .ignoringRequestMatchers("/ws/**")      // WebSocket CSRF 제외
