@@ -13,7 +13,7 @@ const VideoCall = () => {
   const pcRef = useRef<RTCPeerConnection | null>(null);
   const localStreamRef = useRef<MediaStream | null>(null);
 
-  const wsUrl = "ws://70.12.246.252:8080/ws";
+  const wsUrl = "ws://localhost:8080/ws";
   const publicUrl = import.meta.env.VITE_EC2_PUBLIC;
   const coturnPort = import.meta.env.VITE_COTURN_PORT;
   const stunTurn = {
