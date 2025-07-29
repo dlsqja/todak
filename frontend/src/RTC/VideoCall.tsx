@@ -55,13 +55,20 @@ const VideoCall = () => {
       }
     };
 
+    // 이미 로컬 스트림이 있다면 트랙 추가
+    if (localStreamRef.current) {
+      localStreamRef.current.getTracks().forEach((track) => {
+        pc.addTrack(track, localStreamRef.current!);
+      });
+    }
+
     return pc;
   };
 
   const handleStart = async () => {
     if (!roomId || !userId) return addLog("방 ID와 사용자 ID를 입력하세요");
 
-    // 입장 시 미디어 먼저 획득
+    // 먼저 미디어 획득
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         video: true,
@@ -110,15 +117,7 @@ const VideoCall = () => {
   };
 
   const startCaller = async () => {
-    const stream = await navigator.mediaDevices.getUserMedia({
-      video: true,
-      audio: true,
-    });
-    localStreamRef.current = stream;
-    if (localVideoRef.current) localVideoRef.current.srcObject = stream;
-
-    const pc = createPeerConnection();
-    stream.getTracks().forEach((track) => pc.addTrack(track, stream));
+    const pc = createPeerConnection(); // 이미 트랙이 추가됨
     pcRef.current = pc;
 
     const offer = await pc.createOffer();
@@ -136,15 +135,7 @@ const VideoCall = () => {
   };
 
   const receiveOffer = async (msg: any) => {
-    const stream = await navigator.mediaDevices.getUserMedia({
-      video: true,
-      audio: true,
-    });
-    localStreamRef.current = stream;
-    if (localVideoRef.current) localVideoRef.current.srcObject = stream;
-
-    const pc = createPeerConnection();
-    stream.getTracks().forEach((track) => pc.addTrack(track, stream));
+    const pc = createPeerConnection(); // 이미 트랙이 추가됨
     pcRef.current = pc;
 
     await pc.setRemoteDescription(new RTCSessionDescription(msg.offer));
