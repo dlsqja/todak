@@ -1,5 +1,5 @@
 pipeline {
-  agent any  // 전역 agent
+  agent any
 
   environment {
     DOCKER_IMAGE = 'dlsqja3436/frontend'
@@ -12,18 +12,20 @@ pipeline {
     stage('Build Frontend') {
       agent {
         docker {
-          image 'node:20.19.1'  // npm 빌드용
+          image 'node:20.19.1'
         }
       }
       steps {
         dir('frontend') {
-          // EC2에서 저장해둔 frontend.env 파일을 가져와서 .env로 복사
-          sh '''
-            cp /home/ubuntu/frontend.env .env
-            echo "✅ Copied frontend.env to .env for Vite build"
-            npm install
-            npm run build
-          '''
+          // .env 내용 주입
+          withCredentials([string(credentialsId: 'frontend-env', variable: 'FRONT_ENV')]) {
+            sh '''
+              echo "$FRONT_ENV" > .env
+              echo "✅ .env 파일 생성 완료"
+              npm install
+              npm run build
+            '''
+          }
           archiveArtifacts artifacts: 'dist/**', fingerprint: true
         }
       }
