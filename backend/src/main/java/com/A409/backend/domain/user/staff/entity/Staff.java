@@ -12,17 +12,17 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class Staff {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "staff_id")
-    private Long staffId;
+    private Long id;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "staff_id", nullable = false)
+    private Auth staffId;
 
     @Column(name = "staff_code", length = 6, nullable = false, unique = true)
     private String staffCode;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "auth_id", nullable = false)
-    private Auth auth;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "hospital_id", nullable = false)
