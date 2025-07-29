@@ -29,6 +29,8 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(auth -> auth
                 .requestMatchers(HttpMethod.POST, "/login").permitAll()
+                        .requestMatchers("/kapi/**").permitAll()
+                .requestMatchers("/auth/**").permitAll() //테스트 용 허용
                 .requestMatchers("/api/v1/owners/**").hasAuthority("OWNER")
                 .requestMatchers("/api/v1/vets/**").hasAuthority("VET")
                 .requestMatchers("/api/v1/staff/**").hasAuthority("STAFF")
