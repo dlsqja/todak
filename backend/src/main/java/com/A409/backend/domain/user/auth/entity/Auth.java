@@ -15,11 +15,8 @@ public class Auth {
     @Column(name = "auth_id")
     private Long authId;
 
-    @Column(length = 100)
+    @Column(length = 50,unique = true)
     private String email;
-
-    @Column(name = "auth_code", length = 6, nullable = false, unique = true)
-    private String authCode;
 }
 
 
