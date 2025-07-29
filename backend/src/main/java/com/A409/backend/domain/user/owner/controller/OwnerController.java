@@ -20,7 +20,7 @@ public class OwnerController {
     @GetMapping("/pets")
     public ApiResponse<?> getMyPets() {
 
-        return ApiResponse.OfSuccess(null);
+        return ApiResponse.ofSuccess(null);
     }
 
     @PostMapping("/pets")
