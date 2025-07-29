@@ -1,19 +1,26 @@
-// 절대경로 @는 vite.config.ts + tsconfig.json 기반
-import HomePage from '@/pages/HomePage'; 
-import MyPage from '@/pages/Mypage'; // 마이페이지 컴포넌트
-import { createBrowserRouter } from 'react-router';
+import React from 'react';
+import { createBrowserRouter } from 'react-router-dom';
+import HomePage from '@/pages/HomePage';
+import OwnerHome from '@/pages/Owner/OwnerHome';
+import VetHome from '@/pages/Vet/VetHome';
+import StaffHome from '@/pages/Staff/StaffHome';
 
-export const router = createBrowserRouter([
-  {
-    path: '/',
-    element: <HomePage />
+// 역할 분기
+function RoleRedirect() {
+  const role = localStorage.getItem('role'); 
+  if (role === 'owner') window.location.replace('/owner/home');
+  else if (role === 'vet') window.location.replace('/vet/home');
+  else if (role === 'staff') window.location.replace('/staff/home');
+  else window.location.replace('/');
+  return null;
+}
 
-  },
-  {
-    path: '/mypage',
-    element: <MyPage />
-
-  },
-  ])
+const router = createBrowserRouter([
+  { path: '/', element: <HomePage /> },
+  { path: '/role-redirect', element: <RoleRedirect /> },
+  { path: '/owner/home', element: <OwnerHome /> },
+  { path: '/vet/home', element: <VetHome /> },
+  { path: '/staff/home', element: <StaffHome /> },
+]);
 
 export default router;

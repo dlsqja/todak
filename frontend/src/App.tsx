@@ -1,12 +1,13 @@
 import React from 'react';
 import { RouterProvider } from 'react-router-dom';
-import router from '@/router'; // index 생략 가능
+import router from '@/router';
+import MobileLayout from '@/layouts/MobileLayout';
 
 function App() {
   return (
-    <div className="App">
+    <MobileLayout>
       <RouterProvider router={router} />
-    </div>
+    </MobileLayout>
   );
 }
 
