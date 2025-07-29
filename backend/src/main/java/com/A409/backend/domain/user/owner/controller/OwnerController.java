@@ -2,7 +2,10 @@ package com.A409.backend.domain.user.owner.controller;
 
 import com.A409.backend.domain.pet.service.PetService;
 import com.A409.backend.domain.user.owner.service.OwnerService;
+import com.A409.backend.global.response.ApiResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,8 +20,9 @@ public class OwnerController {
     private final PetService petService;
 
     @GetMapping("/pets")
-    public String getOwner() {
-        return "owner get";
+    public ApiResponse<?> getOwner() {
+
+        return ApiResponse.OfSuccess(null);
     }
 
     @PostMapping("/")
