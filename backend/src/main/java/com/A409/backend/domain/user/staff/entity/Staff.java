@@ -15,11 +15,12 @@ public class Staff {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "staff_id")
+    private Long staffId;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "staff_id", nullable = false)
-    private Auth staffId;
+    @JoinColumn(name = "auth_id", nullable = false,unique = true)
+    private Auth authId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "hospital_id", nullable = false)

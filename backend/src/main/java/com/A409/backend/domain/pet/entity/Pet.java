@@ -36,7 +36,6 @@ public class Pet {
     @Builder.Default
     private Gender gender = Gender.NON;
 
-
     @Column(nullable = false)
     private Integer age;
 }
