@@ -27,8 +27,11 @@ const VideoCall = () => {
     ],
   };
 
-  const addLog = (msg: string) =>
-    setLogs((prev) => [...prev, `${new Date().toLocaleTimeString()} ${msg}`]);
+  const addLog = (msg: string) => {
+    const logMessage = `${new Date().toLocaleTimeString()} ${msg}`;
+    setLogs((prev) => [...prev, logMessage]);
+    console.log("VideoCall:", logMessage); // 콘솔에도 출력
+  };
 
   const getTargetId = () => (userId === "user1" ? "user2" : "user1");
 
@@ -37,6 +40,7 @@ const VideoCall = () => {
 
     pc.onicecandidate = (event) => {
       if (event.candidate && wsRef.current) {
+        addLog(`ICE candidate 생성: ${event.candidate.type}`);
         wsRef.current.send(
           JSON.stringify({
             type: "ice-candidate",
@@ -46,6 +50,8 @@ const VideoCall = () => {
             candidate: event.candidate,
           })
         );
+      } else if (!event.candidate) {
+        addLog("ICE gathering 완료");
       }
     };
 
@@ -53,13 +59,23 @@ const VideoCall = () => {
       addLog("상대방 스트림 수신!");
       if (remoteVideoRef.current) {
         remoteVideoRef.current.srcObject = event.streams[0];
+        addLog("원격 비디오 설정 완료");
       }
+    };
+
+    pc.onconnectionstatechange = () => {
+      addLog(`연결 상태: ${pc.connectionState}`);
+    };
+
+    pc.oniceconnectionstatechange = () => {
+      addLog(`ICE 연결 상태: ${pc.iceConnectionState}`);
     };
 
     // 이미 로컬 스트림이 있다면 트랙 추가
     if (localStreamRef.current) {
       localStreamRef.current.getTracks().forEach((track) => {
         pc.addTrack(track, localStreamRef.current!);
+        addLog(`트랙 추가: ${track.kind}`);
       });
     }
 
@@ -107,8 +123,14 @@ const VideoCall = () => {
           break;
         case "ice-candidate":
           if (pcRef.current) {
-            await pcRef.current.addIceCandidate(msg.candidate);
-            addLog("ICE candidate 추가됨");
+            try {
+              await pcRef.current.addIceCandidate(msg.candidate);
+              addLog("ICE candidate 추가 성공");
+            } catch (error) {
+              addLog(`ICE candidate 추가 실패: ${error}`);
+            }
+          } else {
+            addLog("PeerConnection이 없어서 ICE candidate 무시");
           }
           break;
         case "peer-left":
@@ -239,10 +261,20 @@ const VideoCall = () => {
         />
       </div>
 
-      <div className="mt-4">
-        {logs.map((log, idx) => (
-          <div key={idx}>{log}</div>
-        ))}
+      <div className="mt-4 p-4 bg-gray-100 rounded-lg max-h-60 overflow-y-auto">
+        <h3 className="font-bold mb-2">연결 로그:</h3>
+        {logs.length === 0 ? (
+          <div className="text-gray-500">로그가 없습니다</div>
+        ) : (
+          logs.map((log, idx) => (
+            <div
+              key={idx}
+              className="text-sm py-1 border-b border-gray-200 last:border-b-0"
+            >
+              {log}
+            </div>
+          ))
+        )}
       </div>
     </div>
   );
