@@ -61,6 +61,20 @@ const VideoCall = () => {
   const handleStart = async () => {
     if (!roomId || !userId) return addLog("방 ID와 사용자 ID를 입력하세요");
 
+    // 입장 시 미디어 먼저 획득
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: true,
+        audio: true,
+      });
+      localStreamRef.current = stream;
+      if (localVideoRef.current) localVideoRef.current.srcObject = stream;
+      addLog("미디어 획득 완료");
+    } catch (error) {
+      addLog("미디어 획득 실패");
+      return;
+    }
+
     const ws = new WebSocket(wsUrl);
     wsRef.current = ws;
 
