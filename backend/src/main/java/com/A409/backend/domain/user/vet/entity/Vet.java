@@ -21,9 +21,6 @@ public class Vet {
     @JoinColumn(name = "vet_id", nullable = false, unique = true)
     private Auth vetId;
 
-    @Column(name = "vet_code", length = 6, nullable = false, unique = true)
-    private String vetCode;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "hospital_id", nullable = false)
     private Hospital hospital;

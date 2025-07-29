@@ -22,9 +22,6 @@ public class Owner {
     @JoinColumn(name = "owner_id", nullable = false)
     private Auth ownerId;
 
-    @Column(name = "owner_code", length = 6, nullable = false, unique = true)
-    private String ownerCode;
-
     @Column(length = 20, nullable = false)
     private String name;
 

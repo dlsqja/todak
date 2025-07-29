@@ -21,9 +21,6 @@ public class Staff {
     @JoinColumn(name = "staff_id", nullable = false)
     private Auth staffId;
 
-    @Column(name = "staff_code", length = 6, nullable = false, unique = true)
-    private String staffCode;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "hospital_id", nullable = false)
     private Hospital hospital;

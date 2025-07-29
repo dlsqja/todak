@@ -1,5 +1,7 @@
 package com.A409.backend.domain.pet.entity;
 
+import com.A409.backend.global.enums.Gender;
+import com.A409.backend.global.enums.Species;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -10,13 +12,6 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class Pet {
-    public enum Species {
-        DOG, CAT, OTHER
-    }
-
-    public enum Gender {
-        MALE, FEMALE, NON
-    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,7 +33,9 @@ public class Pet {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 10)
+    @Builder.Default
     private Gender gender = Gender.NON;
+
 
     @Column(nullable = false)
     private Integer age;
