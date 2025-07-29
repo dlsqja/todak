@@ -1,52 +1,26 @@
 :root {
   --spacing: 0.25rem;
 
-  /* --color-*: initial; */
   --color-black: #000000;
   --color-white: #ffffff;
-  --color-gray-100: #ffffff;
-  --color-gray-200: #fafafa;
-  --color-gray-300: #f0f0f0;
-  --color-gray-400: #e5e5e5;
-  --color-gray-500: #cccccc;
-  --color-gray-600: #b3b3b3;
-  --color-gray-700: #757575;
+  --color-green-100: #FDFCFB;
+  --color-green-200: #E9F1D7;
+  --color-green-300: #AFCF7E;
 
-  --color-cocoa-100: #D9CFCB;
-  --color-cocoa-200: #B9A79D;
-  --color-cocoa-300: #8C6D55;
-  --color-cocoa-400: #6C4F3D;
-  --color-cocoa-500: #503828;
-  --color-cocoa-600: #3B271C;
+  --color-pink-100: #FFC8C8;
+  --color-pink-200: #D14D72;
 
-  --color-minty-100: #E8FAEC;
-  --color-minty-200: #C5F2D2;
-  --color-minty-300: #A7E9AF;
-  --color-minty-400: #86C890;
-  --color-minty-500: #5FA26A;
-  --color-minty-600: #40784B;
+  --color-brown-100: #BDAFA1;
+  --color-brown-200: #5C4B3B;
+  --color-brown-300: #3B271C;
 
-  --color-brown-100: #FFE2CC;
-  --color-brown-200: #FFC699;
-  --color-brown-300: #FFB347;
-  --color-brown-400: #E6993D;
-  --color-brown-500: #CC832F;
-  --color-brown-600: #B36D27;
+  --color-gray-100: #F0F0F0;
+  --color-gray-200: #F0F0F0;
+  --color-gray-300: #E5E5E5;
+  --color-gray-400: #CCCCCC;
+  --color-gray-500: #B3B3B3;
 
-  --color-gold-100: #FFF4CC;
-  --color-gold-200: #FFE999;
-  --color-gold-300: #FFD966;
-  --color-gold-400: #E6C24D;
-  --color-gold-500: #CCAA33;
-  --color-gold-600: #B3932D;
-
-  --color-naver-green-100: #02C75A;
-  --color-naver-green-200: #17B75E;
-
-  --color-kakao-100: #FEE500;
-  --color-kakao-200: #FDD14A;
-
-  --color-red-600: #FF0000;
+  --color-black-100: #B3B3B3;
 
   --font-display: 'PretendardVariable', sans-serif;
   --font-body: 'PretendardVariable', sans-serif;
@@ -56,7 +30,7 @@
 
 @font-face {
   font-family: 'PretendardVariable';
-  src: url('../fonts/PretendardVariable.ttf') format('truetype');
-  /* font-weight: 400; */
+  src: url('../assets/fonts/PretendardVariable.ttf') format('truetype');
+  font-weight: 400;
   font-style: normal;
 }
