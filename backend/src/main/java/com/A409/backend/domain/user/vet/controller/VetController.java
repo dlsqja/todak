@@ -20,4 +20,6 @@ public class VetController {
     public Vet signup(@RequestBody VetRequest vetRequest) {
         return vetService.insertVet(vetRequest);
     }
+
+
 }
