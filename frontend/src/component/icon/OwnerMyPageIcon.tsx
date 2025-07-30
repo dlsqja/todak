@@ -1,16 +1,16 @@
-interface OnwerMyPageIconProps {
+interface OwnerMyPageIconProps {
   fill?: string;
   stroke?: string;
   width?: number | string;
   height?: number | string;
 }
 
-function OnwerMyPageIcon({
+function OwnerMyPageIcon({
   fill = '#A09CAB',
   stroke = 'none',
   width = 48,
   height = 40,
-}: OnwerMyPageIconProps) {
+}: OwnerMyPageIconProps) {
   return (
     <svg width={width} height={height} viewBox="0 0 48 40" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path d="M30.39 14.56C28.71 13.7 26.53 13 24 13C21.47 13 19.29 13.7 17.61 14.56C16.61 15.07 16 16.1 16 17.22V20H32V17.22C32 16.1 31.39 15.07 30.39 14.56ZM30 18H18V17.22C18 16.84 18.2 16.5 18.52 16.34C19.71 15.73 21.63 15 24 15C26.37 15 28.29 15.73 29.48 16.34C29.8 16.5 30 16.84 30 17.22V18Z" fill={fill} stroke={stroke}/>
@@ -20,4 +20,4 @@ function OnwerMyPageIcon({
   );
 }
 
-export default OnwerMyPageIcon;
+export default OwnerMyPageIcon;
