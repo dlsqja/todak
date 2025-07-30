@@ -20,7 +20,7 @@ public class Staff {
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "auth_id", nullable = false,unique = true)
-    private Auth authId;
+    private Auth auth;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "hospital_id", nullable = false)
