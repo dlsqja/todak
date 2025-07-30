@@ -21,7 +21,7 @@ public class Owner {
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "auth_id", nullable = false,unique = true)
-    private Auth authId;
+    private Auth auth;
 
     @Column(length = 20, nullable = false)
     private String name;
