@@ -10,6 +10,7 @@ public enum ErrorCode {
 
     INVALID_ERROR(HttpStatus.BAD_REQUEST,  "알 수 없는 오류가 발생했습니다"),
     ACCESS_DENIED(HttpStatus.FORBIDDEN,  "조회 권한이 없습니다."),
+    CONTENT_NOT_FOUND(HttpStatus.NOT_FOUND,  "해당 정보를 찾을 수 없습니다."),
 
     INVALID_INPUT_VALUE(HttpStatus.BAD_REQUEST,  "유효하지 않은 입력 값입니다."),
     METHOD_NOT_ALLOWED(HttpStatus.METHOD_NOT_ALLOWED,  "지원하지 않는 HTTP 메서드입니다."),

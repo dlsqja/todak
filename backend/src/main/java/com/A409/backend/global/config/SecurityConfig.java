@@ -15,10 +15,10 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(authz -> authz
-                        .anyRequest().permitAll()  // 모든 요청 허용
+                        .anyRequest().permitAll()
                 )
                 .csrf(csrf -> csrf
-                        .ignoringRequestMatchers("/ws/**")      // WebSocket CSRF 제외
+                        .disable() //
                 )
                 .httpBasic(Customizer.withDefaults());
 
