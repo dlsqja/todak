@@ -30,16 +30,6 @@ public class HomeController {
         return ApiResponse.ofSuccess("A409팀입니다 ㄱ-");
     }
 
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ApiResponse<?> createReservation(@RequestPart(value = "photo", required = false) MultipartFile photo
-    ) throws IOException {
-
-        String url = s3Uploader.upload(photo,"lunch");
-
-
-        return ApiResponse.ofSuccess(url);
-    }
-
     @GetMapping("/hospitals")
     public ApiResponse<?> getHospitals() {
 

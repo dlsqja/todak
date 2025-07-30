@@ -22,6 +22,7 @@ public class S3Uploader {
 
     private final AmazonS3 amazonS3;
     private final String bucket;
+    private final String defaultURL = "https://todackbucket.s3.ap-northeast-2.amazonaws.com/";
 
     public S3Uploader(AmazonS3 amazonS3, @Value("${cloud.aws.s3.bucket}") String bucket) {
         this.amazonS3 = amazonS3;
@@ -65,7 +66,7 @@ public class S3Uploader {
     private String putS3(File uploadFile, String fileName) {
         amazonS3.putObject(new PutObjectRequest(bucket, fileName, uploadFile)
                 .withCannedAcl(CannedAccessControlList.PublicRead));
-        return amazonS3.getUrl(bucket, fileName).toString();
+        return fileName;
     }
 
     private void removeNewFile(File targetFile) {
