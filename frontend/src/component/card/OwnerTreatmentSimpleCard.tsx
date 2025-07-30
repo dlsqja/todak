@@ -14,11 +14,11 @@ const OwnerTreatmentSimpleCard: React.FC<OwnerTreatmentSimpleCardProps> = ({
   petInfo,
 }) => {
   return (
-    <div className="w-full max-w-[240px] p-4 bg-white rounded-[12px] shadow-card">
-      <h4 className="text-lg font-semibold text-black">{time}</h4>
-      <p className="mt-2 text-black">{department}</p>
-      <p className="mt-1 text-black">{petName}</p>
-      <p className="mt-1 text-black">{petInfo}</p>
+    <div className="w-full max-w-[240px] p-4 bg-white rounded-[12px] drop-shadow-gray-500">
+      <h4 className="h4 text-black">{time}</h4>
+      <p className="p mt-2 text-black">{department}</p>
+      <p className="p mt-1 text-black">{petName}</p>
+      <p className="caption mt-1 text-black">{petInfo}</p>
     </div>
   );
 };
