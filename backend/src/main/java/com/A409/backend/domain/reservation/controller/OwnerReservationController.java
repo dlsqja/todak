@@ -52,4 +52,12 @@ public class OwnerReservationController {
         return ApiResponse.ofSuccess(reservation);
     }
 
+    @DeleteMapping("/{reservation_id}")
+    public ApiResponse<?> deleteReservation(@AuthenticationPrincipal User user,@PathVariable("reservation_id")Long reservationId) {
+
+        reservationService.deleteReservation(user.getId(),reservationId);
+
+        return ApiResponse.ofSuccess(null);
+    }
+
 }

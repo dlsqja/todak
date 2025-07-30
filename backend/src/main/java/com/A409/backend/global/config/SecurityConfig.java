@@ -15,12 +15,12 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(authz -> authz
-                        .anyRequest().permitAll() // ✅ 모든 요청 허용
+                        .anyRequest().permitAll()
                 )
                 .csrf(csrf -> csrf
-                        .disable() // ✅ CSRF 완전 비활성화
+                        .disable() //
                 )
-                .httpBasic(Customizer.withDefaults()); // 또는 필요 없으면 제거 가능
+                .httpBasic(Customizer.withDefaults());
 
         return http.build();
     }

@@ -74,4 +74,9 @@ public class ReservationService {
         return ReservationResponse.toOwnerResponse(reservation);
     }
 
+    public void deleteReservation(Long ownerId, Long reservationId) {
+
+        reservationRepository.removeByOwner_OwnerIdAndReservationId(ownerId,reservationId);
+    }
+
 }
