@@ -1,0 +1,44 @@
+import React from "react";
+
+interface PetProfileCardProps {
+  name: string;
+  genderAge: string; // 예: "여 (중성)"
+  breedAge: string; // 예: "비숑 9세"
+  weight: string; // 예: "4.1kg"
+  imageUrl?: string; // null이면 기본 Gray 원형
+}
+
+const PetProfileCard: React.FC<PetProfileCardProps> = ({
+  name,
+  genderAge,
+  breedAge,
+  weight,
+  imageUrl,
+}) => {
+  return (
+    <div className="w-[332px] h-[136px] rounded-[16px] bg-white shadow-card flex items-center px-6 py-4 gap-4">
+      {/* 이미지 영역 */}
+      <div className="w-[88px] h-[88px] rounded-full bg-green-200 overflow-hidden flex-shrink-0">
+        {imageUrl && (
+          <img
+            src={imageUrl}
+            alt="pet"
+            className="w-full h-full object-cover"
+          />
+        )}
+      </div>
+
+      {/* 텍스트 영역 */}
+      <div className="flex flex-col justify-center flex-1 min-w-0">
+        <div className="flex justify-between items-center">
+          <h3 className="text-lg font-semibold text-black">{name}</h3>
+          <p className="text-sm text-black">{genderAge}</p>
+        </div>
+        <p className="text-sm text-black mt-1">{breedAge}</p>
+        <p className="text-sm text-black mt-1">{weight}</p>
+      </div>
+    </div>
+  );
+};
+
+export default PetProfileCard;
