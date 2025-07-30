@@ -32,7 +32,7 @@
 
 @font-face {
   font-family: 'PretendardVariable';
-  src: url('@/assets/fonts/PretendardVariable.ttf') format('truetype');
+  src: url('../assets/fonts/PretendardVariable.ttf') format('truetype');
   font-weight: 400;
   font-style: normal;
 }
