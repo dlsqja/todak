@@ -15,6 +15,8 @@ services:
       - SPRING_DATASOURCE_USERNAME=${MYSQL_USERNAME}
       - SPRING_DATASOURCE_PASSWORD=${MYSQL_PASSWORD}
       - SPRING_PROFILES_ACTIVE=
+      - SPRING_WEB_SERVLET_CONTEXT-PATH=/api/v1
+      -
       
   my-db:
     image: mysql:8.0
