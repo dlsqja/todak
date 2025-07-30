@@ -28,9 +28,16 @@
   --shadow-menu-bar: 0px 0px 10px 5px rgba(0, 0, 0, 0.1);
 }
 
+
+
 @font-face {
   font-family: 'PretendardVariable';
-  src: url('../assets/fonts/PretendardVariable.ttf') format('truetype');
+  src: url('@/assets/fonts/PretendardVariable.ttf') format('truetype');
   font-weight: 400;
   font-style: normal;
+}
+
+/* 폰트 적용 */
+body {
+  font-family: 'PretendardVariable', Pretendard, sans-serif;
 }
