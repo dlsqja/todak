@@ -18,8 +18,12 @@ import java.util.List;
 @AllArgsConstructor
 public class User implements UserDetails {
 
+    //TODO : jwt access 토큰에서 아래 정보들을 파싱해서 user 객체에 저장.
+    /// /      "id": 1,
+    /// /      "username": "dksdks@kakao.com",
+    /// /      "role": "ROLE_OWNER",
     private String username;
-    private String password;
+    private String password; //null
     private Long id;
     private Role role;
 
@@ -30,11 +34,11 @@ public class User implements UserDetails {
 
     @Override
     public String getPassword() {
-        return "";
+        return null;
     }
 
     @Override
     public String getUsername() {
-        return "";
+        return username;
     }
 }
