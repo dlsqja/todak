@@ -15,7 +15,7 @@ public class WorkingHourService {
     private final WorkingHourRepository workingHourRepository;
 
     // 수의사 ID를 받아서 근무 시간 목록 조회
-    List<WorkingHourResponse> getWorkingHourByVetId(Long vetId){
+    public List<WorkingHourResponse> getWorkingHourByVetId(Long vetId){
         return workingHourRepository.findByVet_VetId(vetId)
                 .stream()
                 .map(WorkingHourResponse::toResponse)

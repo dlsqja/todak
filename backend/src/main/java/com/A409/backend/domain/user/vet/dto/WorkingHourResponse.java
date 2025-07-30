@@ -1,8 +1,14 @@
 package com.A409.backend.domain.user.vet.dto;
 
 import com.A409.backend.domain.user.vet.entity.WorkingHour;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class WorkingHourResponse {
     private String day;
