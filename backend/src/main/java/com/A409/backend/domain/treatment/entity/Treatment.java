@@ -2,6 +2,7 @@ package com.A409.backend.domain.treatment.entity;
 
 import com.A409.backend.domain.pet.entity.Pet;
 import com.A409.backend.domain.reservation.entity.Reservation;
+import com.A409.backend.domain.user.owner.entity.Owner;
 import com.A409.backend.domain.user.vet.entity.Vet;
 import jakarta.persistence.*;
 import lombok.*;
@@ -27,6 +28,10 @@ public class Treatment {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "vet_id", nullable = false)
     private Vet vet;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "owner_id", nullable = false)
+    private Owner owner;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "pet_id", nullable = false)
