@@ -6,6 +6,7 @@ import TreatmentSlideList from "@/component/card/TreatmentSlideList";
 import PetProfileCard from '@/component/card/PetProfileCard';
 import TreatmentRecordCard from '@/component/card/TreatmentRecordCard';
 import SearchListItem from '@/component/card/SearchListItem';
+import RemoteTreatmentCard from '@/component/card/RemoteTreatmentCard';
 
 
 export default function OwnerHome() {
@@ -14,6 +15,19 @@ export default function OwnerHome() {
       <h1 className='h1'>Owner 홈</h1>
       <p>여기는 Owner 홈 화면입니다.</p>
       <Outlet />
+
+      <div className="mt-10">
+        <h2 className="text-lg font-semibold mb-2">📱 비대면 진료 예약</h2>
+        <RemoteTreatmentCard
+          petName="뽀삐"
+          petInfo="강아지 / 3세"
+          department="피부과"
+          symptom="눈꼽이 많이 껴요."
+          time="17:00"
+          onDetailClick={() => console.log("상세 정보 클릭됨!")}
+          onTreatClick={() => console.log("진료 받기 클릭됨!")}
+        />
+      </div>
       <div className="mt-10">
       {/* 🆕 최근 방문 병원 리스트 */}
       <div className="mt-10">

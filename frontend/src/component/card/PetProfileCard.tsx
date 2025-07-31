@@ -16,7 +16,7 @@ const PetProfileCard: React.FC<PetProfileCardProps> = ({
   imageUrl,
 }) => {
   return (
-    <div className="w-[332px] h-[136px] rounded-[16px] bg-white shadow-card flex items-center px-6 py-4 gap-4">
+    <div className="w-[332px] h-[136px] rounded-[16px] bg-white shadow-[0px_5px_15px_rgba(0,0,0,0.08)]  flex items-center px-6 py-4 gap-4">
       {/* 이미지 영역 */}
       <div className="w-[88px] h-[88px] rounded-full bg-green-200 overflow-hidden flex-shrink-0">
         {imageUrl && (

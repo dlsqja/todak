@@ -1,4 +1,5 @@
 import React from "react";
+import '@/styles/theme.css';
 
 interface TreatmentRecordCardProps {
   doctorName: string;
@@ -16,7 +17,7 @@ const TreatmentRecordCard: React.FC<TreatmentRecordCardProps> = ({
   onClickDetail,
 }) => {
   return (
-    <div className="w-full p-4 bg-white rounded-[12px] border border-gray-400 shadow-card">
+    <div className="w-full p-4 bg-white rounded-[12px] border border-green-300">
       <div className="flex justify-between items-start">
         {/* 왼쪽: 텍스트 묶음 */}
         <div className="space-y-1">
@@ -41,7 +42,7 @@ const TreatmentRecordCard: React.FC<TreatmentRecordCardProps> = ({
         {/* 오른쪽: 상세보기 버튼 */}
         <button
           onClick={onClickDetail}
-          className="h5 px-3 py-1 rounded-full bg-gray-200 text-gray-500 font-semibold whitespace-nowrap hover:bg-gray-200 transition-colors"
+          className="h5 px-3 py-1 text-brown-300 rounded-full bg-green-200 text-brown-300 whitespace-nowrap hover:bg-green-300 transition-colors"
         >
           상세 보기
         </button>
