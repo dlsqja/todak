@@ -13,7 +13,11 @@ const VideoCall = () => {
   const pcRef = useRef<RTCPeerConnection | null>(null);
   const localStreamRef = useRef<MediaStream | null>(null);
 
-  const wsUrl = "wss://i13a409.p.ssafy.io/ws";
+  // 환경에 따른 WebSocket URL 설정
+  const wsUrl =
+    window.location.hostname === "localhost"
+      ? "ws://localhost:8080/ws" // 로컬 개발환경
+      : "wss://i13a409.p.ssafy.io/ws"; // 배포환경
   const publicUrl = import.meta.env.VITE_EC2_PUBLIC;
   const coturnPort = import.meta.env.VITE_COTURN_PORT;
   const stunTurn = {
@@ -87,6 +91,7 @@ const VideoCall = () => {
 
     // 먼저 미디어 획득
     try {
+      console.log(wsUrl);
       const stream = await navigator.mediaDevices.getUserMedia({
         video: true,
         audio: true,
@@ -167,6 +172,8 @@ const VideoCall = () => {
   };
 
   const receiveOffer = async (msg: any) => {
+    addLog(`Offer 수신 from ${msg.senderId}`);
+
     // offer를 받았을 때 PeerConnection 생성
     if (!pcRef.current) {
       const pc = createPeerConnection();
@@ -174,31 +181,46 @@ const VideoCall = () => {
       addLog("Callee PeerConnection 생성");
     }
 
-    addLog("Offer 수신, Answer 생성 중...");
-    await pcRef.current.setRemoteDescription(
-      new RTCSessionDescription(msg.offer)
-    );
-    const answer = await pcRef.current.createAnswer();
-    await pcRef.current.setLocalDescription(answer);
+    try {
+      addLog("RemoteDescription 설정 중...");
+      await pcRef.current.setRemoteDescription(
+        new RTCSessionDescription(msg.offer)
+      );
+      addLog("RemoteDescription 설정 완료");
 
-    wsRef.current?.send(
-      JSON.stringify({
-        type: "answer",
-        roomId,
-        senderId: userId,
-        targetId: msg.senderId,
-        answer,
-      })
-    );
-    addLog("Answer 전송 완료");
+      addLog("Answer 생성 중...");
+      const answer = await pcRef.current.createAnswer();
+      await pcRef.current.setLocalDescription(answer);
+      addLog("LocalDescription(Answer) 설정 완료");
+
+      wsRef.current?.send(
+        JSON.stringify({
+          type: "answer",
+          roomId,
+          senderId: userId,
+          targetId: msg.senderId,
+          answer,
+        })
+      );
+      addLog("Answer 전송 완료");
+    } catch (error) {
+      addLog(`Offer 처리 중 오류: ${error}`);
+    }
   };
 
   const receiveAnswer = async (msg: any) => {
+    addLog(`Answer 수신 from ${msg.senderId}`);
     if (pcRef.current) {
-      await pcRef.current.setRemoteDescription(
-        new RTCSessionDescription(msg.answer)
-      );
-      addLog("Answer 수신 완료, 연결 성공!");
+      try {
+        await pcRef.current.setRemoteDescription(
+          new RTCSessionDescription(msg.answer)
+        );
+        addLog("Answer 처리 완료, 연결 협상 중...");
+      } catch (error) {
+        addLog(`Answer 처리 중 오류: ${error}`);
+      }
+    } else {
+      addLog("PeerConnection이 없어서 Answer 무시");
     }
   };
 
