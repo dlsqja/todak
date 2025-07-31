@@ -6,6 +6,7 @@ import MultipleContent from '@/component/text/MultipleContent';
 import ImageContent from '@/component/text/ImageContent';
 import SummaryContent from '@/component/text/SummaryContent';
 import TreatmentListContent from '@/component/text/TeatmentListContent';
+import OwnerAnimalIcon from '@/component/icon/OwnerAnimalIcon';
 
 
 export default function StaffHome() {
@@ -52,6 +53,7 @@ export default function StaffHome() {
         status="대기 중"
       />
 
+      <OwnerAnimalIcon />
     </div>
   );
 }
