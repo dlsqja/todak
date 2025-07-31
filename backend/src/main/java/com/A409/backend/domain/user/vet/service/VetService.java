@@ -5,6 +5,7 @@ import com.A409.backend.domain.hospital.repository.HospitalRepository;
 import com.A409.backend.domain.user.auth.entity.Auth;
 import com.A409.backend.domain.user.vet.dto.VetRequest;
 import com.A409.backend.domain.user.vet.dto.VetResponse;
+import com.A409.backend.domain.user.vet.dto.VetResponseDetail;
 import com.A409.backend.domain.user.vet.entity.Vet;
 import com.A409.backend.domain.user.vet.entity.WorkingHour;
 import com.A409.backend.domain.user.vet.repository.VetRepository;
@@ -26,6 +27,11 @@ public class VetService {
 
     public List<VetResponse> getVetsByHospitalId(Long hospitalId){
         return vetRepository.findVetsByHospital_HospitalId(hospitalId).stream().map(VetResponse::toResponse).toList();
+    }
+
+    public VetResponseDetail getVetById(Long vetId){
+        Vet vet = vetRepository.findVetByVetId(vetId);
+        return  VetResponseDetail.toResponse(vet);
     }
 
     @Transactional

@@ -1,5 +1,6 @@
 package com.A409.backend.domain.user.vet.entity;
 
+import co.elastic.clients.elasticsearch.watcher.Day;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -20,7 +21,7 @@ public class WorkingHour {
     private Vet vet;
 
     @Column(length = 1, nullable = false)
-    private String day;
+    private Day day;
 
     @Column(name = "start_time", nullable = false)
     private Byte startTime;
