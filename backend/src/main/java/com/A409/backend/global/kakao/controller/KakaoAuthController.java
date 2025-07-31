@@ -7,6 +7,7 @@ import com.A409.backend.global.kakao.service.KakaoAuthService;
 import com.A409.backend.global.security.jwt.JwtService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
@@ -24,8 +25,28 @@ public class KakaoAuthController {
     private final AuthRepository authRepository;
     private final JwtService jwtService;
 
+    @GetMapping("/kakao/callback")
+    public ResponseEntity<Map<String, String>> saveAuthAfterKakaoLogin(@RequestParam("code") String code){
+        String kakaoAccessToken = kakaoAuthService.getAccessToken(code);
+        Map<String, Object> userInfo = kakaoAuthService.getUserInfo(kakaoAccessToken);
+        Map<String, Object> kakaoAccount = (Map<String, Object>) userInfo.get("kakao_account");
+        String username = (String) kakaoAccount.get("email");
+
+        if(!authRepository.existsAuthByEmail(username)){
+            Auth auth = Auth.builder()
+                    .email(username)
+                    .build();
+            authRepository.save(auth);
+        }
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(Map.of(
+                        "message", "success"
+                ));
+    }
+
     @GetMapping("/kakao/callback/{role}")
-    public ResponseEntity<Map<String, String>> kakaoCallback(@RequestParam("code") String code, @PathVariable("role")String roleStr) {
+    public ResponseEntity<Map<String, String>> kakaoLoginCallback(@RequestParam("code") String code, @PathVariable("role")String roleStr) {
         log.info("kakaoCallback roleStr:{}",roleStr);
 
         Role role = switch (roleStr.toLowerCase()) {

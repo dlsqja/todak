@@ -21,6 +21,32 @@ public class KakaoAuthService {
 
     private final RestTemplate restTemplate;
 
+    public String getAccessToken(String code){
+        String tokenUrl = "https://kauth.kakao.com/oauth/token";
+        String redirectUrl = "http://localhost:8080/auth/kakao/callback";
+
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add("grant_type", "authorization_code");
+        params.add("client_id", "667d2627399b81dd6da889758c291eb5");
+        params.add("redirect_uri", redirectUrl);
+        params.add("code", code);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
+
+        ResponseEntity<Map> response = restTemplate.exchange(
+                tokenUrl,
+                HttpMethod.POST,
+                request,
+                Map.class
+        );
+        log.info("token response: {}", response.getBody());
+
+        return (String) response.getBody().get("access_token");
+    }
+
     public String getAccessToken(String code, String roleStr){
         String tokenUrl = "https://kauth.kakao.com/oauth/token";
         String redirectUrl = "http://localhost:8080/auth/kakao/callback/" + roleStr;
