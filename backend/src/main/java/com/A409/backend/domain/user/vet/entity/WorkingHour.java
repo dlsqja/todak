@@ -1,5 +1,6 @@
 package com.A409.backend.domain.user.vet.entity;
 
+import com.A409.backend.global.enums.Day;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -19,8 +20,9 @@ public class WorkingHour {
     @JoinColumn(name = "vet_id", nullable = false)
     private Vet vet;
 
-    @Column(length = 1, nullable = false)
-    private String day;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Day day;
 
     @Column(name = "start_time", nullable = false)
     private Byte startTime;
