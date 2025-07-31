@@ -1,7 +1,11 @@
 package com.A409.backend.domain.user.owner.service; // 가상의 서비스 패키지
 
+import com.A409.backend.domain.user.owner.dto.OwnerRequest;
+import com.A409.backend.domain.user.owner.dto.OwnerResponse;
 import com.A409.backend.domain.user.owner.entity.Owner;
 import com.A409.backend.domain.user.owner.repository.OwnerRepository;
+import com.A409.backend.global.enums.ErrorCode;
+import com.A409.backend.global.exceptin.CustomException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,25 +16,25 @@ public class OwnerService {
 
     private final OwnerRepository ownerRepository;
 
-    @Transactional
-    public Owner createOwner(Owner newOwner) {
-
-        return ownerRepository.save(newOwner);
-    }
-
     @Transactional(readOnly = true)
-    public Owner findOwnerById(Long ownerId) {
+    public OwnerResponse getOwnerInfo(Long ownerId) {
 
-       return ownerRepository.findById(ownerId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 ID의 Owner를 찾을 수 없습니다: " + ownerId));
+       Owner owner = ownerRepository.findById(ownerId)
+                .orElseThrow(() -> new CustomException(ErrorCode.RESOURCE_NOT_FOUND));
+
+       return OwnerResponse.toResponse(owner);
     }
 
     @Transactional
-    public void deleteOwner(Long ownerId) {
+    public void updateOwnerInfo(Long ownerId, OwnerRequest ownerRequest) {
 
-        if (!ownerRepository.existsById(ownerId)) {
-            throw new IllegalArgumentException("삭제하려는 Owner가 존재하지 않습니다: " + ownerId);
-        }
-        ownerRepository.deleteById(ownerId);
+        Owner owner = ownerRepository.findById(ownerId).orElseThrow(() -> new CustomException(ErrorCode.RESOURCE_NOT_FOUND));
+
+        owner.setName(ownerRequest.getName());
+        owner.setPhone(ownerRequest.getPhone());
+        owner.setBirth(ownerRequest.getBirth());
+
+        ownerRepository.save(owner);
     }
+
 }

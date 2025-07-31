@@ -4,6 +4,8 @@ import com.A409.backend.domain.reservation.entity.Reservation;
 import com.A409.backend.domain.reservation.service.ReservationService;
 import com.A409.backend.domain.user.vet.dto.VetRequest;
 import com.A409.backend.domain.user.vet.entity.Vet;
+import com.A409.backend.domain.user.vet.dto.VetRequest;
+import com.A409.backend.domain.user.vet.entity.Vet;
 import com.A409.backend.domain.user.vet.service.VetService;
 import com.A409.backend.global.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -13,6 +15,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/vets")

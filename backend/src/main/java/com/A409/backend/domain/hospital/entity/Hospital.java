@@ -10,6 +10,7 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
 @Entity
 @Table(name = "hospital")
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder

@@ -2,6 +2,8 @@ package com.A409.backend.domain.user.owner.controller;
 
 import com.A409.backend.domain.pet.dto.PetRequest;
 import com.A409.backend.domain.pet.service.PetService;
+import com.A409.backend.domain.user.owner.dto.OwnerRequest;
+import com.A409.backend.domain.user.owner.dto.OwnerResponse;
 import com.A409.backend.domain.user.owner.service.OwnerService;
 import com.A409.backend.global.response.ApiResponse;
 import com.A409.backend.global.security.model.User;
@@ -10,13 +12,28 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/my")
+@RequestMapping("/owners/my")
 @RequiredArgsConstructor
 public class OwnerController {
 
     private final OwnerService ownerService;
-    private final PetService petService;
 
+
+    @GetMapping
+    public ApiResponse<?> getOwnerInfo(@AuthenticationPrincipal User user){
+
+        OwnerResponse ownerResponse = ownerService.getOwnerInfo(user.getId());
+
+        return ApiResponse.ofSuccess(ownerResponse);
+    }
+
+    @PatchMapping
+    public ApiResponse<?> updateOwnerInfo(@AuthenticationPrincipal User user,@RequestBody OwnerRequest ownerRequest){
+
+        ownerService.updateOwnerInfo(user.getId(),ownerRequest);
+
+        return ApiResponse.ofSuccess(null);
+    }
 
 
 
