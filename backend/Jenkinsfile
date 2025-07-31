@@ -81,8 +81,8 @@ pipeline {
             echo "TAG=${TAG}" >> ${COMPOSE_DIR}/.env
             echo "MYSQL_PASSWORD=$MYSQL_PASSWORD" >> ${COMPOSE_DIR}/.env
             echo "MYSQL_USERNAME=$MYSQL_USERNAME" >> ${COMPOSE_DIR}/.env
-            echo "S3_ACCESS_KEY=$S3_ACCESS_KEY" > ${COMPOSE_DIR}/.env
-            echo "S3_SECRET_KEY=$S3_SECRET_KEY" > ${COMPOSE_DIR}/.env
+            echo "S3_ACCESS_KEY=$S3_ACCESS_KEY" >> ${COMPOSE_DIR}/.env
+            echo "S3_SECRET_KEY=$S3_SECRET_KEY" >> ${COMPOSE_DIR}/.env
             scp -i "$KEYFILE" -o StrictHostKeyChecking=no ${COMPOSE_DIR}/.env $EC2_USERNAME@$EC2_HOST:/home/$EC2_USERNAME/
 
             # EC2에서 실행
