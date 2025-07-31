@@ -28,4 +28,7 @@ public class Staff {
 
     @Column(length = 100, nullable = false)
     private String name;
+
+    @Column(columnDefinition = "TEXT")
+    private String profile;
 }

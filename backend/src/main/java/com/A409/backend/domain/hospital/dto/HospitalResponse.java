@@ -16,6 +16,12 @@ public class HospitalResponse {
     private String contact;
 
     public static HospitalResponse toResponse(Hospital hospital){
-        return HospitalResponse.builder().build();
+        return HospitalResponse.builder()
+                .hospitalId(hospital.getHospitalId())
+                .name(hospital.getName())
+                .profile(hospital.getProfile())
+                .location(hospital.getLocation())
+                .contact(hospital.getContact())
+                .build();
     }
 }
