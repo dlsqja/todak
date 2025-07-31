@@ -6,6 +6,7 @@ import com.A409.backend.domain.user.vet.entity.WorkingHour;
 import com.A409.backend.domain.user.vet.repository.WorkingHourRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -20,6 +21,24 @@ public class WorkingHourService {
                 .stream()
                 .map(WorkingHourResponse::toResponse)
                 .toList();
+    }
+
+    // 해당 workingHour를 추가 및 수정
+    @Transactional
+    public List<WorkingHour> putWorkingHours(Long vetId,List<WorkingHourResponse> workingHours) {
+        Vet vet = Vet.builder().vetId(vetId).build();
+
+        List<WorkingHour> whs = workingHourRepository.saveAll(workingHours.stream().map(wh ->
+                WorkingHour.builder()
+                        .workingId(wh.getWorkingId())
+                        .day(wh.getDay())
+                        .vet(vet)
+                        .startTime(wh.getStartTime())
+                        .endTime(wh.getEndTime())
+                        .build()
+        ).toList());
+
+        return workingHourRepository.saveAll(whs);
     }
 
 }

@@ -8,4 +8,5 @@ import java.util.List;
 
 public interface WorkingHourRepository extends JpaRepository<WorkingHour,Long> {
     List<WorkingHour> findByVet_VetId(Long vetId); //수의사 근무시간 목록 조회.
+
 }
