@@ -1,28 +1,20 @@
+
 interface SubmitButtonProps {
-  bgcolor?: string;      
-  textcolor?: string;     
-  text?: string;        
-  className?: string;  
-  rounded?: string;
+  color?: string;
+  text?: string;
+  className?: string;
 }
- 
-export default function SubmitButton({
-    // 기본값 설정
-  bgcolor = 'green-200',
-  textcolor = 'black',
-  text = '제출용 버튼 입니다',
-  rounded = 'lg',
-  className = '',
-  ...props
-}: SubmitButtonProps) {
+
+export default function SubmitButton({color, text, className}: SubmitButtonProps) {
+  const colorVariants = {
+    lightgreen: 'bg-green-200',
+    green: 'bg-green-300 text-green-100',
+    pink:  'bg-pink-100',
+    gray:  'bg-gray-100',
+  }
   return (
-    <button
-    // props 변수로 받을 항목 설정
-      className={`w-full bg-${bgcolor} text-${textcolor} rounded-${rounded} ${className}`}
-      {...props}
-    >
+    <button className={`w-full h-13 rounded-[12px] h4 ${colorVariants[color as keyof typeof colorVariants]} ${className}`}>
       {text}
     </button>
   );
 }
- 
