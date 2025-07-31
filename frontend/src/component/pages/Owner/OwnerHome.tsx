@@ -7,11 +7,16 @@ import PetProfileCard from '@/component/card/PetProfileCard';
 import TreatmentRecordCard from '@/component/card/TreatmentRecordCard';
 import SearchListItem from '@/component/card/SearchListItem';
 import RemoteTreatmentCard from '@/component/card/RemoteTreatmentCard';
-
+import SimpleHeader from '@/component/header/SimpleHeader';
+import BackHeader from '@/component/header/BackHeader';
 
 export default function OwnerHome() {
   return (
     <div>
+      <BackHeader text="진료 상세" />
+
+      <SimpleHeader text="비대면 진료" />
+
       <h1 className='h1'>Owner 홈</h1>
       <p>여기는 Owner 홈 화면입니다.</p>
       <Outlet />
