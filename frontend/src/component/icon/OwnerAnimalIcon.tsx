@@ -5,7 +5,7 @@ interface OwnerAnimalIconProps {
   height?: number | string;
 }
 
-function OnwnerAnimalIcon({
+function OwnerAnimalIcon({
   fill = '#A09CAB',
   stroke = 'none',
   width = 48,
@@ -19,4 +19,4 @@ function OnwnerAnimalIcon({
   );
 }
 
-export default OnwnerAnimalIcon;
+export default OwnerAnimalIcon;
