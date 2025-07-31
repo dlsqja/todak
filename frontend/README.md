@@ -1,69 +1,43 @@
-# React + TypeScript + Vite
+### Prettier 설치 및 설정 방법
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+1. 확장 설치
 
-Currently, two official plugins are available:
+- 좌측 Extensions(⌘⇧X / Ctrl+Shift+X) → “Prettier - Code formatter” 설치
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+2. 사용자/워크스페이스 설정 열기
 
-## Expanding the ESLint configuration
+- Command Palette(⌘⇧P / Ctrl+Shift+P) → “Preferences: Open Settings (JSON)”
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+3. 아래 항목 추가 (권장 기본)
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+```
+{
+  // Prettier를 기본 포맷터로
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
+  // 저장할 때 자동 포맷
+  "editor.formatOnSave": true,
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+  // TypeScript, JSON 등에서도 강제
+  "[javascript]": { "editor.formatOnSave": true },
+  "[typescript]": { "editor.formatOnSave": true },
+  "[json]":       { "editor.formatOnSave": true }
+}
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+4. 프로젝트 전용 설정 파일(선택)
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
 ```
+//.prettierrc
+{
+  "singleQuote": true,
+  "trailingComma": "all",
+  "printWidth": 100,
+  "semi": true,
+  "tabWidth: 2",
+  "useTabs": false
+}
+```
+
+루트에 .prettierrc 생성
+→ 팀원이 동일 규칙을 쓰도록 Git 에 커밋
