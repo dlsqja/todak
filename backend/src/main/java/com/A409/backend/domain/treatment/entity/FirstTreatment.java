@@ -1,4 +1,4 @@
-package com.A409.backend.domain.reservation.entity;
+package com.A409.backend.domain.treatment.entity;
 
 import com.A409.backend.domain.hospital.entity.Hospital;
 import com.A409.backend.domain.user.owner.entity.Owner;
