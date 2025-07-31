@@ -10,6 +10,7 @@ import com.A409.backend.domain.user.vet.entity.Vet;
 import com.A409.backend.domain.user.vet.entity.WorkingHour;
 import com.A409.backend.domain.user.vet.repository.VetRepository;
 import com.A409.backend.domain.user.vet.repository.WorkingHourRepository;
+import com.A409.backend.global.enums.Day;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,6 +32,9 @@ public class VetService {
 
     public VetResponseDetail getVetById(Long vetId){
         Vet vet = vetRepository.findVetByVetId(vetId);
+        if (vet == null) {
+            return null;
+        }
         return  VetResponseDetail.toResponse(vet);
     }
 
@@ -51,7 +55,7 @@ public class VetService {
 
         List<WorkingHour> workingHours = IntStream.rangeClosed(0, 6)
                 .mapToObj(day -> WorkingHour.builder()
-                        .day(day + "")
+                        .day(Day.values()[day])
                         .startTime((byte) 0)
                         .endTime((byte) 0)
                         .vet(newVet)

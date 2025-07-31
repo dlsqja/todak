@@ -4,7 +4,10 @@ import com.A409.backend.domain.hospital.dto.HospitalResponse;
 import com.A409.backend.domain.hospital.entity.Hospital;
 import com.A409.backend.domain.user.vet.entity.Vet;
 import lombok.Builder;
+import lombok.Getter;
 
+
+@Getter
 @Builder
 public class VetResponseDetail {
 
