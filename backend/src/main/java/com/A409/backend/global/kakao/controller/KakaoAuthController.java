@@ -29,9 +29,9 @@ public class KakaoAuthController {
         log.info("kakaoCallback roleStr:{}",roleStr);
 
         Role role = switch (roleStr.toLowerCase()) {
-            case "owner" -> Role.ROLE_OWNER;
-            case "vet"   -> Role.ROLE_VET;
-            case "staff" -> Role.ROLE_STAFF;
+            case "owner" -> Role.OWNER;
+            case "vet"   -> Role.VET;
+            case "staff" -> Role.STAFF;
             default      -> throw new IllegalArgumentException("Invalid role");
         };
         String kakaoAccessToken = kakaoAuthService.getAccessToken(code, roleStr.toLowerCase());
@@ -44,7 +44,7 @@ public class KakaoAuthController {
         Long id = auth.getAuthId();
 
         String accessToken = jwtService.generateAccessToken(id, username, role);
-        String refreshToken = jwtService.generateRefreshToken(id, role);
+        String refreshToken = jwtService.generateRefreshToken(id, username, role);
 
         Map<String, String> tokens = new HashMap<>();
         tokens.put("accessToken", accessToken);

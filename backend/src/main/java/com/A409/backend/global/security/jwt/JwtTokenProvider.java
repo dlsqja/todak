@@ -5,7 +5,6 @@ import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
@@ -53,11 +52,11 @@ public class JwtTokenProvider {
                 .getExpiration()
                 .before(new Date());
     }
-    public String createAccessJwt(Long id, String nickname, Role role, Long expiredMs) {
+    public String createAccessJwt(Long id, String email, Role role, Long expiredMs) {
         return Jwts.builder()
                 .id(UUID.randomUUID().toString())
                 .claim("id", id)
-                .claim("username", nickname)
+                .claim("username", email)
                 .claim("role", role)
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + expiredMs))
@@ -65,10 +64,11 @@ public class JwtTokenProvider {
                 .compact();
     }
 
-    public String createRefreshToken(Long userId, Role role, Long expiredMs) {
+    public String createRefreshToken(Long id, String email, Role role, Long expiredMs) {
         return Jwts.builder()
                 .id(UUID.randomUUID().toString())
-                .claim("id", userId)
+                .claim("id", id)
+                .claim("username", email)
                 .claim("role", role)
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + expiredMs))

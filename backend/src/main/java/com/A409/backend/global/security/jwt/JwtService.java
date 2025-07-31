@@ -18,12 +18,12 @@ public class JwtService {
     private static final long ACCESS_TOKEN_EXPIRATION = 1000L * 60 * 60;
     private static final long REFRESH_TOKEN_EXPIRATION = 1000L * 60 * 60 * 24 * 7;
 
-    public String generateAccessToken(Long userId, String username , Role role) {
-        return jwtTokenProvider.createAccessJwt(userId, username, role, ACCESS_TOKEN_EXPIRATION);
+    public String generateAccessToken(Long id, String username , Role role) {
+        return jwtTokenProvider.createAccessJwt(id, username, role, ACCESS_TOKEN_EXPIRATION);
     }
 
-    public String generateRefreshToken(Long userId, Role role) {
-        return jwtTokenProvider.createRefreshToken(userId, role ,REFRESH_TOKEN_EXPIRATION);
+    public String generateRefreshToken(Long id ,String username,Role role) {
+        return jwtTokenProvider.createRefreshToken(id, username ,role ,REFRESH_TOKEN_EXPIRATION);
     }
 
     public boolean validateToken(String token) {
