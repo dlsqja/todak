@@ -30,8 +30,7 @@ public class SecurityConfig {
                         "/webjars/**",
                         "/signup/**"
                 ).permitAll()
-                .requestMatchers("/kapi/**").permitAll()
-                .requestMatchers("/auth/**").permitAll() //테스트 용 허용
+                .requestMatchers("/public/**").permitAll()
                 .requestMatchers("/api/v1/owners/**").hasRole("OWNER")
                 .requestMatchers("/api/v1/vets/**").hasRole("VET")
                 .requestMatchers("/api/v1/staffs/**").hasRole("STAFF")
