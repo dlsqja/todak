@@ -2,7 +2,9 @@ package com.A409.backend.global.kakao.controller;
 
 import com.A409.backend.domain.user.auth.entity.Auth;
 import com.A409.backend.domain.user.auth.repository.AuthRepository;
+import com.A409.backend.global.enums.ErrorCode;
 import com.A409.backend.global.enums.Role;
+import com.A409.backend.global.exceptin.CustomException;
 import com.A409.backend.global.kakao.service.KakaoAuthService;
 import com.A409.backend.global.response.ApiResponse;
 import com.A409.backend.global.security.jwt.JwtService;
@@ -40,7 +42,7 @@ public class KakaoAuthController {
             authRepository.save(auth);
         }
         Auth auth = authRepository.findByEmail(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         return ApiResponse.ofSuccess(auth.getAuthId());
     }

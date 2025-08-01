@@ -13,6 +13,8 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class SecurityConfig {
 
+
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
@@ -31,10 +33,19 @@ public class SecurityConfig {
                         "/signup/**"
                 ).permitAll()
                 .requestMatchers("/public/**").permitAll()
-                .requestMatchers("/api/v1/owners/**").hasRole("OWNER")
-                .requestMatchers("/api/v1/vets/**").hasRole("VET")
-                .requestMatchers("/api/v1/staffs/**").hasRole("STAFF")
 
+                .requestMatchers("/api/v1/owners/**").hasRole("OWNER")
+                .requestMatchers("/api/v1/reservations/owner/**").hasRole("OWNER")
+                .requestMatchers("/api/v1/treatments/owner/**").hasRole("OWNER")
+                .requestMatchers("/api/v1/pets/**").hasRole("OWNER")
+
+                .requestMatchers("/api/v1/vets/**").hasRole("VET")
+                .requestMatchers("/api/v1/reservations/vets/**").hasRole("VET")
+                .requestMatchers("/api/v1/treatments/vets/**").hasRole("VET")
+
+                .requestMatchers("/api/v1/staffs/**").hasRole("STAFF")
+                .requestMatchers("/api/v1/hospitals/**").hasRole("STAFF")
+                .requestMatchers("/api/v1/reservations/hospitals/**").hasRole("STAFF")
                 .anyRequest().authenticated());
         http
                 .sessionManagement((session) -> session

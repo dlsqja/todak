@@ -11,4 +11,5 @@ import java.util.Optional;
 
 public interface VetRepository extends JpaRepository<Vet,Long> {
     List<Vet> findVetsByHospital_HospitalId(Long hospitalId);
+    Optional<Vet> findByAuth(Auth auth);
 }

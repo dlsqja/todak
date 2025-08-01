@@ -1,13 +1,15 @@
 package com.A409.backend.global.security.jwt;
 
+import com.A409.backend.global.enums.ErrorCode;
 import com.A409.backend.global.enums.Role;
-import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.Jwts;
+import com.A409.backend.global.exceptin.CustomException;
+import io.jsonwebtoken.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
+import io.jsonwebtoken.security.SignatureException;
 import java.util.Date;
 import java.util.UUID;
 
@@ -83,8 +85,16 @@ public class JwtTokenProvider {
                     .build()
                     .parseSignedClaims(token);
             return true;
+        } catch (ExpiredJwtException e) {
+            throw new CustomException(ErrorCode.AUTH_TOKEN_EXPIRED);
+        } catch (UnsupportedJwtException e) {
+            throw new CustomException(ErrorCode.AUTH_TOKEN_UNSUPPORTED);
+        } catch (MalformedJwtException e) {
+            throw new CustomException(ErrorCode.AUTH_TOKEN_MALFORMED);
+        } catch (SignatureException e) {
+            throw new CustomException(ErrorCode.AUTH_TOKEN_INVALID_SIGNATURE);
         } catch (JwtException e) {
-            return false;
+            throw new CustomException(ErrorCode.AUTH_INVALID_TOKEN);
         }
     }
 
