@@ -8,7 +8,7 @@ import lombok.Setter;
 public class VetRequest {
     String name;
     String license;
-    Long hospitalCode;
+    String hospitalCode;
     String profile;
     String photo;
 }

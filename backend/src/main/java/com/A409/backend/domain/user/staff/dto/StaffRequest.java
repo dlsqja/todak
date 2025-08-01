@@ -7,5 +7,5 @@ import lombok.Setter;
 @Setter
 public class StaffRequest {
     String name;
-    Long hospitalCode;
+    String hospitalCode;
 }

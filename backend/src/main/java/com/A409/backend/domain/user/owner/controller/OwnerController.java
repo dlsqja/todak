@@ -5,11 +5,15 @@ import com.A409.backend.domain.pet.service.PetService;
 import com.A409.backend.domain.user.owner.dto.OwnerRequest;
 import com.A409.backend.domain.user.owner.dto.OwnerResponse;
 import com.A409.backend.domain.user.owner.service.OwnerService;
+import com.A409.backend.global.enums.Role;
 import com.A409.backend.global.response.ApiResponse;
 import com.A409.backend.global.security.model.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/owners/my")
@@ -34,7 +38,5 @@ public class OwnerController {
 
         return ApiResponse.ofSuccess(null);
     }
-
-
 
 }

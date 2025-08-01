@@ -16,15 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class VetController {
 
-    private final VetService vetService;
-
-    @Operation(summary = "수의사 회원가입", description = "새로운 수의사를 등록합니다.")
-    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "회원가입 성공")
-    @PostMapping("/signup")
-    public ApiResponse<?> signup(@RequestBody VetRequest vetRequest) {
-        Vet newvet = vetService.insertVet(vetRequest);
-        return ApiResponse.ofSuccess(newvet);
-    }
 
 
 }

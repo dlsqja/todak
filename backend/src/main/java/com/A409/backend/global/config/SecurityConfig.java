@@ -23,11 +23,19 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(auth -> auth
                 .requestMatchers(HttpMethod.POST, "/login").permitAll()
+                .requestMatchers(
+                        "/swagger-ui/**",
+                        "/swagger-resources/**",
+                        "/v3/api-docs/**",
+                        "/webjars/**",
+                        "/signup/**"
+                ).permitAll()
                 .requestMatchers("/kapi/**").permitAll()
                 .requestMatchers("/auth/**").permitAll() //테스트 용 허용
                 .requestMatchers("/api/v1/owners/**").hasRole("OWNER")
                 .requestMatchers("/api/v1/vets/**").hasRole("VET")
                 .requestMatchers("/api/v1/staffs/**").hasRole("STAFF")
+
                 .anyRequest().authenticated());
         http
                 .sessionManagement((session) -> session

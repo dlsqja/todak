@@ -26,7 +26,7 @@ public class KakaoAuthController {
     private final JwtService jwtService;
 
     @GetMapping("/kakao/callback")
-    public ResponseEntity<Map<String, String>> saveAuthAfterKakaoLogin(@RequestParam("code") String code){
+    public ResponseEntity<Map<String, Object>> saveAuthAfterKakaoLogin(@RequestParam("code") String code){
         String kakaoAccessToken = kakaoAuthService.getAccessToken(code);
         Map<String, Object> userInfo = kakaoAuthService.getUserInfo(kakaoAccessToken);
         Map<String, Object> kakaoAccount = (Map<String, Object>) userInfo.get("kakao_account");
@@ -38,10 +38,14 @@ public class KakaoAuthController {
                     .build();
             authRepository.save(auth);
         }
+        Auth auth = authRepository.findByEmail(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(Map.of(
-                        "message", "success"
+                        "message", "success",
+                        "auth_id", auth.getAuthId()
                 ));
     }
 

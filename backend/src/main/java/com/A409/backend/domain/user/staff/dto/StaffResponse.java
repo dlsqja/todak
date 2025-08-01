@@ -12,7 +12,6 @@ public class StaffResponse {
     public static StaffResponse toResponse(Staff staff){
         return StaffResponse.builder()
                 .name(staff.getName())
-                .profile(staff.getProfile())
                 .build();
     }
 }
