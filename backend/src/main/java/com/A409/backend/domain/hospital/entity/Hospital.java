@@ -24,6 +24,9 @@ public class Hospital {
     @Column(name = "hospital_code", length = 6, nullable = false, unique = true)
     private String hospitalCode;
 
+    @Column(length = 255, nullable = false)
+    private String location;
+
     @Column(length = 100, nullable = false)
     private String name;
 
@@ -33,8 +36,7 @@ public class Hospital {
     @Column(columnDefinition = "TEXT")
     private String profile;
 
-    @Column(length = 255, nullable = false)
-    private String location;
+
 
     @Column(length = 50)
     private String contact;
