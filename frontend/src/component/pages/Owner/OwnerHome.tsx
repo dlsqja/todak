@@ -10,7 +10,7 @@ import RemoteTreatmentCard from '@/component/card/RemoteTreatmentCard';
 import SimpleHeader from '@/component/header/SimpleHeader';
 import BackHeader from '@/component/header/BackHeader';
 import ReservationTimeTable from "@/component/table/ReservationTimeTable";
-
+import ModalTemplate from '@/component/template/ModalTemplate';
 
 export default function OwnerHome() {
   return (
@@ -22,8 +22,13 @@ export default function OwnerHome() {
       <h1 className='h1'>Owner 홈</h1>
       <p>여기는 Owner 홈 화면입니다.</p>
       <Outlet />
+
+      <ModalTemplate title="예약 시간 21:00" onClose={() => setOpen(false)}>
+        <div>이곳엔 원하는 컴포넌트를 자유롭게!!!</div>
+      </ModalTemplate>
+
       <div className="mt-10">
-  <h2 className="text-lg font-semibold mb-2">🕘 시간대별 예약 테이블</h2>
+        <h2 className="text-lg font-semibold mb-2">🕘 시간대별 예약 테이블</h2>
 
   
   <ReservationTimeTable
