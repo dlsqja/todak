@@ -38,6 +38,11 @@ public class LoginController {
 
         String username = (String) kakaoAccount.get("email");
         Auth auth = authRepository.findByEmail(username).orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+        //TODO:: 만약 auth table 존재 X or 각 ROLE에 해당하는 행 발견 못하면 예외 던지기
+
+        //TODO:: 각 role에 맞는 테이블에서 owner->owner_id staff->hospital_id vet->vet_id 가져와서 jwt id에 저장
+
         Long authId = auth.getAuthId();
 
 
