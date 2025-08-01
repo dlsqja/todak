@@ -33,7 +33,6 @@ public class ElasticController {
             return (List<HospitalDocument>) cached;
         }
 
-        log.info("Cache miss for keyword: {}, querying Elasticsearch...", keyword);
         List<HospitalDocument> result = elasticService.autocompleteByName(keyword);
 
         redisTemplate.opsForValue().set(cacheKey, result, CACHE_TTL_MINUTES, TimeUnit.MINUTES);
