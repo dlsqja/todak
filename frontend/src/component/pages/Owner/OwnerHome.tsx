@@ -9,6 +9,8 @@ import SearchListItem from '@/component/card/SearchListItem';
 import RemoteTreatmentCard from '@/component/card/RemoteTreatmentCard';
 import SimpleHeader from '@/component/header/SimpleHeader';
 import BackHeader from '@/component/header/BackHeader';
+import ReservationTimeTable from "@/component/table/ReservationTimeTable";
+
 
 export default function OwnerHome() {
   return (
@@ -20,6 +22,37 @@ export default function OwnerHome() {
       <h1 className='h1'>Owner 홈</h1>
       <p>여기는 Owner 홈 화면입니다.</p>
       <Outlet />
+      <div className="mt-10">
+  <h2 className="text-lg font-semibold mb-2">🕘 시간대별 예약 테이블</h2>
+
+  
+  <ReservationTimeTable
+  data={[
+    {
+      time: "9:00",
+      records: [
+        { doctor: "송인범", pet: "안녕하세요멍", owner: "김유성" },
+        { doctor: "송인범", pet: "뽀삐", owner: "안성수" },
+        { doctor: "송인범", pet: "땅콩이", owner: "김태희" },
+      ],
+    },
+    {
+      time: "21:00",
+      records: [
+        { doctor: "송인범", pet: "하늘이", owner: "김유성" },
+        { doctor: "송인범", pet: "뽀삐", owner: "안성수" },
+        { doctor: "송인범", pet: "땅콩이", owner: "김태희" },
+      ],
+    },
+  ]}
+  onRowClick={(record) => {
+    console.log("🔥 예약 클릭됨!", record);
+    // 예: navigate(`/owner/reservation/detail?pet=${record.pet}`)
+  }}
+/>
+
+
+</div>
 
       <div className="mt-10">
         <h2 className="text-lg font-semibold mb-2">📱 비대면 진료 예약</h2>
