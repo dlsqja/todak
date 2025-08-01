@@ -3,6 +3,7 @@ package com.A409.backend.domain.user.vet.controller;
 import com.A409.backend.domain.reservation.entity.Reservation;
 import com.A409.backend.domain.reservation.service.ReservationService;
 import com.A409.backend.domain.user.vet.dto.VetRequest;
+import com.A409.backend.domain.user.vet.dto.VetUpdateRequest;
 import com.A409.backend.domain.user.vet.entity.Vet;
 import com.A409.backend.domain.user.vet.dto.VetRequest;
 import com.A409.backend.domain.user.vet.entity.Vet;
@@ -44,5 +45,15 @@ public class VetController {
     public ApiResponse<?> getVet(@PathVariable("vet_id") Long vetId) {
 //        return ApiResponse.ofSuccess(vetService.getVetById(vet.getVetId()));
         return ApiResponse.ofSuccess(vetService.getVetById(vetId));
+    }
+
+    @Operation(summary = "수의사 정보 수정", description = "수의사 마이페이지를 수정합니다.")
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "수의사 정보 수정 성공")
+//    @PostMapping("/my")
+    @PostMapping("/my/{vet_id}")
+//    public void updateVet(@AuthenticationPrincipal Vet vet, @RequestBody VetRequest vetRequest) {
+    public ApiResponse<?> updateVet(@PathVariable("vet_id") Long vetId, @RequestBody VetUpdateRequest vetUpdateRequest) {
+        vetService.updateVet(vetId, vetUpdateRequest);
+        return ApiResponse.ofSuccess(null);
     }
 }

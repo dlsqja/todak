@@ -6,11 +6,15 @@ import com.A409.backend.domain.user.auth.entity.Auth;
 import com.A409.backend.domain.user.vet.dto.VetRequest;
 import com.A409.backend.domain.user.vet.dto.VetResponse;
 import com.A409.backend.domain.user.vet.dto.VetResponseDetail;
+import com.A409.backend.domain.user.vet.dto.VetUpdateRequest;
 import com.A409.backend.domain.user.vet.entity.Vet;
 import com.A409.backend.domain.user.vet.entity.WorkingHour;
 import com.A409.backend.domain.user.vet.repository.VetRepository;
 import com.A409.backend.domain.user.vet.repository.WorkingHourRepository;
 import com.A409.backend.global.enums.Day;
+import com.A409.backend.global.enums.ErrorCode;
+import com.A409.backend.global.exceptin.CustomException;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,17 +35,17 @@ public class VetService {
     }
 
     public VetResponseDetail getVetById(Long vetId){
-        Vet vet = vetRepository.findVetByVetId(vetId);
-        if (vet == null) {
-            return null;
-        }
+        Vet vet = vetRepository.findVetByVetId(vetId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
         return  VetResponseDetail.toResponse(vet);
     }
 
     @Transactional
     public Vet insertVet(VetRequest vetRequest) {
         Auth auth = Auth.builder().authId(vetRequest.getAuthId()).build();
-        Hospital hospital = hospitalRepository.findByHospitalCode(vetRequest.getHospitalCode());
+        Hospital hospital = hospitalRepository.findByHospitalCode(vetRequest.getHospitalCode())
+                .orElseThrow(() -> new CustomException(ErrorCode.HOSPITAL_NOT_FOUND));
 
         Vet newVet = Vet.builder()
                 .auth(auth)
@@ -64,5 +68,23 @@ public class VetService {
 
         workingHourRepository.saveAll(workingHours);
         return newVet;
+    }
+
+    @Transactional
+    public void updateVet(Long vetId, @NotNull VetUpdateRequest vetUpdateRequest) {
+        // 기존 Vet 조회 (영속 상태로 만듦)
+        Vet existingVet = vetRepository.findById(vetId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        // 기존 엔티티 기반으로 builder 사용 (id 유지)
+        Vet updateVet = existingVet.toBuilder()
+                .name(vetUpdateRequest.getName())
+                .license(vetUpdateRequest.getLicense())
+                .profile(vetUpdateRequest.getProfile())
+                .photo(vetUpdateRequest.getPhoto())
+                .build();
+
+        // 저장
+        vetRepository.save(updateVet);
     }
 }
