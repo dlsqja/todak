@@ -1,11 +1,12 @@
-import React, { useState } from "react";
-import Button from "@/component/button/Button";
-import CopyButton from "@/component/button/CopyButton";
-import Input from "@/component/input/input";
+import React, { useState } from 'react';
+import Button from '@/component/button/Button';
+import CopyButton from '@/component/button/CopyButton';
+import Input from '@/component/input/input';
+import TimeSelection from '@/component/button/TimeSelection';
 
 export default function VetHome() {
-  const [name, setName] = useState("");
-  const [birthday, setBirthday] = useState("");
+  const [name, setName] = useState('');
+  const [birthday, setBirthday] = useState('');
 
   return (
     <div className="mx-7">
@@ -29,6 +30,7 @@ export default function VetHome() {
         value={birthday}
         onChange={(e) => setBirthday(e.target.value)}
       />
+      {/* <TimeSelection time="10:00" nowHour={10} nowMinute={0} endTime="18:00" /> */}
     </div>
   );
 }
