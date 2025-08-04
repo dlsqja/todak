@@ -12,11 +12,10 @@ const VideoCall = () => {
       const res = await myaxios.get('/video/get-token', {
         params: { session_id: sessionId },
       });
-      const token: string = res.data.data.token; // 서버 응답 구조에 맞게 수정
+      const token = res.data.data.token; // 서버 응답 구조에 맞게 수정
       console.log('res.data', token);
 
       OVRef.current = new OpenVidu();
-      // (OVRef.current as any).openviduServerUrl = 'http://127.0.0.1:4443';
       sessionRef.current = OVRef.current.initSession();
 
       sessionRef.current.on('streamCreated', (event) => {
