@@ -32,7 +32,7 @@ export default function VetHome() {
         onChange={(e) => setBirthday(e.target.value)}
       />
       <TimeSelectionButton start_time="08:00" end_time="21:00" />
-      <TimeSelectionDropdown start_time="08:00" end_time="21:00" />
+      <TimeSelectionDropdown start_time="08:00" end_time="21:00" label="진료 가능 시간" />
     </div>
   );
 }
