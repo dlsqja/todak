@@ -7,6 +7,7 @@ interface TreatmentSlideCardProps {
   petInfo: string;
   time: string;
   isAuthorized: boolean;
+  is_signed: boolean;
 }
 
 const TreatmentSlideCard: React.FC<TreatmentSlideCardProps> = ({
@@ -15,6 +16,7 @@ const TreatmentSlideCard: React.FC<TreatmentSlideCardProps> = ({
   petInfo,
   time,
   isAuthorized,
+  is_signed
 }) => {
   return (
     <div className="w-[340px] h-[96px] shrink-0 bg-white rounded-[12px] shadow-[0px_5px_15px_rgba(0,0,0,0.08)] p-4 overflow-hidden">
@@ -32,7 +34,7 @@ const TreatmentSlideCard: React.FC<TreatmentSlideCardProps> = ({
         <div className="flex justify-between items-end">
           <p className="caption text-black leading-none">{petInfo}</p>
           <div className="flex-shrink-0 leading-none translate-y-[-4px]">
-            <StatusBadge isActive={isAuthorized} type="treatment" />
+            <StatusBadge type="treatment" statusKey={is_signed}/>
           </div>
         </div>
       </div>

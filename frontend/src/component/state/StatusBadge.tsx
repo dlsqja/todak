@@ -1,9 +1,10 @@
 import React from "react";
 
 interface StatusBadgeProps {
-  isActive: boolean;
-  type: "treatment" | "payment" | "reservation" | "voice" | "기타추후추가"; // ✅ 테이블 구분
+  type: "treatment" | "reservation" | "payment" ;
+  statusKey: string | number; // 0, 1, 2, "success", "fail" 등
 }
+
 
 const statusConfig = {
   treatment: {
@@ -16,6 +17,20 @@ const statusConfig = {
       className: "bg-green-200 text-brown-300",
     },
   },
+    reservation: {
+    0: {
+      text: "대기",
+      className: "bg-green-200 text-brown-300",
+    },
+    1: {
+      text: "승인",
+      className: "bg-green-300 text-green-100",
+    },
+    2: {
+      text: "반려",
+      className: "bg-pink-200 text-green-100",
+    },
+  },
   payment: {
     true: {
       text: "결제 완료",
@@ -26,30 +41,11 @@ const statusConfig = {
       className: "bg-green-200 text-brown-300",
     },
   },
-  reservation: {
-    true: {
-      text: "예약 확정",
-      className: "bg-green-300 text-green-100",
-    },
-    false: {
-      text: "예약 대기",
-      className: "bg-green-200 text-brown-300",
-    },
-  },
-  voice: {
-    true: {
-      text: "정책 적용",
-      className: "bg-green-300 text-green-100",
-    },
-    false: {
-      text: "정책 미적용",
-      className: "bg-green-200 text-brown-300",
-    },
-  },
+
 };
 
-const StatusBadge: React.FC<StatusBadgeProps> = ({ isActive, type }) => {
-  const config = statusConfig[type][isActive ? "true" : "false"];
+const StatusBadge: React.FC<StatusBadgeProps> = ({ statusKey, type }) => {
+  const config = statusConfig[type][String(statusKey)];
 
   return (
     <span className={`caption px-3 py-1 rounded-full ${config.className}`}>
@@ -57,5 +53,6 @@ const StatusBadge: React.FC<StatusBadgeProps> = ({ isActive, type }) => {
     </span>
   );
 };
+
 
 export default StatusBadge;
