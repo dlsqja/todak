@@ -9,7 +9,7 @@ interface ModalTemplateProps {
 
 const ModalTemplate: React.FC<ModalTemplateProps> = ({ title, onClose, children }) => {
   return (
-    <div className="bg-white rounded-[12px] px-6 py-6 w-[320px] shadow-[0px_5px_15px_rgba(0,0,0,0.08)] relative">
+    <div className="bg-white rounded-[12px] px-6 py-6 w-full shadow-[0px_5px_15px_rgba(0,0,0,0.08)] relative">
       {/* 상단 제목 및 닫기 아이콘 */}
       {(title || onClose) && (
         <div className="flex items-center justify-between mb-4">
