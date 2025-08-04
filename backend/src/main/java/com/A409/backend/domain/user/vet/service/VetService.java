@@ -7,6 +7,8 @@ import com.A409.backend.domain.user.vet.dto.VetRequest;
 import com.A409.backend.domain.user.vet.dto.VetResponse;
 import com.A409.backend.domain.user.vet.entity.Vet;
 import com.A409.backend.domain.user.vet.repository.VetRepository;
+import com.A409.backend.global.enums.ErrorCode;
+import com.A409.backend.global.exception.CustomException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +23,11 @@ public class VetService {
 
     public List<VetResponse> getVetsByHospitalId(Long hospitalId){
         return vetRepository.findVetsByHospital_HospitalId(hospitalId).stream().map(VetResponse::toResponse).toList();
+    }
+
+    public Long getHospitalIdByVetId(Long vetId){
+        Vet vet = vetRepository.findById(vetId).orElseThrow((() -> new CustomException(ErrorCode.RESOURCE_NOT_FOUND)));
+        return vet.getHospital().getHospitalId();
     }
 
     public Vet insertVet(VetRequest vetRequest) {
