@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import Button from '@/component/button/Button';
 import CopyButton from '@/component/button/CopyButton';
 import Input from '@/component/input/input';
-import TimeSelection from '@/component/button/TimeSelection';
+import TimeSelectionButton from '@/selection/TimeSelectionButton';
+import TimeSelectionDropdown from '@/selection/TimeSelectionDropdown';
 
 export default function VetHome() {
   const [name, setName] = useState('');
@@ -30,7 +31,8 @@ export default function VetHome() {
         value={birthday}
         onChange={(e) => setBirthday(e.target.value)}
       />
-      {/* <TimeSelection time="10:00" nowHour={10} nowMinute={0} endTime="18:00" /> */}
+      <TimeSelectionButton start_time="08:00" end_time="21:00" />
+      <TimeSelectionDropdown start_time="08:00" end_time="21:00" />
     </div>
   );
 }
