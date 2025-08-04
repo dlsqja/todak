@@ -2,8 +2,8 @@ import { useState } from 'react';
 import Button from '@/component/button/Button';
 import CopyButton from '@/component/button/CopyButton';
 import Input from '@/component/input/Input';
-import TimeSelectionButton from '@/selection/TimeSelectionButton';
-import TimeSelectionDropdown from '@/selection/TimeSelectionDropdown';
+import TimeSelectionButton from '@/component/selection/TimeSelectionButton';
+import TimeSelectionDropdown from '@/component/selection/TimeSelectionDropdown';
 import ImageInputBox from '@/component/input/ImageInputBox';
 
 export default function VetHome() {

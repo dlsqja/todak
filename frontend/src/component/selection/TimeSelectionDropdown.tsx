@@ -1,5 +1,5 @@
 import React from 'react';
-import { useTimeStore } from '../store/timeStore';
+import { useTimeStore } from '../../store/timeStore';
 import DropdownArrow from '@/component/icon/Dropdown_Arrow';
 
 interface TimeSelectionDropdownProps {
@@ -65,7 +65,7 @@ export default function TimeSelectionDropdown({
           onChange={(e) => setSelectedTime(e.target.value)}
         >
           {filteredTimeList.map((time) => (
-            <option key={time} value={time}>
+            <option className="text-black bg-white h4" key={time} value={time}>
               {time}
             </option>
           ))}
