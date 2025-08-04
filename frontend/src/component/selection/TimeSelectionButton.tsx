@@ -16,7 +16,7 @@ export default function TimeSelection({ start_time, end_time }: TimeSelectionBut
   const selectedTime = useTimeStore((state) => state.selectedTime);
   const setSelectedTime = useTimeStore((state) => state.setSelectedTime);
 
-  console.log('현재 store에 저장된 selectedTime:', selectedTime);
+  console.log('진료 신청서에 선택한 시간:', selectedTime);
 
   // 현재 시간 구하기
   const now = new Date();

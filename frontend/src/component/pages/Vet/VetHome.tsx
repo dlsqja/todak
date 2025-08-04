@@ -5,10 +5,25 @@ import Input from '@/component/input/Input';
 import TimeSelectionButton from '@/component/selection/TimeSelectionButton';
 import TimeSelectionDropdown from '@/component/selection/TimeSelectionDropdown';
 import ImageInputBox from '@/component/input/ImageInputBox';
+import SelectionDropdown from '@/component/selection/SelectionDropdown';
+import FilteredList from '@/component/selection/FilterDropdown';
 
 export default function VetHome() {
   const [name, setName] = useState('');
   const [birthday, setBirthday] = useState('');
+
+  // 테스트 : 필터링 옵션
+  const options1 = [
+    { value: '0', label: '치과' },
+    { value: '1', label: '피부과' },
+    { value: '2', label: '골절' },
+    { value: '3', label: '안과' },
+  ];
+  const options2 = [
+    { value: 'all', label: '전체' },
+    { value: 'cat', label: '고양이' },
+    { value: 'dog', label: '강아지' },
+  ];
 
   return (
     <div className="mx-7">
@@ -35,6 +50,8 @@ export default function VetHome() {
       <TimeSelectionButton start_time="08:00" end_time="21:00" />
       <TimeSelectionDropdown start_time="08:00" end_time="21:00" label="진료 가능 시간" />
       <ImageInputBox src="/images/미료_test.jpg" />
+      <SelectionDropdown options={options1} placeholder="진료 과목을 선택하세요" />
+      <FilteredList options={options2} />
     </div>
   );
 }

@@ -1,5 +1,5 @@
 import React from 'react';
-import { useTimeStore } from '../../store/timeStore';
+import { useTimeStore } from '@/store/timeStore';
 import DropdownArrow from '@/component/icon/Dropdown_Arrow';
 
 interface TimeSelectionDropdownProps {
