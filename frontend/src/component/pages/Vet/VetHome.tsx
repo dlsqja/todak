@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import Button from '@/component/button/Button';
 import CopyButton from '@/component/button/CopyButton';
-import Input from '@/component/input/input';
+import Input from '@/component/input/Input';
 import TimeSelectionButton from '@/selection/TimeSelectionButton';
 import TimeSelectionDropdown from '@/selection/TimeSelectionDropdown';
+import ImageInputBox from '@/component/input/ImageInputBox';
 
 export default function VetHome() {
   const [name, setName] = useState('');
@@ -33,6 +34,7 @@ export default function VetHome() {
       />
       <TimeSelectionButton start_time="08:00" end_time="21:00" />
       <TimeSelectionDropdown start_time="08:00" end_time="21:00" label="진료 가능 시간" />
+      <ImageInputBox />
     </div>
   );
 }
