@@ -4,8 +4,10 @@ import com.A409.backend.domain.pet.entity.Pet;
 import com.A409.backend.global.enums.Gender;
 import com.A409.backend.global.enums.Species;
 import lombok.Builder;
+import lombok.Getter;
 
 @Builder
+@Getter
 public class PetResponse {
 
     private Long petId;
