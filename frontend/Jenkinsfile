@@ -1,5 +1,5 @@
 pipeline {
-  agent any  // 전역 agent
+  agent any
 
   environment {
     DOCKER_IMAGE = 'dlsqja3436/frontend'
@@ -12,22 +12,27 @@ pipeline {
     stage('Build Frontend') {
       agent {
         docker {
-          image 'node:20.19.1'  // npm 빌드용
+          image 'node:20.19.1'
         }
       }
       steps {
         dir('frontend') {
+          // .env 내용 주입
+          withCredentials([file(credentialsId: 'frontend-env', variable: 'FRONT_ENV_FILE')]) {
           sh '''
+            cp "$FRONT_ENV_FILE" .env
+            echo "✅ .env 파일 복사 완료"
             npm install
             npm run build
           '''
+        }
           archiveArtifacts artifacts: 'dist/**', fingerprint: true
         }
       }
     }
 
     stage('Build and Push Docker Image') {
-      agent any  // Jenkins 호스트에서 Docker 명령어 실행
+      agent any
       steps {
         dir('frontend') {
           withCredentials([
