@@ -1,32 +1,33 @@
 import React from 'react';
-import { FiChevronLeft } from 'react-icons/fi'; 
+import { FiChevronLeft } from 'react-icons/fi';
+import { useNavigate } from 'react-router-dom'; // 추가
 
 interface BackHeaderProps {
   text: string;
-  onBack?: () => void; // 옵션: 기본은 window.history.back
+  onBack?: () => void; // 옵션: 기본은 router back
 }
 
 const BackHeader: React.FC<BackHeaderProps> = ({ text, onBack }) => {
+  const navigate = useNavigate(); // 추가
+
   const handleBack = () => {
     if (onBack) {
       onBack();
     } else {
-      window.history.back(); // 기본 동작: 뒤로가기
+      navigate(-1); // React Router의 뒤로가기
     }
   };
 
   return (
-    <div className="w-full h-12 bg-green-100 flex items-center justify-between px-4">
+    <div className="relative w-full h-12 bg-green-100 flex items-center justify-between px-4">
       <button
         onClick={handleBack}
-        className="text-2xl text-black"
+        className="left-4 text-2xl text-black cursor-pointer"
         aria-label="뒤로가기"
       >
         <FiChevronLeft />
       </button>
-      <div className="absolute left-1/2 transform -translate-x-1/2 h4 text-black">
-        {text}
-      </div>
+      <div className="absolute left-1/2 transform -translate-x-1/2 h4 text-black">{text}</div>
     </div>
   );
 };
