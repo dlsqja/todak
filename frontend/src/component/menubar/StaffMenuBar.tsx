@@ -1,20 +1,20 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import OwnerAnimalIcon from '@/component/icon/AnimalIcon';
-import OwnerMyPageIcon from '@/component/icon/MyPageIcon';
-import OwnerReservationIcon from '@/component/icon/ReservationIcon';
-import OwnerTreatmentIcon from '@/component/icon/TreatmentIcon';
-import OwnerHomeIcon from '@/component/icon/HomeIcon';
+import StaffHospitalIcon from '@/component/icon/HospitalIcon';
+import StaffMyPageIcon from '@/component/icon/MyPageIcon';
+import StaffReservationManagementIcon from '@/component/icon/ReservationManagementIcon';
+import StaffVetManagementIcon from '@/component/icon/VetManagementIcon';
+import StaffHomeIcon from '@/component/icon/HomeIcon';
 
 const menuList = [
-  { name: '홈', icon: OwnerHomeIcon, path: '/owner/home' },
-  { name: '동물 관리', icon: OwnerAnimalIcon, path: '/owner/animal' },
-  { name: '예약내역', icon: OwnerReservationIcon, path: '/owner/reservation' },
-  { name: '비대면 진료', icon: OwnerTreatmentIcon, path: '/owner/treatment' },
-  { name: '마이', icon: OwnerMyPageIcon, path: '/owner/mypage' },
+  { name: '홈', icon: StaffHomeIcon, path: '/staff/home' },
+  { name: '병원 관리', icon: StaffHospitalIcon, path: '/staff/hospital' },
+  { name: '예약 관리', icon: StaffReservationManagementIcon, path: '/staff/reservationManagement' },
+  { name: '수의사 관리', icon: StaffVetManagementIcon, path: '/staff/vetManagement' },
+  { name: '마이', icon: StaffMyPageIcon, path: '/staff/mypage' },
 ];
 
-const OwnerMenuBar: React.FC = () => {
+const BottomMenuBar: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -53,4 +53,4 @@ const OwnerMenuBar: React.FC = () => {
   );
 };
 
-export default OwnerMenuBar;
+export default BottomMenuBar;
