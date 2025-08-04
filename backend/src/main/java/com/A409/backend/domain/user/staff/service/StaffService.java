@@ -10,7 +10,7 @@ import com.A409.backend.domain.user.staff.dto.StaffResponse;
 import com.A409.backend.domain.user.staff.entity.Staff;
 import com.A409.backend.domain.user.staff.repository.StaffRepository;
 import com.A409.backend.global.enums.ErrorCode;
-import com.A409.backend.global.exceptin.CustomException;
+import com.A409.backend.global.exception.CustomException;
 import com.A409.backend.global.response.ApiResponse;
 import com.A409.backend.global.security.model.User;
 import lombok.RequiredArgsConstructor;

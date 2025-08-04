@@ -2,7 +2,7 @@ package com.A409.backend.global.security.jwt;
 
 import com.A409.backend.global.enums.ErrorCode;
 import com.A409.backend.global.enums.Role;
-import com.A409.backend.global.exceptin.CustomException;
+import com.A409.backend.global.exception.CustomException;
 import io.jsonwebtoken.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
