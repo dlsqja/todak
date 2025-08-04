@@ -45,7 +45,7 @@ const BottomMenuBar: React.FC = () => {
             type="button"
           >
             <Icon />
-            <span className="caption">{menu.name}</span>
+            <span className="caption-bold">{menu.name}</span>
           </button>
         );
       })}
