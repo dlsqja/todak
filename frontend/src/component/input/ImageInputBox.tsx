@@ -1,12 +1,11 @@
 interface ImageBoxProps {
   src?: string; // 이미지 경로(필수)
-  alt?: string; // 대체 텍스트(선택)
 }
 
-export default function ImageInputBox({ src, alt }: ImageBoxProps) {
+export default function ImageInputBox({ src }: ImageBoxProps) {
   return (
-    <div className="w-22 h-22 bg-gray-500 rounded-lg ">
-      {src ? <img src={src} alt={alt} className="max-w-full max-h-full object-contain" /> : null}
+    <div className="w-22 h-22 bg-gray-500 rounded-[16px] flex items-center justify-center overflow-hidden">
+      {src ? <img src={src} alt="기본 프로필" className="w-full h-full object-cover" /> : null}
     </div>
   );
 }

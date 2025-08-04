@@ -34,7 +34,7 @@ export default function VetHome() {
       />
       <TimeSelectionButton start_time="08:00" end_time="21:00" />
       <TimeSelectionDropdown start_time="08:00" end_time="21:00" label="진료 가능 시간" />
-      <ImageInputBox />
+      <ImageInputBox src="/images/미료_test.jpg" />
     </div>
   );
 }
