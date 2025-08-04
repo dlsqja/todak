@@ -14,7 +14,6 @@ public class RedisService {
 
     private final RedisTemplate<String, Object> redisTemplate;
 
-
     public Object getByKey(String cacheKey){
         return redisTemplate.opsForValue().get(cacheKey);
     }

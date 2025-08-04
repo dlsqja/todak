@@ -1,5 +1,6 @@
 package com.A409.backend.global.config;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,21 +12,23 @@ import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSeriali
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
+@Slf4j
 @Configuration
 @EnableScheduling
 public class RedisConfig {
 
-    @Value("${redis.sentinel.hosts1}")
+    @Value("${redis.sentinel.host1}")
     private String sentinel1;
 
-    @Value("${redis.sentinel.hosts2}")
+    @Value("${redis.sentinel.host2}")
     private String sentinel2;
 
-    @Value("${redis.sentinel.hosts3}")
+    @Value("${redis.sentinel.host3}")
     private String sentinel3;
 
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
+        log.info(sentinel1+","+sentinel2+","+sentinel3);
         RedisSentinelConfiguration sentinelConfig = new RedisSentinelConfiguration()
                 .master("mymaster")
                 .sentinel(sentinel1, 26379)
