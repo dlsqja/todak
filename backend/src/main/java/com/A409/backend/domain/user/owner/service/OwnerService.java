@@ -7,7 +7,7 @@ import com.A409.backend.domain.user.owner.dto.OwnerResponse;
 import com.A409.backend.domain.user.owner.entity.Owner;
 import com.A409.backend.domain.user.owner.repository.OwnerRepository;
 import com.A409.backend.global.enums.ErrorCode;
-import com.A409.backend.global.exceptin.CustomException;
+import com.A409.backend.global.exception.CustomException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

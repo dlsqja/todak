@@ -11,7 +11,7 @@ import com.A409.backend.domain.user.vet.dto.VetResponse;
 import com.A409.backend.domain.user.vet.entity.Vet;
 import com.A409.backend.domain.user.vet.repository.VetRepository;
 import com.A409.backend.global.enums.ErrorCode;
-import com.A409.backend.global.exceptin.CustomException;
+import com.A409.backend.global.exception.CustomException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,10 +30,15 @@ public class VetService {
         return vetRepository.findVetsByHospital_HospitalId(hospitalId).stream().map(VetResponse::toResponse).toList();
     }
 
-    @Transactional
-    public void insertVetInfo(Long authId, VetRequest vetRequest) {
-        Auth auth = authRepository.findById(authId)
-                .orElseThrow(() -> new CustomException(ErrorCode.RESOURCE_NOT_FOUND));
+
+    public Long getHospitalIdByVetId(Long vetId){
+        Vet vet = vetRepository.findById(vetId).orElseThrow((() -> new CustomException(ErrorCode.RESOURCE_NOT_FOUND)));
+        return vet.getHospital().getHospitalId();
+    }
+
+    /*
+    public Vet insertVet(VetRequest vetRequest) {
+        Auth auth = Auth.builder().authId(vetRequest.getAuthId()).build();
         Hospital hospital = hospitalRepository.findByHospitalCode(vetRequest.getHospitalCode());
 
         Vet vet = Vet.builder()
@@ -46,4 +51,5 @@ public class VetService {
                 .build();
         vetRepository.save(vet);
     }
+     */
 }
