@@ -28,14 +28,14 @@ public class SignupController {
         return ApiResponse.ofSuccess(null);
     }
 
-    /*
+
     @PostMapping("/vet")
     public ApiResponse<?> vetSignup(@RequestParam Long authId, @RequestBody VetRequest vetRequest) {
         vetService.insertVetInfo(authId, vetRequest);
         return ApiResponse.ofSuccess(null);
     }
 
-    */
+
     @PostMapping("/staff")
     public ApiResponse<?> signup(@RequestParam Long authId, @RequestBody StaffRequest staffRequest) {
         staffService.insertStaffInfo(authId, staffRequest);

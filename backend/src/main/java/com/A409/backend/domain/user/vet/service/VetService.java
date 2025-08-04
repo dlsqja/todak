@@ -36,9 +36,10 @@ public class VetService {
         return vet.getHospital().getHospitalId();
     }
 
-    /*
-    public Vet insertVet(VetRequest vetRequest) {
-        Auth auth = Auth.builder().authId(vetRequest.getAuthId()).build();
+
+    @Transactional
+    public void insertVetInfo(Long authId, VetRequest vetRequest) {
+        Auth auth = Auth.builder().authId(authId).build();
         Hospital hospital = hospitalRepository.findByHospitalCode(vetRequest.getHospitalCode());
 
         Vet vet = Vet.builder()
@@ -51,5 +52,4 @@ public class VetService {
                 .build();
         vetRepository.save(vet);
     }
-     */
 }
