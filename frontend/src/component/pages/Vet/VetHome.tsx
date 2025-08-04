@@ -1,11 +1,14 @@
-import React, { useState } from "react";
-import Button from "@/component/button/Button";
-import CopyButton from "@/component/button/CopyButton";
-import Input from "@/component/input/input";
+import { useState } from 'react';
+import Button from '@/component/button/Button';
+import CopyButton from '@/component/button/CopyButton';
+import Input from '@/component/input/Input';
+import TimeSelectionButton from '@/component/selection/TimeSelectionButton';
+import TimeSelectionDropdown from '@/component/selection/TimeSelectionDropdown';
+import ImageInputBox from '@/component/input/ImageInputBox';
 
 export default function VetHome() {
-  const [name, setName] = useState("");
-  const [birthday, setBirthday] = useState("");
+  const [name, setName] = useState('');
+  const [birthday, setBirthday] = useState('');
 
   return (
     <div className="mx-7">
@@ -29,6 +32,9 @@ export default function VetHome() {
         value={birthday}
         onChange={(e) => setBirthday(e.target.value)}
       />
+      <TimeSelectionButton start_time="08:00" end_time="21:00" />
+      <TimeSelectionDropdown start_time="08:00" end_time="21:00" label="진료 가능 시간" />
+      <ImageInputBox src="/images/미료_test.jpg" />
     </div>
   );
 }
