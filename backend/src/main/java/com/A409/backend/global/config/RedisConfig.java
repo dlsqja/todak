@@ -1,5 +1,6 @@
 package com.A409.backend.global.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -12,13 +13,22 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 @Configuration
 public class RedisConfig {
 
+    @Value("${redis.sentinel.hosts1}")
+    private String sentinel1;
+
+    @Value("${redis.sentinel.hosts2}")
+    private String sentinel2;
+
+    @Value("${redis.sentinel.hosts3}")
+    private String sentinel3;
+
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
         RedisSentinelConfiguration sentinelConfig = new RedisSentinelConfiguration()
                 .master("mymaster")
-                .sentinel("127.0.0.1", 26379)
-                .sentinel("127.0.0.1", 26380)
-                .sentinel("127.0.0.1", 26381);
+                .sentinel(sentinel1, 26379)
+                .sentinel(sentinel2, 26380)
+                .sentinel(sentinel3, 26381);
 
         return new LettuceConnectionFactory(sentinelConfig);
     }
