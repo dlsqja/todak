@@ -1,12 +1,11 @@
-// ex)증상 - 사진 - 설명
-
 import React from "react";
 
 interface ImageContentProps {
   title: string;
+  image?: string;  // image를 props로 받도록 수정
 }
 
-const ImageContent: React.FC<ImageContentProps> = ({ title }) => {
+const ImageContent: React.FC<ImageContentProps> = ({ title, image }) => {
   // 하드 코딩된 contents 데이터
   const contents = [
     "이름: 뽀삐",
@@ -15,24 +14,20 @@ const ImageContent: React.FC<ImageContentProps> = ({ title }) => {
   ];
 
   return (
-    <div style={{ padding: "10px", borderRadius: "8px" }}>
-      <h2 style={{ fontWeight: "bold", marginBottom: "15px" }}>{title}</h2>
+    <div className="p-4 rounded-lg">
+      <h2 className="font-bold mb-4">{title}</h2>
 
       {/* 이미지 네모 박스만 표시 */}
-      <div
-        style={{
-          width: "90px",   // 네모박스의 크기 설정
-          height: "90px",  // 네모박스의 크기 설정
-          backgroundColor: "#E9F1D7", // 네모 박스의 배경색
-          borderRadius: "16px", // 둥근 모서리 설정
-        }}
-      >
-        {/* 이곳에 나중에 이미지를 추가할 예정 */}
+      <div className="flex-shrink-0">
+        <div className="w-[88px] h-[88px] bg-gray-300 rounded-lg flex justify-center items-center overflow-hidden">
+          {/* 조건부 렌더링: image가 있으면 이미지를, 없으면 빈 박스를 표시 */}
+          {image && <img src={image} alt="아이콘" className="w-full h-full object-cover" />}
+        </div>
       </div>
 
-      <ul>
+      <ul className="mt-4">
         {contents.map((content, index) => (
-          <li key={index} style={{ marginBottom: "5px" }}>
+          <li key={index} className="mb-2">
             {content}
           </li>
         ))}
@@ -42,4 +37,3 @@ const ImageContent: React.FC<ImageContentProps> = ({ title }) => {
 };
 
 export default ImageContent;
-

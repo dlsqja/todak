@@ -6,6 +6,7 @@ interface TreatmentListContentProps {
   petName: string;
   petInfo: string; // petType | age | department
   status: string;
+  image?: string; // 이미지 경로 (선택적)
 }
 
 const TreatmentListContent: React.FC<TreatmentListContentProps> = ({
@@ -14,59 +15,42 @@ const TreatmentListContent: React.FC<TreatmentListContentProps> = ({
   petName,
   petInfo,
   status,
+  image,
 }) => {
   return (
-    <div
-      style={{
-        padding: "15px",
-        backgroundColor: "#f0f0f0",
-        borderRadius: "12px",
-        display: "flex",
-        flexDirection: "row", // 가로 배치
-        gap: "15px",
-        alignItems: "center",
-      }}
-    >
+    <div className="p-4 rounded-lg flex gap-4 items-start">
       {/* 왼쪽: 시간, 반려동물 이름, 나이, 진료과목 (세로 배치) */}
-      <div style={{ display: "flex", flexDirection: "column", gap: "10px", flex: 1 }}>
-        <h4 style={{ fontWeight: "bold", margin: 0 }}>{time}</h4>
-        <p style={{ fontSize: "14px", margin: "5px 0", fontWeight: "bold" }}>{petName}</p>
-        <p style={{ fontSize: "12px", margin: "5px 0" }}>{petInfo}</p>
+      <div className="flex flex-col gap-1 flex-1"> {/* gap-2로 줄임 */}
+        {/* 시간 */}
+        <div className="time">
+          <h4 className="h4 text-black">{time}</h4>
+        </div>
+
+        {/* 반려동물 이름 */}
+        <div className="pet-name">
+          <p className="p mt-1 text-black">{petName}</p> {/*mt-1로 줄임 */}
+        </div>
+
+        {/* 반려동물 정보 */}
+        <div className="pet-info">
+          <p className="caption mt-1 text-black">{petInfo}</p>
+        </div>
       </div>
 
       {/* 중간: 상태 표시 */}
       <div
-        style={{
-          backgroundColor: "#FFB800",
-          color: "white",
-          padding: "5px 10px",
-          borderRadius: "20px",
-          fontSize: "12px",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
+        className={`caption px-3 py-1 text-white rounded-full ${
+          status === "대기중" ? "bg-yellow-400" : "bg-green-300"
+        }`}
       >
         {status}
       </div>
 
-      {/* 오른쪽: 사진 (61.65px x 59.74px 크기) */}
-      <div
-        style={{
-          width: "61.65px",
-          height: "59.74px", // 설정된 크기로 수정
-          backgroundColor: "#e0e0e0",
-          borderRadius: "16px",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        <img
-          src="https://via.placeholder.com/40" // 예시 이미지 (실제 이미지 URL로 교체)
-          alt="아이콘"
-          style={{ width: "40px", height: "40px" }}
-        />
+      {/* 오른쪽: 이미지 (이미지박스) */}
+      <div className="flex-shrink-0">
+        <div className="w-[88px] h-[88px] bg-gray-300 rounded-lg flex justify-center items-center overflow-hidden">
+          {image && <img src={image} alt="아이콘" className="w-full h-full object-cover" />}
+        </div>
       </div>
     </div>
   );
