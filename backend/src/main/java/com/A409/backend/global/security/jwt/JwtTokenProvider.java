@@ -39,11 +39,11 @@ public class JwtTokenProvider {
                 .get("username", String.class);
 
     }
-    public Role getRole(String token){
+    public String getRole(String token){
         return Jwts.parser()
                 .verifyWith(secretKey)
                 .build().parseSignedClaims(token)
-                .getPayload().get("role", Role.class);
+                .getPayload().get("role", String.class);
     }
     public Boolean isExpired(String token) {
         return Jwts.parser()
@@ -59,7 +59,7 @@ public class JwtTokenProvider {
                 .id(UUID.randomUUID().toString())
                 .claim("id", id)
                 .claim("username", email)
-                .claim("role", role)
+                .claim("role", role.name())
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + expiredMs))
                 .signWith(secretKey)
@@ -71,7 +71,7 @@ public class JwtTokenProvider {
                 .id(UUID.randomUUID().toString())
                 .claim("id", id)
                 .claim("username", email)
-                .claim("role", role)
+                .claim("role", role.name())
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + expiredMs))
                 .signWith(secretKey)

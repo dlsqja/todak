@@ -31,12 +31,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             if(jwtService.validateToken(token)){
                 Long id = jwtService.getUserId(token);
                 String username = jwtService.getUsername(token);
-                Role role = jwtService.getRole(token);
+                String role = jwtService.getRole(token);
 
                 User user = User.builder()
                         .id(id)
                         .username(username)
-                        .role(role)
+                        .role(Role.valueOf(role))
                         .password(null)
                         .build();
 

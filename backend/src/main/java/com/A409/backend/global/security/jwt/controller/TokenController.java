@@ -29,8 +29,8 @@ public class TokenController {
         }
         Long id = jwtService.getUserId(refreshToken);
         String username = jwtService.getUsername(refreshToken);
-        Role role = jwtService.getRole(refreshToken);
-        String newAccessToken = jwtService.generateAccessToken(id, username ,role);
+        String role = jwtService.getRole(refreshToken);
+        String newAccessToken = jwtService.generateAccessToken(id, username ,Role.valueOf(role));
 
         Map<String, String> tokens = new HashMap<>();
         tokens.put("accessToken", newAccessToken);

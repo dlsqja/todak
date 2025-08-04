@@ -35,7 +35,7 @@ public class JwtService {
         return jwtTokenProvider.getUsername(token);
     }
 
-    public Role getRole(String token) {
+    public String getRole(String token) {
         return jwtTokenProvider.getRole(token);
     }
     public Long getUserId(String token) {
