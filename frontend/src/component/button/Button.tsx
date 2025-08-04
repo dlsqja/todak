@@ -13,7 +13,7 @@ export default function Button({ color, text, className = '' }: ButtonProps) {
   };
   return (
     <button
-      className={`w-full h-13 rounded-[12px] h4 ${
+      className={`cursor-pointer w-full h-13 rounded-[12px] h4 ${
         colorVariants[color as keyof typeof colorVariants]
       } ${className}`}
     >
