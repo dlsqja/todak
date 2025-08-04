@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import BackHeader from '@/component/header/BackHeader';
 import Button from '@/component/button/Button';
 import CopyButton from '@/component/button/CopyButton';
 import Input from '@/component/input/Input';
@@ -27,6 +28,7 @@ export default function VetHome() {
 
   return (
     <div className="mx-7">
+      <BackHeader text="홈으로 돌아가기" />
       <h1>Vet Home</h1>
       <p>여기는 Vet(수의사)홈 화면입니다.</p>
       <Button color="lightgreen" text="요약본 정리하기" />
