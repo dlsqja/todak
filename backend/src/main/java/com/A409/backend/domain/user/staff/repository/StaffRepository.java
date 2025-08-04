@@ -12,4 +12,5 @@ import java.util.Optional;
 public interface StaffRepository extends JpaRepository<Staff,Long> {
     List<Staff> findAllByHospital_HospitalId(Long hospitalHospitalId);
     Optional<Staff> findByAuth(Auth auth);
+    Optional<Staff> findByStaffId(Long staffId);
 }

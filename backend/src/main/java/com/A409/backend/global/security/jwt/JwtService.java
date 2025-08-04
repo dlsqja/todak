@@ -12,6 +12,7 @@ import java.util.Base64;
 @Service
 @RequiredArgsConstructor
 public class JwtService {
+
     private final JwtTokenProvider jwtTokenProvider;
     private final AuthRepository authRepository;
 

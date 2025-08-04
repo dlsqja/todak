@@ -8,6 +8,8 @@ public enum Role {
     VET,
     STAFF;
 
+    public String getRoleName() { return "ROLE_"+this.name(); }
+
     public String toString() {
         return this.name();
     }

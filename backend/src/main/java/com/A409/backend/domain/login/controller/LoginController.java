@@ -16,11 +16,11 @@ import com.A409.backend.global.kakao.service.KakaoAuthService;
 import com.A409.backend.global.response.ApiResponse;
 import com.A409.backend.global.security.jwt.JwtService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.HashMap;
 import java.util.Map;
-
+@Slf4j
 @RestController
 @RequestMapping("/public/login")
 @RequiredArgsConstructor
@@ -33,8 +33,10 @@ public class LoginController {
     private final VetRepository vetRepository;
     private final StaffRepository staffRepository;
 
-    @PostMapping("/{role}")
+    @GetMapping("/{role}")
     public ApiResponse<?> login(@PathVariable("role") String role, @RequestParam("code") String code) {
+
+
 
         Role selectedRole = switch (role) {
             case "owner" -> Role.OWNER;
@@ -70,6 +72,8 @@ public class LoginController {
         tokens.put("accessToken", accessToken);
         tokens.put("refreshToken", refreshToken);
 
+        log.info("Access Token: {}", accessToken);
+        log.info("Refresh Token: {}", refreshToken);
         return ApiResponse.ofSuccess(tokens);
     }
 }
