@@ -1,7 +1,7 @@
 // 현재 선택된 시간을 store에 저장하고 관리
 import { useTimeStore } from '@/store/timeStore';
 
-interface TimeSelectionProps {
+interface TimeSelectionButtonProps {
   start_time: string;
   end_time: string;
 }
@@ -12,7 +12,7 @@ const timeList = Array.from({ length: 48 }, (_, i) => {
   return `${hour}:${minute}`;
 });
 
-export default function TimeSelection({ start_time, end_time }: TimeSelectionProps) {
+export default function TimeSelection({ start_time, end_time }: TimeSelectionButtonProps) {
   const selectedTime = useTimeStore((state) => state.selectedTime);
   const setSelectedTime = useTimeStore((state) => state.setSelectedTime);
 

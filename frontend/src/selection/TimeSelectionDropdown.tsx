@@ -2,9 +2,10 @@ import React from 'react';
 import { useTimeStore } from '../store/timeStore';
 import DropdownArrow from '../component/icon/dropdown_arrow';
 
-interface TimeSelectionProps {
+interface TimeSelectionDropdownProps {
   start_time: string;
   end_time: string;
+  label: string;
 }
 
 const timeList = Array.from({ length: 48 }, (_, i) => {
@@ -13,7 +14,11 @@ const timeList = Array.from({ length: 48 }, (_, i) => {
   return `${hour}:${minute}`;
 });
 
-export default function TimeSelectionDropdown({ start_time, end_time }: TimeSelectionProps) {
+export default function TimeSelectionDropdown({
+  start_time,
+  end_time,
+  label,
+}: TimeSelectionDropdownProps) {
   const selectedTime = useTimeStore((state) => state.selectedTime);
   const setSelectedTime = useTimeStore((state) => state.setSelectedTime);
 
@@ -44,9 +49,11 @@ export default function TimeSelectionDropdown({ start_time, end_time }: TimeSele
   });
 
   return (
-    <div className="relative">
-      <select
-        className="appearance-none 
+    <div>
+      <label className="block mb-2 text-black h4">{label}</label>
+      <div className="relative">
+        <select
+          className="appearance-none 
         w-full border 
         border-gray-400 h-12 
         focus:outline-none
@@ -54,20 +61,21 @@ export default function TimeSelectionDropdown({ start_time, end_time }: TimeSele
         bg-green-100 
         rounded-2xl 
         px-4 py-2"
-        value={selectedTime}
-        onChange={(e) => setSelectedTime(e.target.value)}
-      >
-        {filteredTimeList.map((time) => (
-          <option key={time} value={time}>
-            {time}
-          </option>
-        ))}
-      </select>
-      <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2">
-        <DropdownArrow width={24} height={24} />
-      </span>
-      {/* 현재 선택된 시간 확인용 - 지워도 됨 */}
-      {/* {selectedTime ? `선택된 시간: ${selectedTime}` : '시간을 선택하세요.'} */}
+          value={selectedTime}
+          onChange={(e) => setSelectedTime(e.target.value)}
+        >
+          {filteredTimeList.map((time) => (
+            <option key={time} value={time}>
+              {time}
+            </option>
+          ))}
+        </select>
+        <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2">
+          <DropdownArrow width={24} height={24} />
+        </span>
+        {/* 현재 선택된 시간 확인용 - 지워도 됨 */}
+        {/* {selectedTime ? `선택된 시간: ${selectedTime}` : '시간을 선택하세요.'} */}
+      </div>
     </div>
   );
 }
