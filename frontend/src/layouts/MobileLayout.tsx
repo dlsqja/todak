@@ -1,15 +1,16 @@
 import React from 'react';
-// import OwnerMenuBar from '@/component/menubar/OwnerMenuBar';
+import { Outlet } from 'react-router-dom';
 
 interface MobileLayoutProps {
-  children: React.ReactNode;
+  menuBar?: React.ReactNode;
 }
 
-export default function MobileLayout({ children }: MobileLayoutProps) {
-  return (
-    <div className="h-screen mx-auto max-w-md bg-green-100 relative flex flex-col pb-16">
-      {/* <OwnerMenuBar /> */}
-      {children}
-    </div>
-  );
-}
+const MobileLayout: React.FC<MobileLayoutProps> = ({ menuBar }) => (
+  <div className="h-screen mx-auto max-w-md bg-green-100 relative flex flex-col items-center">
+    <main>
+      <Outlet />
+    </main>
+    {menuBar}
+  </div>
+);
+export default MobileLayout;
