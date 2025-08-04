@@ -6,7 +6,7 @@ import com.A409.backend.domain.reservation.entity.Reservation;
 import com.A409.backend.domain.reservation.repository.ReservationRepository;
 import com.A409.backend.domain.user.owner.entity.Owner;
 import com.A409.backend.global.enums.ErrorCode;
-import com.A409.backend.global.exceptin.CustomException;
+import com.A409.backend.global.exception.CustomException;
 import com.A409.backend.global.util.uploader.S3Uploader;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,7 +16,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor

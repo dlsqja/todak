@@ -1,4 +1,4 @@
-package com.A409.backend.global.exceptin;
+package com.A409.backend.global.exception;
 
 import com.A409.backend.global.enums.ErrorCode;
 import lombok.Getter;

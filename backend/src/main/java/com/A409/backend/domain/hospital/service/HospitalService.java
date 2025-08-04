@@ -7,9 +7,8 @@ import com.A409.backend.domain.hospital.repository.HospitalRepository;
 import com.A409.backend.domain.user.staff.dto.StaffResponse;
 import com.A409.backend.domain.user.staff.entity.Staff;
 import com.A409.backend.domain.user.staff.repository.StaffRepository;
-import com.A409.backend.domain.user.vet.repository.VetRepository;
 import com.A409.backend.global.enums.ErrorCode;
-import com.A409.backend.global.exceptin.CustomException;
+import com.A409.backend.global.exception.CustomException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
