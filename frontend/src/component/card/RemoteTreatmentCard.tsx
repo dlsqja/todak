@@ -1,5 +1,5 @@
 import React from "react";
-import SubmitButton from "@/component/button/Button";
+import Button from "../button/Button";
 
 interface RemoteTreatmentCardProps {
   petName: string;
@@ -47,12 +47,12 @@ const RemoteTreatmentCard: React.FC<RemoteTreatmentCardProps> = ({
 
       {/* 하단 버튼 */}
       <div className="flex gap-3">
-        <SubmitButton
+        <Button
           text="상세 정보"
           color="lightgreen"
           className="flex-1"
         />
-        <SubmitButton
+        <Button
           text="진료 받기"
           color="green"
           className="flex-1"
