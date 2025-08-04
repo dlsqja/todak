@@ -75,7 +75,7 @@ export default function TimeSelection({ start_time, end_time }: TimeSelectionPro
         )}
       </div>
       {/* 현재 선택된 시간 확인용 - 지워도 됨 */}
-      <div>{selectedTime ? `선택된 시간: ${selectedTime}` : '시간을 선택하세요.'}</div>
+      {/* <div>{selectedTime ? `선택된 시간: ${selectedTime}` : '시간을 선택하세요.'}</div> */}
     </div>
   );
 }
