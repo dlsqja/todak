@@ -1,14 +1,14 @@
 package com.A409.backend.domain.user.vet.dto;
 
-import com.A409.backend.domain.user.vet.entity.Vet;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 public class VetRequest {
-    private Long authId;
-    private String hospitalCode;
-    private String name;
-    private String license;
-    private String profile;
-    private String photo;
+    String name;
+    String license;
+    String hospitalCode;
+    String profile;
+    String photo;
 }

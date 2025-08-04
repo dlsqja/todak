@@ -78,4 +78,24 @@ public class ReservationService {
         reservationRepository.removeByOwner_OwnerIdAndReservationId(ownerId,reservationId);
     }
 
+    public List<Map<String, Object>> getAllHospitalReservationList(Long hospitalId) {
+        List<Reservation> reservations = reservationRepository.findAllByHospital_HospitalId(hospitalId);
+
+        List<Map<String, Object>> result = reservations.stream()
+                .map(reservation -> {
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("reservationId", reservation.getReservationId());
+                    map.put("petName", reservation.getPet().getName());
+                    map.put("hospitalName", reservation.getHospital().getName());
+                    map.put("vetName", reservation.getVet().getName());
+                    map.put("reservationDay", reservation.getReservationDay());
+                    map.put("reservationTime", reservation.getReservationTime());
+                    map.put("subject", reservation.getSubject());
+                    map.put("status", reservation.getStatus());
+                    return map;
+                })
+                .toList();
+
+        return result;
+    }
 }

@@ -1,5 +1,7 @@
 package com.A409.backend.domain.user.owner.service; // 가상의 서비스 패키지
 
+import com.A409.backend.domain.user.auth.entity.Auth;
+import com.A409.backend.domain.user.auth.repository.AuthRepository;
 import com.A409.backend.domain.user.owner.dto.OwnerRequest;
 import com.A409.backend.domain.user.owner.dto.OwnerResponse;
 import com.A409.backend.domain.user.owner.entity.Owner;
@@ -15,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class OwnerService {
 
     private final OwnerRepository ownerRepository;
+    private final AuthRepository authRepository;
 
     @Transactional(readOnly = true)
     public OwnerResponse getOwnerInfo(Long ownerId) {
@@ -37,4 +40,18 @@ public class OwnerService {
         ownerRepository.save(owner);
     }
 
+    @Transactional
+    public void insertOwnerInfo(Long authId, OwnerRequest ownerRequest) {
+        Auth auth = authRepository.findById(authId)
+                .orElseThrow(() -> new CustomException(ErrorCode.RESOURCE_NOT_FOUND));
+
+        Owner owner = Owner.builder()
+                .auth(auth)
+                .name(ownerRequest.getName())
+                .phone(ownerRequest.getPhone())
+                .birth(ownerRequest.getBirth())
+                .build();
+
+        ownerRepository.save(owner);
+    }
 }

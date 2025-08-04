@@ -5,8 +5,10 @@ import com.A409.backend.domain.user.auth.entity.Auth;
 import com.A409.backend.domain.user.vet.entity.Vet;
 import jakarta.persistence.*;
 import lombok.Builder;
+import lombok.Getter;
 
 @Builder
+@Getter
 public class VetResponse {
 
     private Long vetId;
