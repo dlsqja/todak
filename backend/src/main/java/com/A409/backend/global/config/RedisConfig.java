@@ -15,13 +15,13 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableScheduling
 public class RedisConfig {
 
-    @Value("${redis.sentinel.hosts1}")
+    @Value("${redis.sentinel.host1}")
     private String sentinel1;
 
-    @Value("${redis.sentinel.hosts2}")
+    @Value("${redis.sentinel.host2}")
     private String sentinel2;
 
-    @Value("${redis.sentinel.hosts3}")
+    @Value("${redis.sentinel.host3}")
     private String sentinel3;
 
     @Bean
