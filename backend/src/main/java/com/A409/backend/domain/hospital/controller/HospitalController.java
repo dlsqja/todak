@@ -9,7 +9,7 @@ import com.A409.backend.global.enums.ErrorCode;
 import com.A409.backend.global.exception.CustomException;
 import com.A409.backend.global.response.ApiResponse;
 import com.A409.backend.global.security.model.User;
-import com.A409.backend.global.util.redis.RedisService;
+import com.A409.backend.global.redis.service.RedisService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;

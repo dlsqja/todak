@@ -3,15 +3,13 @@ package com.A409.backend.global.elasticsearch.controller;
 import com.A409.backend.global.annotation.LogExecutionTime;
 import com.A409.backend.global.elasticsearch.Entity.HospitalDocument;
 import com.A409.backend.global.elasticsearch.service.ElasticService;
-import com.A409.backend.global.util.redis.RedisService;
+import com.A409.backend.global.redis.service.RedisService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequiredArgsConstructor
