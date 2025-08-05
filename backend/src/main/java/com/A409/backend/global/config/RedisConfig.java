@@ -17,6 +17,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableScheduling
 public class RedisConfig {
 
+    /*
+    배포용 센티널 설정
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
 
@@ -28,6 +30,7 @@ public class RedisConfig {
 
         return new LettuceConnectionFactory(sentinelConfig);
     }
+     */
 
     @Bean
     public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory connectionFactory) {
