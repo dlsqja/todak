@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 // 컴포넌트 제작 테스트
 import SingleContent from '@/component/text/SingleContent';
@@ -8,8 +8,21 @@ import SummaryContent from '@/component/text/SummaryContent';
 import TreatmentListContent from '@/component/text/TeatmentListContent';
 import OwnerAnimalIcon from '@/component/icon/OwnerAnimalIcon';
 
+// Navbar 테스트
+import TabGroupWaiting from '@/component/navbar/TabGroupWaiting';
+import TabGroupTime from '@/component/navbar/TabGroupTime';
+import TabGroupRoles from '@/component/navbar/TabGroupRoles';
+import TabGroupPet from '@/component/navbar/TabGroupPet';
+import TabGroupTreatList from '@/component/navbar/TabGroupTreatList';
+
 
 export default function StaffHome() {
+  const [selectedTab, setSelectedTab] = useState<string>('대기'); // 대기/승인/반려
+  const [selectedTimeTab, setSelectedTimeTab] = useState<string>('진료 가능 시간');  // 진료 가능 시간/예약 목록
+  const [selectedRolesTab, setSelectedRolesTab] = useState<string>('반려인'); // 반려인/수의사/병원관계자
+  const [selectedPetTab, setSelectedPetTab] = useState<string>('상세정보'); // 상세정보 / 진료내역
+  const [selectedTreatListTab, setSelectedTreatListTab] = useState<string>('목록형'); // 목록형/날짜형
+
   // MultipleContent에 전달할 contents 리스트
   const petInfo = [
     '이름: 뽀삐',
@@ -20,6 +33,37 @@ export default function StaffHome() {
     <div>
       <h1>Staff Home</h1>
       <p>여기는 Staff(스태프) 홈 화면입니다.</p>
+
+      {/* 👉 TabGroupWaiting */}
+      <div className="mt-6">
+        <TabGroupWaiting selected={selectedTab} onSelect={setSelectedTab} />
+        <p className="mt-2 text-sm text-gray-600">선택된 탭: {selectedTab}</p>
+      </div>
+
+      {/* 👉 TabGroupTime */}
+      <div className="mt-6">
+        <TabGroupTime selected={selectedTimeTab} onSelect={setSelectedTimeTab} />
+        <p className="mt-2 text-sm text-gray-600">선택된 시간탭: {selectedTimeTab}</p>
+      </div>
+
+      {/* 👉 TabGroupRoles */}
+      <div className="mt-6">
+        <TabGroupRoles selected={selectedRolesTab} onSelect={setSelectedRolesTab} />
+        <p className="mt-2 text-sm text-gray-600">선택된 시간탭: {selectedRolesTab}</p>
+      </div>
+
+      {/* 👉 TabGroupPet */}
+      <div className="mt-6">
+        <TabGroupPet selected={selectedPetTab} onSelect={setSelectedPetTab} />
+        <p className="mt-2 text-sm text-gray-600">선택된 시간탭: {selectedPetTab}</p>
+      </div>
+
+      {/* 👉 TabGroupTreatList */}
+      <div className="mt-6">
+        <TabGroupTreatList selected={selectedTreatListTab} onSelect={setSelectedTreatListTab} />
+        <p className="mt-2 text-sm text-gray-600">선택된 시간탭: {selectedTreatListTab}</p>
+      </div>
+
 
       {/* SingleContent 컴포넌트 사용 */}
       <SingleContent 
