@@ -6,6 +6,7 @@ import com.A409.backend.domain.reservation.entity.Reservation;
 import com.A409.backend.domain.reservation.repository.ReservationRepository;
 import com.A409.backend.domain.user.owner.entity.Owner;
 import com.A409.backend.global.enums.ErrorCode;
+import com.A409.backend.global.enums.Status;
 import com.A409.backend.global.exception.CustomException;
 import com.A409.backend.global.util.uploader.S3Uploader;
 import lombok.RequiredArgsConstructor;
@@ -66,7 +67,7 @@ public class ReservationService {
     public ReservationResponse getReservationDetail(Long ownerId, Long reservationId) {
 
         Reservation reservation = reservationRepository.findById(reservationId).orElseThrow(() -> new CustomException(ErrorCode.CONTENT_NOT_FOUND));
-        if(ownerId!=reservation.getOwner().getOwnerId()){
+        if(!ownerId.equals(reservation.getOwner().getOwnerId())){
             throw  new CustomException(ErrorCode.ACCESS_DENIED);
         }
 
@@ -78,7 +79,7 @@ public class ReservationService {
         reservationRepository.removeByOwner_OwnerIdAndReservationId(ownerId,reservationId);
     }
 
-    public List<Map<String, Object>> getAllHospitalReservationList(Long hospitalId) {
+    public List<Map<String, Object>> getHospitalReservations(Long hospitalId) {
         List<Reservation> reservations = reservationRepository.findAllByHospital_HospitalId(hospitalId);
 
         List<Map<String, Object>> result = reservations.stream()
@@ -97,5 +98,33 @@ public class ReservationService {
                 .toList();
 
         return result;
+    }
+    public List<Map<String, Object>> getReservationsByHospitalAndStatus(Long hospitalId, Status status) {
+        List<Reservation> reservations = reservationRepository.findAllByHospital_HospitalIdAndStatus(hospitalId, status);
+        List<Map<String, Object>> result = reservations.stream()
+                .map(reservation -> {
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("reservationId", reservation.getReservationId());
+                    map.put("petName", reservation.getPet().getName());
+                    map.put("hospitalName", reservation.getHospital().getName());
+                    map.put("vetName", reservation.getVet().getName());
+                    map.put("reservationDay", reservation.getReservationDay());
+                    map.put("reservationTime", reservation.getReservationTime());
+                    map.put("subject", reservation.getSubject());
+                    map.put("status", reservation.getStatus());
+                    return map;
+                })
+                .toList();
+
+        return result;
+    }
+    public ReservationResponse getHospitalReservationDetail(Long hospitalId, Long reservationId) {
+        Reservation reservation = reservationRepository.findReservationByReservationId(reservationId).orElseThrow(() -> new CustomException(ErrorCode.CONTENT_NOT_FOUND));
+
+        if(!hospitalId.equals(reservation.getHospital().getHospitalId())){
+            throw  new CustomException(ErrorCode.ACCESS_DENIED);
+        }
+
+        return ReservationResponse.toOwnerResponse(reservation);
     }
 }
