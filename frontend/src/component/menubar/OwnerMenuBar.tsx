@@ -8,7 +8,7 @@ import OwnerHomeIcon from '@/component/icon/HomeIcon';
 
 const menuList = [
   { name: '홈', icon: OwnerHomeIcon, path: '/owner/home' },
-  { name: '동물 관리', icon: OwnerAnimalIcon, path: '/owner/animal' },
+  { name: '동물 관리', icon: OwnerAnimalIcon, path: '/owner/pet' },
   { name: '예약내역', icon: OwnerReservationIcon, path: '/owner/reservation' },
   { name: '비대면 진료', icon: OwnerTreatmentIcon, path: '/owner/treatment' },
   { name: '마이', icon: OwnerMyPageIcon, path: '/owner/mypage' },
