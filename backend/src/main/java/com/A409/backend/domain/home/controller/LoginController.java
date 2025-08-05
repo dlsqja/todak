@@ -12,7 +12,7 @@ import com.A409.backend.domain.user.vet.repository.VetRepository;
 import com.A409.backend.global.enums.ErrorCode;
 import com.A409.backend.global.enums.Role;
 import com.A409.backend.global.exception.CustomException;
-import com.A409.backend.global.kakao.service.KakaoAuthService;
+import com.A409.backend.global.oauth.kakao.service.KakaoAuthService;
 import com.A409.backend.global.response.ApiResponse;
 import com.A409.backend.global.security.jwt.JwtService;
 import lombok.RequiredArgsConstructor;

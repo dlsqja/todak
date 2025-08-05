@@ -1,21 +1,16 @@
-package com.A409.backend.global.kakao.controller;
+package com.A409.backend.global.oauth.kakao.controller;
 
 import com.A409.backend.domain.user.auth.entity.Auth;
 import com.A409.backend.domain.user.auth.repository.AuthRepository;
 import com.A409.backend.global.enums.ErrorCode;
-import com.A409.backend.global.enums.Role;
 import com.A409.backend.global.exception.CustomException;
-import com.A409.backend.global.kakao.service.KakaoAuthService;
+import com.A409.backend.global.oauth.kakao.service.KakaoAuthService;
 import com.A409.backend.global.response.ApiResponse;
 import com.A409.backend.global.security.jwt.JwtService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.Map;
 
 @Slf4j
