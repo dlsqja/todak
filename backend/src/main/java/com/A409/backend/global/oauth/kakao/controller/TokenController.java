@@ -1,10 +1,9 @@
-package com.A409.backend.global.security.jwt.controller;
+package com.A409.backend.global.oauth.kakao.controller;
 
 import com.A409.backend.global.enums.Role;
 import com.A409.backend.global.security.jwt.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.token.TokenService;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
