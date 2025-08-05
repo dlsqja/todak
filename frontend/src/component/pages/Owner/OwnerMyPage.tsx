@@ -4,13 +4,19 @@ import BackHeader from '@/component/header/BackHeader';
 import Input from '@/component/input/Input';
 
 export default function OwnerMyPage() {
+  const ownerInfo = {
+    name: '김싸피',
+    phone: '010-1234-5678',
+    birth: '1998.12.23',
+  };
+
   return (
     <>
       <BackHeader text="마이페이지" />
       <div className="flex flex-col gap-6 px-4 mt-11">
-        <Input id="name" label="이름" value="김싸피" disabled={true} />
-        <Input id="birth" label="생년월일" value="1998.12.23" disabled={true} />
-        <Input id="phone" label="전화번호" value="010-3953-8888" disabled={true} />
+        <Input id="name" label="이름" value={ownerInfo.name} disabled={true} />
+        <Input id="birth" label="생년월일" value={ownerInfo.birth} disabled={true} />
+        <Input id="phone" label="전화번호" value={ownerInfo.phone} disabled={true} />
       </div>
       <br />
       <div className="flex justify-center gap-2">
