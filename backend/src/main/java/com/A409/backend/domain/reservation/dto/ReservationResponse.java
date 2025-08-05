@@ -20,7 +20,7 @@ import java.time.LocalDate;
 public class ReservationResponse {
 
     private Long reservationId;
-    private OwnerResponse owner;
+    private OwnerResponse onwer;
     private PetResponse pet;
     private String hospitalName;
     private String vetName;

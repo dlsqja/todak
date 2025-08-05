@@ -17,3 +17,4 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     Optional<Reservation> findReservationByReservationId(Long reservationId);
     List<Reservation> findByVet_VetIdAndStatus(Long vetId, Status status);
 }
+

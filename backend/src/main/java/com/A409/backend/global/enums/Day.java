@@ -1,5 +1,5 @@
 package com.A409.backend.global.enums;
 
 public enum Day {
-    MON, Tue, Wed, Thu, Fri, Sat, Sun
+    MON, TUE, WED, THU, FRI, SAT, SUN
 }

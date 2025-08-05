@@ -12,12 +12,14 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class WorkingHourResponse {
+    private Long workingId;
     private Day day;
     private Byte startTime;
     private Byte endTime;
 
     public static WorkingHourResponse toResponse(WorkingHour workingHour) {
         return WorkingHourResponse.builder()
+                .workingId(workingHour.getWorkingId())
                 .day(workingHour.getDay())
                 .startTime(workingHour.getStartTime())
                 .endTime(workingHour.getEndTime())

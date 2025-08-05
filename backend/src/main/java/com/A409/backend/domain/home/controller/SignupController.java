@@ -30,7 +30,7 @@ public class SignupController {
     @Operation(summary = "수의사 회원가입")
     @PostMapping("/vet")
     public APIResponse<?> vetSignup(@RequestParam Long authId, @RequestBody VetRequest vetRequest) {
-        //vetService.insertVetInfo(authId, vetRequest);
+        vetService.insertVetInfo(authId, vetRequest);
         return APIResponse.ofSuccess(null);
     }
 
