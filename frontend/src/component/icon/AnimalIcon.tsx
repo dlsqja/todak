@@ -1,11 +1,11 @@
-interface OwnerAnimalIconProps {
+interface AnimalIconProps {
   fill?: string;
   stroke?: string;
   width?: number | string;
   height?: number | string;
 }
 
-function OwnerAnimalIcon({ fill = 'inherit', stroke = 'inherit', width = 28, height = 28 }: OwnerAnimalIconProps) {
+function AnimalIcon({ fill = 'inherit', stroke = 'inherit', width = 28, height = 28 }: AnimalIconProps) {
   return (
     <svg
       width={width}
@@ -20,4 +20,4 @@ function OwnerAnimalIcon({ fill = 'inherit', stroke = 'inherit', width = 28, hei
   );
 }
 
-export default OwnerAnimalIcon;
+export default AnimalIcon;

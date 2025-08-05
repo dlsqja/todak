@@ -1,16 +1,11 @@
-interface OwnerReservationIconProps {
+interface ReservationIconProps {
   fill?: string;
   width?: number | string;
   height?: number | string;
   stroke?: string;
 }
 
-function OwnerReservationIcon({
-  fill = 'inherit',
-  stroke = 'inherit',
-  width = 24,
-  height = 24,
-}: OwnerReservationIconProps) {
+function ReservationIcon({ fill = 'inherit', stroke = 'inherit', width = 24, height = 24 }: ReservationIconProps) {
   return (
     <svg
       width={width}
@@ -25,4 +20,4 @@ function OwnerReservationIcon({
   );
 }
 
-export default OwnerReservationIcon;
+export default ReservationIcon;

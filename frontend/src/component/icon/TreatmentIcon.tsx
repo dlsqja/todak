@@ -1,16 +1,11 @@
-interface OwnerTreatmentIconProps {
+interface TreatmentIconProps {
   fill?: string;
   stroke?: string;
   width?: number | string;
   height?: number | string;
 }
 
-function OwnerTreatmentIcon({
-  fill = 'inherit',
-  stroke = 'inherit',
-  width = 24,
-  height = 24,
-}: OwnerTreatmentIconProps) {
+function TreatmentIcon({ fill = 'inherit', stroke = 'inherit', width = 24, height = 24 }: TreatmentIconProps) {
   return (
     <svg
       width={width}
@@ -25,4 +20,4 @@ function OwnerTreatmentIcon({
   );
 }
 
-export default OwnerTreatmentIcon;
+export default TreatmentIcon;

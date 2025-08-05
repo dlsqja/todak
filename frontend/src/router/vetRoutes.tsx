@@ -1,8 +1,8 @@
 import VetHome from '@/component/pages/Vet/VetHome';
 import MobileLayout from '@/layouts/MobileLayout';
 import VetMenuBar from '@/component/menubar/VetMenuBar';
-import VetHospital from '@/component/pages/Vet/VetHosptial';
-import VetTreatment from '@/component/pages/Vet/VetTreatement';
+import VetHospital from '@/component/pages/Vet/VetHospital';
+import VetTreatment from '@/component/pages/Vet/VetTreatment';
 import VetRecord from '@/component/pages/Vet/VetRecord';
 import VetMyPage from '@/component/pages/Vet/VetMypage';
 
