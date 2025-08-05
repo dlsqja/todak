@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { OpenVidu, Session } from 'openvidu-browser';
+import { OpenVidu, Session, StreamManager } from 'openvidu-browser';
 import myaxios from '@/api/axios-common';
 
 const VideoCall = () => {
@@ -7,25 +7,63 @@ const VideoCall = () => {
   const OVRef = useRef<OpenVidu | null>(null);
   const sessionRef = useRef<Session | null>(null);
 
+  const localVideoRef = useRef<HTMLVideoElement>(null);
+  const remoteVideoRef = useRef<HTMLVideoElement>(null);
+
   async function joinSession() {
     try {
       const res = await myaxios.get('/video/get-token', {
         params: { session_id: sessionId },
       });
-      const token: string = res.data.data.token; // 서버 응답 구조에 맞게 수정
-      console.log('res.data', token);
+      console.log('[TOKEN]', res.data);
+      const tokenUrl: string = res.data.token;
 
       OVRef.current = new OpenVidu();
-      // (OVRef.current as any).openviduServerUrl = 'http://127.0.0.1:4443';
+      (OVRef.current as any).openviduServerUrl = 'https://70.12.246.252';
+
       sessionRef.current = OVRef.current.initSession();
 
+      // 다른 참가자 스트림 구독
       sessionRef.current.on('streamCreated', (event) => {
-        sessionRef.current?.subscribe(event.stream, 'remote-video');
+        console.log('[REMOTE] streamCreated', event.stream);
+        const subscriber: StreamManager = sessionRef.current!.subscribe(event.stream, undefined);
+        subscriber.on('videoElementCreated', (e) => {
+          console.log('[REMOTE] videoElementCreated');
+          if (remoteVideoRef.current) {
+            remoteVideoRef.current.srcObject = e.element.srcObject;
+            remoteVideoRef.current.play().catch((err) => console.error('[REMOTE] play error', err));
+          }
+        });
       });
 
-      await sessionRef.current.connect(token);
-      const publisher = OVRef.current.initPublisher('local-video');
+      await sessionRef.current.connect(tokenUrl);
+      console.log('[SESSION] connected');
+
+      // 로컬 스트림 생성
+      const publisher = OVRef.current.initPublisher(undefined, {
+        audioSource: undefined,
+        videoSource: undefined,
+        publishAudio: true,
+        publishVideo: true,
+        resolution: '640x480',
+        frameRate: 30,
+        insertMode: 'APPEND',
+        mirror: true,
+      });
+
+      publisher.on('videoElementCreated', (e) => {
+        console.log('[LOCAL] videoElementCreated');
+        if (localVideoRef.current) {
+          localVideoRef.current.srcObject = e.element.srcObject;
+          localVideoRef.current
+            .play()
+            .then(() => console.log('[LOCAL] play success'))
+            .catch((err) => console.error('[LOCAL] play error', err));
+        }
+      });
+
       sessionRef.current.publish(publisher);
+      console.log('[SESSION] publisher published');
     } catch (err) {
       console.error('세션 참가 실패:', err);
     }
@@ -45,10 +83,9 @@ const VideoCall = () => {
       <button onClick={joinSession}>세션참가</button>
       <button onClick={leaveSession}>세션종료</button>
 
-      {/* 비디오 영역 */}
       <div>
-        <video id="local-video" autoPlay playsInline muted></video>
-        <video id="remote-video" autoPlay playsInline></video>
+        <video ref={localVideoRef} autoPlay playsInline muted></video>
+        <video ref={remoteVideoRef} autoPlay playsInline></video>
       </div>
     </div>
   );
