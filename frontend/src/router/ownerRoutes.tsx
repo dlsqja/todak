@@ -3,7 +3,7 @@ import OwnerMenuBar from '@/component/menubar/OwnerMenuBar';
 import OwnerHome from '@/component/pages/Owner/OwnerHome';
 import OwnerAnimal from '@/component/pages/Owner/OwnerAnimal';
 import OwnerMyPage from '@/component/pages/Owner/OwnerMyPage';
-import OwnerReservation from '@/component/pages/Owner/OwnerReservation';
+import OwnerReservation from '@/component/pages/Owner/Reservation/OwnerReservationHome';
 import OwnerTreatment from '@/component/pages/Owner/OwnerTreatment';
 
 const ownerRoutes = {
