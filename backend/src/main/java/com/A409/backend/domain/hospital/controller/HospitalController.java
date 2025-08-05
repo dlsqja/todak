@@ -106,4 +106,12 @@ public class HospitalController {
 
         return APIResponse.ofSuccess(null);
     }
+    @GetMapping("/working-hours")
+    public APIResponse<?> getWorkingHours(@AuthenticationPrincipal User user) {
+        return null;
+    }
+    @PostMapping("/{vet_id}/working-hours")
+    public APIResponse<?> getWorkingHours(@AuthenticationPrincipal User user, @PathVariable("vet_id") Long vetId) {
+        return null;
+    }
 }

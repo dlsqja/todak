@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -21,6 +22,9 @@ public class WorkingHourService {
                 .stream()
                 .map(WorkingHourResponse::toResponse)
                 .toList();
+    }
+    public List<Map<String, Object>> getWorkingHoursAndVet(Long hospital_id){
+        return null;
     }
 
     // 해당 workingHour를 추가 및 수정
