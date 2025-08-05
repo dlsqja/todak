@@ -40,12 +40,7 @@ public class PetController {
     }
 
     @Operation(summary = "반려동물 상세 조회")
-    @ApiResponse(responseCode = "200",
-            content = @Content(
-                    mediaType = "application/json",
-                    array = @ArraySchema(schema = @Schema(implementation = PetResponse.class))
-            )
-    )
+    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = PetResponse.class)))
     @GetMapping("/{pet_id}")
     public APIResponse<?> getMyPetDetail(@AuthenticationPrincipal User user, @PathVariable("pet_id") Long petId) {
 
