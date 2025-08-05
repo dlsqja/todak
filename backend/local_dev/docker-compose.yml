@@ -1,19 +1,33 @@
 services:
-  local-server:
-    build:
-      context: ../
+
+#  local-server:
+#    build:
+#      context: ../
+#    ports:
+#      - "8081:8080"
+#    depends_on:
+#      local-mysql:
+#        condition: service_healthy
+#      local-elasticsearch:
+#        condition: service_healthy
+#      redis-master:
+#        condition: service_healthy
+#    environment:
+#      - SPRING_ELASTICSEARCH_URIS=http://local-elasticsearch:9200
+#      - SPRING_DATASOURCE_URL=jdbc:mysql://local-mysql:3306/todak?serverTimezone=Asia/Seoul&useSSL=false&allowPublicKeyRetrieval=true
+
+  rabbitmq:
+    image: rabbitmq:3.11-management
+    container_name: rabbitmq
     ports:
-      - "8081:8080"
-    depends_on:
-      local-mysql:
-        condition: service_healthy
-      local-elasticsearch:
-        condition: service_healthy
-      redis-master:
-        condition: service_healthy
+      - "5672:5672"
+      - "15672:15672"
+    restart: unless-stopped
     environment:
-      - SPRING_ELASTICSEARCH_URIS=http://local-elasticsearch:9200
-      - SPRING_DATASOURCE_URL=jdbc:mysql://local-mysql:3306/todak?serverTimezone=Asia/Seoul&useSSL=false&allowPublicKeyRetrieval=true
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
 
   local-mysql:
     image: mysql:8
@@ -121,3 +135,4 @@ volumes:
   es_data:
   redis_master_data:
   redis_slave_data:
+  rabbitmq_data:

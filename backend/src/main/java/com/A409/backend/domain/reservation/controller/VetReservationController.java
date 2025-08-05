@@ -1,14 +1,11 @@
 package com.A409.backend.domain.reservation.controller;
 
-import com.A409.backend.domain.reservation.dto.ReservationResponse;
 import com.A409.backend.domain.reservation.dto.ReservationResponseToVet;
 import com.A409.backend.domain.reservation.entity.Reservation;
 import com.A409.backend.domain.reservation.service.ReservationService;
-import com.A409.backend.domain.user.vet.entity.Vet;
-import com.A409.backend.global.response.ApiResponse;
+import com.A409.backend.global.response.APIResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,10 +28,10 @@ public class VetReservationController {
     @GetMapping("/{vet_id}")
     //배포 시에는 Authentication으로 해서 vet.getVetId() 받아오도록
     //public ApiResponse<?> getPendingReservations(@AuthenticationPrincipal Vet vet, @PathVariable("vet_id") Long vetId) {
-    public ApiResponse<?> getPendingReservations(@PathVariable("vet_id") Long vetId) {
+    public APIResponse<?> getPendingReservations(@PathVariable("vet_id") Long vetId) {
         List<Reservation> reservations = reservationService.getReservationsByVetId(vetId);
 
-        return ApiResponse.ofSuccess(reservations.stream().map(reservation -> Map.of(
+        return APIResponse.ofSuccess(reservations.stream().map(reservation -> Map.of(
                 "reservationId", reservation.getReservationId(),
                 "ownerName", reservation.getOwner().getName(),
                 "petName", reservation.getPet().getName(),
@@ -47,8 +44,8 @@ public class VetReservationController {
 //    @GetMapping("/{reservation_id}")
     @GetMapping("/{vet_id}/{reservation_id}")
 //    public ApiResponse<?> getDetailReservation(@AuthenticationPrincipal Vet vet, @PathVariable("reservation_id") Long reservationId) {
-    public ApiResponse<?> getDetailReservation(@PathVariable("vet_id") Long vetId, @PathVariable("reservation_id") Long reservationId) {
+    public APIResponse<?> getDetailReservation(@PathVariable("vet_id") Long vetId, @PathVariable("reservation_id") Long reservationId) {
         ReservationResponseToVet reservation = reservationService.getReservationDetailByVetId(vetId, reservationId);
-        return ApiResponse.ofSuccess(reservation);
+        return APIResponse.ofSuccess(reservation);
     }
 }

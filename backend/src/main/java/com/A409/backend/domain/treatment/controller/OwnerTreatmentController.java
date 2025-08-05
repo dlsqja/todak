@@ -1,8 +1,12 @@
 package com.A409.backend.domain.treatment.controller;
 
 import com.A409.backend.domain.treatment.service.TreatmentService;
-import com.A409.backend.global.response.ApiResponse;
+import com.A409.backend.global.response.APIResponse;
 import com.A409.backend.global.security.model.User;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,11 +23,18 @@ public class OwnerTreatmentController {
 
     private final TreatmentService treatmentService;
 
+    @Operation(summary = "진료 리스트 조회")
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200",
+            content = @Content(
+                    mediaType = "application/json",
+                    array = @ArraySchema(schema = @Schema(implementation = Map.class))
+            )
+    )
     @GetMapping
-    public ApiResponse<?> getTreatments(@AuthenticationPrincipal User user){
+    public APIResponse<?> getTreatments(@AuthenticationPrincipal User user){
 
         List<Map<String,Object>> treatments = treatmentService.getTreatments(user.getId());
 
-        return ApiResponse.ofSuccess(treatments);
+        return APIResponse.ofSuccess(treatments);
     }
 }

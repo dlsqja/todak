@@ -1,20 +1,17 @@
 package com.A409.backend.domain.user.owner.controller;
 
-import com.A409.backend.domain.pet.dto.PetRequest;
-import com.A409.backend.domain.pet.service.PetService;
 import com.A409.backend.domain.user.owner.dto.OwnerRequest;
 import com.A409.backend.domain.user.owner.dto.OwnerResponse;
 import com.A409.backend.domain.user.owner.service.OwnerService;
-import com.A409.backend.global.enums.Role;
-import com.A409.backend.global.response.ApiResponse;
+import com.A409.backend.global.response.APIResponse;
 import com.A409.backend.global.security.model.User;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
 
 @Slf4j
 @RestController
@@ -24,22 +21,25 @@ public class OwnerController {
 
     private final OwnerService ownerService;
 
+    @Operation(summary = "반려인 정보 조회")
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = OwnerResponse.class)))
 
     @GetMapping
-    public ApiResponse<?> getOwnerInfo(@AuthenticationPrincipal User user){
+    public APIResponse<?> getOwnerInfo(@AuthenticationPrincipal User user){
 
         log.info(String.valueOf(user.getId()));
         OwnerResponse ownerResponse = ownerService.getOwnerInfo(user.getId());
 
-        return ApiResponse.ofSuccess(ownerResponse);
+        return APIResponse.ofSuccess(ownerResponse);
     }
 
+    @Operation(summary = "반려인 정보 수정")
     @PatchMapping
-    public ApiResponse<?> updateOwnerInfo(@AuthenticationPrincipal User user,@RequestBody OwnerRequest ownerRequest){
+    public APIResponse<?> updateOwnerInfo(@AuthenticationPrincipal User user, @RequestBody OwnerRequest ownerRequest){
 
         ownerService.updateOwnerInfo(user.getId(),ownerRequest);
 
-        return ApiResponse.ofSuccess(null);
+        return APIResponse.ofSuccess(null);
     }
 
 }

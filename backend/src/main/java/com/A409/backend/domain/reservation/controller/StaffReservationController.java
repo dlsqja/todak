@@ -1,17 +1,18 @@
 package com.A409.backend.domain.reservation.controller;
 
 
-import com.A409.backend.domain.hospital.entity.Hospital;
 import com.A409.backend.domain.hospital.service.HospitalService;
 import com.A409.backend.domain.reservation.dto.ReservationResponse;
 import com.A409.backend.domain.reservation.service.ReservationService;
-import com.A409.backend.domain.user.staff.entity.Staff;
 import com.A409.backend.domain.user.staff.repository.StaffRepository;
 import com.A409.backend.global.enums.Status;
-import com.A409.backend.global.response.ApiResponse;
+import com.A409.backend.global.response.APIResponse;
 import com.A409.backend.global.security.model.User;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.elasticsearch.ResourceNotFoundException;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,18 +24,19 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class StaffReservationController {
 
-    private ReservationService reservationService;
-    private HospitalService hospitalService;
-    private StaffRepository staffRepository;
+    private final ReservationService reservationService;
+    private final HospitalService hospitalService;
+    private final StaffRepository staffRepository;
 
-    @GetMapping
-    public ApiResponse<?> getAllHospitalReservations(@AuthenticationPrincipal User user){
-        Long hospitalId = user.getId();
-        List<Map<String, Object>> hospitalReservations = reservationService.getHospitalReservations(hospitalId);
-        return ApiResponse.ofSuccess(hospitalReservations);
-    }
-    @GetMapping(params = "status")
-    public ApiResponse<?> getHospitalReservationsByType(@AuthenticationPrincipal User user, @RequestParam("status") int code){
+    @Operation(summary = "병원 예약 리스트 필터 조회")
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200",
+            content = @Content(
+                    mediaType = "application/json",
+                    array = @ArraySchema(schema = @Schema(implementation = Map.class))
+            )
+    )
+    @GetMapping()
+    public APIResponse<?> getHospitalReservationsByType(@AuthenticationPrincipal User user, @RequestParam("status") int code){
         Long hospitalId = user.getId();
         Status status = switch (code) {
             case 0 -> Status.REQUESTED;
@@ -44,11 +46,14 @@ public class StaffReservationController {
             default -> throw new IllegalArgumentException("Invalid status code: " + code);
         };
         List<Map<String, Object>> hospitalReservations = reservationService.getReservationsByHospitalAndStatus(hospitalId, status);
-        return ApiResponse.ofSuccess(hospitalReservations);
+        return APIResponse.ofSuccess(hospitalReservations);
     }
+
+    @Operation(summary = "예약 상세 조회")
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = ReservationResponse.class)))
     @GetMapping("/{reservation_id}")
-    public ApiResponse<?> getHospitalReservationDetail(@AuthenticationPrincipal User user, @PathVariable("reservation_id") Long reservationId){
+    public APIResponse<?> getHospitalReservationDetail(@AuthenticationPrincipal User user, @PathVariable("reservation_id") Long reservationId){
         ReservationResponse reservationResponse = reservationService.getHospitalReservationDetail(user.getId(), reservationId);
-        return ApiResponse.ofSuccess(reservationResponse);
+        return APIResponse.ofSuccess(reservationResponse);
     }
 }

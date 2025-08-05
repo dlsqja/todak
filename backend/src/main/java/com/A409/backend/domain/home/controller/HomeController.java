@@ -2,19 +2,17 @@ package com.A409.backend.domain.home.controller;
 
 import com.A409.backend.domain.hospital.dto.HospitalResponse;
 import com.A409.backend.domain.hospital.service.HospitalService;
-import com.A409.backend.domain.reservation.dto.ReservationReqeust;
 import com.A409.backend.domain.user.vet.dto.VetResponse;
 import com.A409.backend.domain.user.vet.service.VetService;
-import com.A409.backend.global.response.ApiResponse;
-import com.A409.backend.global.security.model.User;
+import com.A409.backend.global.response.APIResponse;
 import com.A409.backend.global.util.uploader.S3Uploader;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.MediaType;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -25,22 +23,39 @@ public class HomeController {
     private final HospitalService hospitalService;
     private final VetService vetService;
     private final S3Uploader s3Uploader;
-    @GetMapping("/")
-    public ApiResponse<?> home() {
-        return ApiResponse.ofSuccess("A409팀입니다 ㄱ-");
+
+    @Operation(summary = "인덱스 페이지")
+    @GetMapping()
+    public APIResponse<?> home() {
+        return APIResponse.ofSuccess("A409팀입니다 ㄱ-");
     }
 
+
+    @Operation(summary = "병원 리스트 조회")
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200",
+            content = @Content(
+                    mediaType = "application/json",
+                    array = @ArraySchema(schema = @Schema(implementation = HospitalResponse.class))
+            )
+    )
     @GetMapping("/hospitals")
-    public ApiResponse<?> getHospitals() {
+    public APIResponse<?> getHospitals() {
 
         List<HospitalResponse> hospitals = hospitalService.getHospitals();
-        return ApiResponse.ofSuccess(hospitals);
+        return APIResponse.ofSuccess(hospitals);
     }
 
+    @Operation(summary = "수의사 리스트 조회")
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200",
+            content = @Content(
+                    mediaType = "application/json",
+                    array = @ArraySchema(schema = @Schema(implementation = VetResponse.class))
+            )
+    )
     @GetMapping("/hospitals/{hospital_id}/vets")
-    public ApiResponse<?> getVetsByHospitalId(@PathVariable("hospital_id")Long hospitalId) {
+    public APIResponse<?> getVetsByHospitalId(@PathVariable("hospital_id")Long hospitalId) {
 
         List<VetResponse> vets = vetService.getVetsByHospitalId(hospitalId);
-        return ApiResponse.ofSuccess(vets);
+        return APIResponse.ofSuccess(vets);
     }
 }

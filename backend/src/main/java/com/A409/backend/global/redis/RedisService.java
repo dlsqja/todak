@@ -1,4 +1,4 @@
-package com.A409.backend.global.redis.service;
+package com.A409.backend.global.redis;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;

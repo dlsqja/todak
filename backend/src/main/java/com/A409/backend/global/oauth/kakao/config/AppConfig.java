@@ -1,4 +1,4 @@
-package com.A409.backend.global.kakao.config;
+package com.A409.backend.global.oauth.kakao.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -3,8 +3,8 @@ package com.A409.backend.global.elasticsearch.controller;
 import com.A409.backend.global.annotation.LogExecutionTime;
 import com.A409.backend.global.elasticsearch.Entity.HospitalDocument;
 import com.A409.backend.global.elasticsearch.service.ElasticService;
-import com.A409.backend.global.redis.service.RedisService;
-import com.A409.backend.global.response.ApiResponse;
+import com.A409.backend.global.redis.RedisService;
+import com.A409.backend.global.response.APIResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,14 +23,14 @@ public class ElasticController {
 
     @GetMapping("/autocomplete/{keyword}")
     @LogExecutionTime
-    public ApiResponse<?> autocomplete(@PathVariable String keyword) {
+    public APIResponse<?> autocomplete(@PathVariable String keyword) {
         String cacheKey = "autocomplete:" + keyword;
 
         Object cached = redisService.getByKey(cacheKey);
         if (cached != null) {
             log.info("Cache hit for keyword: {}", keyword);
 
-            return ApiResponse.ofSuccess(cached);
+            return APIResponse.ofSuccess(cached);
         }
 
         List<HospitalDocument> result = elasticService.autocompleteByName(keyword);
@@ -39,7 +39,7 @@ public class ElasticController {
             redisService.setByKeyWithTTL(cacheKey, result,CACHE_TTL_MINUTES);
         }
 
-        return ApiResponse.ofSuccess(result);
+        return APIResponse.ofSuccess(result);
     }
 
     @GetMapping("/autocomplete")
