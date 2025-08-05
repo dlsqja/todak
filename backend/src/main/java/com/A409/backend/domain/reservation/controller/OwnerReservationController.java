@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -41,7 +42,7 @@ public class OwnerReservationController {
     }
 
     @Operation(summary = "내 예약 목록")
-    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200",
+    @ApiResponse(responseCode = "200",
             content = @Content(
                     mediaType = "application/json",
                     array = @ArraySchema(schema = @Schema(implementation = Map.class))
@@ -56,7 +57,7 @@ public class OwnerReservationController {
     }
 
     @Operation(summary = "예약 상세 조회")
-    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = ReservationResponse.class)))
+    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = ReservationResponse.class)))
     @GetMapping("/{reservation_id}")
     public APIResponse<?> getReservationDetail(@AuthenticationPrincipal User user, @PathVariable("reservation_id")Long reservationId) {
 

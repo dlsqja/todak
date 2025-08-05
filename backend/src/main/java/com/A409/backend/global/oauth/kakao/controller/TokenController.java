@@ -7,6 +7,7 @@ import com.A409.backend.global.security.jwt.JwtService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,7 +25,7 @@ public class TokenController {
     private final JwtService jwtService;
 
     @Operation(summary = "토큰 재발급")
-    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = Map.class)))
+    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = Map.class)))
     @PostMapping("/refresh")
     public APIResponse<?> refresh(@RequestBody Map<String, String> request) {
         String refreshToken = request.get("refresh_token");

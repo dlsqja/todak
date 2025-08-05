@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -29,7 +30,7 @@ public class StaffReservationController {
     private final StaffRepository staffRepository;
 
     @Operation(summary = "병원 예약 리스트 필터 조회")
-    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200",
+    @ApiResponse(responseCode = "200",
             content = @Content(
                     mediaType = "application/json",
                     array = @ArraySchema(schema = @Schema(implementation = Map.class))
@@ -50,7 +51,7 @@ public class StaffReservationController {
     }
 
     @Operation(summary = "예약 상세 조회")
-    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = ReservationResponse.class)))
+    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = ReservationResponse.class)))
     @GetMapping("/{reservation_id}")
     public APIResponse<?> getHospitalReservationDetail(@AuthenticationPrincipal User user, @PathVariable("reservation_id") Long reservationId){
         ReservationResponse reservationResponse = reservationService.getHospitalReservationDetail(user.getId(), reservationId);

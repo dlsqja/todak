@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,7 +33,7 @@ public class HomeController {
 
 
     @Operation(summary = "병원 리스트 조회")
-    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200",
+    @ApiResponse(responseCode = "200",
             content = @Content(
                     mediaType = "application/json",
                     array = @ArraySchema(schema = @Schema(implementation = HospitalResponse.class))
@@ -46,7 +47,7 @@ public class HomeController {
     }
 
     @Operation(summary = "수의사 리스트 조회")
-    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200",
+    @ApiResponse(responseCode = "200",
             content = @Content(
                     mediaType = "application/json",
                     array = @ArraySchema(schema = @Schema(implementation = VetResponse.class))
