@@ -1,4 +1,5 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { FiImage } from 'react-icons/fi';
 import { useLocation } from 'react-router-dom';
 import BackHeader from '@/component/header/BackHeader';
 import TimeSelectionDropdown from '@/component/selection/TimeSelectionDropdown';
@@ -15,20 +16,37 @@ export default function ApplyFormPage() {
   const selectedTime = useTimeStore((state) => state.selectedTime);
   const setSelectedTime = useTimeStore((state) => state.setSelectedTime);
 
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [symptomImage, setSymptomImage] = useState<string | null>(null);
+
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const preview = URL.createObjectURL(file);
+      setSymptomImage(preview);
+    }
+  };
+
+  const handleAddClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleRemoveImage = () => {
+    setSymptomImage(null);
+    fileInputRef.current!.value = '';
+  };
+
   useEffect(() => {
-    // 페이지 진입 시 time이 전달되었고 selectedTime이 비어있다면 초기화
     if (time && !selectedTime) {
       setSelectedTime(time);
     }
   }, [time, selectedTime, setSelectedTime]);
 
   return (
-    
     <div className="min-h-screen bg-green-100 flex flex-col">
       <BackHeader text="진료 신청서 작성" />
 
-      <div className="flex-1 overflow-y-auto px-6 py-6 flex flex-col gap-6">
-        {/* 진료 희망 시간 */}
+      <div className="flex-1 overflow-y-auto px-7 py-6 flex flex-col gap-6">
         <TimeSelectionDropdown
           label="진료 희망 시간"
           start_time={vet?.start_time || '09:00'}
@@ -42,7 +60,7 @@ export default function ApplyFormPage() {
             <ImageInputBox src={pet?.profileImage} />
             <div className="flex flex-col gap-1">
               <p className="h4">{pet?.name || '반려동물 이름'}</p>
-              <p className="p text-gray-400">{`${pet?.species || '동물 종류'} / ${pet?.age || '나이'} / ${pet?.gender || '성별'}`}</p>
+              <p className="p text-gray-400">{`${pet?.species || '동물 종류'} | ${pet?.age || '나이'} | ${pet?.gender || '성별'}`}</p>
             </div>
           </div>
         </div>
@@ -62,12 +80,35 @@ export default function ApplyFormPage() {
         {/* 증상 */}
         <div>
           <h4 className="h4 mb-2">증상</h4>
-          <div className="flex gap-4 mb-4">
-            <ImageInputBox stroke="border-2 border-gray-300" />
-            <div className="w-22 h-22 bg-gray-200 rounded-[16px] flex items-center justify-center">
-              <span className="p text-gray-500">Add</span>
-            </div>
+          <div className="flex gap-4 mb-4 relative">
+            {symptomImage ? (
+              <div className="relative w-22 h-22">
+                <ImageInputBox src={symptomImage} />
+                <button
+                  onClick={handleRemoveImage}
+                  className="absolute top-[-8px] right-[-8px] w-6 h-6 rounded-full bg-black bg-opacity-60 text-white text-xs flex items-center justify-center"
+                >
+                  ✕
+                </button>
+              </div>
+            ) : (
+              <div
+                onClick={handleAddClick}
+                className="w-22 h-22 bg-gray-200 rounded-[16px] flex flex-col items-center justify-center cursor-pointer"
+              >
+                <FiImage className="w-6 h-6 mb-1 text-gray-500" />
+                <span className="p text-gray-500">Add</span>
+              </div>
+            )}
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleImageSelect}
+              className="hidden"
+            />
           </div>
+
           <Dropdown
             placeholder="진료받을 과를 선택해주세요."
             options={[
@@ -80,13 +121,12 @@ export default function ApplyFormPage() {
           <textarea
             rows={4}
             className="w-full mt-4 p text-black bg-white rounded-2xl border border-gray-400 px-4 py-2 focus:outline-none placeholder:text-gray-500"
-            placeholder="어떤 증상이 있는지 입력해주세요. 필요할 경우 사진을 첨부해주세요."
+            placeholder="어떤 증상이 있는지 입력해주시고, 필요할 경우 사진을 첨부해주세요."
           />
         </div>
       </div>
 
-      {/* 하단 버튼 */}
-      <div className="px-6 pb-6">
+      <div className="px-6">
         <Button color="lightgreen" text="진료비 결제 수단 선택" />
       </div>
     </div>
