@@ -6,7 +6,7 @@ interface MobileLayoutProps {
 }
 
 const MobileLayout: React.FC<MobileLayoutProps> = ({ menuBar }) => (
-  <div className="h-screen w-full mx-auto max-w-md bg-green-100 relative pb-16">
+  <div className="min-h-screen w-full mx-auto max-w-md bg-green-100 relative pb-16">
     <main>
       <Outlet />
     </main>
