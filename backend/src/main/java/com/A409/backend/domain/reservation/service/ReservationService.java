@@ -2,6 +2,7 @@ package com.A409.backend.domain.reservation.service;
 
 import com.A409.backend.domain.reservation.dto.ReservationReqeust;
 import com.A409.backend.domain.reservation.dto.ReservationResponse;
+import com.A409.backend.domain.reservation.dto.ReservationResponseToVet;
 import com.A409.backend.domain.reservation.entity.Reservation;
 import com.A409.backend.domain.reservation.repository.ReservationRepository;
 import com.A409.backend.domain.user.owner.entity.Owner;
@@ -17,6 +18,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -67,7 +69,7 @@ public class ReservationService {
     public ReservationResponse getReservationDetail(Long ownerId, Long reservationId) {
 
         Reservation reservation = reservationRepository.findById(reservationId).orElseThrow(() -> new CustomException(ErrorCode.CONTENT_NOT_FOUND));
-        if(!ownerId.equals(reservation.getOwner().getOwnerId())){
+        if(ownerId!=reservation.getOwner().getOwnerId()){
             throw  new CustomException(ErrorCode.ACCESS_DENIED);
         }
 
@@ -77,6 +79,23 @@ public class ReservationService {
     public void deleteReservation(Long ownerId, Long reservationId) {
 
         reservationRepository.removeByOwner_OwnerIdAndReservationId(ownerId,reservationId);
+    }
+
+    public List<Reservation> getReservationsByVetId(Long vetId) {
+        List<Reservation> reservations = reservationRepository.findByVet_VetIdAndStatus(vetId, Status.승인);
+
+        return reservations;
+    }
+
+    public ReservationResponseToVet getReservationDetailByVetId(Long vetId, Long reservationId) {
+
+        Reservation reservation = reservationRepository.findById(reservationId).orElseThrow(() -> new CustomException(ErrorCode.CONTENT_NOT_FOUND));
+        System.out.println(reservation.getOwner().getOwnerId());
+        if(vetId != reservation.getVet().getVetId()){
+            throw new CustomException(ErrorCode.ACCESS_DENIED);
+        }
+
+        return ReservationResponseToVet.toOwnerResponse(reservation);
     }
 
     public List<Map<String, Object>> getHospitalReservations(Long hospitalId) {
