@@ -3,7 +3,7 @@ package com.A409.backend.global.elasticsearch.controller;
 import com.A409.backend.global.annotation.LogExecutionTime;
 import com.A409.backend.global.elasticsearch.Entity.HospitalDocument;
 import com.A409.backend.global.elasticsearch.service.ElasticService;
-import com.A409.backend.global.redis.service.RedisService;
+import com.A409.backend.global.redis.RedisService;
 import com.A409.backend.global.response.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

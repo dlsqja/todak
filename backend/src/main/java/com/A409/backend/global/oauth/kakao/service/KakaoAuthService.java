@@ -1,4 +1,4 @@
-package com.A409.backend.global.kakao.service;
+package com.A409.backend.global.oauth.kakao.service;
 
 import com.A409.backend.global.enums.Role;
 import lombok.RequiredArgsConstructor;
