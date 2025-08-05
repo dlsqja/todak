@@ -2,6 +2,7 @@ package com.A409.backend.global.config;
 
 import com.A409.backend.global.security.jwt.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -18,7 +19,10 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
-    private static final String VERSION = "";
+
+    @Value("${api.version}")
+    private String VERSION;
+
     /*
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -65,20 +69,6 @@ public class SecurityConfig {
                         .requestMatchers(VERSION + "/staffs/**").hasRole("STAFF")
                         .requestMatchers(VERSION + "/hospitals/**").hasRole("STAFF")
                         .requestMatchers(VERSION + "/reservations/hospitals/**").hasRole("STAFF")
-
-
-                        .requestMatchers("/owners/**").hasRole("OWNER")
-                        .requestMatchers("/reservations/owner/**").hasRole("OWNER")
-                        .requestMatchers("/treatments/owner/**").hasRole("OWNER")
-                        .requestMatchers("/pets/**").hasRole("OWNER")
-
-                        .requestMatchers("/vets/**").hasRole("VET")
-                        .requestMatchers("/reservations/vets/**").hasRole("VET")
-                        .requestMatchers("/treatments/vets/**").hasRole("VET")
-
-                        .requestMatchers("/staffs/**").hasRole("STAFF")
-                        .requestMatchers("/hospitals/**").hasRole("STAFF")
-                        .requestMatchers("/reservations/hospitals/**").hasRole("STAFF")
                         .anyRequest().authenticated())
                 .sessionManagement((session) -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
