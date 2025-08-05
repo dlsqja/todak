@@ -1,4 +1,4 @@
-// src/component/pages/Owner/Pet/petMockList.js
+// src/component/pages/Owner/Pet/petMockList.ts
 // 테스트용 더미 데이터 입니다
 
 export const petMockList = [
