@@ -6,7 +6,7 @@ interface MobileAuthLayoutProps {
 }
 
 const MobileAuthLayout: React.FC<MobileAuthLayoutProps> = ({ children }) => (
-  <div className="min-h-[956px] mx-auto max-w-md bg-green-100 relative py-16">
+  <div className="min-h-[956px] mx-auto max-w-md bg-green-100 relative pb-16">
     <main>{children}</main>
   </div>
 );

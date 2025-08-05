@@ -3,7 +3,7 @@ import OwnerMenuBar from '@/component/menubar/OwnerMenuBar';
 import OwnerHome from '@/component/pages/Owner/OwnerHome';
 import OwnerPet from '@/component/pages/Owner/Pet/OwnerPetHome';
 import OwnerMyPage from '@/component/pages/Owner/OwnerMyPage';
-import OwnerReservation from '@/component/pages/Owner/Reservation/OwnerReservationHome';
+import OwnerReservationHome from '@/component/pages/Owner/Reservation/OwnerReservationHome';
 import OwnerTreatment from '@/component/pages/Owner/OwnerTreatment';
 import RegisterPet from '@/component/pages/Owner/Pet/RegisterPet';
 import SelectHospitalPage from '@/component/pages/Owner/Home/OwnerHomeSelectHospital';
@@ -12,6 +12,7 @@ import VetInfoPage from '@/component/pages/Owner/Home/OwnerHomeVetInfo'
 import ApplyFormPage from '@/component/pages/Owner/Home/OwnerHomeApplyForm';
 import OwnerPetEdit from '@/component/pages/Owner/Pet/OwnerPetEdit';
 import OwnerPetRegister from '@/component/pages/Owner/Pet/OwnerPetRegister';
+import OwnerReservationDetail from '@/component/pages/Owner/Reservation/OwnerReservationDetail';
 
 const ownerRoutes = {
   path: '/owner',
@@ -25,7 +26,8 @@ const ownerRoutes = {
     { path: 'pet', element: <OwnerPet /> },
     { path: 'pet/register', element: <OwnerPetRegister /> },
     { path: 'pet/edit/:id', element: <OwnerPetEdit /> },
-    { path: 'reservation', element: <OwnerReservation /> },
+    { path: 'reservation', element: <OwnerReservationHome /> },
+    { path: 'reservation/:id', element: <OwnerReservationDetail /> },
     { path: 'treatment', element: <OwnerTreatment /> },
     { path: 'mypage', element: <OwnerMyPage /> },
   ],
