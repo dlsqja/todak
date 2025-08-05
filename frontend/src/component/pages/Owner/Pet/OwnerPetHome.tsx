@@ -1,3 +1,5 @@
+// 주소 : owner/pet
+
 import React from 'react';
 import '@/styles/main.css';
 
