@@ -8,7 +8,6 @@ import lombok.Getter;
 
 @Getter
 @Builder
-@Getter
 public class PetResponse {
 
     private Long petId;

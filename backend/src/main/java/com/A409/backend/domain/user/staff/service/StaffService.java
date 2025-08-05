@@ -30,7 +30,7 @@ public class StaffService {
     public void insertStaffInfo(Long authId, StaffRequest staffRequest){
         Auth auth = authRepository.findById(authId)
                 .orElseThrow(() -> new CustomException(ErrorCode.RESOURCE_NOT_FOUND));
-        Hospital hospital = hospitalRepository.findByHospitalCode(staffRequest.getHospitalCode());
+        Hospital hospital = hospitalRepository.findByHospitalCode(staffRequest.getHospitalCode()).orElseThrow(() -> new CustomException(ErrorCode.HOSPITAL_NOT_FOUND));
 
         Staff staff = Staff.builder()
                 .auth(auth)

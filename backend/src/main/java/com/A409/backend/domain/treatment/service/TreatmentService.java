@@ -33,4 +33,20 @@ public class TreatmentService {
 
         return result;
     }
+    public List<Map<String,Object>> getTreatmentsByVetId(Long vetId){
+        List<Treatment> treatmentList = treatmentRepository.findAllByVetId(vetId);
+
+        List<Map<String, Object>> result = treatmentList.stream()
+                .map(treatments -> {
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("reservationId", treatments.getReservation().getReservationId());
+                    map.put("petInfo", PetResponse.toResponse(treatments.getPet()));
+                    map.put("subject", treatments.getReservation().getSubject());
+                    map.put("reservationTime", treatments.getReservation().getReservationTime());
+                    return map;
+                })
+                .toList();
+
+        return result;
+    }
 }

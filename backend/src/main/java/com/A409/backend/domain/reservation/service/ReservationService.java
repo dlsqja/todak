@@ -82,7 +82,7 @@ public class ReservationService {
     }
 
     public List<Reservation> getReservationsByVetId(Long vetId) {
-        List<Reservation> reservations = reservationRepository.findByVet_VetIdAndStatus(vetId, Status.승인);
+        List<Reservation> reservations = reservationRepository.findByVet_VetIdAndStatus(vetId, Status.APPROVED);
 
         return reservations;
     }
