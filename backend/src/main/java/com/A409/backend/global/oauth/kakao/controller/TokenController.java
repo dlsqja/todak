@@ -1,7 +1,13 @@
 package com.A409.backend.global.oauth.kakao.controller;
 
+import com.A409.backend.global.enums.ErrorCode;
 import com.A409.backend.global.enums.Role;
+import com.A409.backend.global.response.APIResponse;
 import com.A409.backend.global.security.jwt.JwtService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,12 +25,14 @@ public class TokenController {
 
     private final JwtService jwtService;
 
+    @Operation(summary = "토큰 재발급")
+    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = Map.class)))
     @PostMapping("/refresh")
-    public ResponseEntity<Map<String, String>> refresh(@RequestBody Map<String, String> request) {
+    public APIResponse<?> refresh(@RequestBody Map<String, String> request) {
         String refreshToken = request.get("refresh_token");
 
         if(!jwtService.validateToken(refreshToken)) {
-            return ResponseEntity.badRequest().build();
+            return APIResponse.ofFail(ErrorCode.AUTH_INVALID_TOKEN);
         }
         Long id = jwtService.getUserId(refreshToken);
         String username = jwtService.getUsername(refreshToken);
@@ -34,6 +42,6 @@ public class TokenController {
         Map<String, String> tokens = new HashMap<>();
         tokens.put("accessToken", newAccessToken);
 
-        return ResponseEntity.ok(tokens);
+        return APIResponse.ofSuccess(tokens);
     }
 }
