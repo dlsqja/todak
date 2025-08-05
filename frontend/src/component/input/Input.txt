@@ -9,7 +9,7 @@ interface InputProps {
   disabled?: boolean;
 }
 
-export default function Input({ id = '', label = '', placeholder, value, onChange,disabled = false, }: InputProps) {
+export default function Input({ id = '', label = '', placeholder, value, onChange, disabled = false }: InputProps) {
   return (
     <div className="flex flex-col">
       <div>
@@ -26,8 +26,9 @@ export default function Input({ id = '', label = '', placeholder, value, onChang
             disabled={disabled}
             placeholder={placeholder}
             className={`w-full h-12 block border-1 rounded-[12px]
-                         border-gray-400 py-4 px-5 p text-black placeholder:text-gray-500
-                         ${disabled ? 'bg-gray-200 text-gray-500 cursor-not-allowed' : ''}`} 
+                         border-gray-400 py-4 px-5 p text-black 
+                         placeholder:text-gray-500
+                         ${disabled ? 'bg-gray-200 text-gray-500 cursor-not-allowed' : ''}`}
           />
         </div>
       </div>
