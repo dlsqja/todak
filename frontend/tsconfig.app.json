@@ -21,11 +21,13 @@
 
     /* 개발용용 */
     "strict": false, // 모든 엄격한 타입 검사 옵션 활성화
-    "noUnusedLocals": true, // 미사용 변수 허용
-    "noUnusedParameters": true, // 미사용 매개변수 허용
+    "noUnusedLocals": false, // 미사용 변수 허용
+    "noUnusedParameters": false, // 미사용 매개변수 허용
     "erasableSyntaxOnly": true, // 타입 관련 코드만 제거하고 런타임 코드는 보존
     "noFallthroughCasesInSwitch": false, // switch문에서 break 없는 case 금지
-    "noUncheckedSideEffectImports": false // 사이드 이펙트가 있는 import를 명시적으로 체크
+    "noUncheckedSideEffectImports": false, // 사이드 이펙트가 있는 import를 명시적으로 체크
+    "noEmitOnError": false, // 오류가 있어도 .js 파일은 내보냄
+    "incremental": false // (타입 체크를 안 할 거라면 캐시도 불필요)
     // "strict": true, // 모든 엄격한 타입 검사 옵션 활성화
     // "noUnusedLocals": false, // 미사용 변수 허용
     // "noUnusedParameters": false, // 미사용 매개변수 허용
