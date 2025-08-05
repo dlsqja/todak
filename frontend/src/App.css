@@ -1,5 +1,5 @@
 /* 스크롤바 사라지게 하기 */
 
 .hide-scrollbar::-webkit-scrollbar {
-  display: none;
+  display: none; /* Chrome, Safari and Opera */
 }
