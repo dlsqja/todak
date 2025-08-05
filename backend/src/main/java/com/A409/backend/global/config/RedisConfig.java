@@ -17,23 +17,14 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableScheduling
 public class RedisConfig {
 
-    @Value("${redis.sentinel.host1}")
-    private String sentinel1;
-
-    @Value("${redis.sentinel.host2}")
-    private String sentinel2;
-
-    @Value("${redis.sentinel.host3}")
-    private String sentinel3;
-
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
-        log.info(sentinel1+","+sentinel2+","+sentinel3);
+
         RedisSentinelConfiguration sentinelConfig = new RedisSentinelConfiguration()
                 .master("mymaster")
-                .sentinel(sentinel1, 26379)
-                .sentinel(sentinel2, 26380)
-                .sentinel(sentinel3, 26381);
+                .sentinel("sentinel1", 26379)
+                .sentinel("sentinel2", 26380)
+                .sentinel("sentinel3", 26381);
 
         return new LettuceConnectionFactory(sentinelConfig);
     }
