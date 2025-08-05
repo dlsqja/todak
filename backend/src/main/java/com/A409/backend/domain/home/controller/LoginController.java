@@ -18,6 +18,7 @@ import com.A409.backend.global.security.jwt.JwtService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -37,7 +38,7 @@ public class LoginController {
     private final StaffRepository staffRepository;
 
     @Operation(summary = "카카오 로그인")
-    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = Map.class)))
+    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = Map.class)))
     @GetMapping("/{role}")
     public APIResponse<?> login(@PathVariable("role") String role, @RequestParam("code") String code) {
 

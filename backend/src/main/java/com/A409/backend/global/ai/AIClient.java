@@ -15,7 +15,7 @@ public class AIClient {
     @Value("${gms.api.key}")
     private String GMS_KEY;
 
-    public String sendChatRequest() {
+    public String sendChatRequest(String message) {
         RestTemplate restTemplate = new RestTemplate();
 
         HttpHeaders headers = new HttpHeaders();
@@ -27,7 +27,7 @@ public class AIClient {
 
         List<Map<String, String>> messages = new ArrayList<>();
         messages.add(Map.of("role", "developer", "content", "Answer in Korean"));
-        messages.add(Map.of("role", "user", "content", "Summarize the 2024 total production data."));
+        messages.add(Map.of("role", "user", "content", message));
 
         body.put("messages", messages);
 
