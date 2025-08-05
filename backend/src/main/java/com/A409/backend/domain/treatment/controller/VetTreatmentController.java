@@ -1,11 +1,14 @@
 package com.A409.backend.domain.treatment.controller;
 
+import com.A409.backend.domain.treatment.entity.Treatment;
+import com.A409.backend.domain.treatment.entity.TreatmentResponse;
 import com.A409.backend.domain.treatment.service.TreatmentService;
 import com.A409.backend.global.response.APIResponse;
 import com.A409.backend.global.security.model.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -24,4 +27,11 @@ public class VetTreatmentController {
         List<Map<String, Object>> treatments = treatmentService.getTreatmentsByVetId(user.getId());
         return APIResponse.ofSuccess(treatments);
     }
+
+    @GetMapping("/details/{treatment_id}")
+    public APIResponse<?> getVetTreatmentDetails(@AuthenticationPrincipal User user, @PathVariable Long treatment_id) {
+        TreatmentResponse treatmentResponse = treatmentService.getTreatmentById(user.getId(), treatment_id);
+        return APIResponse.ofSuccess(treatmentResponse);
+    }
+
 }

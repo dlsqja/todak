@@ -5,7 +5,9 @@ import com.A409.backend.domain.hospital.service.HospitalService;
 import com.A409.backend.domain.reservation.dto.ReservationResponse;
 import com.A409.backend.domain.reservation.service.ReservationService;
 import com.A409.backend.domain.user.staff.repository.StaffRepository;
+import com.A409.backend.global.enums.ErrorCode;
 import com.A409.backend.global.enums.Status;
+import com.A409.backend.global.exception.CustomException;
 import com.A409.backend.global.response.APIResponse;
 import com.A409.backend.global.security.model.User;
 import io.swagger.v3.oas.annotations.Operation;
@@ -44,7 +46,7 @@ public class StaffReservationController {
             case 1 -> Status.APPROVED;
             case 2 -> Status.REJECTED;
             case 3 -> Status.COMPLETED;
-            default -> throw new IllegalArgumentException("Invalid status code: " + code);
+            default -> throw new CustomException(ErrorCode.INVALID_STATUS);
         };
         List<Map<String, Object>> hospitalReservations = reservationService.getReservationsByHospitalAndStatus(hospitalId, status);
         return APIResponse.ofSuccess(hospitalReservations);

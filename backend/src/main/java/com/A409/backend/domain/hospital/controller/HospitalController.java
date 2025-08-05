@@ -4,7 +4,11 @@ import com.A409.backend.domain.hospital.dto.HospitalRequest;
 import com.A409.backend.domain.hospital.dto.HospitalResponse;
 import com.A409.backend.domain.hospital.service.HospitalService;
 import com.A409.backend.domain.user.staff.dto.StaffResponse;
+import com.A409.backend.domain.user.staff.service.StaffService;
+import com.A409.backend.domain.user.vet.dto.WorkingHourResponse;
+import com.A409.backend.domain.user.vet.entity.WorkingHour;
 import com.A409.backend.domain.user.vet.service.VetService;
+import com.A409.backend.domain.user.vet.service.WorkingHourService;
 import com.A409.backend.global.enums.ErrorCode;
 import com.A409.backend.global.exception.CustomException;
 import com.A409.backend.global.response.APIResponse;
@@ -20,6 +24,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/hospitals")
@@ -29,6 +34,7 @@ public class HospitalController {
     private final HospitalService hospitalService;
     private final RedisService redisService;
     private final VetService vetService;
+    private final WorkingHourService workingHourService;
 
     @Operation(summary = "병원 정보 조회")
     @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = HospitalResponse.class)))
@@ -110,10 +116,19 @@ public class HospitalController {
 
     @GetMapping("/working-hours")
     public APIResponse<?> getWorkingHours(@AuthenticationPrincipal User user) {
-        return null;
+        Map<String, List<WorkingHourResponse>> workingHours = hospitalService.getWorkingHours(user.getId());
+        return APIResponse.ofSuccess(workingHours);
     }
+
     @PostMapping("/{vet_id}/working-hours")
-    public APIResponse<?> getWorkingHours(@AuthenticationPrincipal User user, @PathVariable("vet_id") Long vetId) {
-        return null;
+    public APIResponse<?> saveWorkingHours(
+            @AuthenticationPrincipal User user,
+            @PathVariable("vet_id") Long vetId,
+            @RequestBody List<WorkingHourResponse> workingHours
+    ) {
+        List<WorkingHour> savedHours = workingHourService.putWorkingHours(vetId, workingHours);
+        return APIResponse.ofSuccess(savedHours.stream()
+                .map(WorkingHourResponse::toResponse)
+                .toList());
     }
 }

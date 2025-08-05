@@ -69,7 +69,7 @@ public class ReservationService {
     public ReservationResponse getReservationDetail(Long ownerId, Long reservationId) {
 
         Reservation reservation = reservationRepository.findById(reservationId).orElseThrow(() -> new CustomException(ErrorCode.CONTENT_NOT_FOUND));
-        if(ownerId!=reservation.getOwner().getOwnerId()){
+        if(!ownerId.equals(reservation.getOwner().getOwnerId())){
             throw  new CustomException(ErrorCode.ACCESS_DENIED);
         }
 
@@ -91,7 +91,7 @@ public class ReservationService {
 
         Reservation reservation = reservationRepository.findById(reservationId).orElseThrow(() -> new CustomException(ErrorCode.CONTENT_NOT_FOUND));
         System.out.println(reservation.getOwner().getOwnerId());
-        if(vetId != reservation.getVet().getVetId()){
+        if(!vetId.equals(reservation.getVet().getVetId())){
             throw new CustomException(ErrorCode.ACCESS_DENIED);
         }
 

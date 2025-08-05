@@ -48,7 +48,7 @@ public class LoginController {
             case "owner" -> Role.OWNER;
             case "vet"   -> Role.VET;
             case "staff" -> Role.STAFF;
-            default      -> throw new IllegalArgumentException("Invalid role");
+            default      -> throw new CustomException(ErrorCode.INVALID_ROLE);
         };
         String kakaoAccessToken = kakaoAuthService.getAccessToken(code, role);
 
