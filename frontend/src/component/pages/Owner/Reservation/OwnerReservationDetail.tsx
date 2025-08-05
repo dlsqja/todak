@@ -157,6 +157,7 @@ const reservations: { [petName: string]: Reservation[] } = {
 };
 
 import React, { useEffect, useState } from 'react';
+import Button from '@/component/button/Button';
 import { useParams } from 'react-router-dom';
 import BackHeader from '@/component/header/BackHeader';
 import ImageInputBox from '@/component/input/ImageInputBox';
@@ -166,6 +167,12 @@ export default function OwnerReservationDetail() {
   const petName = '미료';
 
   const reservation = reservations[petName].find((item) => item.reservationId === Number(id));
+  const getStatusColor = (status: string) => {
+    if (status === '대기') return 'bg-gray-300 text-black';
+    if (status === '승인') return 'bg-green-300 text-white';
+    if (status === '반려') return 'bg-red-400 text-white';
+    return 'bg-gray-300 text-black';
+  };
 
   if (!reservation) {
     return (
@@ -197,28 +204,36 @@ export default function OwnerReservationDetail() {
 
   return (
     <div>
-      <BackHeader text="예약 정보" />
-      <section className="flex flex-col gap-2 mt-4 px-7">
-        <div className="flex flex-col gap-1">
-          <div className="h4">{reservation.pet.name}</div>
-          <div className="flex gap-1">
-            <div className="p text-center">{reservation.pet.species}</div> /
-            <div className="p">{reservation.pet.age}세</div> /<div className="p">{reservation.subject}</div>
+      <BackHeader text="상세 정보" />
+      <section className="flex flex-col gap-6 mt-4 px-7">
+        <h4 className="h4">예약 상세 정보</h4>
+        <div className="flex justify-between border-b-1 border-gray-100 pb-4 ">
+          <div className="flex flex-col gap-2">
+            <div className="h4">{reservation.pet.name}</div>
+            <div className="flex gap-1">
+              <div className="p text-center">{reservation.pet.species}</div> /
+              <div className="p">{reservation.pet.age}세</div> /<div className="p">{reservation.subject}</div>
+            </div>
+          </div>
+          <div>
+            <button className={`w-17 h-6 h5 rounded-[12px] ${getStatusColor(reservation.status)}`}>
+              {reservation.status}
+            </button>
           </div>
         </div>
-        <div className="flex flex-col gap-1">
+        <div className="flex flex-col border-b-1 border-gray-100 pb-4 gap-2">
           <div className="h4">수의사</div>
           <div className="p">{reservation.vetName} 수의사</div>
         </div>
-        <div className="flex flex-col gap-1">
+        <div className="flex flex-col border-b-1 border-gray-100 pb-4 gap-2">
           <div className="h4">병원</div>
           <div className="p">{reservation.hospitalName}</div>
         </div>
-        <div className="flex flex-col gap-1">
+        <div className="flex flex-col border-b-1 border-gray-100 pb-4 gap-2">
           <div className="h4">예약 희망 시간</div>
           <div className="p">{reservation.hospitalName}</div>
         </div>
-        <div className="flex flex-col gap-1">
+        <div className="flex flex-col border-b-1 border-gray-100 pb-4 gap-2 ">
           <div className="h4">증상</div>
           <div>
             <ImageInputBox src={reservation.photo} />
