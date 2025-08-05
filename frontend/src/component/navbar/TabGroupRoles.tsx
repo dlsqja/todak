@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 
 interface Props {
   selected: string;
@@ -6,16 +6,14 @@ interface Props {
 }
 
 export default function TabGroupRoles({ selected, onSelect }: Props) {
-  const tabs = ["반려인", "수의사", "병원 관계자"];
+  const tabs = ['반려인', '수의사', '병원 관계자'];
   return (
-    <div className="flex justify-between">
+    <div className="flex justify-center gap-15">
       {tabs.map((tab) => (
         <button
           key={tab}
           onClick={() => onSelect(tab)}
-          className={`text-sm ${
-            selected === tab ? "font-semibold border-b-2 border-black" : "text-gray-500"
-          }`}
+          className={`h4 ${selected === tab ? 'font-semibold border-b-2 border-black' : 'h4 text-gray-500'}`}
         >
           {tab}
         </button>
