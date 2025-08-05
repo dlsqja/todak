@@ -17,7 +17,7 @@ const SummaryContent: React.FC<SummaryContentProps> = ({ title, content }) => {
           padding: "15px",  // 내용과 박스 간의 간격
           borderRadius: "8px",  // 둥근 모서리
         //   boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)", // 약간의 그림자
-          boxShadow: "0px_5px_15px_rgba(0,0,0,0.08)",
+          boxShadow: "0px 5px 15px rgba(0,0,0,0.08)",
         }}
       >
         <p>{content}</p>
