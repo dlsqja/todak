@@ -18,5 +18,10 @@ public class ApiResponse<T> extends ResponseEntity<ApiBody<T>> {
         return new ApiResponse<>(errorCode.getStatus(),
                 new ApiBody<>(errorCode.getMessage(), null));
     }
+
+    public static <T> ApiResponse<T> ofFail(ErrorCode errorCode, String customMessage) {
+        return new ApiResponse<>(errorCode.getStatus(),
+                new ApiBody<>(customMessage, null));
+    }
 }
 
