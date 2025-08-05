@@ -1,6 +1,6 @@
 @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/variable/pretendardvariable.css');
-@import "tailwindcss";
-@import "./theme.css";
+@import 'tailwindcss';
+@import './theme.css';
 
 /* 미리 클래스를 생성해두고 사용 */
 /* @source inline("{hover:,focus:,active:,}{bg,text,border,fill,stroke}-{gray,cocoa,minty,brown,gold,naver-green,kakao,red,diamond}-{100..600..100}"); @source inline("{hover:,focus:,active:,}{bg,text,border,fill,stroke}-{white,black}");
@@ -8,7 +8,6 @@
 @source inline("{font}-{display,body}");
 @source inline("{shadow}-{menu-bar}");
 @source inline("{stroke,fill}-none"); */
-
 
 /* 1rem = 16pt */
 .h1 {
@@ -39,7 +38,6 @@
   line-height: 150%;
 }
 
-
 .h4 {
   font-weight: 600;
   font-weight: 600;
@@ -65,7 +63,7 @@
   line-height: 160%;
 }
 
-.p{
+.p {
   font-weight: 400;
   font-weight: 400;
   font-size: 1rem;
@@ -82,3 +80,11 @@
   line-height: 120%;
 }
 
+.caption-bold {
+  font-weight: 600;
+  font-size: 0.75rem;
+  line-height: 120%;
+  font-weight: 600;
+  font-size: 0.75rem;
+  line-height: 120%;
+}

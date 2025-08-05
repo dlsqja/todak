@@ -1,17 +1,14 @@
 import React from 'react';
 import { createBrowserRouter } from 'react-router-dom';
 import MainPage from '@/component/pages/MainPage';
-import OwnerHome from '@/component/pages/Owner/OwnerHome';
-import VetHome from '@/component/pages/Vet/VetHome';
-import StaffHome from '@/component/pages/Staff/StaffHome';
-import OwnerAnimal from '@/component/pages/Owner/OwnerAnimal';
-import OwnerReservation from '@/component/pages/Owner/OwnerReservation';
-import OwnerTreatment from '@/component/pages/Owner/OwnerTreatment';
-import OwnerMyPage from '@/component/pages/Owner/OwnerMyPage';
+import ownerRoutes from '@/router/ownerRoutes';
+import vetRoutes from '@/router/vetRouter';
+import staffRoutes from '@/router/staffRoutes';
+import MobileAuthLayout from '@/layouts/MobileAuthLayout';
 
 // 역할 분기
 function RoleRedirect() {
-  const role = localStorage.getItem('role'); 
+  const role = localStorage.getItem('role');
   if (role === 'owner') window.location.replace('/owner/home');
   else if (role === 'vet') window.location.replace('/vet/home');
   else if (role === 'staff') window.location.replace('/staff/home');
@@ -20,21 +17,18 @@ function RoleRedirect() {
 }
 
 const router = createBrowserRouter([
-  { path: '/', element: <MainPage /> },
-  { path: '/role-redirect', element: <RoleRedirect /> },
   {
-    path: '/owner/home',
-    element: <OwnerHome />,
-    children: [
-      { path: 'animal', element: <OwnerAnimal /> },
-      { path: 'mypage', element: <OwnerMyPage /> },
-      { path: 'reservation', element: <OwnerReservation /> },
-      { path: 'treatemnet', element: <OwnerTreatment /> },
-
-    ],
+    path: '/',
+    element: (
+      <MobileAuthLayout>
+        <MainPage />
+      </MobileAuthLayout>
+    ),
   },
-  { path: '/vet/home', element: <VetHome /> },
-  { path: '/staff/home', element: <StaffHome /> },
+  { path: '/role-redirect', element: <RoleRedirect /> },
+  ownerRoutes,
+  vetRoutes,
+  staffRoutes,
 ]);
 
 export default router;

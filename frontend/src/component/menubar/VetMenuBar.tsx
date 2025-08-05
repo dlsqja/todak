@@ -1,20 +1,20 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import OwnerAnimalIcon from '@/component/icon/AnimalIcon';
-import OwnerMyPageIcon from '@/component/icon/MyPageIcon';
-import OwnerReservationIcon from '@/component/icon/ReservationIcon';
-import OwnerTreatmentIcon from '@/component/icon/TreatmentIcon';
-import OwnerHomeIcon from '@/component/icon/HomeIcon';
+import VetHospitalIcon from '@/component/icon/HospitalIcon';
+import VetMyPageIcon from '@/component/icon/MyPageIcon';
+import VetRecordIcon from '@/component/icon/RecordIcon';
+import VetTreatmentIcon from '@/component/icon/TreatmentIcon';
+import VetHomeIcon from '@/component/icon/HomeIcon';
 
 const menuList = [
-  { name: '홈', icon: OwnerHomeIcon, path: '/owner/home' },
-  { name: '동물 관리', icon: OwnerAnimalIcon, path: '/owner/animal' },
-  { name: '예약내역', icon: OwnerReservationIcon, path: '/owner/reservation' },
-  { name: '비대면 진료', icon: OwnerTreatmentIcon, path: '/owner/treatment' },
-  { name: '마이', icon: OwnerMyPageIcon, path: '/owner/mypage' },
+  { name: '홈', icon: VetHomeIcon, path: '/vet/home' },
+  { name: '병원 관리', icon: VetHospitalIcon, path: '/vet/hospital' },
+  { name: '비대면 진료', icon: VetTreatmentIcon, path: '/vet/treatment' },
+  { name: '진료 기록', icon: VetRecordIcon, path: '/vet/records' },
+  { name: '마이', icon: VetMyPageIcon, path: '/vet/mypage' },
 ];
 
-const OwnerMenuBar: React.FC = () => {
+const VetMenuBar: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -52,4 +52,4 @@ const OwnerMenuBar: React.FC = () => {
   );
 };
 
-export default OwnerMenuBar;
+export default VetMenuBar;
