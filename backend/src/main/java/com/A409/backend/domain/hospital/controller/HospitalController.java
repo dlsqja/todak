@@ -106,6 +106,7 @@ public class HospitalController {
 
         return APIResponse.ofSuccess(null);
     }
+
     @GetMapping("/working-hours")
     public APIResponse<?> getWorkingHours(@AuthenticationPrincipal User user) {
         return null;
