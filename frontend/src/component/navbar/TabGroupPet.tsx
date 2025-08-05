@@ -13,7 +13,7 @@ export default function TabGroupPet({ selected, onSelect }: Props) {
         <button
           key={tab}
           onClick={() => onSelect(tab)}
-          className={`h4 ${selected === tab ? 'h4 border-b-2 border-black' : 'h4 text-gray-500'}`}
+          className={`h4 ${selected === tab ? 'h4 border-b-2 border-black text-center' : 'h4 text-gray-500'}`}
         >
           {tab}
         </button>
