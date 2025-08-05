@@ -7,5 +7,5 @@ import java.util.List;
 
 public interface TreatmentRepository extends JpaRepository<Treatment,Long> {
     List<Treatment> findAllByOwner_OwnerId(Long ownerOwnerId);
-    List<Treatment> findAllByVetId(Long vetId);
+    List<Treatment> findAllByVet_VetId(Long vetId);
 }

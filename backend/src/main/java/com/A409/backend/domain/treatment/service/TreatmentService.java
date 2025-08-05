@@ -34,7 +34,7 @@ public class TreatmentService {
         return result;
     }
     public List<Map<String,Object>> getTreatmentsByVetId(Long vetId){
-        List<Treatment> treatmentList = treatmentRepository.findAllByVetId(vetId);
+        List<Treatment> treatmentList = treatmentRepository.findAllByVet_VetId(vetId);
 
         List<Map<String, Object>> result = treatmentList.stream()
                 .map(treatments -> {
