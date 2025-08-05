@@ -35,7 +35,7 @@ const reservations: { [petName: string]: Reservation[] } = {
       owner: {
         name: '홍길동',
         phone: '010-1234-5678',
-        birth: '2020-01-01',
+        birth: '2020.01.01',
       },
       pet: {
         petId: 1,
@@ -47,7 +47,7 @@ const reservations: { [petName: string]: Reservation[] } = {
       },
       hospitalName: '튼튼동물병원',
       vetName: '김수의',
-      reservationDay: '2025-08-05',
+      reservationDay: '2025.08.05',
       reservationTime: '10:00',
       photo: '/images/미료_test.jpg',
       description:
@@ -72,7 +72,7 @@ const reservations: { [petName: string]: Reservation[] } = {
       },
       hospitalName: '튼튼동물병원',
       vetName: '이수의',
-      reservationDay: '2025-08-06',
+      reservationDay: '2025.08.06',
       reservationTime: '11:30',
       photo: '/images/미료_test.jpg',
       description: '정기 건강검진',
@@ -96,7 +96,7 @@ const reservations: { [petName: string]: Reservation[] } = {
       },
       hospitalName: '튼튼동물병원',
       vetName: '이수의',
-      reservationDay: '2025-08-07',
+      reservationDay: '2025.08.07',
       reservationTime: '11:30',
       photo: '/images/미료_test.jpg',
       description: '내과 문제',
@@ -122,7 +122,7 @@ const reservations: { [petName: string]: Reservation[] } = {
       },
       hospitalName: '희망동물병원',
       vetName: '최수의',
-      reservationDay: '2025-08-07',
+      reservationDay: '2025.08.07',
       reservationTime: '14:00',
       photo: '/images/미료_test.jpg',
       description: '다리 통증으로 내원',
@@ -146,7 +146,7 @@ const reservations: { [petName: string]: Reservation[] } = {
       },
       hospitalName: '튼튼동물병원',
       vetName: '김수의',
-      reservationDay: '2025-08-08',
+      reservationDay: '2025.08.08',
       reservationTime: '16:30',
       photo: '/images/미료_test.jpg',
       description: '피부 알러지 진료',
@@ -231,7 +231,9 @@ export default function OwnerReservationDetail() {
         </div>
         <div className="flex flex-col border-b-1 border-gray-100 pb-4 gap-2">
           <div className="h4">예약 희망 시간</div>
-          <div className="p">{reservation.hospitalName}</div>
+          <div className="p">
+            {reservation.reservationDay} <span className="p">{reservation.reservationTime}</span>
+          </div>
         </div>
         <div className="flex flex-col border-b-1 border-gray-100 pb-4 gap-2 ">
           <div className="h4">증상</div>
