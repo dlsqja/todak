@@ -14,14 +14,6 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class StaffReservationController {
 
-    @Operation(summary = "수의사 불가능 시간 조회")
-    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = HospitalResponse.class)))
-    @ApiResponse(responseCode = "200",
-            content = @Content(
-                    mediaType = "application/json",
-                    array = @ArraySchema(schema = @Schema(implementation = 클래스명.class))
-            )
-    )
     @GetMapping
     public APIResponse<?> getAllHospitalReservations(@AuthenticationPrincipal User user){
         return null;
