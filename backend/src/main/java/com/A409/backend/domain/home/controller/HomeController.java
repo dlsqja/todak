@@ -26,7 +26,7 @@ public class HomeController {
     private final S3Uploader s3Uploader;
 
     @Operation(summary = "인덱스 페이지")
-    @GetMapping("/")
+    @GetMapping()
     public APIResponse<?> home() {
         return APIResponse.ofSuccess("A409팀입니다 ㄱ-");
     }

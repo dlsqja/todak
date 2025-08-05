@@ -137,8 +137,8 @@ services:
       - "15672:15672"
     restart: unless-stopped
     environment:
-      RABBITMQ_DEFAULT_USER: guest
-      RABBITMQ_DEFAULT_PASS: guest
+      RABBITMQ_DEFAULT_USER: ${MQ_USERNAME}
+      RABBITMQ_DEFAULT_PASS: ${MQ_PASSWORD}
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
 
