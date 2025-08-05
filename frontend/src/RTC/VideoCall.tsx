@@ -1,280 +1,91 @@
-import { useEffect, useRef, useState } from "react";
+import { useState, useRef } from 'react';
+import { OpenVidu, Session, StreamManager } from 'openvidu-browser';
+import myaxios from '@/api/axios-common';
 
 const VideoCall = () => {
-  const [roomId, setRoomId] = useState("");
-  const [userId, setUserId] = useState("");
-  const [connected, setConnected] = useState(false);
-  const [logs, setLogs] = useState<string[]>([]);
+  const [sessionId, setSessionId] = useState('');
+  const OVRef = useRef<OpenVidu | null>(null);
+  const sessionRef = useRef<Session | null>(null);
 
   const localVideoRef = useRef<HTMLVideoElement>(null);
   const remoteVideoRef = useRef<HTMLVideoElement>(null);
 
-  const wsRef = useRef<WebSocket | null>(null);
-  const pcRef = useRef<RTCPeerConnection | null>(null);
-  const localStreamRef = useRef<MediaStream | null>(null);
-
-  const wsUrl = "wss://i13a409.p.ssafy.io/ws";
-  const publicUrl = import.meta.env.VITE_EC2_PUBLIC;
-  const coturnPort = import.meta.env.VITE_COTURN_PORT;
-  const stunTurn = {
-    iceServers: [
-      { urls: `stun:${publicUrl}:${coturnPort}` },
-      {
-        urls: `turn:${publicUrl}:${coturnPort}`,
-        username: "myuser",
-        credential: "mypassword",
-      },
-    ],
-  };
-
-  const addLog = (msg: string) => {
-    const logMessage = `${new Date().toLocaleTimeString()} ${msg}`;
-    setLogs((prev) => [...prev, logMessage]);
-    console.log("VideoCall:", logMessage); // 콘솔에도 출력
-  };
-
-  const getTargetId = () => (userId === "user1" ? "user2" : "user1");
-
-  const createPeerConnection = () => {
-    const pc = new RTCPeerConnection(stunTurn);
-
-    pc.onicecandidate = (event) => {
-      if (event.candidate && wsRef.current) {
-        addLog(`ICE candidate 생성: ${event.candidate.type}`);
-        wsRef.current.send(
-          JSON.stringify({
-            type: "ice-candidate",
-            roomId,
-            senderId: userId,
-            targetId: getTargetId(),
-            candidate: event.candidate,
-          })
-        );
-      } else if (!event.candidate) {
-        addLog("ICE gathering 완료");
-      }
-    };
-
-    pc.ontrack = (event) => {
-      addLog("상대방 스트림 수신!");
-      if (remoteVideoRef.current) {
-        remoteVideoRef.current.srcObject = event.streams[0];
-        addLog("원격 비디오 설정 완료");
-      }
-    };
-
-    pc.onconnectionstatechange = () => {
-      addLog(`연결 상태: ${pc.connectionState}`);
-    };
-
-    pc.oniceconnectionstatechange = () => {
-      addLog(`ICE 연결 상태: ${pc.iceConnectionState}`);
-    };
-
-    // 이미 로컬 스트림이 있다면 트랙 추가
-    if (localStreamRef.current) {
-      localStreamRef.current.getTracks().forEach((track) => {
-        pc.addTrack(track, localStreamRef.current!);
-        addLog(`트랙 추가: ${track.kind}`);
-      });
-    }
-
-    return pc;
-  };
-
-  const handleStart = async () => {
-    if (!roomId || !userId) return addLog("방 ID와 사용자 ID를 입력하세요");
-
-    // 먼저 미디어 획득
+  async function joinSession() {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: true,
-        audio: true,
+      const res = await myaxios.get('/video/get-token', {
+        params: { session_id: sessionId },
       });
-      localStreamRef.current = stream;
-      if (localVideoRef.current) localVideoRef.current.srcObject = stream;
-      addLog("미디어 획득 완료");
-    } catch (error) {
-      addLog("미디어 획득 실패");
-      return;
-    }
+      console.log('[TOKEN]', res.data);
+      const tokenUrl: string = res.data.token;
 
-    const ws = new WebSocket(wsUrl);
-    wsRef.current = ws;
+      OVRef.current = new OpenVidu();
+      (OVRef.current as any).openviduServerUrl = 'https://70.12.246.252';
 
-    ws.onopen = () => {
-      addLog("WebSocket 연결됨");
-      ws.send(JSON.stringify({ type: "join", roomId, userId }));
-      setConnected(true);
-    };
+      sessionRef.current = OVRef.current.initSession();
 
-    ws.onmessage = async (event) => {
-      const msg = JSON.parse(event.data);
-
-      switch (msg.type) {
-        case "start-call":
-          await startCaller();
-          break;
-        case "offer":
-          await receiveOffer(msg);
-          break;
-        case "answer":
-          await receiveAnswer(msg);
-          break;
-        case "ice-candidate":
-          if (pcRef.current) {
-            try {
-              await pcRef.current.addIceCandidate(msg.candidate);
-              addLog("ICE candidate 추가 성공");
-            } catch (error) {
-              addLog(`ICE candidate 추가 실패: ${error}`);
-            }
-          } else {
-            addLog("PeerConnection이 없어서 ICE candidate 무시");
+      // 다른 참가자 스트림 구독
+      sessionRef.current.on('streamCreated', (event) => {
+        console.log('[REMOTE] streamCreated', event.stream);
+        const subscriber: StreamManager = sessionRef.current!.subscribe(event.stream, undefined);
+        subscriber.on('videoElementCreated', (e) => {
+          console.log('[REMOTE] videoElementCreated');
+          if (remoteVideoRef.current) {
+            remoteVideoRef.current.srcObject = e.element.srcObject;
+            remoteVideoRef.current.play().catch((err) => console.error('[REMOTE] play error', err));
           }
-          break;
-        case "peer-left":
-          handlePeerLeft();
-          break;
-      }
-    };
+        });
+      });
 
-    ws.onclose = () => addLog("WebSocket 종료");
-  };
+      await sessionRef.current.connect(tokenUrl);
+      console.log('[SESSION] connected');
 
-  const startCaller = async () => {
-    // start-call을 받았을 때 PeerConnection 생성
-    if (!pcRef.current) {
-      const pc = createPeerConnection();
-      pcRef.current = pc;
-      addLog("Caller PeerConnection 생성");
+      // 로컬 스트림 생성
+      const publisher = OVRef.current.initPublisher(undefined, {
+        audioSource: undefined,
+        videoSource: undefined,
+        publishAudio: true,
+        publishVideo: true,
+        resolution: '640x480',
+        frameRate: 30,
+        insertMode: 'APPEND',
+        mirror: true,
+      });
+
+      publisher.on('videoElementCreated', (e) => {
+        console.log('[LOCAL] videoElementCreated');
+        if (localVideoRef.current) {
+          localVideoRef.current.srcObject = e.element.srcObject;
+          localVideoRef.current
+            .play()
+            .then(() => console.log('[LOCAL] play success'))
+            .catch((err) => console.error('[LOCAL] play error', err));
+        }
+      });
+
+      sessionRef.current.publish(publisher);
+      console.log('[SESSION] publisher published');
+    } catch (err) {
+      console.error('세션 참가 실패:', err);
     }
+  }
 
-    addLog("Offer 생성 중...");
-    const offer = await pcRef.current.createOffer();
-    await pcRef.current.setLocalDescription(offer);
-
-    wsRef.current?.send(
-      JSON.stringify({
-        type: "offer",
-        roomId,
-        senderId: userId,
-        targetId: getTargetId(),
-        offer,
-      })
-    );
-    addLog("Offer 전송 완료");
-  };
-
-  const receiveOffer = async (msg: any) => {
-    // offer를 받았을 때 PeerConnection 생성
-    if (!pcRef.current) {
-      const pc = createPeerConnection();
-      pcRef.current = pc;
-      addLog("Callee PeerConnection 생성");
+  function leaveSession() {
+    if (sessionRef.current) {
+      sessionRef.current.disconnect();
     }
-
-    addLog("Offer 수신, Answer 생성 중...");
-    await pcRef.current.setRemoteDescription(
-      new RTCSessionDescription(msg.offer)
-    );
-    const answer = await pcRef.current.createAnswer();
-    await pcRef.current.setLocalDescription(answer);
-
-    wsRef.current?.send(
-      JSON.stringify({
-        type: "answer",
-        roomId,
-        senderId: userId,
-        targetId: msg.senderId,
-        answer,
-      })
-    );
-    addLog("Answer 전송 완료");
-  };
-
-  const receiveAnswer = async (msg: any) => {
-    if (pcRef.current) {
-      await pcRef.current.setRemoteDescription(
-        new RTCSessionDescription(msg.answer)
-      );
-      addLog("Answer 수신 완료, 연결 성공!");
-    }
-  };
-
-  const handlePeerLeft = () => {
-    addLog("상대방이 나갔습니다");
-    if (remoteVideoRef.current) remoteVideoRef.current.srcObject = null;
-    if (pcRef.current) pcRef.current.close();
-  };
-
-  const leave = () => {
-    wsRef.current?.send(
-      JSON.stringify({
-        type: "leave",
-        roomId,
-        senderId: userId,
-        targetId: getTargetId(),
-      })
-    );
-    if (localVideoRef.current) localVideoRef.current.srcObject = null;
-    if (remoteVideoRef.current) remoteVideoRef.current.srcObject = null;
-    pcRef.current?.close();
-    wsRef.current?.close();
-    setConnected(false);
-  };
-
-  useEffect(() => () => leave(), []);
+    sessionRef.current = null;
+    OVRef.current = null;
+  }
 
   return (
-    <div className="p-4">
-      <input
-        value={roomId}
-        onChange={(e) => setRoomId(e.target.value)}
-        placeholder="roomId"
-      />
-      <input
-        value={userId}
-        onChange={(e) => setUserId(e.target.value)}
-        placeholder="userId"
-      />
-      <button onClick={handleStart} disabled={connected}>
-        입장
-      </button>
-      <button onClick={leave} disabled={!connected}>
-        나가기
-      </button>
+    <div>
+      <input type="text" value={sessionId} onChange={(e) => setSessionId(e.target.value)} />
+      <button onClick={joinSession}>세션참가</button>
+      <button onClick={leaveSession}>세션종료</button>
 
-      <div className="flex space-x-4 mt-4">
-        <video
-          ref={localVideoRef}
-          autoPlay
-          muted
-          playsInline
-          className="w-1/2 border"
-        />
-        <video
-          ref={remoteVideoRef}
-          autoPlay
-          playsInline
-          className="w-1/2 border"
-        />
-      </div>
-
-      <div className="mt-4 p-4 bg-gray-100 rounded-lg max-h-60 overflow-y-auto">
-        <h3 className="font-bold mb-2">연결 로그:</h3>
-        {logs.length === 0 ? (
-          <div className="text-gray-500">로그가 없습니다</div>
-        ) : (
-          logs.map((log, idx) => (
-            <div
-              key={idx}
-              className="text-sm py-1 border-b border-gray-200 last:border-b-0"
-            >
-              {log}
-            </div>
-          ))
-        )}
+      <div>
+        <video ref={localVideoRef} autoPlay playsInline muted></video>
+        <video ref={remoteVideoRef} autoPlay playsInline></video>
       </div>
     </div>
   );
