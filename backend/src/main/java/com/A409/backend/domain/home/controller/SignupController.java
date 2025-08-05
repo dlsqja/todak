@@ -1,17 +1,13 @@
-package com.A409.backend.domain.signup.controller;
+package com.A409.backend.domain.home.controller;
 
 import com.A409.backend.domain.user.owner.dto.OwnerRequest;
 import com.A409.backend.domain.user.owner.service.OwnerService;
 import com.A409.backend.domain.user.staff.service.StaffService;
 import com.A409.backend.domain.user.staff.dto.StaffRequest;
-import com.A409.backend.domain.user.vet.dto.VetRequest;
 import com.A409.backend.domain.user.vet.service.VetService;
 import com.A409.backend.global.response.ApiResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
 
 @RestController
 @RequestMapping("/public/signup")

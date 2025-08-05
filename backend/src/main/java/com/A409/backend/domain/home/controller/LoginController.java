@@ -1,4 +1,4 @@
-package com.A409.backend.domain.login.controller;
+package com.A409.backend.domain.home.controller;
 
 import com.A409.backend.domain.hospital.entity.Hospital;
 import com.A409.backend.domain.user.auth.entity.Auth;
