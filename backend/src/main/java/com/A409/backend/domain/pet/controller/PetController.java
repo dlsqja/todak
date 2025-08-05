@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -24,7 +25,7 @@ public class PetController {
     private final PetService petService;
 
     @Operation(summary = "반려동물 목록 조회")
-    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200",
+    @ApiResponse(responseCode = "200",
             content = @Content(
                     mediaType = "application/json",
                     array = @ArraySchema(schema = @Schema(implementation = Pet.class))
@@ -39,7 +40,7 @@ public class PetController {
     }
 
     @Operation(summary = "반려동물 상세 조회")
-    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = PetResponse.class)))
+    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = PetResponse.class)))
     @GetMapping("/{pet_id}")
     public APIResponse<?> getMyPetDetail(@AuthenticationPrincipal User user, @PathVariable("pet_id") Long petId) {
 

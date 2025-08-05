@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -30,7 +31,7 @@ public class HospitalController {
     private final VetService vetService;
 
     @Operation(summary = "병원 정보 조회")
-    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = HospitalResponse.class)))
+    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = HospitalResponse.class)))
     @GetMapping()
     public APIResponse<?> getHospitalDetail(@AuthenticationPrincipal User user){
 
@@ -51,7 +52,7 @@ public class HospitalController {
     }
 
     @Operation(summary = "병원 관리자 목록 조회")
-    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200",
+    @ApiResponse(responseCode = "200",
             content = @Content(
                     mediaType = "application/json",
                     array = @ArraySchema(schema = @Schema(implementation = StaffResponse.class))
@@ -67,7 +68,7 @@ public class HospitalController {
     }
 
     @Operation(summary = "수의사 불가능 시간 조회")
-    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200",
+    @ApiResponse(responseCode = "200",
             content = @Content(
                     mediaType = "application/json",
                     array = @ArraySchema(schema = @Schema(implementation = Integer.class))
