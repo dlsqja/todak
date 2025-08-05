@@ -2,7 +2,7 @@ import React from 'react';
 import { createBrowserRouter } from 'react-router-dom';
 import MainPage from '@/component/pages/MainPage';
 import ownerRoutes from '@/router/ownerRoutes';
-import vetRoutes from '@/router/vetRouter';
+import vetRoutes from '@/router/vetRoutes';
 import staffRoutes from '@/router/staffRoutes';
 import MobileAuthLayout from '@/layouts/MobileAuthLayout';
 

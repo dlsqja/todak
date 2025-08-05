@@ -1,6 +1,6 @@
 import StaffHome from '@/component/pages/Staff/StaffHome';
 import MobileLayout from '@/layouts/MobileLayout';
-import StaffHospital from '@/component/pages/Staff/StaffHosptial';
+import StaffHospital from '@/component/pages/Staff/StaffHospital';
 import StaffReservationManagement from '@/component/pages/Staff/StaffReservationManagement';
 import StaffVetManagement from '@/component/pages/Staff/StaffVetManagement';
 import StaffMypage from '@/component/pages/Staff/StaffMypage';

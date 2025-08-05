@@ -1,11 +1,11 @@
-interface OwnerHomeIconProps {
+interface HomeIconProps {
   fill?: string;
   stroke?: string;
   width?: number | string;
   height?: number | string;
 }
 
-function OwnerHomeIcon({ fill = 'inherit', stroke = 'inherit', width = 24, height = 24 }: OwnerHomeIconProps) {
+function HomeIcon({ fill = 'inherit', stroke = 'inherit', width = 24, height = 24 }: HomeIconProps) {
   return (
     <svg
       width={width}
@@ -23,4 +23,4 @@ function OwnerHomeIcon({ fill = 'inherit', stroke = 'inherit', width = 24, heigh
   );
 }
 
-export default OwnerHomeIcon;
+export default HomeIcon;

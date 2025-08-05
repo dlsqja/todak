@@ -5,8 +5,7 @@ import SingleContent from '@/component/text/SingleContent';
 import MultipleContent from '@/component/text/MultipleContent';
 import ImageContent from '@/component/text/ImageContent';
 import SummaryContent from '@/component/text/SummaryContent';
-import TreatmentListContent from '@/component/text/TeatmentListContent';
-import OwnerAnimalIcon from '@/component/icon/OwnerAnimalIcon';
+import TreatmentListContent from '@/component/text/TreatmentListContent';
 
 // Navbar 테스트
 import TabGroupWaiting from '@/component/navbar/TabGroupWaiting';
@@ -15,10 +14,9 @@ import TabGroupRoles from '@/component/navbar/TabGroupRoles';
 import TabGroupPet from '@/component/navbar/TabGroupPet';
 import TabGroupTreatList from '@/component/navbar/TabGroupTreatList';
 
-
 export default function StaffHome() {
   const [selectedTab, setSelectedTab] = useState<string>('대기'); // 대기/승인/반려
-  const [selectedTimeTab, setSelectedTimeTab] = useState<string>('진료 가능 시간');  // 진료 가능 시간/예약 목록
+  const [selectedTimeTab, setSelectedTimeTab] = useState<string>('진료 가능 시간'); // 진료 가능 시간/예약 목록
   const [selectedRolesTab, setSelectedRolesTab] = useState<string>('반려인'); // 반려인/수의사/병원관계자
   const [selectedPetTab, setSelectedPetTab] = useState<string>('상세정보'); // 상세정보 / 진료내역
   const [selectedTreatListTab, setSelectedTreatListTab] = useState<string>('목록형'); // 목록형/날짜형
@@ -60,7 +58,6 @@ export default function StaffHome() {
         <p className="mt-2 text-sm text-gray-600">선택된 시간탭: {selectedTreatListTab}</p>
       </div>
 
-
       {/* SingleContent 컴포넌트 사용 */}
       <SingleContent
         title="의사 소개"
@@ -87,8 +84,6 @@ export default function StaffHome() {
         petInfo="강아지 | 3세"
         status="대기 중"
       />
-
-      <OwnerAnimalIcon />
     </div>
   );
 }
