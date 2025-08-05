@@ -25,6 +25,13 @@ export default function OwnerHome() {
     ]);
   }, []);
 
+  /** 펫 클릭 시 병원 선택 페이지로 이동 (펫 정보 전달) */
+  const handlePetClick = (pet: Pet) => {
+    navigate('/owner/home/hospital', {
+      state: { pet },
+    });
+  };
+
   return (
     <div>
       <h3 className="h3 mx-7 pt-13">ㅇㅇㅇ님 반가워요!</h3>
@@ -43,23 +50,23 @@ export default function OwnerHome() {
 
       {/* 🐶 펫 리스트 슬라이드 */}
       <div className="overflow-x-auto overflow-visible snap-x snap-mandatory scroll-smooth hide-scrollbar pt-3 pb-6">
-  <div className="flex w-full h-full">
-    {petList.map((pet) => (
-      <div
-        key={pet.id}
-        className="w-full flex-shrink-0 snap-start overflow-visible px-7 " // ← 슬라이드 하나를 화면 전체로!!
-      >
-        <PetProfileCard
-          name={pet.name}
-          genderAge={pet.genderAge}
-          breedAge={pet.breedAge}
-          weight={pet.weight}
-        />
+        <div className="flex w-full h-full">
+          {petList.map((pet) => (
+            <div
+              key={pet.id}
+              className="w-full flex-shrink-0 snap-start overflow-visible px-7"
+              onClick={() => handlePetClick(pet)} // 💥 클릭 시 병원 선택으로 이동!
+            >
+              <PetProfileCard
+                name={pet.name}
+                genderAge={pet.genderAge}
+                breedAge={pet.breedAge}
+                weight={pet.weight}
+              />
+            </div>
+          ))}
+        </div>
       </div>
-    ))}
-  </div>
-</div>
-
     </div>
   );
 }

@@ -64,7 +64,7 @@ export default function VetInfoPage() {
       </div>
 
       {/* 고정 버튼 영역 */}
-      <div className="px-7 pb-15 bg-green-100">
+      <div className="px-7 bg-green-100">
         <Button
           color="green"
           text="진료 신청서 작성하러 가기"
