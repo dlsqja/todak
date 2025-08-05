@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 public class StaffReservationController {
-
     @GetMapping
     public APIResponse<?> getAllHospitalReservations(@AuthenticationPrincipal User user){
         return null;
