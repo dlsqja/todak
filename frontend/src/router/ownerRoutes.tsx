@@ -3,7 +3,7 @@ import OwnerMenuBar from '@/component/menubar/OwnerMenuBar';
 import OwnerHome from '@/component/pages/Owner/OwnerHome';
 import OwnerPet from '@/component/pages/Owner/Pet/OwnerPetHome';
 import OwnerMyPage from '@/component/pages/Owner/OwnerMyPage';
-import OwnerReservation from '@/component/pages/Owner/OwnerReservation';
+import OwnerReservation from '@/component/pages/Owner/Reservation/OwnerReservationHome';
 import OwnerTreatment from '@/component/pages/Owner/OwnerTreatment';
 import OwnerPetEdit from '@/component/pages/Owner/Pet/OwnerPetEdit';
 import OwnerPetRegister from '@/component/pages/Owner/Pet/OwnerPetRegister';

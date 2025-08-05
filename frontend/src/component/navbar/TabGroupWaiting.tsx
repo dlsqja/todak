@@ -10,13 +10,15 @@ export default function TabGroupWaiting({ selected, onSelect }: Props) {
   return (
     <div className="flex justify-center gap-15">
       {tabs.map((tab) => (
-        <button
+        <div
           key={tab}
           onClick={() => onSelect(tab)}
-          className={`w-9 h-13 h4 ${selected === tab ? 'font-semibold border-b-2 border-black' : 'text-gray-500'}`}
+          className={`w-9 h-13 cursor-pointer h4 ${
+            selected === tab ? 'h4 text-center border-b-2 border-black' : 'h4 text-center text-gray-500'
+          }`}
         >
           {tab}
-        </button>
+        </div>
       ))}
     </div>
   );
