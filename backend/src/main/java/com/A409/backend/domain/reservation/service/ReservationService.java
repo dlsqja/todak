@@ -2,6 +2,7 @@ package com.A409.backend.domain.reservation.service;
 
 import com.A409.backend.domain.reservation.dto.ReservationReqeust;
 import com.A409.backend.domain.reservation.dto.ReservationResponse;
+import com.A409.backend.domain.reservation.dto.ReservationResponseToVet;
 import com.A409.backend.domain.reservation.entity.Reservation;
 import com.A409.backend.domain.reservation.repository.ReservationRepository;
 import com.A409.backend.domain.user.owner.entity.Owner;
