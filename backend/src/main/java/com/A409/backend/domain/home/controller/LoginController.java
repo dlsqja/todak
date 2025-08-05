@@ -13,7 +13,7 @@ import com.A409.backend.global.enums.ErrorCode;
 import com.A409.backend.global.enums.Role;
 import com.A409.backend.global.exception.CustomException;
 import com.A409.backend.global.oauth.kakao.service.KakaoAuthService;
-import com.A409.backend.global.response.ApiResponse;
+import com.A409.backend.global.response.APIResponse;
 import com.A409.backend.global.security.jwt.JwtService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,7 +34,7 @@ public class LoginController {
     private final StaffRepository staffRepository;
 
     @GetMapping("/{role}")
-    public ApiResponse<?> login(@PathVariable("role") String role, @RequestParam("code") String code) {
+    public APIResponse<?> login(@PathVariable("role") String role, @RequestParam("code") String code) {
 
 
 
@@ -74,6 +74,6 @@ public class LoginController {
 
         log.info("Access Token: {}", accessToken);
         log.info("Refresh Token: {}", refreshToken);
-        return ApiResponse.ofSuccess(tokens);
+        return APIResponse.ofSuccess(tokens);
     }
 }

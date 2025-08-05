@@ -5,7 +5,7 @@ import com.A409.backend.domain.user.owner.service.OwnerService;
 import com.A409.backend.domain.user.staff.service.StaffService;
 import com.A409.backend.domain.user.staff.dto.StaffRequest;
 import com.A409.backend.domain.user.vet.service.VetService;
-import com.A409.backend.global.response.ApiResponse;
+import com.A409.backend.global.response.APIResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,9 +19,9 @@ public class SignupController {
     private final StaffService staffService;
 
     @PostMapping("/owner")
-    public ApiResponse<?> ownerSignup(@RequestParam Long authId, @RequestBody OwnerRequest ownerRequest) {
+    public APIResponse<?> ownerSignup(@RequestParam Long authId, @RequestBody OwnerRequest ownerRequest) {
         ownerService.insertOwnerInfo(authId, ownerRequest);
-        return ApiResponse.ofSuccess(null);
+        return APIResponse.ofSuccess(null);
     }
 
     /*
@@ -33,8 +33,8 @@ public class SignupController {
 
     */
     @PostMapping("/staff")
-    public ApiResponse<?> signup(@RequestParam Long authId, @RequestBody StaffRequest staffRequest) {
+    public APIResponse<?> signup(@RequestParam Long authId, @RequestBody StaffRequest staffRequest) {
         staffService.insertStaffInfo(authId, staffRequest);
-        return ApiResponse.ofSuccess(null);
+        return APIResponse.ofSuccess(null);
     }
 }

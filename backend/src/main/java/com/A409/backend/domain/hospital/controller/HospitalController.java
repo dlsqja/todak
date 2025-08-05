@@ -7,7 +7,7 @@ import com.A409.backend.domain.user.staff.dto.StaffResponse;
 import com.A409.backend.domain.user.vet.service.VetService;
 import com.A409.backend.global.enums.ErrorCode;
 import com.A409.backend.global.exception.CustomException;
-import com.A409.backend.global.response.ApiResponse;
+import com.A409.backend.global.response.APIResponse;
 import com.A409.backend.global.security.model.User;
 import com.A409.backend.global.redis.RedisService;
 import lombok.RequiredArgsConstructor;
@@ -26,34 +26,34 @@ public class HospitalController {
     private final VetService vetService;
 
     @GetMapping()
-    public ApiResponse<?> getHospitalDetail(@AuthenticationPrincipal User user){
+    public APIResponse<?> getHospitalDetail(@AuthenticationPrincipal User user){
 
         Long hospitalId = user.getId();
         HospitalResponse hospitalResponse = hospitalService.getHospitalDetail(hospitalId);
 
-        return ApiResponse.ofSuccess(hospitalResponse);
+        return APIResponse.ofSuccess(hospitalResponse);
     }
 
     @PatchMapping()
-    public ApiResponse<?> updateHospital(@AuthenticationPrincipal User user, @RequestBody HospitalRequest hospitalRequest){
+    public APIResponse<?> updateHospital(@AuthenticationPrincipal User user, @RequestBody HospitalRequest hospitalRequest){
 
         Long hospitalId = user.getId();
         hospitalService.updateHospital(hospitalId,hospitalRequest);
 
-        return ApiResponse.ofSuccess(null);
+        return APIResponse.ofSuccess(null);
     }
 
     @GetMapping("/staffs")
-    public ApiResponse<?> getHospitalStaffs(@AuthenticationPrincipal User user){
+    public APIResponse<?> getHospitalStaffs(@AuthenticationPrincipal User user){
 
         Long hospitalId = user.getId();
         List<StaffResponse> hospitalResponse = hospitalService.getHospitalStaffs(hospitalId);
 
-        return ApiResponse.ofSuccess(hospitalResponse);
+        return APIResponse.ofSuccess(hospitalResponse);
     }
 
     @GetMapping("/{vet_id}/closing-hours")
-    public ApiResponse<?> getClosingHours(@AuthenticationPrincipal User user, @PathVariable("vet_id") Long vetId) {
+    public APIResponse<?> getClosingHours(@AuthenticationPrincipal User user, @PathVariable("vet_id") Long vetId) {
         Long hospitalId = user.getId();
 
         Long hospitalIdByVetId = vetService.getHospitalIdByVetId(vetId);
@@ -65,11 +65,11 @@ public class HospitalController {
 
         List<Integer> cachedTimes = (List<Integer>) redisService.getByKey(cacheKey);
 
-        return ApiResponse.ofSuccess(cachedTimes);
+        return APIResponse.ofSuccess(cachedTimes);
     }
 
     @PostMapping("/{vet_id}/closing-hours")
-    public ApiResponse<?> updateClosingHours(@AuthenticationPrincipal User user, @PathVariable("vet_id") Long vetId,@RequestBody List<Integer> closingTimes) {
+    public APIResponse<?> updateClosingHours(@AuthenticationPrincipal User user, @PathVariable("vet_id") Long vetId, @RequestBody List<Integer> closingTimes) {
 
         Long hospitalId = user.getId();
 
@@ -82,6 +82,6 @@ public class HospitalController {
 
         redisService.setByKey(cacheKey,closingTimes);
 
-        return ApiResponse.ofSuccess(null);
+        return APIResponse.ofSuccess(null);
     }
 }
