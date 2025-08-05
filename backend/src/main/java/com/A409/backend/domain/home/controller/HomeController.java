@@ -25,6 +25,7 @@ public class HomeController {
     private final VetService vetService;
     private final S3Uploader s3Uploader;
 
+    @Operation(summary = "인덱스 페이지")
     @GetMapping("/")
     public APIResponse<?> home() {
         return APIResponse.ofSuccess("A409팀입니다 ㄱ-");

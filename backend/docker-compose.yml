@@ -14,6 +14,9 @@ services:
     environment:
       - SPRING_ELASTICSEARCH_URIS=http://ec2-elasticsearch:9200
       - SPRING_DATASOURCE_URL=jdbc:mysql://ec2-db:3306/todak?serverTimezone=Asia/Seoul&useSSL=false&allowPublicKeyRetrieval=true
+      - SPRING_RABBITMQ_HOST=ec2-rabbitmq
+      - SPRING_RABBITMQ_USERNAME=${MQ_USERNAME}
+      - SPRING_RABBITMQ_PASSWORD=${MQ_USERNAME}
       - SPRING_DATASOURCE_USERNAME=${MYSQL_USERNAME}
       - SPRING_DATASOURCE_PASSWORD=${MYSQL_PASSWORD}
       - SPRING_PROFILES_ACTIVE=
@@ -123,8 +126,22 @@ services:
       command: [ "redis-sentinel", "/usr/local/etc/redis/sentinel.conf" ]
       restart: unless-stopped
 
+  ec2-rabbitmq:
+    image: rabbitmq:3.11-management
+    container_name: ec2-rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    restart: unless-stopped
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+
 volumes:
   mysql_data:
   es_data:
   redis_master_data:
   redis_slave_data:
+  rabbitmq_data:

@@ -15,6 +15,10 @@ import com.A409.backend.global.exception.CustomException;
 import com.A409.backend.global.oauth.kakao.service.KakaoAuthService;
 import com.A409.backend.global.response.APIResponse;
 import com.A409.backend.global.security.jwt.JwtService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -33,6 +37,8 @@ public class LoginController {
     private final VetRepository vetRepository;
     private final StaffRepository staffRepository;
 
+    @Operation(summary = "카카오 로그인")
+    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = Map.class)))
     @GetMapping("/{role}")
     public APIResponse<?> login(@PathVariable("role") String role, @RequestParam("code") String code) {
 
