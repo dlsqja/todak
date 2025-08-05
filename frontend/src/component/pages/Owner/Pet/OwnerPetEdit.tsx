@@ -1,13 +1,12 @@
 // 주소 : owner/pet/edit/{id}
 
-
 import '@/styles/main.css';
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import BackHeader from '@/component/header/BackHeader';
 import ImageInputBox from '@/component/input/ImageInputBox';
-import Input from '@/component/input/input';
+import Input from '@/component/input/Input';
 import Button from '@/component/button/Button';
 import { petMockList } from './petMockList';
 
@@ -56,25 +55,15 @@ export default function OwnerPetEdit() {
         />
 
         <div className="flex gap-4">
-          <Input
-            id="age"
-            label="나이"
-            placeholder="0"
-            value={age}
-            onChange={(e) => setAge(e.target.value)}
-          />
-          <Input
-            id="weight"
-            label="무게"
-            placeholder="0"
-            value={weight}
-            onChange={(e) => setWeight(e.target.value)}
-          />
+          <Input id="age" label="나이" placeholder="0" value={age} onChange={(e) => setAge(e.target.value)} />
+          <Input id="weight" label="무게" placeholder="0" value={weight} onChange={(e) => setWeight(e.target.value)} />
         </div>
 
         <div className="flex gap-4">
           <div className="flex flex-col w-full">
-            <label htmlFor="gender" className="h4 mb-2 text-black">성별</label>
+            <label htmlFor="gender" className="h4 mb-2 text-black">
+              성별
+            </label>
             <select
               id="gender"
               className="w-full h-12 rounded-[12px] border border-gray-400 px-4 p text-black"
@@ -87,7 +76,9 @@ export default function OwnerPetEdit() {
             </select>
           </div>
           <div className="flex flex-col w-full">
-            <label htmlFor="neutered" className="h4 mb-2 text-black">중성화 여부</label>
+            <label htmlFor="neutered" className="h4 mb-2 text-black">
+              중성화 여부
+            </label>
             <select
               id="neutered"
               className="w-full h-12 rounded-[12px] border border-gray-400 px-4 p text-black"
@@ -102,7 +93,9 @@ export default function OwnerPetEdit() {
         </div>
 
         <div className="flex flex-col">
-          <label htmlFor="type" className="h4 mb-2 text-black">종</label>
+          <label htmlFor="type" className="h4 mb-2 text-black">
+            종
+          </label>
           <select
             id="type"
             className="w-full h-12 rounded-[12px] border border-gray-400 px-4 p text-black"
@@ -124,4 +117,3 @@ export default function OwnerPetEdit() {
     </div>
   );
 }
-
