@@ -16,9 +16,9 @@ const PetProfileCard: React.FC<PetProfileCardProps> = ({
   imageUrl,
 }) => {
   return (
-    <div className="w-[332px] h-[136px] rounded-[16px] bg-white shadow-[0px_5px_15px_rgba(0,0,0,0.08)]  flex items-center px-6 py-4 gap-4">
+    <div className="w-full h-[140px] rounded-[16px] bg-white shadow-[0px_5px_15px_rgba(0,0,0,0.08)]  flex items-center px-5 py-5 gap-6">
       {/* 이미지 영역 */}
-      <div className="w-[88px] h-[88px] rounded-full bg-green-200 overflow-hidden flex-shrink-0">
+      <div className="w-[100px] h-[100px] rounded-full bg-green-200 overflow-hidden flex-shrink-0">
         {imageUrl && (
           <img
             src={imageUrl}
@@ -31,11 +31,11 @@ const PetProfileCard: React.FC<PetProfileCardProps> = ({
       {/* 텍스트 영역 */}
       <div className="flex flex-col justify-center flex-1 min-w-0">
         <div className="flex justify-between items-center">
-          <h3 className="text-lg font-semibold text-black">{name}</h3>
-          <p className="text-sm text-black">{genderAge}</p>
+          <h3 className="h3 font-semibold text-black">{name}</h3>
+          <p className="p text-black">{genderAge}</p>
         </div>
-        <p className="text-sm text-black mt-1">{breedAge}</p>
-        <p className="text-sm text-black mt-1">{weight}</p>
+        <p className="p text-black mt-1">{breedAge}</p>
+        <p className="p text-black mt-1">{weight}</p>
       </div>
     </div>
   );
