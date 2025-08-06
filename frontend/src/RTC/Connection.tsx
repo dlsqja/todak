@@ -6,10 +6,7 @@ function Connection() {
   const [iceLog, setIceLog] = useState<string[]>([]);
 
   const handleIceTest = async () => {
-    console.log('[ICE SERVERS]', [
-      `stun:${publicUrl}:${publicPort}`,
-      `turn:${publicUrl}:${publicPort}?transport=udp`,
-    ]);
+    console.log('[ICE SERVERS]', [`stun:${publicUrl}:${publicPort}`, `turn:${publicUrl}:${publicPort}?transport=udp`]);
 
     const pc = new RTCPeerConnection({
       iceServers: [

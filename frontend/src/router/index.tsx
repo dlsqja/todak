@@ -5,6 +5,7 @@ import ownerRoutes from '@/router/ownerRoutes';
 import vetRoutes from '@/router/vetRoutes';
 import staffRoutes from '@/router/staffRoutes';
 import MobileAuthLayout from '@/layouts/MobileAuthLayout';
+import VideoCall from '@/RTC/VideoCall';
 
 // 역할 분기
 function RoleRedirect() {
@@ -24,6 +25,10 @@ const router = createBrowserRouter([
         <MainPage />
       </MobileAuthLayout>
     ),
+  },
+  {
+    path: '/rtc',
+    element: <VideoCall />,
   },
   { path: '/role-redirect', element: <RoleRedirect /> },
   ownerRoutes,

@@ -1,94 +1,163 @@
-import { useState, useRef } from 'react';
-import { OpenVidu, Session, StreamManager } from 'openvidu-browser';
-import myaxios from '@/api/axios-common';
+import { useEffect, useRef, useState } from 'react';
+import KurentoUtils from 'kurento-utils';
 
-const VideoCall = () => {
-  const [sessionId, setSessionId] = useState('');
-  const OVRef = useRef<OpenVidu | null>(null);
-  const sessionRef = useRef<Session | null>(null);
-
+export default function VideoCall() {
   const localVideoRef = useRef<HTMLVideoElement>(null);
   const remoteVideoRef = useRef<HTMLVideoElement>(null);
+  const socket = useRef<WebSocket | null>(null);
+  const [sessionId, setSessionId] = useState('');
+  const sessionIdRef = useRef('');
+  const webRtcPeerRef = useRef<any>(null);
 
-  async function joinSession() {
-    try {
-      const res = await myaxios.get('/video/get-token', {
-        params: { session_id: sessionId },
-      });
-      console.log('[TOKEN]', res.data);
-      const tokenUrl: string = res.data.token;
+  const publicUrl = import.meta.env.VITE_EC2_PUBLIC;
+  const publicPort = import.meta.env.VITE_COTURN_PORT;
 
-      OVRef.current = new OpenVidu();
-      (OVRef.current as any).openviduServerUrl = 'https://70.12.246.252';
+  const onMessage = (message: MessageEvent) => {
+    const parsed = JSON.parse(message.data);
 
-      sessionRef.current = OVRef.current.initSession();
-
-      // 다른 참가자 스트림 구독
-      sessionRef.current.on('streamCreated', (event) => {
-        console.log('[REMOTE] streamCreated', event.stream);
-        const subscriber: StreamManager = sessionRef.current!.subscribe(event.stream, undefined);
-        subscriber.on('videoElementCreated', (e) => {
-          console.log('[REMOTE] videoElementCreated');
-          if (remoteVideoRef.current) {
-            remoteVideoRef.current.srcObject = e.element.srcObject;
-            remoteVideoRef.current.play().catch((err) => console.error('[REMOTE] play error', err));
-          }
-        });
-      });
-
-      await sessionRef.current.connect(tokenUrl);
-      console.log('[SESSION] connected');
-
-      // 로컬 스트림 생성
-      const publisher = OVRef.current.initPublisher(undefined, {
-        audioSource: undefined,
-        videoSource: undefined,
-        publishAudio: true,
-        publishVideo: true,
-        resolution: '640x480',
-        frameRate: 30,
-        insertMode: 'APPEND',
-        mirror: true,
-      });
-
-      publisher.on('videoElementCreated', (e) => {
-        console.log('[LOCAL] videoElementCreated');
-        if (localVideoRef.current) {
-          localVideoRef.current.srcObject = e.element.srcObject;
-          localVideoRef.current
-            .play()
-            .then(() => console.log('[LOCAL] play success'))
-            .catch((err) => console.error('[LOCAL] play error', err));
+    switch (parsed.id) {
+      case 'startResponse':
+        webRtcPeerRef.current?.processAnswer(parsed.sdpAnswer);
+        break;
+      case 'iceCandidate':
+        // 서버 → 브라우저 ICE 후보
+        if (parsed.candidate) {
+          webRtcPeerRef.current?.addIceCandidate(parsed.candidate);
         }
+        break;
+      case 'peerLeft':
+        endCall();
+        break;
+      default:
+        console.warn('Unrecognized message', parsed);
+        break;
+    }
+  };
+
+  useEffect(() => {
+    const wsProtocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+    const wsUrl =
+      wsProtocol === 'wss' ? `${wsProtocol}://${window.location.host}/ws` : `${wsProtocol}://localhost:8080/ws`;
+    // console.log('socket url:', wsUrl);
+    const ws = new WebSocket(wsUrl);
+    ws.onopen = () => {
+      console.log('WS opened');
+      socket.current = ws;
+    };
+    ws.onmessage = onMessage;
+
+    return () => {
+      ws.close();
+      socket.current = null;
+    };
+  }, []);
+
+  useEffect(() => {
+    sessionIdRef.current = sessionId;
+  }, [sessionId]);
+
+  const endCall = () => {
+    socket.current?.send(
+      JSON.stringify({
+        id: 'leave',
+        sessionId: sessionIdRef.current,
+      }),
+    );
+    webRtcPeerRef.current?.dispose();
+    webRtcPeerRef.current = null;
+    stopLocalVideo();
+    stopRemoteVideo();
+  };
+
+  const stopLocalVideo = () => {
+    if (localVideoRef.current?.srcObject) {
+      (localVideoRef.current.srcObject as MediaStream).getTracks().forEach((track) => track.stop());
+      localVideoRef.current!.srcObject = null;
+    }
+  };
+
+  const stopRemoteVideo = () => {
+    if (remoteVideoRef.current?.srcObject) {
+      (remoteVideoRef.current.srcObject as MediaStream).getTracks().forEach((track) => track.stop());
+      remoteVideoRef.current.srcObject = null;
+    }
+  };
+
+  const startCall = () => {
+    if (sessionId === '') {
+      alert('방 이름을 작성하세요');
+      return;
+    }
+    // console.log('[ICE SERVERS]', [`stun:${publicUrl}:${publicPort}`, `turn:${publicUrl}:${publicPort}?transport=udp`]);
+
+    const options = {
+      localVideo: localVideoRef.current!, // 내 카메라 영상
+      remoteVideo: remoteVideoRef.current!, // 상대방 영상
+      onicecandidate: (candidate: RTCIceCandidate) => {
+        if (candidate) {
+          socket.current?.send(
+            JSON.stringify({
+              id: 'onIceCandidate',
+              candidate, // 객체 전체
+            }),
+          );
+        }
+      },
+      configuration: {
+        iceServers: [
+          { urls: `stun:${publicUrl}:${publicPort}` },
+          {
+            urls: `turn:${publicUrl}:${publicPort}?transport=udp`,
+            username: 'myuser',
+            credential: 'mypassword',
+          },
+        ],
+      },
+    };
+
+    const webRtcPeer = KurentoUtils.WebRtcPeer.WebRtcPeerSendrecv(options, function (err: any) {
+      if (err) return console.error(err);
+
+      webRtcPeer.generateOffer((err: any, sdpOffer: string) => {
+        if (err) return console.error(err);
+
+        socket.current?.send(
+          JSON.stringify({
+            id: 'join',
+            sessionId: sessionId,
+            sdpOffer,
+          }),
+        );
       });
+    });
 
-      sessionRef.current.publish(publisher);
-      console.log('[SESSION] publisher published');
-    } catch (err) {
-      console.error('세션 참가 실패:', err);
-    }
-  }
-
-  function leaveSession() {
-    if (sessionRef.current) {
-      sessionRef.current.disconnect();
-    }
-    sessionRef.current = null;
-    OVRef.current = null;
-  }
+    webRtcPeerRef.current = webRtcPeer;
+  };
 
   return (
-    <div>
-      <input type="text" value={sessionId} onChange={(e) => setSessionId(e.target.value)} />
-      <button onClick={joinSession}>세션참가</button>
-      <button onClick={leaveSession}>세션종료</button>
-
-      <div>
-        <video ref={localVideoRef} autoPlay playsInline muted></video>
-        <video ref={remoteVideoRef} autoPlay playsInline></video>
+    <div className="p-4 space-y-2">
+      <div className="flex gap-2">
+        <div>
+          <p className="text-sm">내 화면</p>
+          <video ref={localVideoRef} autoPlay playsInline muted className="border w-64 h-48 bg-gray-200" />
+        </div>
+        <div>
+          <p className="text-sm">상대방 화면</p>
+          <video ref={remoteVideoRef} autoPlay playsInline className="border w-64 h-48 bg-gray-200" />
+        </div>
       </div>
+      <input
+        type="text"
+        placeholder="접속할 방 이름을 적어주세요"
+        value={sessionId}
+        onChange={(e) => setSessionId(e.target.value)}
+      />
+      <button onClick={startCall} className="mt-2 px-4 py-2 bg-blue-500 text-white rounded">
+        통화시작
+      </button>
+      <button onClick={endCall} className="mt-2 px-4 py-2 bg-blue-500 text-white rounded">
+        통화 종료
+      </button>
     </div>
   );
-};
-
-export default VideoCall;
+}
