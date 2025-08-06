@@ -15,6 +15,7 @@ import OwnerReservationDetail from '@/component/pages/Owner/Reservation/OwnerRes
 import OwnerTreatmentDetail from '@/component/pages/Owner/Treatment/OwnerTreatmentDetail';
 import PaymentMethodPage from '@/component/pages/Owner/Home/OwnerHomePaymentMethod';
 import ApplyCompletePage from '@/component/pages/Owner/Home/OwnerHomeApplyComplete';
+import OwnerTreatmentRTC from '@/component/pages/Owner/Treatment/OwnerTreatmentRTC';
 
 const ownerRoutes = {
   path: '/owner',
@@ -35,6 +36,7 @@ const ownerRoutes = {
     { path: 'mypage', element: <OwnerMyPage /> },
     { path: 'treatment', element: <OwnerTreatment /> },
     { path: 'treatment/detail/:id', element: <OwnerTreatmentDetail /> },
+    { path: 'treatment/rtc/:id', element: <OwnerTreatmentRTC /> },
   ],
 };
 

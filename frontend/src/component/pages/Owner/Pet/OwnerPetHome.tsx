@@ -35,9 +35,9 @@ export default function OwnerPetHome() {
   };
 
   return (
-    <div className="p-4 pt-4 pb-20 px-5 space-y-6">
+    <div className="pb-20">
       <SimpleHeader text="반려동물 관리" />
-
+      <div className='px-7 space-y-6 pt-6'>
       {/* 1. 이미지 박스 리스트 */}
       <div className="flex justify-center gap-4 overflow-x-auto">
         {pets.map((pet) => (
@@ -62,7 +62,7 @@ export default function OwnerPetHome() {
 
       {/* 3. 상세 정보 or 진료 내역 */}
       {selectedTab === '상세 정보' && selectedPet && (
-        <div className="space-y-3 bg-white p-4">
+        <div className="space-y-3 bg-green-100 p-4">
           <div className="flex justify-between">
             <p className="p text-brown-300">이름</p>
             <p className="p">{selectedPet.name}</p>
@@ -100,6 +100,7 @@ export default function OwnerPetHome() {
           </div>
         </>
       )}
+    </div>
     </div>
   );
 }

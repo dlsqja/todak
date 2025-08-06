@@ -26,11 +26,11 @@ export default function OwnerPetRegister() {
   };
 
   return (
-    <div className="p-4 pt-4 pb-20 px-5 space-y-6">
+    <div className="pb-20 space-y-6">
       <BackHeader text="반려동물 등록" />
-
+      <div className='px-7'>
       {/* 이미지 등록 */}
-      <div className="flex flex-col items-center space-y-2">
+      <div className="flex flex-col items-center space-y-2 pb-6">
         <ImageInputBox src={image} onChange={(newImg) => setImage(newImg)} />
         <button className="text-white bg-green-300 px-4 py-1 rounded-xl h5">사진 등록</button>
         <button className="text-gray-400 bg-gray-100 px-4 py-1 rounded-xl h5">사진 제거</button>
@@ -106,6 +106,7 @@ export default function OwnerPetRegister() {
       <div className="mt-6">
         <Button text="반려동물 등록하기" color="green" onClick={handleSubmit} />
       </div>
+    </div>
     </div>
   );
 }

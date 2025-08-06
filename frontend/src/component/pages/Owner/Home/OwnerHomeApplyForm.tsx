@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { FiImage } from 'react-icons/fi';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import BackHeader from '@/component/header/BackHeader';
 import TimeSelectionDropdown from '@/component/selection/TimeSelectionDropdown';
 import ImageInputBox from '@/component/input/ImageInputBox';
@@ -18,6 +18,8 @@ export default function ApplyFormPage() {
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [symptomImage, setSymptomImage] = useState<string | null>(null);
+
+  const navigate = useNavigate();
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -41,6 +43,27 @@ export default function ApplyFormPage() {
       setSelectedTime(time);
     }
   }, [time, selectedTime, setSelectedTime]);
+
+  const [selectedDepartment, setSelectedDepartment] = useState('');
+  const symptomRef = useRef<HTMLTextAreaElement | null>(null);
+
+  const handleSubmit = () => {
+    const symptomText = symptomRef.current?.value.trim();
+    if (!selectedTime) {
+      alert('진료 희망 시간을 선택해주세요!');
+      return;
+    }
+    if (!selectedDepartment) {
+      alert('진료받을 과를 선택해주세요!');
+      return;
+    }
+    if (!symptomText) {
+      alert('증상 내용을 입력해주세요!');
+      return;
+    }
+
+    navigate('/owner/home/payment');
+  };
 
   return (
     <div className="min-h-screen bg-green-100 flex flex-col">
@@ -110,24 +133,34 @@ export default function ApplyFormPage() {
           </div>
 
           <Dropdown
-            placeholder="진료받을 과를 선택해주세요."
-            options={[
-              { value: '내과', label: '내과' },
-              { value: '외과', label: '외과' },
-              { value: '안과', label: '안과' },
-              { value: '피부과', label: '피부과' },
-            ]}
-          />
+          placeholder="진료받을 과를 선택해주세요."
+          options={[
+            { value: '내과', label: '내과' },
+            { value: '외과', label: '외과' },
+            { value: '안과', label: '안과' },
+            { value: '피부과', label: '피부과' },
+          ]}
+          value={selectedDepartment}
+  onChange={(value) => setSelectedDepartment(value)}
+        />
+
+
           <textarea
-            rows={4}
-            className="w-full mt-4 p text-black bg-white rounded-2xl border border-gray-400 px-4 py-2 focus:outline-none placeholder:text-gray-500"
-            placeholder="어떤 증상이 있는지 입력해주시고, 필요할 경우 사진을 첨부해주세요."
-          />
+          ref={symptomRef}
+          rows={4}
+          className="w-full mt-4 p text-black bg-white rounded-2xl border border-gray-400 px-4 py-2 focus:outline-none placeholder:text-gray-500"
+          placeholder="어떤 증상이 있는지 입력해주시고, 필요할 경우 사진을 첨부해주세요."
+        />
         </div>
       </div>
 
       <div className="px-6">
-        <Button color="lightgreen" text="진료비 결제 수단 선택" />
+        <Button
+        color="green"
+        text="진료비 결제 수단 선택"
+        onClick={handleSubmit}
+      />
+
       </div>
     </div>
   );

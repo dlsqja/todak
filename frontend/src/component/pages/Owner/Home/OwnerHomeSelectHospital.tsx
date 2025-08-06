@@ -16,7 +16,14 @@ export default function SelectHospitalPage() {
     { id: 3, name: '병원 이름 3', desc: '서울시 강남구 강남대로 126' },
   ];
 
-  const searchResult = { name: '검색한 병원 명', desc: '서울시 동대문구 답십리로 123' };
+  const searchResult = { id: 999, name: '검색한 병원 명', desc: '서울시 동대문구 답십리로 123' };
+
+  /** 병원 클릭 시 공통 이동 로직 */
+  const handleHospitalClick = (hospital: { id: number; name: string; desc: string }) => {
+    navigate('/owner/home/vet', {
+      state: { hospital, pet },
+    });
+  };
 
   return (
     <div className="min-h-screen pb-4">
@@ -39,12 +46,7 @@ export default function SelectHospitalPage() {
                 key={hospital.id}
                 name={hospital.name}
                 description={hospital.desc}
-                onClick={() => {
-                  // 다음 단계로 이동 (예: navigate('/apply/doctor', { state: { hospital } }))
-                  navigate('/owner/home/vet', {
-                  state: { hospital, pet }, // 🔥 병원 + 펫 정보 넘기기
-                });
-                }}
+                onClick={() => handleHospitalClick(hospital)}
               />
             ))}
           </div>
@@ -56,9 +58,7 @@ export default function SelectHospitalPage() {
             <SearchListItem
               name={searchResult.name}
               description={searchResult.desc}
-              onClick={() => {
-                // 선택 로직
-              }}
+              onClick={() => handleHospitalClick(searchResult)} // 💥 검색 결과도 이동 가능하게!!!
             />
           </div>
         </div>

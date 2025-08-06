@@ -28,6 +28,7 @@ interface Reservation {
   status: string;
 }
 
+// 더미데이터터
 const reservations: { [petName: string]: Reservation[] } = {
   미료: [
     {

@@ -70,9 +70,9 @@ export default function TimeSelectionDropdown({
             </option>
           ))}
         </select>
-        <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2">
-          <DropdownArrow width={24} height={24} />
-        </span>
+        <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 z-10 text-gray-500">
+  <DropdownArrow width={24} height={24} stroke="currentColor" />
+</span>
         {/* 현재 선택된 시간 확인용 - 지워도 됨 */}
         {/* {selectedTime ? `선택된 시간: ${selectedTime}` : '시간을 선택하세요.'} */}
       </div>
