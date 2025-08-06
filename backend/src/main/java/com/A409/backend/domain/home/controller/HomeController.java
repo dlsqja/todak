@@ -4,10 +4,6 @@ import com.A409.backend.domain.hospital.dto.HospitalResponse;
 import com.A409.backend.domain.hospital.service.HospitalService;
 import com.A409.backend.domain.user.vet.dto.VetResponse;
 import com.A409.backend.domain.user.vet.service.VetService;
-import com.A409.backend.global.annotation.LogExecutionTime;
-import com.A409.backend.global.elasticsearch.Entity.HospitalDocument;
-import com.A409.backend.global.elasticsearch.service.ElasticService;
-import com.A409.backend.global.redis.RedisService;
 import com.A409.backend.global.response.APIResponse;
 import com.A409.backend.global.util.uploader.S3Uploader;
 import io.swagger.v3.oas.annotations.Operation;
@@ -16,7 +12,6 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,14 +19,11 @@ import java.util.List;
 @RestController
 @RequestMapping("/public")
 @RequiredArgsConstructor
-@Slf4j
 public class HomeController {
 
     private final HospitalService hospitalService;
     private final VetService vetService;
-    private final ElasticService elasticService;
-    private final RedisService redisService;
-    private static final long CACHE_TTL_MINUTES = 5;
+    private final S3Uploader s3Uploader;
 
     @Operation(summary = "인덱스 페이지")
     @GetMapping()
@@ -66,33 +58,5 @@ public class HomeController {
 
         List<VetResponse> vets = vetService.getVetsByHospitalId(hospitalId);
         return APIResponse.ofSuccess(vets);
-    }
-
-    @Operation(summary = "자동완성")
-    @ApiResponse(responseCode = "200",
-            content = @Content(
-                    mediaType = "application/json",
-                    array = @ArraySchema(schema = @Schema(implementation = HospitalDocument.class))
-            )
-    )
-    @GetMapping("/autocomplete/{keyword}")
-    @LogExecutionTime
-    public APIResponse<?> autocomplete(@PathVariable String keyword) {
-        String cacheKey = "autocomplete:" + keyword;
-
-        Object cached = redisService.getByKey(cacheKey);
-        if (cached != null) {
-            log.info("Cache hit for keyword: {}", keyword);
-
-            return APIResponse.ofSuccess(cached);
-        }
-
-        List<HospitalDocument> result = elasticService.autocompleteByName(keyword);
-
-        if (result != null) {
-            redisService.setByKeyWithTTL(cacheKey, result,CACHE_TTL_MINUTES);
-        }
-
-        return APIResponse.ofSuccess(result);
     }
 }

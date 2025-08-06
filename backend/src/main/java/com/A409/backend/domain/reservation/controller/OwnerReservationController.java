@@ -20,7 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 import java.util.Map;
 
-@RequestMapping("/reservations/owner")
+@RequestMapping("/reservation/owner")
 @RestController
 @RequiredArgsConstructor
 public class OwnerReservationController {

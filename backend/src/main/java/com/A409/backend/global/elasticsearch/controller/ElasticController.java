@@ -18,6 +18,29 @@ import java.util.List;
 public class ElasticController {
 
     private final ElasticService elasticService;
+    private final RedisService redisService;
+    private static final long CACHE_TTL_MINUTES = 5;
+
+    @GetMapping("/autocomplete/{keyword}")
+    @LogExecutionTime
+    public APIResponse<?> autocomplete(@PathVariable String keyword) {
+        String cacheKey = "autocomplete:" + keyword;
+
+        Object cached = redisService.getByKey(cacheKey);
+        if (cached != null) {
+            log.info("Cache hit for keyword: {}", keyword);
+
+            return APIResponse.ofSuccess(cached);
+        }
+
+        List<HospitalDocument> result = elasticService.autocompleteByName(keyword);
+
+        if (result != null) {
+            redisService.setByKeyWithTTL(cacheKey, result,CACHE_TTL_MINUTES);
+        }
+
+        return APIResponse.ofSuccess(result);
+    }
 
     @GetMapping("/autocomplete")
     public void autocomplete() {

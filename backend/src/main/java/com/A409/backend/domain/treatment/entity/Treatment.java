@@ -15,7 +15,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Setter
 public class Treatment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

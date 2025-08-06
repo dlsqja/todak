@@ -8,7 +8,6 @@ import com.A409.backend.domain.pet.repository.PetRepository;
 import com.A409.backend.domain.user.owner.entity.Owner;
 import com.A409.backend.global.enums.ErrorCode;
 import com.A409.backend.global.exception.CustomException;
-import com.A409.backend.global.util.RandomCodeGenerator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -46,9 +45,6 @@ public class PetService {
 
     public void registerPet(Long ownerId,PetRequest petRequest){
         Pet registerPet = petRequest.toEntity();
-
-        String randomCode = RandomCodeGenerator.generateRandomCode();
-        registerPet.setPetCode(randomCode);
 
         Pet savePet = petRepository.save(registerPet);
 
