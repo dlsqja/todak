@@ -18,6 +18,7 @@ public class Pet {
     @Column(name = "pet_id")
     private Long petId;
 
+    @Setter
     @Column(name = "pet_code", length = 6, nullable = false, unique = true)
     private String petCode;
 
@@ -38,5 +39,6 @@ public class Pet {
 
     @Column(nullable = false)
     private Integer age;
+
 }
 
