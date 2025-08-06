@@ -21,7 +21,6 @@ public class ElasticService {
 
     private final HospitalRepository hospitalRepository;
     private final HospitalElasticRepository hospitalElasticRepository;
-    private final ElasticsearchOperations elasticsearchOperations;
 
     @Transactional(readOnly = true)
     public void syncAllHospitalsToElasticsearch() {
