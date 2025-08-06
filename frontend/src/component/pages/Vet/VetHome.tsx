@@ -136,7 +136,7 @@ export default function VetHome() {
       </button>
       <h3 className="mx-7 h3 mt-11">비대면 진료 예정 목록</h3>
       <div className="overflow-x-auto overflow-visible snap-x snap-mandatory scroll-smooth hide-scrollbar mx-7 pt-3 pb-6">
-        <div className="w-full overflow-x-auto hide-scrollbar flex gap-7 h-full p-3">
+        <div className="w-full overflow-x-auto hide-scrollbar flex gap-4 h-full p-3">
           {reservations.map((reservation) => (
             <div key={reservation.reservation_id}>
               <OwnerTreatmentSimpleCard
