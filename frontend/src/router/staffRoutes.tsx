@@ -1,9 +1,10 @@
 import StaffHome from '@/component/pages/Staff/StaffHome';
-import MobileLayout from '@/layouts/MobileLayout';
 import StaffHospital from '@/component/pages/Staff/StaffHospital';
-import StaffReservationManagement from '@/component/pages/Staff/StaffReservationManagement';
-import StaffVetManagement from '@/component/pages/Staff/StaffVetManagement';
+import StaffReservation from '@/component/pages/Staff/StaffReservation';
+import StaffPayment from '@/component/pages/Staff/StaffPayment';
 import StaffMypage from '@/component/pages/Staff/StaffMypage';
+
+import MobileLayout from '@/layouts/MobileLayout';
 import StaffMenuBar from '@/component/menubar/StaffMenuBar';
 
 const staffRoutes = {
@@ -12,8 +13,8 @@ const staffRoutes = {
   children: [
     { path: 'home', element: <StaffHome /> },
     { path: 'hospital', element: <StaffHospital /> },
-    { path: 'reservationManagement', element: <StaffReservationManagement /> },
-    { path: 'vetManagement', element: <StaffVetManagement /> },
+    { path: 'reservation', element: <StaffReservation /> },
+    { path: 'payment', element: <StaffPayment /> },
     { path: 'mypage', element: <StaffMypage /> },
   ],
 };
