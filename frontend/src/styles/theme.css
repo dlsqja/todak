@@ -1,52 +1,24 @@
 :root {
   --spacing: 0.25rem;
 
-  /* --color-*: initial; */
   --color-black: #000000;
   --color-white: #ffffff;
-  --color-gray-100: #ffffff;
-  --color-gray-200: #fafafa;
-  --color-gray-300: #f0f0f0;
-  --color-gray-400: #e5e5e5;
-  --color-gray-500: #cccccc;
-  --color-gray-600: #b3b3b3;
-  --color-gray-700: #757575;
+  --color-green-100: #fdfcfb;
+  --color-green-200: #e9f1d7;
+  --color-green-300: #afcf7e;
 
-  --color-cocoa-100: #D9CFCB;
-  --color-cocoa-200: #B9A79D;
-  --color-cocoa-300: #8C6D55;
-  --color-cocoa-400: #6C4F3D;
-  --color-cocoa-500: #503828;
-  --color-cocoa-600: #3B271C;
+  --color-pink-100: #ffc8c8;
+  --color-pink-200: #d14d72;
 
-  --color-minty-100: #E8FAEC;
-  --color-minty-200: #C5F2D2;
-  --color-minty-300: #A7E9AF;
-  --color-minty-400: #86C890;
-  --color-minty-500: #5FA26A;
-  --color-minty-600: #40784B;
+  --color-brown-100: #bdafa1;
+  --color-brown-200: #5c4b3b;
+  --color-brown-300: #3b271c;
 
-  --color-brown-100: #FFE2CC;
-  --color-brown-200: #FFC699;
-  --color-brown-300: #FFB347;
-  --color-brown-400: #E6993D;
-  --color-brown-500: #CC832F;
-  --color-brown-600: #B36D27;
-
-  --color-gold-100: #FFF4CC;
-  --color-gold-200: #FFE999;
-  --color-gold-300: #FFD966;
-  --color-gold-400: #E6C24D;
-  --color-gold-500: #CCAA33;
-  --color-gold-600: #B3932D;
-
-  --color-naver-green-100: #02C75A;
-  --color-naver-green-200: #17B75E;
-
-  --color-kakao-100: #FEE500;
-  --color-kakao-200: #FDD14A;
-
-  --color-red-600: #FF0000;
+  --color-gray-100: #f0f0f0;
+  --color-gray-200: #f0f0f0;
+  --color-gray-300: #e5e5e5;
+  --color-gray-400: #cccccc;
+  --color-gray-500: #b3b3b3;
 
   --font-display: 'PretendardVariable', sans-serif;
   --font-body: 'PretendardVariable', sans-serif;
@@ -56,7 +28,16 @@
 
 @font-face {
   font-family: 'PretendardVariable';
-  src: url('../fonts/PretendardVariable.ttf') format('truetype');
-  /* font-weight: 400; */
+  src: url('../assets/fonts/PretendardVariable.ttf') format('truetype');
+  font-weight: 400;
   font-style: normal;
+}
+
+/* 폰트 적용 */
+body {
+  font-family: 'PretendardVariable', Pretendard, sans-serif;
+}
+
+.menu-bar {
+  box-shadow: var(--shadow-menu-bar);
 }
