@@ -23,7 +23,7 @@ public class KakaoAuthService {
 
     public String getAccessToken(String code){
         String tokenUrl = "https://kauth.kakao.com/oauth/token";
-        String redirectUrl = "http://localhost:8080/public/auth/kakao/callback";
+        String redirectUrl = "http://i13a409.p.ssafy.io:8081/api/v1/public/auth/kakao/callback";
 
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("grant_type", "authorization_code");
@@ -49,7 +49,7 @@ public class KakaoAuthService {
 
     public String getAccessToken(String code, String roleStr){
         String tokenUrl = "https://kauth.kakao.com/oauth/token";
-        String redirectUrl = "http://localhost:8080/public/login/" + roleStr;
+        String redirectUrl = "http://i13a409.p.ssafy.io:8081/api/v1/public/login/" + roleStr;
 
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("grant_type", "authorization_code");
