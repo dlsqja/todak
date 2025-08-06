@@ -5,6 +5,7 @@ import ImageInputBox from '@/component/input/ImageInputBox';
 import { useState } from 'react';
 import TabGroupWaiting from '@/component/navbar/TabGroupWaiting';
 import { useNavigate } from 'react-router-dom';
+import SummaryContent from '@/component/text/SummaryContent';
 
 // 더미데이터
 interface Owner {
@@ -112,30 +113,6 @@ const reservations: { [petName: string]: Reservation[] } = {
     },
     {
       reservationId: 4,
-      owner: {
-        name: '홍길동',
-        phone: '010-1234-5678',
-        birth: '2020-01-01',
-      },
-      pet: {
-        petId: 1,
-        name: '미료',
-        species: 'DOG',
-        photo: '/images/미료_test.jpg',
-        gender: 'FEMALE',
-        age: 4,
-      },
-      hospitalName: '튼튼동물병원',
-      vetName: '이수의',
-      reservationDay: '2025-08-07',
-      reservationTime: '11:30',
-      photo: '/images/미료_test.jpg',
-      description: '내과 문제',
-      subject: '내과',
-      status: '반려',
-    },
-    {
-      reservationId: 3,
       owner: {
         name: '홍길동',
         phone: '010-1234-5678',
@@ -279,6 +256,30 @@ const reservations: { [petName: string]: Reservation[] } = {
       status: '반려',
     },
     {
+      reservationId: 9,
+      owner: {
+        name: '홍길동',
+        phone: '010-1234-5678',
+        birth: '2020-01-01',
+      },
+      pet: {
+        petId: 1,
+        name: '미료',
+        species: 'DOG',
+        photo: '/images/미료_test.jpg',
+        gender: 'FEMALE',
+        age: 4,
+      },
+      hospitalName: '튼튼동물병원',
+      vetName: '이수의',
+      reservationDay: '2025-08-07',
+      reservationTime: '11:30',
+      photo: '/images/미료_test.jpg',
+      description: '내과 문제',
+      subject: '내과',
+      status: '반려',
+    },
+    {
       reservationId: 10,
       owner: {
         name: '홍길동',
@@ -305,7 +306,7 @@ const reservations: { [petName: string]: Reservation[] } = {
   ],
   초코: [
     {
-      reservationId: 4,
+      reservationId: 11,
       owner: {
         name: '이몽룡',
         phone: '010-5678-1234',
@@ -329,7 +330,7 @@ const reservations: { [petName: string]: Reservation[] } = {
       status: '대기',
     },
     {
-      reservationId: 5,
+      reservationId: 12,
       owner: {
         name: '이몽룡',
         phone: '010-5678-1234',
@@ -430,7 +431,6 @@ export default function OwnerReservation() {
                 </div>
                 <div className="flex flex-col items-center gap-2">
                   <div className="h4 text-black">{res.reservationTime}</div>
-                  <button className="w-17 h-6 h5 rounded-[12px] bg-gray-300 text-black cursor-pointer">상세</button>
                 </div>
               </div>
             </div>
