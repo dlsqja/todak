@@ -34,7 +34,7 @@ const TreatmentSlideCard: React.FC<TreatmentSlideCardProps> = ({
         <div className="flex justify-between items-end">
           <p className="caption text-black leading-none">{petInfo}</p>
           <div className="flex-shrink-0 leading-none translate-y-[-4px]">
-            <StatusBadge type="treatment" statusKey={is_signed ? 1 : 2} />
+            <StatusBadge type="treatment" statusKey={is_signed ? 'true' : 'false'} />
           </div>
         </div>
       </div>

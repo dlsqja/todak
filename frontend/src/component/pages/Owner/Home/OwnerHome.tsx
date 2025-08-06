@@ -44,8 +44,6 @@ export default function OwnerHome() {
         비대면 진료 가이드
       </button>
 
-      <Outlet />
-
       <h3 className="mx-7 h3 mt-11">비대면 진료 시작하기</h3>
 
       {/* 🐶 펫 리스트 슬라이드 */}
@@ -57,12 +55,7 @@ export default function OwnerHome() {
               className="w-full flex-shrink-0 snap-start overflow-visible px-7"
               onClick={() => handlePetClick(pet)} // 💥 클릭 시 병원 선택으로 이동!
             >
-              <PetProfileCard
-                name={pet.name}
-                genderAge={pet.genderAge}
-                breedAge={pet.breedAge}
-                weight={pet.weight}
-              />
+              <PetProfileCard name={pet.name} genderAge={pet.genderAge} breedAge={pet.breedAge} weight={pet.weight} />
             </div>
           ))}
         </div>

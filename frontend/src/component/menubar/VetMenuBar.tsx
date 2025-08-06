@@ -30,7 +30,7 @@ const VetMenuBar: React.FC = () => {
       className="fixed w-md bottom-0 left-1/2 -translate-x-1/2 
     flex flex-row items-center justify-center
     rounded-t-4xl 
-    bg-green-100 py-0.5 px-5 gap-4 menu-bar"
+    bg-green-100 py-0.5 px-5 gap-4 menu-bar z-80"
     >
       {menuList.map((menu, index) => {
         const Icon = menu.icon;
