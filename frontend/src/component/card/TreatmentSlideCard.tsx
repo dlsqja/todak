@@ -8,6 +8,7 @@ interface TreatmentSlideCardProps {
   time: string;
   isAuthorized: boolean;
   is_signed: boolean;
+  onClick?: () => void;
 }
 
 const TreatmentSlideCard: React.FC<TreatmentSlideCardProps> = ({
@@ -17,9 +18,13 @@ const TreatmentSlideCard: React.FC<TreatmentSlideCardProps> = ({
   time,
   isAuthorized,
   is_signed,
+  onClick,
 }) => {
   return (
-    <div className="w-full h-[96px] shrink-0 bg-white rounded-[12px] shadow-[0px_5px_15px_rgba(0,0,0,0.08)] p-4 overflow-hidden">
+    <div
+      className="w-full h-[96px] shrink-0 bg-white rounded-[12px] shadow-[0px_5px_15px_rgba(0,0,0,0.08)] p-4 overflow-hidden"
+      onClick={onClick}
+    >
       <div className="flex flex-col justify-between h-full">
         {/* 상단: 진료과 / 시간 */}
         <div className="flex justify-between items-start">

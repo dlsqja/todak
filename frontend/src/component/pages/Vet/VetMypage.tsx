@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import '@/styles/main.css';
 import BackHeader from '@/component/header/BackHeader';
 import Input from '@/component/input/Input';
 import Button from '@/component/button/Button';
-import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+
 export default function VetMypage() {
+  const navigate = useNavigate();
   const [profile, setProfile] = useState('테스트 소개글');
   const [vetName, setVetName] = useState('테스트 이름');
 
@@ -30,6 +32,7 @@ export default function VetMypage() {
     console.log('제출할 이름:', vetName);
     console.log('제출할 소개글:', profile);
     alert(`수정 완료`);
+    navigate('/vet/home');
   };
 
   return (
