@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 import java.util.Map;
 
-@RequestMapping("/treatment/owner")
+@RequestMapping("/treatments/owner")
 @RestController
 @RequiredArgsConstructor
 public class OwnerTreatmentController {
