@@ -9,7 +9,7 @@ interface OwnerTreatmentSimpleCardProps {
 
 const OwnerTreatmentSimpleCard: React.FC<OwnerTreatmentSimpleCardProps> = ({ time, department, petName, petInfo }) => {
   return (
-    <div className="w-full h-full p-4 bg-green-100 rounded-[12px] shadow-[0px_5px_15px_rgba(0,0,0,0.08)] ">
+    <div className="w-full h-full p-4 bg-white rounded-[12px] shadow-[0px_5px_15px_rgba(0,0,0,0.08)] ">
       <h4 className="h4 text-black">{time}</h4>
       <p className="p mt-1 text-black">{department}</p>
       <p className="p mt-2 text-black">{petName}</p>
