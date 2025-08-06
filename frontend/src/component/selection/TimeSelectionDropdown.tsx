@@ -58,7 +58,7 @@ export default function TimeSelectionDropdown({
         border-gray-400 h-12 
         focus:outline-none
         hover:outline-none
-        bg-green-100 
+        bg-white 
         rounded-2xl 
         px-4 py-2"
           value={selectedTime}

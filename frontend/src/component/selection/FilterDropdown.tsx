@@ -1,82 +1,99 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import DropdownArrow from '@/component/icon/Dropdown_Arrow';
 
 interface OptionType {
   value: string;
   label: string;
+  description?: string;
+  photo?: string;
 }
-interface DataType {
-  id: number;
-  name: string;
-  cat: boolean;
-  dog: boolean;
-}
-interface FilteredListProps {
+
+interface FilterDropdownProps {
   options: OptionType[];
-  api_url?: string;
+  placeholder?: string;
+  value: string;
+  onChange: (value: string) => void;
 }
 
-export default function FilteredList({ options, api_url = '' }: FilteredListProps) {
-  // const [allData, setAllData] = useState<DataType[]>([]);
+export default function FilterDropdown({
+  options,
+  placeholder = '전체',
+  value,
+  onChange,
+}: FilterDropdownProps) {
+  const [open, setOpen] = useState(false);
+  const selectedOption = options.find((opt) => opt.value === value);
 
-  // 테스트용 더미데이터
-  const [allData, setAllData] = useState<DataType[]>([
-    { id: 1, name: '나비', cat: true, dog: false },
-    { id: 2, name: '초코', cat: false, dog: true },
-    { id: 3, name: '야옹이', cat: true, dog: false },
-  ]);
-
-  const [selected, setSelected] = useState('');
-
-  // api_url 사용 시 주석 해제
-  //   useEffect(() => {
-  //     const Data = async () => {
-  //       try {
-  //         const res = await fetch(`${api_url}`);
-  //         const data = await res.json();
-  //         setAllData(data);
-  //       } catch (error) {
-  //         console.error('데이터 불러오기 실패:', error);
-  //       }
-  //     };
-  //     Data();
-  //   }, [api_url]);
-
-  // 필터링
-  const filteredList =
-    selected === '' || selected === 'all'
-      ? allData
-      : allData.filter((item) => item[selected as keyof DataType]);
+  // ✅ 사진 or 설명이 있을 경우 true
+  const hasDetail = selectedOption?.photo || selectedOption?.description;
 
   return (
-    <div>
-      <div className="relative">
-        <select
-          value={selected}
-          onChange={(e) => setSelected(e.target.value)}
-          className="w-full border border-gray-400 h-12 appearance-none 
-        focus:outline-none 
-        hover:outline-none 
-        bg-green-100 rounded-2xl px-4 py-2"
-        >
-          <option value="" disabled hidden>
-            전체
-          </option>
-          {options.map((opt) => (
-            <option key={opt.value} value={opt.value}>
-              {opt.label}
-            </option>
-          ))}
-        </select>
-        <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2">
-          <DropdownArrow width={24} height={24} />
+    <div className="relative w-full">
+      {/* 선택된 항목 */}
+      <button
+        onClick={() => setOpen(!open)}
+        className={`
+          w-full 
+          ${hasDetail ? 'h-16' : 'h-12'} 
+          rounded-2xl border border-gray-300 px-4 
+          flex items-center justify-between bg-white
+        `}
+      >
+        <div className="flex items-center gap-3 text-left">
+          {selectedOption?.photo && (
+            <img
+              src={selectedOption.photo}
+              alt="profile"
+              className="w-10 h-10 rounded-full object-cover"
+            />
+          )}
+          <div className="flex flex-col">
+            <p className="p">{selectedOption?.label ?? placeholder}</p>
+            {selectedOption?.description && (
+              <p className="caption text-gray-500">{selectedOption.description}</p>
+            )}
+          </div>
+        </div>
+        <span className="text-gray-400">
+          <DropdownArrow width={24} height={24} stroke="currentColor" />
         </span>
-      </div>
-      <ul className="mx-4">
-        {filteredList.map((item) => (
-          <li key={item.id}>{item.name}</li>
-        ))}
-      </ul>
+      </button>
+
+      {/* 옵션 리스트 */}
+      {open && (
+        <ul className="absolute z-10 mt-2 w-full bg-white border border-gray-300 rounded-2xl overflow-hidden shadow-lg">
+          {options.map((opt) => {
+            const hasOptDetail = opt.photo || opt.description;
+            return (
+              <li
+                key={opt.value}
+                onClick={() => {
+                  onChange(opt.value);
+                  setOpen(false);
+                }}
+                className={`
+                  flex items-center gap-3 px-4 py-3 hover:bg-gray-100 cursor-pointer
+                  ${!hasOptDetail ? 'h-12' : ''}
+                `}
+              >
+                {opt.photo && (
+                  <img
+                    src={opt.photo}
+                    alt="profile"
+                    className="w-10 h-10 rounded-full object-cover"
+                  />
+                )}
+                <div className="flex flex-col">
+                  <p className="p">{opt.label}</p>
+                  {opt.description && (
+                    <p className="caption text-gray-500">{opt.description}</p>
+                  )}
+                </div>
+              </li>
+            );
+          })}
+        </ul>
+      )}
     </div>
   );
 }

@@ -19,7 +19,7 @@ export default function Dropdown({ options, placeholder = '', value, onChange }:
         className="w-full border border-gray-400 h-12 appearance-none 
         focus:outline-none 
         hover:outline-none 
-        bg-green-100 rounded-2xl px-4 py-2"
+        bg-white rounded-2xl px-4 py-2"
       >
         {placeholder !== '' && (
           <option value="" disabled hidden>
@@ -32,7 +32,7 @@ export default function Dropdown({ options, placeholder = '', value, onChange }:
           </option>
         ))}
       </select>
-      <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 z-10 text-gray-500">
+      <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 z-10">
   <DropdownArrow width={24} height={24} stroke="currentColor" />
 </span>
 
