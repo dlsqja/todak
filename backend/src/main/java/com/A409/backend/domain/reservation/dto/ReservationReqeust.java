@@ -5,7 +5,7 @@ import com.A409.backend.domain.pet.entity.Pet;
 import com.A409.backend.domain.reservation.entity.Reservation;
 import com.A409.backend.domain.user.owner.entity.Owner;
 import com.A409.backend.domain.user.vet.entity.Vet;
-import com.A409.backend.global.enums.Status;
+import com.A409.backend.global.enums.ReservationStatus;
 import com.A409.backend.global.enums.Subject;
 import lombok.Getter;
 import lombok.Setter;
@@ -23,7 +23,7 @@ public class ReservationReqeust {
     private Byte reservationTime;
     private String description;
     private Subject subject;
-    private Status status;
+    private ReservationStatus status;
 
     public Reservation toEntity() {
         Owner owner = Owner.builder().ownerId(ownerId).build();

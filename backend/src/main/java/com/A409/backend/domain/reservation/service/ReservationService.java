@@ -7,7 +7,7 @@ import com.A409.backend.domain.reservation.entity.Reservation;
 import com.A409.backend.domain.reservation.repository.ReservationRepository;
 import com.A409.backend.domain.user.owner.entity.Owner;
 import com.A409.backend.global.enums.ErrorCode;
-import com.A409.backend.global.enums.Status;
+import com.A409.backend.global.enums.ReservationStatus;
 import com.A409.backend.global.exception.CustomException;
 import com.A409.backend.global.util.uploader.S3Uploader;
 import lombok.RequiredArgsConstructor;
@@ -82,7 +82,7 @@ public class ReservationService {
     }
 
     public List<Reservation> getReservationsByVetId(Long vetId) {
-        List<Reservation> reservations = reservationRepository.findByVet_VetIdAndStatus(vetId, Status.APPROVED);
+        List<Reservation> reservations = reservationRepository.findByVet_VetIdAndStatus(vetId, ReservationStatus.APPROVED);
 
         return reservations;
     }
@@ -118,7 +118,7 @@ public class ReservationService {
 
         return result;
     }
-    public List<Map<String, Object>> getReservationsByHospitalAndStatus(Long hospitalId, Status status) {
+    public List<Map<String, Object>> getReservationsByHospitalAndStatus(Long hospitalId, ReservationStatus status) {
         List<Reservation> reservations = reservationRepository.findAllByHospital_HospitalIdAndStatus(hospitalId, status);
         List<Map<String, Object>> result = reservations.stream()
                 .map(reservation -> {

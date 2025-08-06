@@ -7,7 +7,7 @@ import com.A409.backend.domain.reservation.entity.Reservation;
 import com.A409.backend.domain.user.owner.entity.Owner;
 import com.A409.backend.domain.user.owner.entity.OwnerResponse;
 import com.A409.backend.domain.user.vet.entity.Vet;
-import com.A409.backend.global.enums.Status;
+import com.A409.backend.global.enums.ReservationStatus;
 import com.A409.backend.global.enums.Subject;
 import jakarta.persistence.*;
 import lombok.Builder;
@@ -29,7 +29,7 @@ public class ReservationResponse {
     private String photo;
     private String description;
     private Subject subject;
-    private Status status;
+    private ReservationStatus status;
 
     public static ReservationResponse toOwnerResponse(Reservation reservation){
         return ReservationResponse.builder()
