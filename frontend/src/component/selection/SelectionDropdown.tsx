@@ -10,16 +10,13 @@ interface DropdownProps {
   onChange: (value: string) => void;
 }
 
-export default function Dropdown({ options, placeholder = '', value, onChange }: DropdownProps) {
+export default function SelectionDropdown({ options, placeholder = '', value, onChange }: DropdownProps) {
   return (
     <div className="relative">
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full border border-gray-400 h-12 appearance-none 
-        focus:outline-none 
-        hover:outline-none 
-        bg-green-100 rounded-2xl px-4 py-2"
+        className="w-full border border-green-300 h-12 appearance-none rounded-2xl px-4 py-2"
       >
         {placeholder !== '' && (
           <option value="" disabled hidden>
@@ -33,12 +30,8 @@ export default function Dropdown({ options, placeholder = '', value, onChange }:
         ))}
       </select>
       <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 z-10 text-gray-500">
-  <DropdownArrow width={24} height={24} stroke="currentColor" />
-</span>
-
-
-
-
+        <DropdownArrow width={24} height={24} stroke="currentColor" />
+      </span>
     </div>
   );
 }
