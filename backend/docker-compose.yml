@@ -152,12 +152,11 @@ services:
   coturn:
     image: coturn/coturn:latest
     container_name: coturn-server
-    ports:
-      - "3478:3478"
-      - "5349:5349"
+    network_mode: host
     volumes:
       - ./coturn/turnserver.conf:/etc/coturn/turnserver.conf
     restart: unless-stopped
+
 
 volumes:
   mysql_data:
