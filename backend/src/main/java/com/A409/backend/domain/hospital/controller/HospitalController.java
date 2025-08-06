@@ -5,6 +5,8 @@ import com.A409.backend.domain.hospital.dto.HospitalResponse;
 import com.A409.backend.domain.hospital.service.HospitalService;
 import com.A409.backend.domain.user.staff.dto.StaffResponse;
 import com.A409.backend.domain.user.staff.service.StaffService;
+import com.A409.backend.domain.user.vet.dto.VetResponse;
+import com.A409.backend.domain.user.vet.dto.VetWorkingHourResponse;
 import com.A409.backend.domain.user.vet.dto.WorkingHourResponse;
 import com.A409.backend.domain.user.vet.entity.WorkingHour;
 import com.A409.backend.domain.user.vet.service.VetService;
@@ -114,21 +116,27 @@ public class HospitalController {
         return APIResponse.ofSuccess(null);
     }
 
+    @Operation(summary = "병원 소속 수의사 근무 시간 조회")
+    @ApiResponse(responseCode = "200",
+            content = @Content(
+                    mediaType = "application/json",
+                    array = @ArraySchema(schema = @Schema(implementation = VetWorkingHourResponse.class))
+            )
+    )
     @GetMapping("/working-hours")
     public APIResponse<?> getWorkingHours(@AuthenticationPrincipal User user) {
-        Map<String, List<WorkingHourResponse>> workingHours = hospitalService.getWorkingHours(user.getId());
+        List<VetWorkingHourResponse> workingHours = hospitalService.getWorkingHours(user.getId());
         return APIResponse.ofSuccess(workingHours);
     }
 
+    @Operation(summary = "병원 소속 수의사 근무 시간 수정")
     @PostMapping("/{vet_id}/working-hours")
     public APIResponse<?> saveWorkingHours(
             @AuthenticationPrincipal User user,
             @PathVariable("vet_id") Long vetId,
             @RequestBody List<WorkingHourResponse> workingHours
     ) {
-        List<WorkingHour> savedHours = workingHourService.putWorkingHours(vetId, workingHours);
-        return APIResponse.ofSuccess(savedHours.stream()
-                .map(WorkingHourResponse::toResponse)
-                .toList());
+        workingHourService.putWorkingHours(vetId, workingHours);
+        return APIResponse.ofSuccess(null);
     }
 }

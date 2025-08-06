@@ -6,7 +6,7 @@ import com.A409.backend.domain.reservation.dto.ReservationResponse;
 import com.A409.backend.domain.reservation.service.ReservationService;
 import com.A409.backend.domain.user.staff.repository.StaffRepository;
 import com.A409.backend.global.enums.ErrorCode;
-import com.A409.backend.global.enums.Status;
+import com.A409.backend.global.enums.ReservationStatus;
 import com.A409.backend.global.exception.CustomException;
 import com.A409.backend.global.response.APIResponse;
 import com.A409.backend.global.security.model.User;
@@ -39,16 +39,10 @@ public class StaffReservationController {
             )
     )
     @GetMapping()
-    public APIResponse<?> getHospitalReservationsByType(@AuthenticationPrincipal User user, @RequestParam("status") int code){
+    public APIResponse<?> getHospitalReservationsByType(@AuthenticationPrincipal User user, @RequestParam("status") ReservationStatus reservationStatus){
         Long hospitalId = user.getId();
-        Status status = switch (code) {
-            case 0 -> Status.REQUESTED;
-            case 1 -> Status.APPROVED;
-            case 2 -> Status.REJECTED;
-            case 3 -> Status.COMPLETED;
-            default -> throw new CustomException(ErrorCode.INVALID_STATUS);
-        };
-        List<Map<String, Object>> hospitalReservations = reservationService.getReservationsByHospitalAndStatus(hospitalId, status);
+
+        List<Map<String, Object>> hospitalReservations = reservationService.getReservationsByHospitalAndStatus(hospitalId, reservationStatus);
         return APIResponse.ofSuccess(hospitalReservations);
     }
 

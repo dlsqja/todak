@@ -142,6 +142,23 @@ services:
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
 
+  kurento:
+    image: kurento/kurento-media-server:latest
+    container_name: kurento-server
+    ports:
+      - "8888:8888"
+    restart: unless-stopped
+
+  coturn:
+    image: coturn/coturn:latest
+    container_name: coturn-server
+    ports:
+      - "3478:3478"
+      - "5349:5349"
+    volumes:
+      - ./coturn/turnserver.conf:/etc/coturn/turnserver.conf
+    restart: unless-stopped
+
 volumes:
   mysql_data:
   es_data:

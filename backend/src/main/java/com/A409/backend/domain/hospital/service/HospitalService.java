@@ -7,6 +7,7 @@ import com.A409.backend.domain.hospital.repository.HospitalRepository;
 import com.A409.backend.domain.user.staff.dto.StaffResponse;
 import com.A409.backend.domain.user.staff.entity.Staff;
 import com.A409.backend.domain.user.staff.repository.StaffRepository;
+import com.A409.backend.domain.user.vet.dto.VetWorkingHourResponse;
 import com.A409.backend.domain.user.vet.dto.WorkingHourResponse;
 import com.A409.backend.domain.user.vet.entity.Vet;
 import com.A409.backend.domain.user.vet.entity.WorkingHour;
@@ -17,6 +18,7 @@ import com.A409.backend.global.exception.CustomException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -64,18 +66,16 @@ public class HospitalService {
         return staffs.stream().map(StaffResponse::toResponse).toList();
     }
 
-    public Map<String, List<WorkingHourResponse>> getWorkingHours(Long hospitalId) {
+    public List<VetWorkingHourResponse> getWorkingHours(Long hospitalId) {
         List<Vet> vets = vetRepository.findVetsByHospital_HospitalId(hospitalId);
+        List<VetWorkingHourResponse> vetWorkingHourResponses = new ArrayList<>();
 
-        Map<String, List<WorkingHourResponse>> result = new HashMap<>();
-        for (Vet vet : vets) {
-            List<WorkingHour> hours = workingHourRepository.findByVet_VetId(vet.getVetId());
-            List<WorkingHourResponse> hourResponses = hours.stream()
-                    .map(WorkingHourResponse::toResponse)
-                    .toList();
-            result.put(vet.getName(), hourResponses);
+        for(Vet vet : vets){
+            List<WorkingHour> workingHours = workingHourRepository.findAllByVet(vet);
+            vetWorkingHourResponses.add(VetWorkingHourResponse.toResponse(workingHours));
         }
-        return result;
+
+        return vetWorkingHourResponses;
     }
 
 }
