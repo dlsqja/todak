@@ -4,9 +4,11 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public enum Role {
-    ROLE_OWNER,
-    ROLE_VET,
-    ROLE_STAFF;
+    OWNER,
+    VET,
+    STAFF;
+
+    public String getRoleName() { return "ROLE_"+this.name(); }
 
     public String toString() {
         return this.name();

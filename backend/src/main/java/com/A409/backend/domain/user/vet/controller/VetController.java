@@ -27,15 +27,14 @@ import org.springframework.web.bind.annotation.RestController;
 public class VetController {
 
     private final VetService vetService;
-    private final ReservationService reservationService;
 
-    @Operation(summary = "수의사 회원가입", description = "새로운 수의사를 등록합니다.")
-    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "회원가입 성공")
-    @PostMapping("/signup")
-    public ApiResponse<?> signup(@RequestBody VetRequest vetRequest) {
-        Vet newvet = vetService.insertVet(vetRequest);
-        return ApiResponse.ofSuccess(newvet);
-    }
+//    @Operation(summary = "수의사 회원가입", description = "새로운 수의사를 등록합니다.")
+//    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "회원가입 성공")
+//    @PostMapping("/signup")
+//    public ApiResponse<?> signup(@RequestBody VetRequest vetRequest) {
+//        Vet newvet = vetService.insertVet(vetRequest);
+//        return ApiResponse.ofSuccess(newvet);
+//    }
 
     @Operation(summary = "수의사 상세 조회", description = "마이페이지에 보여주기 위해 수의사의 상세정보를 가지고 옵니다.")
     @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "수의사 상세조회 성공")

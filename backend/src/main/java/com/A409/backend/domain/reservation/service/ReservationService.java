@@ -7,8 +7,8 @@ import com.A409.backend.domain.reservation.entity.Reservation;
 import com.A409.backend.domain.reservation.repository.ReservationRepository;
 import com.A409.backend.domain.user.owner.entity.Owner;
 import com.A409.backend.global.enums.ErrorCode;
+import com.A409.backend.global.exception.CustomException;
 import com.A409.backend.global.enums.Status;
-import com.A409.backend.global.exceptin.CustomException;
 import com.A409.backend.global.util.uploader.S3Uploader;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,7 +18,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -82,7 +81,7 @@ public class ReservationService {
     }
 
     public List<Reservation> getReservationsByVetId(Long vetId) {
-        List<Reservation> reservations = reservationRepository.findByVet_VetIdAndStatus(vetId, Status.승인);
+        List<Reservation> reservations = reservationRepository.findByVet_VetIdAndStatus(vetId, Status.APPROVED);
 
         return reservations;
     }
@@ -98,4 +97,24 @@ public class ReservationService {
         return ReservationResponseToVet.toOwnerResponse(reservation);
     }
 
+    public List<Map<String, Object>> getAllHospitalReservationList(Long hospitalId) {
+        List<Reservation> reservations = reservationRepository.findAllByHospital_HospitalId(hospitalId);
+
+        List<Map<String, Object>> result = reservations.stream()
+                .map(reservation -> {
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("reservationId", reservation.getReservationId());
+                    map.put("petName", reservation.getPet().getName());
+                    map.put("hospitalName", reservation.getHospital().getName());
+                    map.put("vetName", reservation.getVet().getName());
+                    map.put("reservationDay", reservation.getReservationDay());
+                    map.put("reservationTime", reservation.getReservationTime());
+                    map.put("subject", reservation.getSubject());
+                    map.put("status", reservation.getStatus());
+                    return map;
+                })
+                .toList();
+
+        return result;
+    }
 }

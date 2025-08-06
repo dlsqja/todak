@@ -12,4 +12,5 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     List<Reservation> findAllByOwner_OwnerId(Long ownerOwnerId);
     void removeByOwner_OwnerIdAndReservationId(Long ownerOwnerId, Long reservationId);
     List<Reservation> findByVet_VetIdAndStatus(Long vetId, Status status);
+    List<Reservation> findAllByHospital_HospitalId(Long hospitalId);
 }
