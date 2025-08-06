@@ -19,7 +19,7 @@ const BackHeader: React.FC<BackHeaderProps> = ({ text, onBack }) => {
   };
 
   return (
-    <div className="relative w-full h-12 bg-green-100 flex items-center justify-between px-4">
+    <div className="sticky top-0 z-50 relative w-full h-16 bg-green-100 flex items-center justify-between px-4">
       <button
         onClick={handleBack}
         className="left-4 text-2xl text-black cursor-pointer"
