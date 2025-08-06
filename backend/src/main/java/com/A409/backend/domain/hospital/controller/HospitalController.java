@@ -5,6 +5,7 @@ import com.A409.backend.domain.hospital.dto.HospitalResponse;
 import com.A409.backend.domain.hospital.service.HospitalService;
 import com.A409.backend.domain.user.staff.dto.StaffResponse;
 import com.A409.backend.domain.user.staff.service.StaffService;
+import com.A409.backend.domain.user.vet.dto.VetWorkingHourResponse;
 import com.A409.backend.domain.user.vet.dto.WorkingHourResponse;
 import com.A409.backend.domain.user.vet.entity.WorkingHour;
 import com.A409.backend.domain.user.vet.service.VetService;
@@ -116,7 +117,7 @@ public class HospitalController {
 
     @GetMapping("/working-hours")
     public APIResponse<?> getWorkingHours(@AuthenticationPrincipal User user) {
-        Map<String, List<WorkingHourResponse>> workingHours = hospitalService.getWorkingHours(user.getId());
+        List<VetWorkingHourResponse> workingHours = hospitalService.getWorkingHours(user.getId());
         return APIResponse.ofSuccess(workingHours);
     }
 
