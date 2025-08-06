@@ -9,8 +9,8 @@ import StaffHomeIcon from '@/component/icon/HomeIcon';
 const menuList = [
   { name: '홈', icon: StaffHomeIcon, path: '/staff/home' },
   { name: '병원 관리', icon: StaffHospitalIcon, path: '/staff/hospital' },
-  { name: '예약 관리', icon: StaffReservationManagementIcon, path: '/staff/reservationManagement' },
-  { name: '수의사 관리', icon: StaffVetManagementIcon, path: '/staff/vetManagement' },
+  { name: '예약 관리', icon: StaffReservationManagementIcon, path: '/staff/reservation' },
+  { name: '결제 관리', icon: StaffVetManagementIcon, path: '/staff/payment' },
   { name: '마이', icon: StaffMyPageIcon, path: '/staff/mypage' },
 ];
 
