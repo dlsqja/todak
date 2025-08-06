@@ -3,6 +3,7 @@ import Button from '../button/Button';
 import ImageInputBox from '../input/ImageInputBox';
 
 interface RemoteTreatmentCardProps {
+  buttonText?: string;
   petName?: string;
   petInfo?: string;
   department?: string;
@@ -14,6 +15,7 @@ interface RemoteTreatmentCardProps {
 }
 
 const RemoteTreatmentCard: React.FC<RemoteTreatmentCardProps> = ({
+  buttonText = '',
   petName = '',
   petInfo = '',
   department = '',
@@ -53,7 +55,7 @@ const RemoteTreatmentCard: React.FC<RemoteTreatmentCardProps> = ({
       {/* 하단 버튼 */}
       <div className="flex gap-3">
         <Button text="상세 정보" color="lightgreen" className="flex-1" onClick={onDetailClick} />
-        <Button text="진료 받기" color="green" className="flex-1" onClick={onTreatClick} />
+        <Button text={buttonText} color="green" className="flex-1" onClick={onTreatClick} />
       </div>
     </div>
   );

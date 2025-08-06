@@ -33,11 +33,11 @@ export default function OwnerTreatment() {
   };
 
   const handleDetailClick = (reservationId: number) => {
-    navigate(`/owner/treatment/detail/${reservationId}`);
+    navigate(`/vet/treatment/detail/${reservationId}`);
   };
 
   const handleRTCClick = (reservationId: number) => {
-    navigate(`/owner/treatment/rtc/${reservationId}`);
+    navigate(`/vet/treatment/rtc/${reservationId}`);
   };
 
   // 더미데이터
@@ -95,7 +95,7 @@ export default function OwnerTreatment() {
             photo={data.photo}
             onDetailClick={() => handleDetailClick(data.reservation_id)}
             onTreatClick={() => handleRTCClick(data.reservation_id)}
-            buttonText="진료 받기"
+            buttonText="진료 하기"
           />
         ))}
       </div>
