@@ -130,6 +130,22 @@ services:
       - ./redis/sentinel.conf:/usr/local/etc/redis/sentinel.conf
     command: [ "redis-sentinel", "/usr/local/etc/redis/sentinel.conf" ]
     restart: unless-stopped
+
+  kurento:
+    image: kurento/kurento-media-server:latest
+    container_name: kurento-server
+    ports:
+      - "8888:8888"
+    restart: unless-stopped
+
+  coturn:
+    image: coturn/coturn:latest
+    container_name: coturn-server
+    network_mode: host
+    volumes:
+       - ./coturn/turnserver.conf:/etc/coturn/turnserver.conf
+    restart: unless-stopped
+
 volumes:
   mysql_data:
   es_data:

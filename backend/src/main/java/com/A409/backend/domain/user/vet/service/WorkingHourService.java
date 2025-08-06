@@ -33,7 +33,7 @@ public class WorkingHourService {
 
     // 해당 workingHour를 추가 및 수정
     @Transactional
-    public List<WorkingHour> putWorkingHours(Long vetId,List<WorkingHourResponse> workingHours) {
+    public void putWorkingHours(Long vetId,List<WorkingHourResponse> workingHours) {
         Vet vet = vetRepository.findVetByVetId(vetId).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         List<WorkingHour> whs = workingHourRepository.saveAll(workingHours.stream().map(wh ->
@@ -45,8 +45,6 @@ public class WorkingHourService {
                         .endTime(wh.getEndTime())
                         .build()
         ).toList());
-
-        return workingHourRepository.saveAll(whs);
     }
 
 }
