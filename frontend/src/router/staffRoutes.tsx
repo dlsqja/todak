@@ -1,6 +1,7 @@
 import StaffHome from '@/component/pages/Staff/StaffHome';
 import StaffHospitalHome from '@/component/pages/Staff/StaffHospital/StaffHospitalHome';
-import StaffReservation from '@/component/pages/Staff/Reservation/StaffReservation';
+import StaffReservation from '@/component/pages/Staff/Reservation/StaffReservationMain';
+import StaffReservationDetail from '@/component/pages/Staff/Reservation/StaffReservationDetail';
 import StaffPayment from '@/component/pages/Staff/StaffPayment';
 import StaffMypage from '@/component/pages/Staff/StaffMypage';
 
@@ -17,8 +18,9 @@ const staffRoutes = {
     { path: 'home', element: <StaffHome /> },
     { path: 'hospital', element: <StaffHospitalHome /> },
     { path: 'hospital/info', element: <StaffHospitalInfo />},
-    { paht: 'hospital/vet', element: <StaffHospitalVet />},
+    { path: 'hospital/vet', element: <StaffHospitalVet />},
     { path: 'reservation', element: <StaffReservation /> },
+    { path: 'reservation/detail', element: <StaffReservationDetail /> },
     { path: 'payment', element: <StaffPayment /> },
     { path: 'mypage', element: <StaffMypage /> },
   ],
