@@ -4,8 +4,10 @@ import BackHeader from '@/component/header/BackHeader';
 import Input from '@/component/input/Input';
 import Button from '@/component/button/Button';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export default function OwnerMyPage() {
+  const navigate = useNavigate();
   const [name, setName] = useState('테스트 이름');
   const [phone, setPhone] = useState('테스트 전화번호');
   const [birth, setBirth] = useState('테스트 생일');
@@ -15,6 +17,7 @@ export default function OwnerMyPage() {
     console.log('제출할 생일:', birth);
     console.log('제출할 전화번호:', phone);
     alert(`수정 완료`);
+    navigate('/owner/home');
   };
 
   return (

@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import '@/styles/main.css';
 import BackHeader from '@/component/header/BackHeader';
 import Input from '@/component/input/Input';
 import Button from '@/component/button/Button';
 
 export default function VetMypage() {
+  const navigate = useNavigate();
   const [profile, setProfile] = useState('테스트 소개글');
 
   // // 페이지 로딩 시 기존 데이터 불러오기
@@ -30,6 +32,7 @@ export default function VetMypage() {
   const handleSubmit = () => {
     console.log('제출할 소개글:', profile);
     alert(`수정 완료`);
+    navigate('/vet/home');
   };
 
   return (
