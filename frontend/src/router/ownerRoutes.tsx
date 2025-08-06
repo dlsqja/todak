@@ -13,6 +13,7 @@ import OwnerPetEdit from '@/component/pages/Owner/Pet/OwnerPetEdit';
 import OwnerPetRegister from '@/component/pages/Owner/Pet/OwnerPetRegister';
 import OwnerReservationDetail from '@/component/pages/Owner/Reservation/OwnerReservationDetail';
 import OwnerTreatmentDetail from '@/component/pages/Owner/Treatment/OwnerTreatmentDetail';
+import OwnerTreatmentRTC from '@/component/pages/Owner/Treatment/OwnerTreatmentRTC';
 
 const ownerRoutes = {
   path: '/owner',
@@ -31,6 +32,7 @@ const ownerRoutes = {
     { path: 'mypage', element: <OwnerMyPage /> },
     { path: 'treatment', element: <OwnerTreatment /> },
     { path: 'treatment/detail/:id', element: <OwnerTreatmentDetail /> },
+    { path: 'treatment/rtc/:id', element: <OwnerTreatmentRTC /> },
   ],
 };
 

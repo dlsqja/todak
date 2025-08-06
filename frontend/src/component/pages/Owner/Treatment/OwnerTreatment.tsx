@@ -36,6 +36,11 @@ export default function OwnerTreatment() {
     navigate(`/owner/treatment/detail/${reservationId}`);
   };
 
+  const handleRTCClick = (reservationId: number) => {
+    navigate(`/owner/treatment/rtc/${reservationId}`);
+  };
+
+  // 더미데이터
   const treatmentData = [
     {
       reservation_id: 1,
@@ -58,7 +63,7 @@ export default function OwnerTreatment() {
       reservation_id: 2,
       owner_id: 1,
       pet_id: 2,
-      pet_name: '미료',
+      pet_name: '구름이',
       species: 'CAT',
       gender: 'FEMALE',
       age: 2,
@@ -69,57 +74,6 @@ export default function OwnerTreatment() {
       photo: '/images/미료_test.jpg',
       description: '식욕이 없고 설사를 하고 있습니다. 소화제를 처방받았습니다.',
       subject: 0, // 치과
-      status: 3, // 완료
-    },
-    {
-      reservation_id: 3,
-      owner_id: 1,
-      pet_id: 3,
-      pet_name: '미료',
-      species: 'CAT',
-      gender: 'FEMALE',
-      age: 2,
-      hospital_id: 1,
-      vet_id: 3,
-      reservation_day: '2025-01-13',
-      reservation_time: 32, // 16:00
-      photo: '/images/미료_test.jpg',
-      description: '다리를 절고 통증을 보입니다. 엑스레이 촬영 후 치료를 받았습니다.',
-      subject: 2, // 골절
-      status: 3, // 완료
-    },
-    {
-      reservation_id: 4,
-      owner_id: 1,
-      pet_id: 4,
-      pet_name: '미료',
-      species: 'CAT',
-      gender: 'FEMALE',
-      age: 2,
-      hospital_id: 1,
-      vet_id: 1,
-      reservation_day: '2025-01-12',
-      reservation_time: 31, // 15:30
-      photo: '/images/미료_test.jpg',
-      description: '입에서 냄새가 나고 치아가 시커멓습니다. 치석 제거를 받았습니다.',
-      subject: 0, // 치과
-      status: 3, // 완료
-    },
-    {
-      reservation_id: 5,
-      owner_id: 1,
-      pet_id: 5,
-      pet_name: '미료',
-      species: 'CAT',
-      gender: 'FEMALE',
-      age: 2,
-      hospital_id: 1,
-      vet_id: 2,
-      reservation_day: '2025-01-11',
-      reservation_time: 20, // 10:00
-      photo: '/images/미료_test.jpg',
-      description: '눈이 충혈되고 눈물이 많이 납니다. 안약을 처방받았습니다.',
-      subject: 3, // 안과
       status: 3, // 완료
     },
   ];
@@ -140,6 +94,7 @@ export default function OwnerTreatment() {
             symptom={data.description}
             photo={data.photo}
             onDetailClick={() => handleDetailClick(data.reservation_id)}
+            onTreatClick={() => handleRTCClick(data.reservation_id)}
           />
         ))}
       </div>
