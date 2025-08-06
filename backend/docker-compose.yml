@@ -157,7 +157,6 @@ services:
       - ./coturn/turnserver.conf:/etc/coturn/turnserver.conf
     restart: unless-stopped
 
-
 volumes:
   mysql_data:
   es_data:
