@@ -47,7 +47,7 @@ export default function VetMypage() {
         <Input id="license" label="면허번호" value={vetInfo.license_number} disabled={true} />
         <div className="flex flex-col">
           <label htmlFor="profile" className="mb-2 block h4 text-black">
-            소개글
+            소개글(선택)
           </label>
           <textarea
             id="profile"
