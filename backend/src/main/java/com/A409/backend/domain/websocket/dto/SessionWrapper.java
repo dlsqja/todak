@@ -34,8 +34,8 @@ public class SessionWrapper {
         if (webRtc != null) {
             webRtc.release();
         }
-        if (pipeline != null) {
-            pipeline.release();
-        }
+//        if (pipeline != null) {
+//            pipeline.release();
+//        }
     }
 }
