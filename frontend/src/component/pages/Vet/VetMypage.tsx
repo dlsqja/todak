@@ -37,6 +37,7 @@ export default function VetMypage() {
       <BackHeader text="마이페이지" />
       <div className="flex flex-col gap-6 px-7 mt-11">
         <Input id="hospital_Code" label="병원코드" value={vetInfo.hospital_Code} disabled={true} />
+        <Input id="license" label="면허번호" value={vetInfo.license_number} disabled={true} />
         <Input
           id="name"
           label="수의사 이름"
@@ -44,10 +45,9 @@ export default function VetMypage() {
           onChange={(e) => setVetName(e.target.value)}
           disabled={false}
         />
-        <Input id="license" label="면허번호" value={vetInfo.license_number} disabled={true} />
         <div className="flex flex-col">
           <label htmlFor="profile" className="mb-2 block h4 text-black">
-            소개글(선택)
+            수의사 소개글
           </label>
           <textarea
             id="profile"
