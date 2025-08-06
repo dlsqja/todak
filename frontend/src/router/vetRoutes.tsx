@@ -2,9 +2,11 @@ import VetHome from '@/component/pages/Vet/VetHome';
 import MobileLayout from '@/layouts/MobileLayout';
 import VetMenuBar from '@/component/menubar/VetMenuBar';
 import VetHospital from '@/component/pages/Vet/VetHospital';
-import VetTreatment from '@/component/pages/Vet/VetTreatment';
+import VetTreatment from '@/component/pages/Vet/Treatment/VetTreatment';
 import VetRecord from '@/component/pages/Vet/VetRecord';
 import VetMyPage from '@/component/pages/Vet/VetMypage';
+import VetTreatmentDetail from '@/component/pages/Vet/Treatment/VetTreatmentDetail';
+import VetTreatmentRTC from '@/component/pages/Vet/Treatment/VetTreatmentRTC';
 
 const vetRoutes = {
   path: '/vet',
@@ -13,6 +15,8 @@ const vetRoutes = {
     { path: 'home', element: <VetHome /> },
     { path: 'hospital', element: <VetHospital /> },
     { path: 'treatment', element: <VetTreatment /> },
+    { path: 'treatment/detail/:reservationId', element: <VetTreatmentDetail /> },
+    { path: 'treatment/rtc/:reservationId', element: <VetTreatmentRTC /> },
     { path: 'records', element: <VetRecord /> },
     { path: 'mypage', element: <VetMyPage /> },
   ],

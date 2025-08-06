@@ -33,11 +33,11 @@ export default function OwnerTreatment() {
   };
 
   const handleDetailClick = (reservationId: number) => {
-    navigate(`/owner/treatment/detail/${reservationId}`);
+    navigate(`/vet/treatment/detail/${reservationId}`);
   };
 
   const handleRTCClick = (reservationId: number) => {
-    navigate(`/owner/treatment/rtc/${reservationId}`);
+    navigate(`/vet/treatment/rtc/${reservationId}`);
   };
 
   // 더미데이터
@@ -76,12 +76,29 @@ export default function OwnerTreatment() {
       subject: 0, // 치과
       status: 3, // 완료
     },
+    {
+      reservation_id: 3,
+      owner_id: 1,
+      pet_id: 3,
+      pet_name: '미료',
+      species: 'CAT',
+      gender: 'FEMALE',
+      age: 2,
+      hospital_id: 1,
+      vet_id: 2,
+      reservation_day: '2025-01-14',
+      reservation_time: 29, // 14:30
+      photo: '/images/미료_test.jpg',
+      description: '식욕이 없고 설사를 하고 있습니다. 소화제를 처방받았습니다.',
+      subject: 0, // 치과
+      status: 3, // 완료
+    },
   ];
 
   return (
     <div>
       <SimpleHeader text="비대면 진료" />
-      <div className="px-4 space-y-4 overflow-y-auto hide-scrollbar">
+      <div className="px-4 py-1 space-y-4 max-h-full overflow-y-auto hide-scrollbar">
         {treatmentData.map((data, index) => (
           <RemoteTreatmentCard
             key={index}
@@ -95,7 +112,7 @@ export default function OwnerTreatment() {
             photo={data.photo}
             onDetailClick={() => handleDetailClick(data.reservation_id)}
             onTreatClick={() => handleRTCClick(data.reservation_id)}
-            buttonText="진료 받기"
+            buttonText="진료 하기"
           />
         ))}
       </div>
