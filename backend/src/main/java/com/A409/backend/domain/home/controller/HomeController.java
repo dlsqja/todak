@@ -68,7 +68,13 @@ public class HomeController {
         return APIResponse.ofSuccess(vets);
     }
 
-
+    @Operation(summary = "자동완성")
+    @ApiResponse(responseCode = "200",
+            content = @Content(
+                    mediaType = "application/json",
+                    array = @ArraySchema(schema = @Schema(implementation = HospitalDocument.class))
+            )
+    )
     @GetMapping("/autocomplete/{keyword}")
     @LogExecutionTime
     public APIResponse<?> autocomplete(@PathVariable String keyword) {

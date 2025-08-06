@@ -42,13 +42,4 @@ public class OwnerTreatmentController {
 
         return APIResponse.ofSuccess(treatments);
     }
-
-    @PostMapping
-    public APIResponse<?> getTreatments(@RequestBody STTData sttData) throws JsonProcessingException {
-
-        String message = objectMapper.writeValueAsString(sttData);
-        sttRequestProducer.sendSttRequest(message);
-
-        return APIResponse.ofSuccess(null);
-    }
 }
