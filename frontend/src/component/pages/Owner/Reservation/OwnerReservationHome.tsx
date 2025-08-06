@@ -256,7 +256,7 @@ const reservations: { [petName: string]: Reservation[] } = {
       status: '반려',
     },
     {
-      reservationId: 9,
+      reservationId: 10,
       owner: {
         name: '홍길동',
         phone: '010-1234-5678',
@@ -280,7 +280,7 @@ const reservations: { [petName: string]: Reservation[] } = {
       status: '반려',
     },
     {
-      reservationId: 10,
+      reservationId: 11,
       owner: {
         name: '홍길동',
         phone: '010-1234-5678',
@@ -306,7 +306,7 @@ const reservations: { [petName: string]: Reservation[] } = {
   ],
   초코: [
     {
-      reservationId: 11,
+      reservationId: 12,
       owner: {
         name: '이몽룡',
         phone: '010-5678-1234',
@@ -330,7 +330,7 @@ const reservations: { [petName: string]: Reservation[] } = {
       status: '대기',
     },
     {
-      reservationId: 12,
+      reservationId: 13,
       owner: {
         name: '이몽룡',
         phone: '010-5678-1234',

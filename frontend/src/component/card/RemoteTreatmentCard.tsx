@@ -21,7 +21,7 @@ const RemoteTreatmentCard: React.FC<RemoteTreatmentCardProps> = ({
   time = '',
   photo = '',
   onDetailClick,
-  // onTreatClick,
+  onTreatClick,
 }) => {
   return (
     <div className="w-full h-full bg-white rounded-[12px] shadow-[0px_5px_15px_rgba(0,0,0,0.08)]  px-6 py-6 flex flex-col justify-between">
@@ -45,15 +45,15 @@ const RemoteTreatmentCard: React.FC<RemoteTreatmentCardProps> = ({
       </div>
 
       {/* 중단: 증상 */}
-      <div>
-        <h4 className="h4 text-black font-bold">증상</h4>
+      <div className="my-2">
+        <h4 className="h4 text-black">증상</h4>
         <p className="p text-black">{symptom}</p>
       </div>
 
       {/* 하단 버튼 */}
       <div className="flex gap-3">
         <Button text="상세 정보" color="lightgreen" className="flex-1" onClick={onDetailClick} />
-        <Button text="진료 받기" color="green" className="flex-1" />
+        <Button text="진료 받기" color="green" className="flex-1" onClick={onTreatClick} />
       </div>
     </div>
   );
