@@ -31,7 +31,7 @@ public class PetController {
                     array = @ArraySchema(schema = @Schema(implementation = Pet.class))
             )
     )
-    @GetMapping("/")
+    @GetMapping()
     public APIResponse<?> getMyPets(@AuthenticationPrincipal User user) {
 
         List<Pet> petList = petService.getMyPets(user.getId());
@@ -50,7 +50,7 @@ public class PetController {
     }
 
     @Operation(summary = "반려동물 등록")
-    @PostMapping("/")
+    @PostMapping()
     public APIResponse<?> registerPet(@AuthenticationPrincipal User user, @RequestBody PetRequest petRequest) {
         petService.registerPet(user.getId(),petRequest);
 

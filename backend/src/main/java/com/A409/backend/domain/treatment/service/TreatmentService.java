@@ -19,6 +19,15 @@ public class TreatmentService {
 
     private final TreatmentRepository treatmentRepository;
 
+    public void saveAISummary(Long treatmentId,String summary){
+
+        Treatment treatment = treatmentRepository.findById(treatmentId).orElseThrow(() -> new CustomException(ErrorCode.RESOURCE_NOT_FOUND));
+
+        treatment.setAiSummary(summary);
+
+        treatmentRepository.save(treatment);
+    }
+
     public List<Map<String,Object>> getTreatments(Long ownerId){
 
         List<Treatment> treatmentList = treatmentRepository.findAllByOwner_OwnerId(ownerId);

@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/reservation/vets")
+@RequestMapping("/reservations/vets")
 @RequiredArgsConstructor
 public class VetReservationController {
 
