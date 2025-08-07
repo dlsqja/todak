@@ -20,6 +20,7 @@ public class OwnerResponse {
         return OwnerResponse.builder()
                 .name(owner.getName())
                 .phone(owner.getPhone())
+                .birth(owner.getBirth())
                 .build();
     }
 }
