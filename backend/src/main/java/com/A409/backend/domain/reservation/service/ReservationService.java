@@ -81,6 +81,9 @@ public class ReservationService {
     public void deleteReservation(Long ownerId, Long reservationId) {
 
 //        reservationRepository.removeByOwner_OwnerIdAndReservationId(ownerId,reservationId);
+        if(!reservationRepository.existsReservationByReservationIdAndOwner_OwnerId(reservationId, ownerId)){
+            throw  new CustomException(ErrorCode.RESOURCE_NOT_FOUND);
+        }
         reservationRepository.deleteByReservationIdAndOwner_OwnerId(reservationId,ownerId);
     }
 
