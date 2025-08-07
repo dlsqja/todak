@@ -1,10 +1,15 @@
 package com.A409.backend.domain.reservation.service;
 
+import com.A409.backend.domain.hospital.entity.Hospital;
+import com.A409.backend.domain.hospital.repository.HospitalRepository;
 import com.A409.backend.domain.reservation.dto.ReservationReqeust;
 import com.A409.backend.domain.reservation.dto.ReservationResponse;
 import com.A409.backend.domain.reservation.dto.ReservationResponseToVet;
 import com.A409.backend.domain.reservation.entity.Reservation;
 import com.A409.backend.domain.reservation.repository.ReservationRepository;
+import com.A409.backend.domain.treatment.entity.Treatment;
+import com.A409.backend.domain.treatment.entity.TreatmentResponse;
+import com.A409.backend.domain.treatment.repository.TreatmentRepository;
 import com.A409.backend.domain.user.owner.dto.OwnerResponse;
 import com.A409.backend.domain.user.owner.entity.Owner;
 import com.A409.backend.global.enums.ErrorCode;
@@ -29,6 +34,8 @@ public class ReservationService {
 
     private final S3Uploader s3Uploader;
     private final ReservationRepository reservationRepository;
+    private final HospitalRepository hospitalRepository;
+    private final TreatmentRepository treatmentRepository;
 
     public void createReservation(Long ownerId, ReservationReqeust reservationReqeust, MultipartFile photo) {
         Owner owner = Owner.builder().ownerId(ownerId).build();
@@ -151,5 +158,21 @@ public class ReservationService {
         }
 
         return ReservationResponse.toOwnerResponse(reservation);
+    }
+
+    public void approveReservation(Long hospitals_id, Long reservationId) {
+        Reservation reservation = reservationRepository.findReservationByReservationId(reservationId).orElseThrow(() -> new CustomException(ErrorCode.CONTENT_NOT_FOUND));
+        if(!hospitals_id.equals(reservation.getHospital().getHospitalId())){
+            throw new CustomException(ErrorCode.ACCESS_DENIED);
+        }
+        reservation.setStatus(ReservationStatus.APPROVED);
+        Treatment treatment = Treatment.builder()
+                        .pet(reservation.getPet())
+                        .isCompleted(false)
+                        .owner(reservation.getOwner())
+                        .vet(reservation.getVet())
+                        .build();
+        treatmentRepository.save(treatment);
+        reservationRepository.save(reservation);
     }
 }
