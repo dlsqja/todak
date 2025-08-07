@@ -1,8 +1,7 @@
 import '@/styles/main.css';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { petMockList } from './petMockList';
 
 import SimpleHeader from '@/component/header/SimpleHeader';
 import ImageInputBox from '@/component/input/ImageInputBox';
@@ -12,15 +11,67 @@ import OwnerPetTabRecord from './OwnerPetTabRecord';
 
 import { motion, AnimatePresence } from 'framer-motion';
 
+import { getMyPets } from '@/services/api/Owner/ownerpet' // ✅ API 함수 import
+
 export default function OwnerPetHome() {
   const navigate = useNavigate();
-  const [pets, setPets] = useState(petMockList);
-  const [selectedPet, setSelectedPet] = useState(petMockList[0]);
+  const [pets, setPets] = useState([]);              // 실제 API로 바뀐 데이터
+  const [selectedPet, setSelectedPet] = useState(null);
   const [selectedTab, setSelectedTab] = useState('상세 정보');
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const handleRegister = () => {
     navigate('/owner/pet/register');
   };
+
+  // ✅ API 호출 로직
+  // useEffect(() => {
+  //   const fetchPets = async () => {
+  //     try {
+  //       const data = await getMyPets();
+  //       setPets(data);
+  //       setSelectedPet(data[0]); // 첫 번째 pet 선택
+  //     } catch (err) {
+  //       setError(err);
+  //     } finally {
+  //       setIsLoading(false);
+  //     }
+  //   };
+  useEffect(() => {
+  const fetchPets = async () => {
+    try {
+      const data = await getMyPets();
+      if (Array.isArray(data)) {
+        setPets(data);
+        setSelectedPet(data[0]);
+      } else {
+        console.error('❌ 응답이 배열이 아님:', data);
+        setPets([]); // fallback
+      }
+    } catch (err) {
+      setError(err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+    fetchPets();
+  }, []);
+
+  if (isLoading) return <div className="p">불러오는 중...</div>;
+  if (error) return <div className="p">에러 발생: {error.message}</div>;
+  if (pets.length === 0) return (
+    <div className="p flex flex-col items-center justify-center h-[60vh] gap-6 text-center">
+      <p className="p">등록된 반려동물이 없습니다.</p>
+      <button
+        className="text-white bg-green-400 px-6 py-2 rounded-xl h5"
+        onClick={handleRegister}
+      >
+        반려동물 등록하기
+      </button>
+    </div>
+  );
 
   return (
     <motion.div
@@ -42,18 +93,19 @@ export default function OwnerPetHome() {
         >
           {pets.map((pet) => (
             <motion.div
-              key={pet.id}
+              key={pet.petId}
               className="flex flex-col items-center cursor-pointer"
               onClick={() => setSelectedPet(pet)}
               whileTap={{ scale: 0.95 }}
             >
               <ImageInputBox
-                src={pet.image}
-                stroke={pet.id === selectedPet?.id ? 'border-4 border-pink-200' : ''}
+                src={pet.photo}
+                stroke={pet.petId === selectedPet?.petId ? 'border-4 border-pink-200' : ''}
               />
               <p className="caption mt-2">{pet.name}</p>
             </motion.div>
           ))}
+
           {/* 등록 버튼 */}
           <motion.div
             className="flex flex-col items-center cursor-pointer"
@@ -65,7 +117,7 @@ export default function OwnerPetHome() {
           </motion.div>
         </motion.div>
 
-        {/* 2. 탭 메뉴 */}
+        {/* 탭 메뉴 */}
         <motion.div
           initial={{ opacity: 0, scale: 0.98 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -74,7 +126,7 @@ export default function OwnerPetHome() {
           <TabGroupPet selected={selectedTab} onSelect={setSelectedTab} />
         </motion.div>
 
-        {/* 3. 탭 콘텐츠 (애니메이션 전환) */}
+        {/* 탭 콘텐츠 */}
         <AnimatePresence mode="wait">
           {selectedTab === '상세 정보' && selectedPet && (
             <motion.div
@@ -91,7 +143,6 @@ export default function OwnerPetHome() {
               />
             </motion.div>
           )}
-
           {selectedTab === '진료 내역' && (
             <motion.div
               key="record"
@@ -104,7 +155,6 @@ export default function OwnerPetHome() {
             </motion.div>
           )}
         </AnimatePresence>
-
       </div>
     </motion.div>
   );
