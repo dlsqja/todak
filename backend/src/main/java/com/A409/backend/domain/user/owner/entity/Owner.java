@@ -16,14 +16,12 @@ import java.time.LocalDate;
 public class Owner {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "owner_id")
+    private Long ownerId;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "owner_id", nullable = false)
-    private Auth ownerId;
-
-    @Column(name = "owner_code", length = 6, nullable = false, unique = true)
-    private String ownerCode;
+    @JoinColumn(name = "auth_id", nullable = false,unique = true)
+    private Auth auth;
 
     @Column(length = 20, nullable = false)
     private String name;

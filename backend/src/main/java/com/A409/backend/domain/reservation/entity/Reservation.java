@@ -4,6 +4,8 @@ import com.A409.backend.domain.hospital.entity.Hospital;
 import com.A409.backend.domain.user.owner.entity.Owner;
 import com.A409.backend.domain.pet.entity.Pet;
 import com.A409.backend.domain.user.vet.entity.Vet;
+import com.A409.backend.global.enums.ReservationStatus;
+import com.A409.backend.global.enums.Subject;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -12,17 +14,11 @@ import java.time.LocalDate;
 @Entity
 @Table(name = "reservation")
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class Reservation {
-    public enum Subject {
-        치과, 피부과, 골절, 안과
-    }
-
-    public enum Status {
-        신청, 승인, 반려, 완료
-    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -63,6 +59,6 @@ public class Reservation {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Status status;
+    private ReservationStatus status;
 }
 
