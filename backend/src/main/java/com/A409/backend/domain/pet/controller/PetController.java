@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -39,6 +40,7 @@ public class PetController {
         return APIResponse.ofSuccess(petList);
     }
 
+
     @Operation(summary = "반려동물 상세 조회")
     @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = PetResponse.class)))
     @GetMapping("/{pet_id}")
@@ -51,8 +53,8 @@ public class PetController {
 
     @Operation(summary = "반려동물 등록")
     @PostMapping()
-    public APIResponse<?> registerPet(@AuthenticationPrincipal User user, @RequestBody PetRequest petRequest) {
-        petService.registerPet(user.getId(),petRequest);
+    public APIResponse<?> registerPet(@AuthenticationPrincipal User user, @RequestBody PetRequest petRequest,@RequestPart(value = "photo", required = false) MultipartFile photo) {
+        petService.registerPet(user.getId(),petRequest,photo);
 
         return APIResponse.ofSuccess(null);
     }
@@ -61,6 +63,16 @@ public class PetController {
     @PostMapping("/code")
     public APIResponse<?> registerPetByCode(@AuthenticationPrincipal User user, @RequestBody String petCode) {
         petService.registerPetByCode(user.getId(),petCode);
+
+        return APIResponse.ofSuccess(null);
+    }
+
+
+    @Operation(summary = "반려동물 수정")
+    @GetMapping()
+    public APIResponse<?> getMyPets(@AuthenticationPrincipal User user, @RequestBody PetRequest petRequest,@RequestPart(value = "photo", required = false) MultipartFile photo) {
+
+        petService.registerPet(user.getId(),petRequest,photo);
 
         return APIResponse.ofSuccess(null);
     }

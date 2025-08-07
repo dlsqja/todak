@@ -29,6 +29,7 @@ public class Pet {
     @Column(nullable = false, length = 10)
     private Species species;
 
+    @Setter
     @Column(length = 255)
     private String photo;
 
