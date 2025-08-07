@@ -21,9 +21,21 @@ export default function OwnerPetTabRecord({ selectedPet }: OwnerPetTabRecordProp
 
   const fetchData = async () => {
     try {
-      const data = await getReservations();
-      const filtered = data.filter((r) => r.pet?.petId === selectedPet.petId);
-      setRecords(filtered);
+      const data = await getReservations(); // [{ petResponse, reservations }, ...]
+      
+      // 1. 선택된 petId에 해당하는 항목만 찾기
+      const matched = data.find((entry) => entry.petResponse.petId === selectedPet.petId);
+      
+      // 2. 없으면 빈 배열 반환
+      const extractedRecords = matched?.reservations ?? [];
+
+      // 3. 날짜 필터링용 가공 (reservationDay 추가)
+      const withDate = extractedRecords.map((r) => ({
+        ...r,
+        reservationDay: new Date(r.reservationTime).toISOString().slice(0, 10), // "YYYY-MM-DD"
+      }));
+
+      setRecords(withDate);
     } catch (error) {
       console.error('예약 불러오기 실패:', error);
     }
@@ -33,9 +45,10 @@ export default function OwnerPetTabRecord({ selectedPet }: OwnerPetTabRecordProp
 }, [selectedPet]);
 
 
+
   // 상세보기 페이지로 이동
   const handleClickDetail = (reservationId: number) => {
-    navigate(`/owner/pet/treatment/${reservationId}`);
+    navigate(`/owner/pet/treatment/detail/${reservationId}`);
   };
 
   // 드롭다운 필터링
@@ -86,13 +99,13 @@ export default function OwnerPetTabRecord({ selectedPet }: OwnerPetTabRecordProp
         )}
         {filtered.map((r) => (
           <TreatmentRecordCard
-            key={r.reservationId}
-            doctorName={r.vetName}
-            hospitalName={r.hospitalName}
-            treatmentDate={r.reservationDay}
-            department={r.subject}
-            onClickDetail={() => handleClickDetail(r.reservationId)}
-          />
+          key={r.reservationId}
+          doctorName={r.vetName}
+          hospitalName={r.hospitalName}
+          treatmentDate={r.reservationDay}
+          department={r.subject}
+          onClickDetail={() => handleClickDetail(r.reservationId)}
+        />
         ))}
       </div>
     </div>
