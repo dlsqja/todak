@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -157,7 +158,7 @@ public class ReservationService {
     public void rejectReservation(Long hospitalId, Long reservationId, RejectionRequest rejectionRequest) {
 
         Reservation reservation = reservationRepository.findById(reservationId).orElseThrow(()->new CustomException(ErrorCode.RESOURCE_NOT_FOUND));
-        if(reservation.getHospital().getHospitalId()!=hospitalId){
+        if(!Objects.equals(reservation.getHospital().getHospitalId(), hospitalId)){
             throw new CustomException(ErrorCode.ACCESS_DENIED);
         }
 

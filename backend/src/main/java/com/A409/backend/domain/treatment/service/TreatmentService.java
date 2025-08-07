@@ -9,6 +9,7 @@ import com.A409.backend.global.exception.CustomException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,13 +46,24 @@ public class TreatmentService {
 
         return result;
     }
-    public List<Map<String,Object>> getTreatmentsByVetId(Long vetId){
-        List<Treatment> treatmentList = treatmentRepository.findAllByVet_VetId(vetId);
+    public List<Map<String,Object>> getTreatmentsByVetIdAndType(Long vetId,Integer type){
+
+        List<Treatment> treatmentList = new ArrayList<>();
+        if(type==0){
+            treatmentList = treatmentRepository.findAllByVet_VetIdAndIsCompleted(vetId,false);
+        }
+        else if(type==1){
+            treatmentList = treatmentRepository.findAllByVet_VetIdAndIsCompleted(vetId,true);
+        }
+        else{
+            treatmentList = treatmentRepository.findAllByVet_VetId(vetId);
+        }
+
 
         List<Map<String, Object>> result = treatmentList.stream()
                 .map(treatments -> {
                     Map<String, Object> map = new HashMap<>();
-                    map.put("treatmentID", treatments.getTreatmentId());
+                    map.put("treatmentId", treatments.getTreatmentId());
                     map.put("petInfo", PetResponse.toResponse(treatments.getPet()));
                     map.put("subject", treatments.getReservation().getSubject());
                     map.put("isCompleted", treatments.getIsCompleted());
