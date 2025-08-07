@@ -146,11 +146,17 @@ export default function ApplyFormPage() {
 
 
           <textarea
-          ref={symptomRef}
-          rows={4}
-          className="w-full mt-4 p text-black bg-white rounded-2xl border border-gray-400 px-4 py-2 focus:outline-none placeholder:text-gray-500"
-          placeholder="어떤 증상이 있는지 입력해주시고, 필요할 경우 사진을 첨부해주세요."
-        />
+  ref={symptomRef}
+  rows={4}
+  className={`
+    w-full mt-4 p text-black bg-white rounded-2xl px-4 py-2
+    border border-gray-400 placeholder:text-gray-500
+    focus:outline-none focus:border-green-300 focus:ring-1 focus:ring-green-200  focus:border-2
+    transition-all duration-200 ease-in-out
+  `}
+  placeholder="어떤 증상이 있는지 입력해주시고, 필요할 경우 사진을 첨부해주세요."
+/>
+
         </div>
       </div>
 
