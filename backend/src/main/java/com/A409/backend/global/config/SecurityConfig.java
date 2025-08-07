@@ -101,7 +101,7 @@ public class SecurityConfig {
         // Vite ↔ React DevServer ↔ CRA 등 포트만 다른 경우도 모두 추가하세요.
         // ------------------------------------------------------------------
         config.setAllowedOriginPatterns(List.of(
-                "http://localhost:5173"           // Vite
+                "*"
         ));
 
         // ------------------------------------------------------------------
