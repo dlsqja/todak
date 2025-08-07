@@ -4,7 +4,6 @@ package com.A409.backend.domain.reservation.service;
 import com.A409.backend.domain.hospital.entity.Hospital;
 import com.A409.backend.domain.hospital.repository.HospitalRepository;
 import com.A409.backend.domain.pet.dto.PetResponse;
-import com.A409.backend.domain.pet.entity.Pet;
 import com.A409.backend.domain.pet.service.PetService;
 import com.A409.backend.domain.reservation.dto.ReservationReqeust;
 import com.A409.backend.domain.reservation.dto.ReservationResponse;
@@ -68,8 +67,7 @@ public class ReservationService {
         List<Map<String, Object>> result = new ArrayList<>();
 
         for (PetResponse pet : petList) {
-
-            List<Reservation> reservations = reservationRepository.findAllByPet(pet);
+            List<Reservation> reservations = reservationRepository.findAllByPet_PetId(pet.getPetId());
 
             List<Map<String, Object>> reservationList = reservations.stream()
                     .map(reservation -> {

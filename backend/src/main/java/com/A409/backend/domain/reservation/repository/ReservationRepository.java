@@ -1,6 +1,6 @@
 package com.A409.backend.domain.reservation.repository;
 
-import com.A409.backend.domain.pet.dto.PetResponse;
+import com.A409.backend.domain.pet.entity.Pet;
 import com.A409.backend.domain.reservation.entity.Reservation;
 import com.A409.backend.global.enums.ReservationStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -21,6 +21,9 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     void deleteByReservationIdAndOwner_OwnerId(Long reservationId, Long ownerOwnerId);
     boolean existsReservationByReservationIdAndOwner_OwnerId(Long reservationId, Long ownerId);
 
-    List<Reservation> findAllByPet(PetResponse pet);
+
+    List<Reservation> findAllByPet(Pet pet);
+
+    List<Reservation> findAllByPet_PetId(Long petPetId);
 }
 
