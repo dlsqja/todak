@@ -125,7 +125,7 @@ export default function OwnerHome() {
 
       {/* 🔘 인디케이터 */}
       <motion.div
-        className="flex justify-center gap-2 mb-8"
+        className="flex justify-center gap-4 mb-8"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.7, duration: 0.3 }}
@@ -134,7 +134,7 @@ export default function OwnerHome() {
           <button
             key={idx}
             onClick={() => scrollToIndex(idx)}
-            className={`w-2 h-2 rounded-full transition-all ${
+            className={`w-2 h-2 rounded-full cursor-pointer transition-all ${
               idx === currentIndex ? 'bg-green-300 scale-125' : 'bg-green-200'
             }`}
           />

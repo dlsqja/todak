@@ -11,7 +11,7 @@ import type {
  */
 export const getReservations = async (): Promise<ReservationListResponse> => {
   const response = await apiClient.get('/reservations/owner')
-  return response.data
+  return response.data.data;
 }
 
 /**
