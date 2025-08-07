@@ -44,6 +44,7 @@ public class LoginController {
     @Operation(summary = "카카오 로그인")
     @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = Map.class)))
     @GetMapping("/{role}")
+    // TODO::배포시 수정
     public void login(@PathVariable("role") String role, @RequestParam("code") String code, HttpServletResponse response) throws IOException {
 
 
@@ -60,7 +61,10 @@ public class LoginController {
 
         String username = (String) kakaoAccount.get("email");
         Auth auth = authRepository.findByEmail(username).orElse(null);
+
+
         String signRedirectURL = String.format("https://i13a409.p.ssafy.io/auth/%s/", role);
+
         if(auth==null){
             auth = Auth.builder()
                     .email(username)
