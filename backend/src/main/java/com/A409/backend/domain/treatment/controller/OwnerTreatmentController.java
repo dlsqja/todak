@@ -35,10 +35,10 @@ public class OwnerTreatmentController {
                     array = @ArraySchema(schema = @Schema(implementation = Map.class))
             )
     )
-    @GetMapping
-    public APIResponse<?> getTreatments(@AuthenticationPrincipal User user){
+    @GetMapping("")
+    public APIResponse<?> getTreatments(@AuthenticationPrincipal User user,@RequestParam Integer type){
 
-        List<Map<String,Object>> treatments = treatmentService.getTreatments(user.getId());
+        List<Map<String,Object>> treatments = treatmentService.getTreatmentsByOwnerIdAndType(user.getId(),type);
 
         return APIResponse.ofSuccess(treatments);
     }

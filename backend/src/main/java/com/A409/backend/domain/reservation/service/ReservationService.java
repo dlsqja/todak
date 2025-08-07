@@ -175,6 +175,7 @@ public class ReservationService {
         reservation.setStatus(ReservationStatus.APPROVED);
         Treatment treatment = Treatment.builder()
                         .pet(reservation.getPet())
+                        .reservation(reservation)
                         .isCompleted(false)
                         .owner(reservation.getOwner())
                         .vet(reservation.getVet())

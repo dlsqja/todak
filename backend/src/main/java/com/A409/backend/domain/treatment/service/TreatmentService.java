@@ -29,9 +29,19 @@ public class TreatmentService {
         treatmentRepository.save(treatment);
     }
 
-    public List<Map<String,Object>> getTreatments(Long ownerId){
+    public List<Map<String,Object>> getTreatmentsByOwnerIdAndType(Long ownerId,Integer type){
 
-        List<Treatment> treatmentList = treatmentRepository.findAllByOwner_OwnerId(ownerId);
+        List<Treatment> treatmentList = new ArrayList<>();
+
+        if(type==0){
+            treatmentList = treatmentRepository.findAllByOwner_OwnerIdAndIsCompleted(ownerId,false);
+        }
+        else if(type==1){
+            treatmentList = treatmentRepository.findAllByOwner_OwnerIdAndIsCompleted(ownerId,true);
+        }
+        else{
+            throw new CustomException(ErrorCode.INVALID_INPUT_VALUE);
+        }
 
         List<Map<String, Object>> result = treatmentList.stream()
                 .map(treatments -> {
@@ -55,8 +65,11 @@ public class TreatmentService {
         else if(type==1){
             treatmentList = treatmentRepository.findAllByVet_VetIdAndIsCompleted(vetId,true);
         }
-        else{
+        else if(type==2){
             treatmentList = treatmentRepository.findAllByVet_VetId(vetId);
+        }
+        else{
+            throw new CustomException(ErrorCode.INVALID_INPUT_VALUE);
         }
 
 
@@ -68,6 +81,7 @@ public class TreatmentService {
                     map.put("subject", treatments.getReservation().getSubject());
                     map.put("isCompleted", treatments.getIsCompleted());
                     map.put("startTime", treatments.getReservation().getReservationTime());
+                    map.put("reservationId", treatments.getReservation().getReservationId());
                     map.put("endTime", treatments.getReservation().getReservationTime());
                     map.put("treatmentDate", treatments.getReservation().getReservationDay());
                     return map;

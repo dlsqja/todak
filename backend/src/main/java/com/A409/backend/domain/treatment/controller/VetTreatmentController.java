@@ -25,7 +25,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class VetTreatmentController {
 
-    TreatmentService treatmentService;
+    private final TreatmentService treatmentService;
 
     @Operation(summary = "수의사 진료 필터링 조회")
     @ApiResponse(responseCode = "200",
