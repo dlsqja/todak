@@ -111,9 +111,12 @@ public class SignalHandler extends TextWebSocketHandler {
         System.out.println("cleanup:" + ws.getId());
 
         // 1) 참가자 맵에서 본인 endpoint 꺼내서 해제
-        WebRtcEndpoint endpoint = roomParticipants.get(sessionId).remove(ws.getId());
-        if (endpoint != null) {
-            try { endpoint.release(); } catch (Exception ignore) {}
+        Map<String, WebRtcEndpoint> sessionEndpoint = roomParticipants.get(sessionId);
+        if (sessionEndpoint != null) {
+            WebRtcEndpoint endpoint = sessionEndpoint.remove(ws.getId());
+            if (endpoint != null) {
+                try { endpoint.release(); } catch (Exception ignore) {}
+            }
         }
 
         // 2) 세션 래퍼 제거

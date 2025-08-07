@@ -55,7 +55,8 @@ public class SecurityConfig {
                                 "/v3/api-docs/**",
                                 "/webjars/**",
                                 "/signup/**",
-                                "/staffs/mypage/**"
+                                "/staffs/mypage/**",
+                                "/ws"
                         ).permitAll()
                         .requestMatchers("/api/v1/public/**").permitAll()
                         .requestMatchers("/public/**").permitAll()
