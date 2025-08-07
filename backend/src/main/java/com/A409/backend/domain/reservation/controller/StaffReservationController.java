@@ -72,6 +72,15 @@ public class StaffReservationController {
         return APIResponse.ofSuccess(reservationResponse);
     }
 
+
+    @Operation(summary = "예약 승인")
+    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = ReservationResponse.class)))
+    @PatchMapping("/approve/{reservation_id}")
+    public APIResponse<?> approveReservation(@AuthenticationPrincipal User user, @PathVariable("reservation_id") Long reservationId){
+        reservationService.approveReservation(user.getId(), reservationId);
+        return APIResponse.ofSuccess(null);
+    }
+
     @Operation(summary = "예약 반려")
     @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = ReservationResponse.class)))
     @PatchMapping("/rejection/{reservation_id}")
