@@ -99,12 +99,12 @@ public class ReservationService {
     public ReservationResponseToVet getReservationDetailByVetId(Long vetId, Long reservationId) {
 
         Reservation reservation = reservationRepository.findById(reservationId).orElseThrow(() -> new CustomException(ErrorCode.CONTENT_NOT_FOUND));
-        System.out.println(reservation.getOwner().getOwnerId());
+
         if(!vetId.equals(reservation.getVet().getVetId())){
             throw new CustomException(ErrorCode.ACCESS_DENIED);
         }
 
-        return ReservationResponseToVet.toOwnerResponse(reservation);
+        return ReservationResponseToVet.toResposne(reservation);
     }
 
     public List<Map<String, Object>> getHospitalReservations(Long hospitalId) {
