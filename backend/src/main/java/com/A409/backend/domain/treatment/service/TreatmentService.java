@@ -9,6 +9,7 @@ import com.A409.backend.global.exception.CustomException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,9 +29,19 @@ public class TreatmentService {
         treatmentRepository.save(treatment);
     }
 
-    public List<Map<String,Object>> getTreatments(Long ownerId){
+    public List<Map<String,Object>> getTreatmentsByOwnerIdAndType(Long ownerId,Integer type){
 
-        List<Treatment> treatmentList = treatmentRepository.findAllByOwner_OwnerId(ownerId);
+        List<Treatment> treatmentList = new ArrayList<>();
+
+        if(type==0){
+            treatmentList = treatmentRepository.findAllByOwner_OwnerIdAndIsCompleted(ownerId,false);
+        }
+        else if(type==1){
+            treatmentList = treatmentRepository.findAllByOwner_OwnerIdAndIsCompleted(ownerId,true);
+        }
+        else{
+            throw new CustomException(ErrorCode.INVALID_INPUT_VALUE);
+        }
 
         List<Map<String, Object>> result = treatmentList.stream()
                 .map(treatments -> {
@@ -45,17 +56,32 @@ public class TreatmentService {
 
         return result;
     }
-    public List<Map<String,Object>> getTreatmentsByVetId(Long vetId){
-        List<Treatment> treatmentList = treatmentRepository.findAllByVet_VetId(vetId);
+    public List<Map<String,Object>> getTreatmentsByVetIdAndType(Long vetId,Integer type){
+
+        List<Treatment> treatmentList = new ArrayList<>();
+        if(type==0){
+            treatmentList = treatmentRepository.findAllByVet_VetIdAndIsCompleted(vetId,false);
+        }
+        else if(type==1){
+            treatmentList = treatmentRepository.findAllByVet_VetIdAndIsCompleted(vetId,true);
+        }
+        else if(type==2){
+            treatmentList = treatmentRepository.findAllByVet_VetId(vetId);
+        }
+        else{
+            throw new CustomException(ErrorCode.INVALID_INPUT_VALUE);
+        }
+
 
         List<Map<String, Object>> result = treatmentList.stream()
                 .map(treatments -> {
                     Map<String, Object> map = new HashMap<>();
-                    map.put("treatmentID", treatments.getTreatmentId());
+                    map.put("treatmentId", treatments.getTreatmentId());
                     map.put("petInfo", PetResponse.toResponse(treatments.getPet()));
                     map.put("subject", treatments.getReservation().getSubject());
                     map.put("isCompleted", treatments.getIsCompleted());
                     map.put("startTime", treatments.getReservation().getReservationTime());
+                    map.put("reservationId", treatments.getReservation().getReservationId());
                     map.put("endTime", treatments.getReservation().getReservationTime());
                     map.put("treatmentDate", treatments.getReservation().getReservationDay());
                     return map;

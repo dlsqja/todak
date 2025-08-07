@@ -3,12 +3,8 @@ package com.A409.backend.domain.hospital.controller;
 import com.A409.backend.domain.hospital.dto.HospitalRequest;
 import com.A409.backend.domain.hospital.dto.HospitalResponse;
 import com.A409.backend.domain.hospital.service.HospitalService;
-import com.A409.backend.domain.user.staff.dto.StaffResponse;
-import com.A409.backend.domain.user.staff.service.StaffService;
-import com.A409.backend.domain.user.vet.dto.VetResponse;
 import com.A409.backend.domain.user.vet.dto.VetWorkingHourResponse;
-import com.A409.backend.domain.user.vet.dto.WorkingHourResponse;
-import com.A409.backend.domain.user.vet.entity.WorkingHour;
+import com.A409.backend.domain.user.vet.dto.WorkingHourDto;
 import com.A409.backend.domain.user.vet.service.VetService;
 import com.A409.backend.domain.user.vet.service.WorkingHourService;
 import com.A409.backend.global.enums.ErrorCode;
@@ -25,8 +21,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/hospitals")
@@ -59,6 +55,7 @@ public class HospitalController {
         return APIResponse.ofSuccess(null);
     }
 
+    /*
     @Operation(summary = "병원 관리자 목록 조회")
     @ApiResponse(responseCode = "200",
             content = @Content(
@@ -74,6 +71,7 @@ public class HospitalController {
 
         return APIResponse.ofSuccess(hospitalResponse);
     }
+     */
 
     @Operation(summary = "수의사 불가능 시간 조회")
     @ApiResponse(responseCode = "200",
@@ -94,7 +92,9 @@ public class HospitalController {
         String cacheKey = "closinghours:" + vetId;
 
         List<Integer> cachedTimes = (List<Integer>) redisService.getByKey(cacheKey);
-
+        if(cachedTimes==null){
+            cachedTimes = new ArrayList<>();
+        }
         return APIResponse.ofSuccess(cachedTimes);
     }
 
@@ -130,11 +130,11 @@ public class HospitalController {
     }
 
     @Operation(summary = "병원 소속 수의사 근무 시간 수정")
-    @PostMapping("/{vet_id}/working-hours")
+    @PatchMapping("/{vet_id}/working-hours")
     public APIResponse<?> saveWorkingHours(
             @AuthenticationPrincipal User user,
             @PathVariable("vet_id") Long vetId,
-            @RequestBody List<WorkingHourResponse> workingHours
+            @RequestBody List<WorkingHourDto> workingHours
     ) {
         workingHourService.putWorkingHours(vetId, workingHours);
         return APIResponse.ofSuccess(null);

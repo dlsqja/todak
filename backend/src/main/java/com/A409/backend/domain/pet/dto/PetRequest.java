@@ -10,7 +10,6 @@ public class PetRequest {
 
     private String name;
     private Species species;
-    private String photo;
     private Gender gender;
     private Integer age;
 
@@ -18,7 +17,6 @@ public class PetRequest {
         return Pet.builder()
                 .name(this.name)
                 .species(this.species)
-                .photo(this.photo)
                 .gender(this.gender)
                 .age(this.age)
                 .build();

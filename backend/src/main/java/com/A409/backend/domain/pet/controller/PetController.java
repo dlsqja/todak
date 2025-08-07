@@ -1,5 +1,6 @@
 package com.A409.backend.domain.pet.controller;
 
+import com.A409.backend.domain.pet.dto.PetCodeRequest;
 import com.A409.backend.domain.pet.dto.PetRequest;
 import com.A409.backend.domain.pet.dto.PetResponse;
 import com.A409.backend.domain.pet.entity.Pet;
@@ -12,8 +13,10 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -34,10 +37,11 @@ public class PetController {
     @GetMapping()
     public APIResponse<?> getMyPets(@AuthenticationPrincipal User user) {
 
-        List<Pet> petList = petService.getMyPets(user.getId());
+        List<PetResponse> petList = petService.getMyPets(user.getId());
 
         return APIResponse.ofSuccess(petList);
     }
+
 
     @Operation(summary = "반려동물 상세 조회")
     @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = PetResponse.class)))
@@ -50,17 +54,31 @@ public class PetController {
     }
 
     @Operation(summary = "반려동물 등록")
-    @PostMapping()
-    public APIResponse<?> registerPet(@AuthenticationPrincipal User user, @RequestBody PetRequest petRequest) {
-        petService.registerPet(user.getId(),petRequest);
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public APIResponse<?> registerPet(@AuthenticationPrincipal User user,  @RequestPart("petRequest") PetRequest petRequest,@RequestPart(value = "photo", required = false) MultipartFile photo) {
+        petService.registerPet(user.getId(),petRequest,photo);
 
         return APIResponse.ofSuccess(null);
     }
 
     @Operation(summary = "반려동물 코드등록")
     @PostMapping("/code")
-    public APIResponse<?> registerPetByCode(@AuthenticationPrincipal User user, @RequestBody String petCode) {
-        petService.registerPetByCode(user.getId(),petCode);
+    public APIResponse<?> registerPetByCode(@AuthenticationPrincipal User user, @RequestBody PetCodeRequest petCodeRequest) {
+        petService.registerPetByCode(user.getId(),petCodeRequest.getPetCode());
+
+        return APIResponse.ofSuccess(null);
+    }
+
+
+    @Operation(summary = "반려동물 수정")
+    @PatchMapping(path = "/{petId}",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public APIResponse<?> updatePet(
+            @AuthenticationPrincipal User user,
+            @PathVariable("petId") Long petId,
+            @RequestPart("petRequest") PetRequest petRequest,
+            @RequestPart(value = "photo", required = false) MultipartFile photo) {
+
+        petService.updatePet(user.getId(), petId,petRequest, photo);
 
         return APIResponse.ofSuccess(null);
     }

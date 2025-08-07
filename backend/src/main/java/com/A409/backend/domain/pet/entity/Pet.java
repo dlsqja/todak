@@ -11,6 +11,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Setter
 public class Pet {
 
     @Id
@@ -18,7 +19,6 @@ public class Pet {
     @Column(name = "pet_id")
     private Long petId;
 
-    @Setter
     @Column(name = "pet_code", length = 6, nullable = false, unique = true)
     private String petCode;
 

@@ -16,5 +16,8 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     List<Reservation> findAllByHospital_HospitalIdAndStatus(Long hospitalId, ReservationStatus status);
     Optional<Reservation> findReservationByReservationId(Long reservationId);
     List<Reservation> findByVet_VetIdAndStatus(Long vetId, ReservationStatus status);
+
+    void deleteByReservationIdAndOwner_OwnerId(Long reservationId, Long ownerOwnerId);
+    boolean existsReservationByReservationIdAndOwner_OwnerId(Long reservationId, Long ownerId);
 }
 

@@ -29,25 +29,6 @@ public class KakaoAuthController {
     private final AuthRepository authRepository;
     private final JwtService jwtService;
 
-    @GetMapping("/kakao/callback")
-    public APIResponse<?> saveAuthAfterKakaoLogin(@RequestParam("code") String code){
-        String kakaoAccessToken = kakaoAuthService.getAccessToken(code);
-        Map<String, Object> userInfo = kakaoAuthService.getUserInfo(kakaoAccessToken);
-        Map<String, Object> kakaoAccount = (Map<String, Object>) userInfo.get("kakao_account");
-        String username = (String) kakaoAccount.get("email");
-
-        if(!authRepository.existsAuthByEmail(username)){
-            Auth auth = Auth.builder()
-                    .email(username)
-                    .build();
-            authRepository.save(auth);
-        }
-        Auth auth = authRepository.findByEmail(username)
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-
-        return APIResponse.ofSuccess(auth.getAuthId());
-    }
-
     @Operation(summary = "토큰 재발급")
     @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = Map.class)))
     @PostMapping("/refresh")
@@ -67,33 +48,4 @@ public class KakaoAuthController {
 
         return APIResponse.ofSuccess(tokens);
     }
-
-//    @GetMapping("/kakao/callback/{role}")
-//    public ApiResponse<?> kakaoLoginCallback(@RequestParam("code") String code, @PathVariable("role")String roleStr) {
-//        log.info("kakaoCallback roleStr:{}",roleStr);
-//
-//        Role role = switch (roleStr.toLowerCase()) {
-//            case "owner" -> Role.OWNER;
-//            case "vet"   -> Role.VET;
-//            case "staff" -> Role.STAFF;
-//            default      -> throw new IllegalArgumentException("Invalid role");
-//        };
-//        String kakaoAccessToken = kakaoAuthService.getAccessToken(code, roleStr.toLowerCase());
-//
-//        Map<String, Object> userInfo = kakaoAuthService.getUserInfo(kakaoAccessToken);
-//        Map<String, Object> kakaoAccount = (Map<String, Object>) userInfo.get("kakao_account");
-//
-//        String username = (String) kakaoAccount.get("email");
-//        Auth auth = authRepository.findByEmail(username).orElseThrow(() -> new UsernameNotFoundException("User not found"));
-//        Long id = auth.getAuthId();
-//
-//        String accessToken = jwtService.generateAccessToken(id, username, role);
-//        String refreshToken = jwtService.generateRefreshToken(id, username, role);
-//
-//        Map<String, String> tokens = new HashMap<>();
-//        tokens.put("accessToken", accessToken);
-//        tokens.put("refreshToken", refreshToken);
-//
-//        return ApiResponse.ofSuccess(tokens);
-//    }
 }

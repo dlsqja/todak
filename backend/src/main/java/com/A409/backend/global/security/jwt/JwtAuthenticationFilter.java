@@ -2,12 +2,14 @@ package com.A409.backend.global.security.jwt;
 
 import com.A409.backend.global.enums.Role;
 import com.A409.backend.global.security.model.User;
+import jakarta.annotation.PostConstruct;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -21,13 +23,23 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
 
+    @Value("${api.version}")
+    private String VERSION;
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        String path = request.getRequestURI();
+        log.info(path);
+
+        if (isPermitAllPath(path)) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         String authHeader = request.getHeader("Authorization");
 
         if(authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);
-            log.info("Authentication Token: {}", token);
             if(jwtService.validateToken(token)){
                 Long id = jwtService.getUserId(token);
                 String username = jwtService.getUsername(token);
@@ -46,4 +58,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
         filterChain.doFilter(request, response);
     }
+
+    private boolean isPermitAllPath(String path) {
+        return path.equals("/login") // POST /login
+                || path.startsWith(VERSION + "/swagger-ui")
+                || path.startsWith(VERSION + "/swagger-resources")
+                || path.startsWith(VERSION + "/v3/api-docs")
+                || path.startsWith(VERSION + "/webjars")
+                || path.startsWith(VERSION + "/signup")
+                || path.startsWith(VERSION + "/staffs/mypage")
+                || path.startsWith(VERSION + "/public");
+    }
+
+
 }

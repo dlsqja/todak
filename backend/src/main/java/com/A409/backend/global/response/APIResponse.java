@@ -10,6 +10,9 @@ public class APIResponse<T> extends ResponseEntity<ApiBody<T>> {
         super(body, status);
     }
 
+    public static <T> APIResponse<T> ofSuccess(HttpStatus httpStatus,T data) {
+        return new APIResponse<>(httpStatus, new ApiBody<>( "성공", data));
+    }
     public static <T> APIResponse<T> ofSuccess(T data) {
         return new APIResponse<>(HttpStatus.OK, new ApiBody<>( "성공", data));
     }

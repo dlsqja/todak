@@ -1,6 +1,6 @@
 package com.A409.backend.domain.user.vet.service;
 
-import com.A409.backend.domain.user.vet.dto.WorkingHourResponse;
+import com.A409.backend.domain.user.vet.dto.WorkingHourDto;
 import com.A409.backend.domain.user.vet.entity.Vet;
 import com.A409.backend.domain.user.vet.entity.WorkingHour;
 import com.A409.backend.domain.user.vet.repository.VetRepository;
@@ -21,10 +21,10 @@ public class WorkingHourService {
     private final VetRepository vetRepository;
 
     // 수의사 ID를 받아서 근무 시간 목록 조회
-    public List<WorkingHourResponse> getWorkingHourByVetId(Long vetId){
+    public List<WorkingHourDto> getWorkingHourByVetId(Long vetId){
         return workingHourRepository.findByVet_VetId(vetId)
                 .stream()
-                .map(WorkingHourResponse::toResponse)
+                .map(WorkingHourDto::toResponse)
                 .toList();
     }
     public List<Map<String, Object>> getWorkingHoursAndVet(Long hospital_id){
@@ -33,7 +33,7 @@ public class WorkingHourService {
 
     // 해당 workingHour를 추가 및 수정
     @Transactional
-    public void putWorkingHours(Long vetId,List<WorkingHourResponse> workingHours) {
+    public void putWorkingHours(Long vetId,List<WorkingHourDto> workingHours) {
         Vet vet = vetRepository.findVetByVetId(vetId).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         List<WorkingHour> whs = workingHourRepository.saveAll(workingHours.stream().map(wh ->

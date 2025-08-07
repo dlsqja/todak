@@ -33,13 +33,6 @@ public class HomeController {
     private final RedisService redisService;
     private static final long CACHE_TTL_MINUTES = 5;
 
-    @Operation(summary = "인덱스 페이지")
-    @GetMapping()
-    public APIResponse<?> home() {
-        return APIResponse.ofSuccess("A409팀입니다 ㄱ-");
-    }
-
-
     @Operation(summary = "병원 리스트 조회")
     @ApiResponse(responseCode = "200",
             content = @Content(

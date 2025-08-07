@@ -1,6 +1,7 @@
 package com.A409.backend.domain.treatment.controller;
 
 import com.A409.backend.domain.hospital.dto.HospitalResponse;
+import com.A409.backend.domain.reservation.entity.Reservation;
 import com.A409.backend.domain.treatment.entity.Treatment;
 import com.A409.backend.domain.treatment.entity.TreatmentResponse;
 import com.A409.backend.domain.treatment.service.TreatmentService;
@@ -14,10 +15,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
@@ -27,9 +25,9 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class VetTreatmentController {
 
-    TreatmentService treatmentService;
+    private final TreatmentService treatmentService;
 
-    @Operation(summary = "수의사 진료 리스트 조회")
+    @Operation(summary = "수의사 진료 필터링 조회")
     @ApiResponse(responseCode = "200",
             content = @Content(
                     mediaType = "application/json",
@@ -37,8 +35,8 @@ public class VetTreatmentController {
             )
     )
     @GetMapping("/history")
-    public APIResponse<?> getVetTreatmentHistory(@AuthenticationPrincipal User user) {
-        List<Map<String, Object>> treatments = treatmentService.getTreatmentsByVetId(user.getId());
+    public APIResponse<?> getVetTreatmentHistory(@AuthenticationPrincipal User user, @RequestParam Integer type) {
+        List<Map<String, Object>> treatments = treatmentService.getTreatmentsByVetIdAndType(user.getId(),type);
         return APIResponse.ofSuccess(treatments);
     }
 
