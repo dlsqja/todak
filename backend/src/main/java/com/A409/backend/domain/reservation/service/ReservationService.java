@@ -1,9 +1,9 @@
 package com.A409.backend.domain.reservation.service;
 
-import com.A409.backend.domain.reservation.dto.ReservationReqeust;
-import com.A409.backend.domain.reservation.dto.ReservationResponse;
-import com.A409.backend.domain.reservation.dto.ReservationResponseToVet;
+import com.A409.backend.domain.reservation.dto.*;
+import com.A409.backend.domain.reservation.entity.Rejection;
 import com.A409.backend.domain.reservation.entity.Reservation;
+import com.A409.backend.domain.reservation.repository.RejectionRepository;
 import com.A409.backend.domain.reservation.repository.ReservationRepository;
 import com.A409.backend.domain.user.owner.dto.OwnerResponse;
 import com.A409.backend.domain.user.owner.entity.Owner;
@@ -29,6 +29,7 @@ public class ReservationService {
 
     private final S3Uploader s3Uploader;
     private final ReservationRepository reservationRepository;
+    private final RejectionRepository rejectionRepository;
 
     public void createReservation(Long ownerId, ReservationReqeust reservationReqeust, MultipartFile photo) {
         Owner owner = Owner.builder().ownerId(ownerId).build();
@@ -151,5 +152,28 @@ public class ReservationService {
         }
 
         return ReservationResponse.toOwnerResponse(reservation);
+    }
+
+    public void rejectReservation(Long hospitalId, Long reservationId, RejectionRequest rejectionRequest) {
+
+        Reservation reservation = reservationRepository.findById(reservationId).orElseThrow(()->new CustomException(ErrorCode.RESOURCE_NOT_FOUND));
+        if(reservation.getHospital().getHospitalId()!=hospitalId){
+            throw new CustomException(ErrorCode.ACCESS_DENIED);
+        }
+
+        Rejection rejection = Rejection.builder()
+                .reservation(reservation)
+                .reason(rejectionRequest.getReason())
+                .build();
+
+        rejectionRepository.save(rejection);
+
+        reservation.setStatus(ReservationStatus.REJECTED);
+        reservationRepository.save(reservation);
+    }
+
+    public RejectionResponse getRejection(Long hospitalId, Long reservationId) {
+
+        return RejectionResponse.toResponse(rejectionRepository.findByReservation_ReservationId(reservationId));
     }
 }
