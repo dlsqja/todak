@@ -2,7 +2,6 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import Button from '@/component/button/Button';
 import CopyButton from '@/component/button/CopyButton';
-import { useNavigate } from 'react-router-dom';
 
 export default function OwnerPetTabInfo({ selectedPet, setPets, setSelectedPet }) {
   const navigate = useNavigate();
@@ -15,7 +14,6 @@ export default function OwnerPetTabInfo({ selectedPet, setPets, setSelectedPet }
       setSelectedPet(null); // 이전 값 참조 필요 없음
     }
   };
-  const navigate = useNavigate();
 
   const handleEdit = () => {
     navigate(`/owner/pet/edit/${selectedPet.petId}`, {
