@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import '@/styles/main.css';
-import BackHeader from '@/component/header/BackHeader';
+import SimpleHeader from '@/component/header/SimpleHeader';
 import Input from '@/component/input/Input';
 import Button from '@/component/button/Button';
 import { useNavigate } from 'react-router-dom';
@@ -37,7 +37,7 @@ export default function VetMypage() {
 
   return (
     <>
-      <BackHeader text="마이페이지" />
+      <SimpleHeader text="마이페이지" />
       <div className="flex flex-col gap-6 px-7 mt-11">
         <Input id="hospital_Code" label="병원코드" value={vetInfo.hospital_Code} disabled={true} />
         <Input id="license" label="면허번호" value={vetInfo.license_number} disabled={true} />
