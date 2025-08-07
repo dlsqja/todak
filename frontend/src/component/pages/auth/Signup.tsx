@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import KakaoLogin from '@/component/icon/kakao_login.png';
-import { authAPI } from '@/api/auth';
+import { authAPI } from '@/services/api/auth';
 
 // 카카오 SDK 타입 선언
 declare global {

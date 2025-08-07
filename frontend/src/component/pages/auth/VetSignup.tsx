@@ -4,7 +4,7 @@ import BackHeader from '@/component/header/BackHeader';
 import Input from '@/component/input/Input';
 import Button from '@/component/button/Button';
 import { useNavigate } from 'react-router-dom';
-import { authAPI } from '@/api/auth';
+import { authAPI } from '@/services/api/auth';
 
 export default function VetSignup() {
   const navigate = useNavigate();
