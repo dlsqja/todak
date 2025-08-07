@@ -1,6 +1,7 @@
 import React from 'react';
 import Button from '@/component/button/Button';
 import CopyButton from '@/component/button/CopyButton';
+import { useNavigate } from 'react-router-dom';
 
 export default function OwnerPetTabInfo({ selectedPet, setPets, setSelectedPet }) {
   const handleDelete = () => {
@@ -11,9 +12,12 @@ export default function OwnerPetTabInfo({ selectedPet, setPets, setSelectedPet }
       setSelectedPet((prev) => null);
     }
   };
+  const navigate = useNavigate();
 
   const handleEdit = () => {
-    window.location.href = `/owner/pet/edit/${selectedPet.id}`;
+    navigate(`/owner/pet/edit/${selectedPet.petId}`, {
+  state: { pet: selectedPet }, 
+});
   };
 
   return (
@@ -33,12 +37,12 @@ export default function OwnerPetTabInfo({ selectedPet, setPets, setSelectedPet }
         </div>
         <div className="flex justify-between">
           <p className="p text-brown-300">동물 종류</p>
-          <p className="p">{selectedPet.type}</p>
+          <p className="p">{selectedPet.species}</p>
         </div>
         <div className="flex justify-between items-center">
           <p className="p text-brown-300">등록 코드</p>
           <div className="flex items-center gap-2">
-            <p className="p">{selectedPet.code}</p>
+            <p className="p">{selectedPet.pet_code}</p>
             <CopyButton />
           </div>
         </div>
