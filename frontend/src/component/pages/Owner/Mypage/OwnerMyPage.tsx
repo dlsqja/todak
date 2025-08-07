@@ -1,6 +1,6 @@
 import React from 'react';
 import '@/styles/main.css';
-import BackHeader from '@/component/header/BackHeader';
+import SimpleHeader from '@/component/header/SimpleHeader';
 import Input from '@/component/input/Input';
 import Button from '@/component/button/Button';
 import { useState } from 'react';
@@ -22,7 +22,7 @@ export default function OwnerMyPage() {
 
   return (
     <>
-      <BackHeader text="마이페이지" />
+      <SimpleHeader text="마이페이지" />
       <div className="flex flex-col gap-6 px-7 mt-11">
         <Input id="name" label="이름" value={name} onChange={(e) => setName(e.target.value)} disabled={false} />
         <Input id="birth" label="생년월일" value={birth} onChange={(e) => setBirth(e.target.value)} disabled={false} />

@@ -391,7 +391,7 @@ export default function OwnerReservation() {
       <div className="sticky top-0 z-10 bg-green-100">
         <SimpleHeader text="나의 예약" />
         {/* 반려동물 선택 */}
-        <div className="flex gap-4 justify-center mt-3">
+        <div className="flex gap-4 justify-center pt-6">
           {Object.keys(reservations).map((pet, idx) => (
             <div key={idx} className="flex flex-col items-center cursor-pointer" onClick={() => setSelectedIdx(idx)}>
               <ImageInputBox

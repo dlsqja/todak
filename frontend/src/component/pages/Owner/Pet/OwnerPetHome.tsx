@@ -11,6 +11,7 @@ import OwnerPetTabInfo from './OwnerPetTabInfo';
 import OwnerPetTabRecord from './OwnerPetTabRecord';
 
 import { motion, AnimatePresence } from 'framer-motion';
+import PlusIcon from '@/component/icon/PlusIcon';
 
 export default function OwnerPetHome() {
   const navigate = useNavigate();
@@ -23,16 +24,10 @@ export default function OwnerPetHome() {
   };
 
   return (
-    <motion.div
-      className="pb-20"
-      initial={{ opacity: 0, y: 30 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-    >
+    <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
       <SimpleHeader text="반려동물 관리" />
 
       <div className="px-7 space-y-6 pt-6">
-
         {/* 1. 반려동물 이미지 리스트 */}
         <motion.div
           className="flex justify-center gap-4 overflow-x-auto"
@@ -49,19 +44,24 @@ export default function OwnerPetHome() {
             >
               <ImageInputBox
                 src={pet.image}
-                stroke={pet.id === selectedPet?.id ? 'border-4 border-pink-200' : ''}
+                stroke={
+                  pet.id === selectedPet?.id
+                    ? 'border-4 border-pink-200'
+                    : !pet.image || pet.image === '/images/pet_default.png'
+                    ? 'border-1 border-pink-100'
+                    : 'border-1 border-green-100'
+                }
               />
-              <p className="caption mt-2">{pet.name}</p>
+              <p className="p mt-2 text-black">{pet.name}</p>
             </motion.div>
           ))}
           {/* 등록 버튼 */}
           <motion.div
-            className="flex flex-col items-center cursor-pointer"
+            className="flex flex-col items-center mt-5 cursor-pointer"
             onClick={handleRegister}
             whileTap={{ scale: 0.95 }}
           >
-            <ImageInputBox />
-            <p className="caption mt-2">동물 등록</p>
+            <PlusIcon fill="#afcf7e" stroke="#fdfcfb" />
           </motion.div>
         </motion.div>
 
@@ -84,11 +84,7 @@ export default function OwnerPetHome() {
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.3 }}
             >
-              <OwnerPetTabInfo
-                selectedPet={selectedPet}
-                setPets={setPets}
-                setSelectedPet={setSelectedPet}
-              />
+              <OwnerPetTabInfo selectedPet={selectedPet} setPets={setPets} setSelectedPet={setSelectedPet} />
             </motion.div>
           )}
 
@@ -104,7 +100,6 @@ export default function OwnerPetHome() {
             </motion.div>
           )}
         </AnimatePresence>
-
       </div>
     </motion.div>
   );
