@@ -1,7 +1,9 @@
 package com.A409.backend.global.config;
 
 import com.A409.backend.global.security.jwt.JwtAuthenticationFilter;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,13 +18,13 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
+@Slf4j
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Value("${api.version}")
     private String VERSION;
-
 
 //    @Bean
 //    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -48,27 +50,28 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.POST, "/login").permitAll()
                         .requestMatchers(
-                                VERSION + "/swagger-ui/**",
-                                VERSION + "/swagger-resources/**",
-                                VERSION + "/v3/api-docs/**",
-                                VERSION + "/webjars/**",
-                                VERSION + "/signup/**",
-                                VERSION + "/staffs/mypage/**"
+                                "/swagger-ui/**",
+                                "/swagger-resources/**",
+                                "/v3/api-docs/**",
+                                "/webjars/**",
+                                "/signup/**",
+                                "/staffs/mypage/**"
                         ).permitAll()
-                        .requestMatchers(VERSION + "/public/**").permitAll()
+                        .requestMatchers("/api/v1/public/**").permitAll()
+                        .requestMatchers("/public/**").permitAll()
 
-                        .requestMatchers(VERSION + "/owners/**").hasRole("OWNER")
-                        .requestMatchers(VERSION + "/reservations/owner/**").hasRole("OWNER")
-                        .requestMatchers(VERSION + "/treatments/owner/**").hasRole("OWNER")
-                        .requestMatchers(VERSION + "/pets/**").hasRole("OWNER")
+                        .requestMatchers("/owners/**").hasRole("OWNER")
+                        .requestMatchers("/reservations/owner/**").hasRole("OWNER")
+                        .requestMatchers("/treatments/owner/**").hasRole("OWNER")
+                        .requestMatchers("/pets/**").hasRole("OWNER")
 
-                        .requestMatchers(VERSION + "/vets/**").hasRole("VET")
-                        .requestMatchers(VERSION + "/reservations/vets/**").hasRole("VET")
-                        .requestMatchers(VERSION + "/treatments/vets/**").hasRole("VET")
+                        .requestMatchers("/vets/**").hasRole("VET")
+                        .requestMatchers("/reservations/vets/**").hasRole("VET")
+                        .requestMatchers("/treatments/vets/**").hasRole("VET")
 
-                        .requestMatchers(VERSION + "/staffs/**").hasRole("STAFF")
-                        .requestMatchers(VERSION + "/hospitals/**").hasRole("STAFF")
-                        .requestMatchers(VERSION + "/reservations/hospitals/**").hasRole("STAFF")
+                        .requestMatchers("/staffs/**").hasRole("STAFF")
+                        .requestMatchers("/hospitals/**").hasRole("STAFF")
+                        .requestMatchers("/reservations/hospitals/**").hasRole("STAFF")
                         .anyRequest().authenticated())
                 .sessionManagement((session) -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))

@@ -2,6 +2,7 @@ package com.A409.backend.global.security.jwt;
 
 import com.A409.backend.global.enums.Role;
 import com.A409.backend.global.security.model.User;
+import jakarta.annotation.PostConstruct;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,14 +22,18 @@ import java.io.IOException;
 @Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
+
     @Value("${api.version}")
     private String VERSION;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String path = request.getRequestURI();
+        log.info(path);
+        // permitAll 경로는 JWT 검증 없이 통과
         if (isPermitAllPath(path)) {
-            filterChain.doFilter(request, response); // 바로 다음 필터로
+            log.info("Permit all path, skipping JWT validation: {}", path);
+            filterChain.doFilter(request, response);
             return;
         }
 
