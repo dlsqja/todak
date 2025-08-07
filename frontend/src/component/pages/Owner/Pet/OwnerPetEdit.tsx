@@ -1,8 +1,9 @@
 // 주소 : /owner/pet/edit/:id
+// 주소 : /owner/pet/edit/:id
 
 import '@/styles/main.css';
 import React, { useEffect, useRef, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 
 import BackHeader from '@/component/header/BackHeader';
 import ImageInputBox from '@/component/input/ImageInputBox';
@@ -28,6 +29,9 @@ export default function OwnerPetEdit() {
   const [gender, setGender] = useState('');
   const [neutered, setNeutered] = useState('');
   const [type, setType] = useState('');
+  const { state } = useLocation();
+  const selectedPet = state?.pet;
+
 
   // 데이터 불러오기
   useEffect(() => {
@@ -44,6 +48,7 @@ export default function OwnerPetEdit() {
         setSelectedImage(pet.photoUrl || DEFAULT_IMAGE);
         setIsDefaultImage(!pet.photoUrl);
       } catch (err) {
+        console.log(err)
         alert('반려동물 정보를 불러오지 못했습니다.');
       }
     };
@@ -54,6 +59,7 @@ export default function OwnerPetEdit() {
     const file = event.target.files?.[0];
     if (file) {
       const imageUrl = URL.createObjectURL(file);
+
       setSelectedImage(imageUrl);
       setSelectedFile(file);
       setIsDefaultImage(false);
@@ -68,6 +74,7 @@ export default function OwnerPetEdit() {
   const handleRemoveImage = () => {
     if (window.confirm('사진을 제거하시겠습니까?')) {
       setSelectedImage(DEFAULT_IMAGE);
+
       setSelectedFile(null);
       setIsDefaultImage(true);
     }
@@ -98,6 +105,7 @@ export default function OwnerPetEdit() {
     }
   };
 
+
   return (
     <div className="pb-20 space-y-6">
       <BackHeader text="반려동물 수정" />
@@ -127,6 +135,7 @@ export default function OwnerPetEdit() {
           <div className="flex gap-4">
             <div className="w-full flex flex-col">
               <label className="h4 mb-2 text-black">성별</label>
+
               <SelectionDropdown
                 value={gender}
                 onChange={(val) => setGender(val)}
@@ -139,6 +148,7 @@ export default function OwnerPetEdit() {
             </div>
             <div className="w-full flex flex-col">
               <label className="h4 mb-2 text-black">중성화 여부</label>
+
               <SelectionDropdown
                 value={neutered}
                 onChange={(val) => setNeutered(val)}

@@ -20,7 +20,7 @@ const res = await apiClient.get('/pets');
 
 // 2. 반려동물 상세 조회
 export const getPetDetail = async (petId) => {
-  const res = await axios.get(`/pets/${petId}`);
+  const res = await apiClient.get(`/pets/${petId}`);
   return res.data;
 };
 
