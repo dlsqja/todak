@@ -16,12 +16,14 @@ import OwnerTreatmentDetail from '@/component/pages/Owner/Treatment/OwnerTreatme
 import PaymentMethodPage from '@/component/pages/Owner/Home/OwnerHomePaymentMethod';
 import ApplyCompletePage from '@/component/pages/Owner/Home/OwnerHomeApplyComplete';
 import OwnerTreatmentRTC from '@/component/pages/Owner/Treatment/OwnerTreatmentRTC';
+import OwnerHomeGuide from '@/component/pages/Owner/Home/OwnerHomeGuide';
 
 const ownerRoutes = {
   path: '/owner',
   element: <MobileLayout menuBar={<OwnerMenuBar />} />,
   children: [
     { path: 'home', element: <OwnerHome /> },
+    { path: 'home/guide', element: <OwnerHomeGuide /> },
     { path: 'home/hospital', element: <SelectHospitalPage /> },
     { path: 'home/vet', element: <SelectVetPage /> },
     { path: 'home/vet-info', element: <VetInfoPage /> },
