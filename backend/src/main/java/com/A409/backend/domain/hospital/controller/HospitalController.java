@@ -21,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -91,7 +92,9 @@ public class HospitalController {
         String cacheKey = "closinghours:" + vetId;
 
         List<Integer> cachedTimes = (List<Integer>) redisService.getByKey(cacheKey);
-
+        if(cachedTimes==null){
+            cachedTimes = new ArrayList<>();
+        }
         return APIResponse.ofSuccess(cachedTimes);
     }
 
