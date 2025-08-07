@@ -38,11 +38,26 @@ public class StaffReservationController {
                     array = @ArraySchema(schema = @Schema(implementation = Map.class))
             )
     )
-    @GetMapping()
+    @GetMapping("/")
     public APIResponse<?> getHospitalReservationsByType(@AuthenticationPrincipal User user, @RequestParam("status") ReservationStatus reservationStatus){
         Long hospitalId = user.getId();
 
         List<Map<String, Object>> hospitalReservations = reservationService.getReservationsByHospitalAndStatus(hospitalId, reservationStatus);
+        return APIResponse.ofSuccess(hospitalReservations);
+    }
+
+    @Operation(summary = "병원 예약 리스트 모두 조회")
+    @ApiResponse(responseCode = "200",
+            content = @Content(
+                    mediaType = "application/json",
+                    array = @ArraySchema(schema = @Schema(implementation = Map.class))
+            )
+    )
+    @GetMapping("")
+    public APIResponse<?> getHospitalReservations(@AuthenticationPrincipal User user){
+        Long hospitalId = user.getId();
+
+        List<Map<String, Object>> hospitalReservations = reservationService.getHospitalReservations(hospitalId);
         return APIResponse.ofSuccess(hospitalReservations);
     }
 

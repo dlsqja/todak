@@ -2,7 +2,7 @@ package com.A409.backend.domain.reservation.dto;
 
 import com.A409.backend.domain.pet.dto.PetResponse;
 import com.A409.backend.domain.reservation.entity.Reservation;
-import com.A409.backend.domain.user.owner.entity.OwnerResponse;
+import com.A409.backend.domain.user.owner.dto.OwnerResponse;
 import com.A409.backend.global.enums.ReservationStatus;
 import com.A409.backend.global.enums.Subject;
 import lombok.Builder;

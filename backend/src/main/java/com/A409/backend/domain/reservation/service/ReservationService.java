@@ -5,6 +5,7 @@ import com.A409.backend.domain.reservation.dto.ReservationResponse;
 import com.A409.backend.domain.reservation.dto.ReservationResponseToVet;
 import com.A409.backend.domain.reservation.entity.Reservation;
 import com.A409.backend.domain.reservation.repository.ReservationRepository;
+import com.A409.backend.domain.user.owner.dto.OwnerResponse;
 import com.A409.backend.domain.user.owner.entity.Owner;
 import com.A409.backend.global.enums.ErrorCode;
 import com.A409.backend.global.enums.ReservationStatus;
@@ -111,8 +112,8 @@ public class ReservationService {
                 .map(reservation -> {
                     Map<String, Object> map = new HashMap<>();
                     map.put("reservationId", reservation.getReservationId());
+                    map.put("owner", OwnerResponse.toResponse(reservation.getOwner()));
                     map.put("petName", reservation.getPet().getName());
-                    map.put("hospitalName", reservation.getHospital().getName());
                     map.put("vetName", reservation.getVet().getName());
                     map.put("reservationDay", reservation.getReservationDay());
                     map.put("reservationTime", reservation.getReservationTime());
@@ -131,7 +132,6 @@ public class ReservationService {
                     Map<String, Object> map = new HashMap<>();
                     map.put("reservationId", reservation.getReservationId());
                     map.put("petName", reservation.getPet().getName());
-                    map.put("hospitalName", reservation.getHospital().getName());
                     map.put("vetName", reservation.getVet().getName());
                     map.put("reservationDay", reservation.getReservationDay());
                     map.put("reservationTime", reservation.getReservationTime());
