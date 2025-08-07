@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '@/styles/main.css';
-import BackHeader from '@/component/header/BackHeader';
 import Input from '@/component/input/Input';
 import Button from '@/component/button/Button';
+import SimpleHeader from '@/component/header/SimpleHeader';
 
 export default function VetHospital() {
   const navigate = useNavigate();
@@ -37,7 +37,7 @@ export default function VetHospital() {
 
   return (
     <>
-      <BackHeader text="병원 정보" />
+      <SimpleHeader text="병원 정보" />
       <div className="flex flex-col gap-6 px-7 mt-11">
         <Input id="hospital_Code" label="병원코드" value={vetInfo.hospital_Code} disabled={true} />
         <Input id="license" label="병원 이름" value={vetInfo.name} disabled={true} />

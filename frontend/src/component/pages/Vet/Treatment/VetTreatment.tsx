@@ -1,6 +1,6 @@
 import React from 'react';
 import '@/styles/main.css';
-import BackHeader from '@/component/header/BackHeader';
+import SimpleHeader from '@/component/header/SimpleHeader';
 import RemoteTreatmentCard from '@/component/card/RemoteTreatmentCard';
 import { useNavigate } from 'react-router-dom';
 
@@ -97,7 +97,7 @@ export default function VetTreatment() {
 
   return (
     <div>
-      <BackHeader text="비대면 진료" />
+      <SimpleHeader text="비대면 진료" />
       <div className="px-4 py-1 space-y-4 max-h-full overflow-y-auto hide-scrollbar">
         {treatmentData.map((data, index) => (
           <RemoteTreatmentCard
