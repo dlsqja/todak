@@ -18,7 +18,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 public class RedisConfig {
 
     //TODO:: 배포용
-    /*
+
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
 
@@ -30,7 +30,7 @@ public class RedisConfig {
 
         return new LettuceConnectionFactory(sentinelConfig);
     }
-     */
+
 
     @Bean
     public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory connectionFactory) {
