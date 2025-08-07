@@ -25,20 +25,7 @@ public class VetReservationController {
     private final ReservationService reservationService;
 
     
-    @Operation(summary = "예약 승인 목록 조회", description = "수의사가 비대면 진료를 하기위한 예약 승인 목록을 조회합니다.")
-    @ApiResponse(responseCode = "200", description = "예약 승인 목록 조회 성공")
-    @GetMapping("/")
-    public APIResponse<?> getPendingReservations(@AuthenticationPrincipal User user) {
-    
-        List<Reservation> reservations = reservationService.getReservationsByVetId(user.getId());
 
-        return APIResponse.ofSuccess(reservations.stream().map(reservation -> Map.of(
-                "reservationId", reservation.getReservationId(),
-                "ownerName", reservation.getOwner().getName(),
-                "petName", reservation.getPet().getName(),
-                "reservationTime", reservation.getReservationTime()
-        )).toList());
-    }
 
     @Operation(summary = "예약 목록 상세 조회", description = "수의사가 진료 시작 전, 해당 예약을 상세조히합니다.")
     @ApiResponse(responseCode = "200", description = "예약 상세 조회 성공")
