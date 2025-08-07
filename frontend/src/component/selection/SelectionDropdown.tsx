@@ -16,7 +16,7 @@ export default function SelectionDropdown({ options, placeholder = '', value, on
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full border border-green-300 h-12 appearance-none rounded-2xl px-4 py-2"
+        className="w-full border bg-white border-gray-400 h-12 appearance-none rounded-2xl px-4 py-2 focus:outline-none focus:ring-0 focus:border-green-300 focus:border-2"
       >
         {placeholder !== '' && (
           <option value="" disabled hidden>
