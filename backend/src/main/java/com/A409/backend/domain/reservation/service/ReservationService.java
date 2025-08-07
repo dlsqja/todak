@@ -10,6 +10,7 @@ import com.A409.backend.global.enums.ErrorCode;
 import com.A409.backend.global.enums.ReservationStatus;
 import com.A409.backend.global.exception.CustomException;
 import com.A409.backend.global.util.uploader.S3Uploader;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,6 +23,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class ReservationService {
 
     private final S3Uploader s3Uploader;
@@ -78,7 +80,8 @@ public class ReservationService {
 
     public void deleteReservation(Long ownerId, Long reservationId) {
 
-        reservationRepository.removeByOwner_OwnerIdAndReservationId(ownerId,reservationId);
+//        reservationRepository.removeByOwner_OwnerIdAndReservationId(ownerId,reservationId);
+        reservationRepository.deleteByReservationIdAndOwner_OwnerId(reservationId,ownerId);
     }
 
     public List<Reservation> getReservationsByVetId(Long vetId) {
