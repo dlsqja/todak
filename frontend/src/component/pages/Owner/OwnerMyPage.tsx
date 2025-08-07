@@ -3,22 +3,52 @@ import '@/styles/main.css';
 import BackHeader from '@/component/header/BackHeader';
 import Input from '@/component/input/Input';
 import Button from '@/component/button/Button';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { getOwnerInfo, updateOwnerInfo } from '@/services/api/Owner/ownermypage'
+
 
 export default function OwnerMyPage() {
-  const navigate = useNavigate();
-  const [name, setName] = useState('테스트 이름');
-  const [phone, setPhone] = useState('테스트 전화번호');
-  const [birth, setBirth] = useState('테스트 생일');
+  const navigate = useNavigate()
+  const [name, setName] = useState('')
+  const [phone, setPhone] = useState('')
+  const [birth, setBirth] = useState('')
 
-  const handleSubmit = () => {
-    console.log('제출할 이름:', name);
-    console.log('제출할 생일:', birth);
-    console.log('제출할 전화번호:', phone);
-    alert(`수정 완료`);
-    navigate('/owner/home');
-  };
+
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchOwner = async () => {
+      const data = await getOwnerInfo()
+      // console.log('user data:',data)
+      setName(data.name)
+      setPhone(data.phone)
+      setBirth(data.birth)
+      setIsLoading(false)
+    }
+    fetchOwner()
+  }, [])
+
+  if (isLoading) {
+    return <div className="text-center mt-20">불러오는 중...</div>
+  }
+
+
+  const handleSubmit = async () => {
+  try {
+    const payload = { name, phone, birth }
+    // console.log('보낼 payload:', payload)
+
+    const response = await updateOwnerInfo(payload)
+    // console.log('서버 응답:', response)
+
+    alert('수정 완료!')
+    navigate('/owner/mypage')
+  } catch (error) {
+    console.error('수정 실패', error)
+    alert('수정 실패!')
+  }
+}
 
   return (
     <>
