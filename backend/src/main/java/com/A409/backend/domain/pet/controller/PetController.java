@@ -54,7 +54,7 @@ public class PetController {
 
     @Operation(summary = "반려동물 등록")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public APIResponse<?> registerPet(@AuthenticationPrincipal User user, @RequestBody PetRequest petRequest,@RequestPart(value = "photo", required = false) MultipartFile photo) {
+    public APIResponse<?> registerPet(@AuthenticationPrincipal User user,  @RequestPart("petRequest") PetRequest petRequest,@RequestPart(value = "photo", required = false) MultipartFile photo) {
         petService.registerPet(user.getId(),petRequest,photo);
 
         return APIResponse.ofSuccess(null);
