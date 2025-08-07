@@ -58,7 +58,7 @@ for (const [key, value] of formData.entries()) {
 
 // 4. 반려동물 수정 (multipart/form-data)
 // 반려동물 수정
-export const updatePet = async ({ petRequest, photo }) => {
+export const updatePet = async ({ id, petRequest, photo }) => {
   const formData = new FormData();
 
   formData.append(
@@ -70,7 +70,7 @@ export const updatePet = async ({ petRequest, photo }) => {
     formData.append('photo', photo);
   }
 
-  const res = await apiClient.patch('/pets', formData, {
+  const res = await apiClient.patch(`/pets/${id}`, formData, {
     headers: {
       'Content-Type': 'multipart/form-data',
     },
@@ -80,6 +80,7 @@ export const updatePet = async ({ petRequest, photo }) => {
 };
 
 
+
 // 5. 반려동물 코드 등록
 export const registerPetByCode = async (petCode) => {
   const res = await axios.post('/pets/code', petCode, {
@@ -87,5 +88,11 @@ export const registerPetByCode = async (petCode) => {
       'Content-Type': 'application/json',
     },
   });
+  return res.data;
+};
+
+// 반려동물 전체 목록 가져오기
+export const getPets = async () => {
+  const res = await apiClient.get('/pets');
   return res.data;
 };
