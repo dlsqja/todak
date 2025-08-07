@@ -3,6 +3,8 @@ package com.A409.backend.domain.reservation.service;
 
 import com.A409.backend.domain.hospital.entity.Hospital;
 import com.A409.backend.domain.hospital.repository.HospitalRepository;
+import com.A409.backend.domain.pet.dto.PetResponse;
+import com.A409.backend.domain.pet.service.PetService;
 import com.A409.backend.domain.reservation.dto.ReservationReqeust;
 import com.A409.backend.domain.reservation.dto.ReservationResponse;
 import com.A409.backend.domain.reservation.dto.ReservationResponseToVet;
@@ -26,10 +28,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -42,6 +41,7 @@ public class ReservationService {
     private final HospitalRepository hospitalRepository;
     private final TreatmentRepository treatmentRepository;
     private final RejectionRepository rejectionRepository;
+    private final PetService petService;
 
 
     public void createReservation(Long ownerId, ReservationReqeust reservationReqeust, MultipartFile photo) {
@@ -63,22 +63,34 @@ public class ReservationService {
     }
 
     public List<Map<String, Object>> getReservations(Long ownerId) {
-        List<Reservation> reservations = reservationRepository.findAllByOwner_OwnerId(ownerId);
+        List<PetResponse> petList = petService.getMyPets(ownerId);
 
-        List<Map<String, Object>> result = reservations.stream()
-                .map(reservation -> {
-                    Map<String, Object> map = new HashMap<>();
-                    map.put("reservationId", reservation.getReservationId());
-                    map.put("petName", reservation.getPet().getName());
-                    map.put("hospitalName", reservation.getHospital().getName());
-                    map.put("vetName", reservation.getVet().getName());
-                    map.put("reservationDay", reservation.getReservationDay());
-                    map.put("reservationTime", reservation.getReservationTime());
-                    map.put("subject", reservation.getSubject());
-                    map.put("status", reservation.getStatus());
-                    return map;
-                })
-                .toList();
+        List<Map<String, Object>> result = new ArrayList<>();
+
+        for (PetResponse pet : petList) {
+
+            List<Reservation> reservations = reservationRepository.findAllByPet_PetId(pet.getPetId());
+
+            List<Map<String, Object>> reservationList = reservations.stream()
+                    .map(reservation -> {
+                        Map<String, Object> resMap = new HashMap<>();
+                        resMap.put("reservationId", reservation.getReservationId());
+                        resMap.put("hospitalName", reservation.getHospital().getName());
+                        resMap.put("vetName", reservation.getVet().getName());
+                        resMap.put("reservationDay", reservation.getReservationDay());
+                        resMap.put("reservationTime", reservation.getReservationTime());
+                        resMap.put("subject", reservation.getSubject());
+                        resMap.put("status", reservation.getStatus());
+                        return resMap;
+                    })
+                    .toList();
+
+            Map<String, Object> map = new HashMap<>();
+            map.put("petResponse", pet);
+            map.put("reservations", reservationList);
+
+            result.add(map);
+        }
 
         return result;
     }
