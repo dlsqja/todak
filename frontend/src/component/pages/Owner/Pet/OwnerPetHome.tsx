@@ -86,13 +86,15 @@ export default function OwnerPetHome() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2, duration: 0.4 }}
         >
-          {pets.map((pet) => (
+          {pets.map((pet, index) => (
+
             <motion.div
-              key={pet.petId}
+              key={`${pet.petId}-${index}`}
               className="flex flex-col items-center cursor-pointer"
               onClick={() => setSelectedPet(pet)}
               whileTap={{ scale: 0.95 }}
             >
+              
               <ImageInputBox
                 src={pet.image}
                 stroke={

@@ -1,5 +1,5 @@
 import OwnerResponse from "@/types/Owner/ownermypageType"
-import PetResponse from "@/types/Owner/ownerpetType"
+import Pet from "@/types/Owner/ownerpetType"
 
 export interface ReservationRequest {
   ownerId: number
@@ -16,7 +16,7 @@ export interface ReservationRequest {
 export interface ReservationResponse {
   reservationId: number
   owner: OwnerResponse
-  pet: PetResponse
+  pet: Pet
   hospitalName: string
   vetName: string
   reservationDay: string

@@ -1,44 +1,56 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import SelectionDropdown from '@/component/selection/SelectionDropdown';
 import TreatmentRecordCard from '@/component/card/TreatmentRecordCard';
+import { getReservations } from '@/services/api/Owner/ownerreservation';
+import type { ReservationResponse } from '@/types/Owner/ownerreservationType';
+import type { Pet } from '@/types/Owner/ownerpetType';
 
-export default function OwnerPetTabRecord({ selectedPet }) {
+interface OwnerPetTabRecordProps {
+  selectedPet: Pet;
+}
+
+export default function OwnerPetTabRecord({ selectedPet }: OwnerPetTabRecordProps) {
   const [selectedSubject, setSelectedSubject] = useState('');
   const [selectedDate, setSelectedDate] = useState('');
+  const [records, setRecords] = useState<ReservationResponse[]>([]);
+  const navigate = useNavigate();
 
-  // ✅ 반려동물 ID별로 진료 내역 관리
-  const [allRecords] = useState({
-    1: [
-      {
-        id: 1,
-        doctorName: '이의연',
-        hospitalName: '21세기동물병원',
-        treatmentDate: '2025.07.20',
-        department: '피부과',
-      },
-    ],
-    2: [
-      {
-        id: 2,
-        doctorName: '이의연',
-        hospitalName: '21세기동물병원',
-        treatmentDate: '2025.07.22',
-        department: '피부과',
-      },
-    ],
-  });
+  useEffect(() => {
+  if (!selectedPet || !selectedPet.petId) return;
 
-  const currentRecords = allRecords[selectedPet.id] || [];
+  const fetchData = async () => {
+    try {
+      const data = await getReservations();
+      const filtered = data.filter((r) => r.pet?.petId === selectedPet.petId);
+      setRecords(filtered);
+    } catch (error) {
+      console.error('예약 불러오기 실패:', error);
+    }
+  };
 
-  const filtered = currentRecords.filter(
+  fetchData();
+}, [selectedPet]);
+
+
+  // 상세보기 페이지로 이동
+  const handleClickDetail = (reservationId: number) => {
+    navigate(`/owner/pet/treatment/${reservationId}`);
+  };
+
+  // 드롭다운 필터링
+  const filtered = records.filter(
     (r) =>
-      (!selectedSubject || r.department === selectedSubject) &&
-      (!selectedDate || r.treatmentDate === selectedDate)
+      (!selectedSubject || r.subject === selectedSubject) &&
+      (!selectedDate || r.reservationDay === selectedDate)
   );
+
+  // 드롭다운 날짜 옵션 생성
+  const uniqueDates = Array.from(new Set(records.map((r) => r.reservationDay)));
 
   return (
     <div className="space-y-6">
-      {/* 필터 드롭다운 */}
+      {/* 드롭다운 필터 */}
       <div className="flex gap-4 w-full">
         <div className="w-1/2">
           <SelectionDropdown
@@ -46,8 +58,10 @@ export default function OwnerPetTabRecord({ selectedPet }) {
             onChange={setSelectedSubject}
             options={[
               { value: '', label: '전체 과목' },
-              { value: '피부과', label: '피부과' },
-              { value: '내과', label: '내과' },
+              { value: 'DENTAL', label: '치과' },
+              { value: 'DERMATOLOGY', label: '피부과' },
+              { value: 'ORTHOPEDICS', label: '정형외과' },
+              { value: 'OPHTHALMOLOGY', label: '안과' },
             ]}
             placeholder="과목 필터"
           />
@@ -58,25 +72,26 @@ export default function OwnerPetTabRecord({ selectedPet }) {
             onChange={setSelectedDate}
             options={[
               { value: '', label: '전체 날짜' },
-              { value: '2025.07.20', label: '2025.07.20' },
-              { value: '2025.07.22', label: '2025.07.22' },
+              ...uniqueDates.map((date) => ({ value: date, label: date })),
             ]}
             placeholder="날짜 필터"
           />
         </div>
       </div>
 
-      {/* 진료 내역 카드 */}
+      {/* 진료 카드 리스트 */}
       <div className="space-y-4">
-        {filtered.length === 0 && <p className="text-center text-gray-400">진료 내역이 없습니다.</p>}
+        {filtered.length === 0 && (
+          <p className="text-center text-gray-400">진료 내역이 없습니다.</p>
+        )}
         {filtered.map((r) => (
           <TreatmentRecordCard
-            key={r.id}
-            doctorName={r.doctorName}
+            key={r.reservationId}
+            doctorName={r.vetName}
             hospitalName={r.hospitalName}
-            treatmentDate={r.treatmentDate}
-            department={r.department}
-            onClickDetail={() => alert(`${r.treatmentDate} 상세 보기`)}
+            treatmentDate={r.reservationDay}
+            department={r.subject}
+            onClickDetail={() => handleClickDetail(r.reservationId)}
           />
         ))}
       </div>
