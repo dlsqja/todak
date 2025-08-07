@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -20,9 +21,17 @@ import java.io.IOException;
 @Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
+    @Value("${api.version}")
+    private String VERSION;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        String path = request.getRequestURI();
+        if (isPermitAllPath(path)) {
+            filterChain.doFilter(request, response); // 바로 다음 필터로
+            return;
+        }
+
         String authHeader = request.getHeader("Authorization");
 
         if(authHeader != null && authHeader.startsWith("Bearer ")) {
@@ -46,4 +55,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
         filterChain.doFilter(request, response);
     }
+
+    private boolean isPermitAllPath(String path) {
+        return path.equals("/login") // POST /login
+                || path.startsWith(VERSION + "/swagger-ui")
+                || path.startsWith(VERSION + "/swagger-resources")
+                || path.startsWith(VERSION + "/v3/api-docs")
+                || path.startsWith(VERSION + "/webjars")
+                || path.startsWith(VERSION + "/signup")
+                || path.startsWith(VERSION + "/staffs/mypage")
+                || path.startsWith(VERSION + "/public");
+    }
+
+
 }
