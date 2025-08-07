@@ -10,6 +10,8 @@ import TabGroupPet from '@/component/navbar/TabGroupPet';
 import OwnerPetTabInfo from './OwnerPetTabInfo';
 import OwnerPetTabRecord from './OwnerPetTabRecord';
 
+import { motion, AnimatePresence } from 'framer-motion';
+
 export default function OwnerPetHome() {
   const navigate = useNavigate();
   const [pets, setPets] = useState(petMockList);
@@ -21,38 +23,89 @@ export default function OwnerPetHome() {
   };
 
   return (
-    <div className="pb-20">
+    <motion.div
+      className="pb-20"
+      initial={{ opacity: 0, y: 30 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+    >
       <SimpleHeader text="반려동물 관리" />
+
       <div className="px-7 space-y-6 pt-6">
+
         {/* 1. 반려동물 이미지 리스트 */}
-        <div className="flex justify-center gap-4 overflow-x-auto">
+        <motion.div
+          className="flex justify-center gap-4 overflow-x-auto"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2, duration: 0.4 }}
+        >
           {pets.map((pet) => (
-            <div key={pet.id} className="flex flex-col items-center cursor-pointer" onClick={() => setSelectedPet(pet)}>
+            <motion.div
+              key={pet.id}
+              className="flex flex-col items-center cursor-pointer"
+              onClick={() => setSelectedPet(pet)}
+              whileTap={{ scale: 0.95 }}
+            >
               <ImageInputBox
                 src={pet.image}
-                stroke={pet.id === selectedPet?.id ? 'border-2 border-pink-200' : ''}
+                stroke={pet.id === selectedPet?.id ? 'border-4 border-pink-200' : ''}
               />
               <p className="caption mt-2">{pet.name}</p>
-            </div>
+            </motion.div>
           ))}
           {/* 등록 버튼 */}
-          <div className="flex flex-col items-center cursor-pointer" onClick={handleRegister}>
+          <motion.div
+            className="flex flex-col items-center cursor-pointer"
+            onClick={handleRegister}
+            whileTap={{ scale: 0.95 }}
+          >
             <ImageInputBox />
             <p className="caption mt-2">동물 등록</p>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
 
         {/* 2. 탭 메뉴 */}
-        <TabGroupPet selected={selectedTab} onSelect={setSelectedTab} />
+        <motion.div
+          initial={{ opacity: 0, scale: 0.98 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.3, duration: 0.3 }}
+        >
+          <TabGroupPet selected={selectedTab} onSelect={setSelectedTab} />
+        </motion.div>
 
-        {/* 3. 탭 콘텐츠 */}
-        {selectedTab === '상세 정보' && selectedPet && (
-          <OwnerPetTabInfo selectedPet={selectedPet} setPets={setPets} setSelectedPet={setSelectedPet} />
-        )}
-        {selectedTab === '진료 내역' && (
-          <OwnerPetTabRecord selectedPet={selectedPet} />
-        )}
+        {/* 3. 탭 콘텐츠 (애니메이션 전환) */}
+        <AnimatePresence mode="wait">
+          {selectedTab === '상세 정보' && selectedPet && (
+            <motion.div
+              key="info"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.3 }}
+            >
+              <OwnerPetTabInfo
+                selectedPet={selectedPet}
+                setPets={setPets}
+                setSelectedPet={setSelectedPet}
+              />
+            </motion.div>
+          )}
+
+          {selectedTab === '진료 내역' && (
+            <motion.div
+              key="record"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.3 }}
+            >
+              <OwnerPetTabRecord selectedPet={selectedPet} />
+            </motion.div>
+          )}
+        </AnimatePresence>
+
       </div>
-    </div>
+    </motion.div>
   );
 }
