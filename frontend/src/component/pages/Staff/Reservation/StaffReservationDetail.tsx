@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import SimpleHeader from '@/component/header/SimpleHeader';
+import BackHeader from '@/component/header/BackHeader';
 import SingleContent from '@/component/text/SingleContent';
 import MultiContent from '@/component/text/MultipleContent';
 import ImageInputBox from '@/component/input/ImageInputBox';
@@ -15,7 +15,7 @@ export default function StaffReservationDetail() {
   const [isDenialModalOpen, setIsDenialModalOpen] = useState(false);
   return (
     <div className="space-y-6">
-      <SimpleHeader text="예약 상세" />
+      <BackHeader text="예약 상세" />
     <div className='px-7 '>
       {/* 반려동물 정보 */}
       <MultiContent

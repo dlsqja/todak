@@ -72,7 +72,7 @@ const StaffReservationRejectModal: React.FC<Props> = ({
 
           {/* 버튼 */}
           <div className="flex gap-3 mt-6">
-            <Button text="취소" color="gray" onClick={onClose} />
+            <Button text="취소" color="lightgreen" onClick={onClose} />
             <Button
               text="작성 완료"
               color="green"
