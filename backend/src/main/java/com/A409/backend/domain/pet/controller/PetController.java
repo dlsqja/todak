@@ -1,5 +1,6 @@
 package com.A409.backend.domain.pet.controller;
 
+import com.A409.backend.domain.pet.dto.PetCodeRequest;
 import com.A409.backend.domain.pet.dto.PetRequest;
 import com.A409.backend.domain.pet.dto.PetResponse;
 import com.A409.backend.domain.pet.entity.Pet;
@@ -62,8 +63,8 @@ public class PetController {
 
     @Operation(summary = "반려동물 코드등록")
     @PostMapping("/code")
-    public APIResponse<?> registerPetByCode(@AuthenticationPrincipal User user, @RequestBody String petCode) {
-        petService.registerPetByCode(user.getId(),petCode);
+    public APIResponse<?> registerPetByCode(@AuthenticationPrincipal User user, @RequestBody PetCodeRequest petCodeRequest) {
+        petService.registerPetByCode(user.getId(),petCodeRequest.getPetCode());
 
         return APIResponse.ofSuccess(null);
     }

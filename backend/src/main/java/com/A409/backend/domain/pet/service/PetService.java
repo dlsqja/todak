@@ -11,6 +11,7 @@ import com.A409.backend.global.exception.CustomException;
 import com.A409.backend.global.util.RandomCodeGenerator;
 import com.A409.backend.global.util.uploader.S3Uploader;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -19,6 +20,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PetService {
@@ -79,6 +81,7 @@ public class PetService {
     }
 
     public void registerPetByCode(Long userId,String petCode){
+        log.info(petCode);
         Pet findPet = petRepository.findPetByPetCode(petCode).orElseThrow();
         Owner owner = Owner.builder()
                 .ownerId(userId)
@@ -88,6 +91,8 @@ public class PetService {
                 .owner(owner)
                 .pet(findPet)
                 .build();
+
+        log.info(ownerPet.toString());
 
         ownerPetRepository.save(ownerPet);
     }
