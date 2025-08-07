@@ -56,7 +56,7 @@ public class PetService {
 
         if(photo != null){
             try{
-                String url = s3Uploader.upload(photo,"reservation");
+                String url = s3Uploader.upload(photo,"pet");
                 registerPet.setPhoto(url);
             } catch (IOException e) {
                 throw new RuntimeException(e);
