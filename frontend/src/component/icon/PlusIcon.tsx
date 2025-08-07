@@ -12,7 +12,7 @@ const PlusIcon: React.FC<PlusIconProps> = ({ fill = 'inherit', stroke = 'inherit
     <rect x="0.5" y="0.5" width="30" height="30" rx="15" fill={fill} stroke={stroke} />
     <path
       d="M18.6677 15.9921H15.9815V18.9444H15.0861V15.9921H12.3999V15.0079H15.0861V12.0555H15.9815V15.0079H18.6677V15.9921Z"
-      fill={stroke}
+      fill={fill}
     />
   </svg>
 );
