@@ -30,21 +30,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class VetController {
 
     private final VetService vetService;
-    private final WorkingHourService workingHourService;
-
-    @Operation(summary = "수의사 업무시간 조회")
-    @ApiResponse(responseCode = "200",
-            content = @Content(
-                    mediaType = "application/json",
-                    array = @ArraySchema(schema = @Schema(implementation = WorkingHourResponse.class))
-            )
-    )
-    @GetMapping("/my/working-hours")
-    public APIResponse<?> getWorkingHours(@AuthenticationPrincipal User user) {
-        List<WorkingHourResponse> workingHours = workingHourService.getWorkingHourByVetId(user.getId());
-
-        return APIResponse.ofSuccess(workingHours);
-    }
 
     @Operation(summary = "수의사 상세 조회", description = "마이페이지에 보여주기 위해 수의사의 상세정보를 가지고 옵니다.")
     @ApiResponse(responseCode = "200", description = "수의사 상세조회 성공")

@@ -52,6 +52,29 @@ public class PetService {
         return petList.stream().map(PetResponse::toResponse).toList();
     }
 
+    public void updatePet(Long ownerId, Long petId,PetRequest petRequest, MultipartFile photo){
+
+        ownerPetRepository.findOwnerPetByOwner_OwnerIdAndPet_PetId(ownerId,petId).orElseThrow(() -> new CustomException(ErrorCode.ACCESS_DENIED));
+        Pet findPet = petRepository.findById(petId).orElseThrow(() -> new CustomException(ErrorCode.RESOURCE_NOT_FOUND));
+
+        findPet.setAge(petRequest.getAge());
+        findPet.setName(petRequest.getName());
+        findPet.setGender(petRequest.getGender());
+        findPet.setSpecies(petRequest.getSpecies());
+
+        if(photo != null){
+            try{
+                String url = s3Uploader.upload(photo,"pet");
+                findPet.setPhoto(url);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+        }
+
+        petRepository.save(findPet);
+    }
+
     public void registerPet(Long ownerId, PetRequest petRequest, MultipartFile photo){
         Pet registerPet = petRequest.toEntity();
 

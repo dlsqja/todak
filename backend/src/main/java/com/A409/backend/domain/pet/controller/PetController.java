@@ -71,13 +71,15 @@ public class PetController {
 
 
     @Operation(summary = "반려동물 수정")
-    @PatchMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PatchMapping(path = "/{petId}",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public APIResponse<?> updatePet(
             @AuthenticationPrincipal User user,
+            @PathVariable("petId") Long petId,
             @RequestPart("petRequest") PetRequest petRequest,
             @RequestPart(value = "photo", required = false) MultipartFile photo) {
 
-        petService.registerPet(user.getId(), petRequest, photo);
+        petService.updatePet(user.getId(), petId,petRequest, photo);
+
         return APIResponse.ofSuccess(null);
     }
 }
