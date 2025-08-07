@@ -30,7 +30,7 @@ export default function Input({
             id={id}
             type="text"
             name={id}
-            value={value}
+            value={value ?? ''}
             onChange={onChange}
             disabled={disabled}
             placeholder={placeholder}
