@@ -10,8 +10,8 @@ const authRoutes = {
   children: [
     { path: '', element: <SignupPage /> },
     { path: 'owner/:authId', element: <OwnerSignup /> },
-    { path: 'vet', element: <VetSignup /> },
-    { path: 'staff', element: <StaffSignup /> },
+    { path: 'vet/:authId', element: <VetSignup /> },
+    { path: 'staff/:authId', element: <StaffSignup /> },
   ],
 };
 

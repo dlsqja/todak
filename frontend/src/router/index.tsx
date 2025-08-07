@@ -6,6 +6,7 @@ import staffRoutes from '@/router/staffRoutes';
 import authRoutes from '@/router/authRoutes';
 import MobileLayout from '@/layouts/MobileLayout';
 import MainPage from '@/component/pages/MainPage';
+import MainLayout from '@/layouts/MainLayout';
 
 // 역할 분기
 function RoleRedirect() {
@@ -19,7 +20,7 @@ function RoleRedirect() {
 
 const mainRoutes = {
   path: '/',
-  element: <MobileLayout />,
+  element: <MainLayout />,
   children: [{ path: '', element: <MainPage /> }],
 };
 
