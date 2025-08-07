@@ -1,11 +1,11 @@
-import VetHome from '@/component/pages/Vet/VetHome';
+import VetHome from '@/component/pages/Vet/Home/VetHome';
 import MobileLayout from '@/layouts/MobileLayout';
 import VetMenuBar from '@/component/menubar/VetMenuBar';
-import VetHospital from '@/component/pages/Vet/VetHospital';
+import VetHospital from '@/component/pages/Vet/Hospital/VetHospital';
 import VetTreatment from '@/component/pages/Vet/Treatment/VetTreatment';
-import VetRecord from '@/component/pages/Vet/Record/VetRecord';
-import VetRecordDetail from '@/component/pages/Vet/Record/VetRecorddetail';
-import VetMyPage from '@/component/pages/Vet/VetMypage';
+import VetRecord from '@/component/pages/Vet/Record/VetRecordHome';
+import VetRecordDetail from '@/component/pages/Vet/Record/VetRecordDetail';
+import VetMyPage from '@/component/pages/Vet/Mypage/VetMypage';
 import VetTreatmentDetail from '@/component/pages/Vet/Treatment/VetTreatmentDetail';
 import VetTreatmentRTC from '@/component/pages/Vet/Treatment/VetTreatmentRTC';
 

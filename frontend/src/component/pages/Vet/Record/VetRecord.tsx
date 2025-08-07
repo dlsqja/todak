@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import SimpleHeader from '@/component/header/SimpleHeader';
+import BackHeader from '@/component/header/BackHeader';
 import TabGroupTreatList from '@/component/navbar/TabGroupTreatList';
 import VetRecordListFilter from './VetRecordListFilter';
 import VetRecordDateFilter from './VetRecordDateFilter';
@@ -115,7 +115,7 @@ export default function VetRecord() {
 
   return (
     <div className="flex flex-col gap-3">
-      <SimpleHeader text="진료 기록" />
+      <BackHeader text="진료 기록" />
       <TabGroupTreatList onSelect={handleTabSelect} />
 
       {selectedTab === '목록형' ? (

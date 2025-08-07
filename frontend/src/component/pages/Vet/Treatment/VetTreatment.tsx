@@ -1,10 +1,10 @@
 import React from 'react';
 import '@/styles/main.css';
-import SimpleHeader from '@/component/header/SimpleHeader';
+import BackHeader from '@/component/header/BackHeader';
 import RemoteTreatmentCard from '@/component/card/RemoteTreatmentCard';
 import { useNavigate } from 'react-router-dom';
 
-export default function OwnerTreatment() {
+export default function VetTreatment() {
   const navigate = useNavigate();
 
   // 매핑 함수들
@@ -97,7 +97,7 @@ export default function OwnerTreatment() {
 
   return (
     <div>
-      <SimpleHeader text="비대면 진료" />
+      <BackHeader text="비대면 진료" />
       <div className="px-4 py-1 space-y-4 max-h-full overflow-y-auto hide-scrollbar">
         {treatmentData.map((data, index) => (
           <RemoteTreatmentCard
