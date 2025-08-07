@@ -2,7 +2,7 @@ import MobileLayout from '@/layouts/MobileLayout';
 import OwnerMenuBar from '@/component/menubar/OwnerMenuBar';
 import OwnerHome from '@/component/pages/Owner/Home/OwnerHome';
 import OwnerPet from '@/component/pages/Owner/Pet/OwnerPetHome';
-import OwnerMyPage from '@/component/pages/Owner/OwnerMyPage';
+import OwnerMyPage from '@/component/pages/Owner/Mypage/OwnerMyPage';
 import OwnerReservationHome from '@/component/pages/Owner/Reservation/OwnerReservationHome';
 import OwnerTreatment from '@/component/pages/Owner/Treatment/OwnerTreatment';
 import SelectHospitalPage from '@/component/pages/Owner/Home/OwnerHomeSelectHospital';

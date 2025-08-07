@@ -13,7 +13,7 @@ export default function TabGroupWaiting({ selected, onSelect }: Props) {
         <div
           key={tab}
           onClick={() => onSelect(tab)}
-          className={`w-9 h-13 cursor-pointer h4 ${
+          className={`w-9 h-9 cursor-pointer h4 ${
             selected === tab ? 'h4 text-center border-b-2 border-black' : 'h4 text-center text-gray-500'
           }`}
         >

@@ -80,7 +80,7 @@ export default function OwnerHome() {
 
       <motion.button
         onClick={() => navigate('/owner/home/guide')}
-        className="h5 mx-7 px-5 py-1 rounded-full inline-block bg-green-300 text-green-100 hover:bg-green-200 transition"
+        className="h5 mx-7 px-5 py-1 rounded-full inline-block bg-green-300 text-green-100 cursor-pointer"
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 0.3, duration: 0.3 }}
@@ -97,7 +97,7 @@ export default function OwnerHome() {
         비대면 진료 시작하기
       </motion.h3>
 
-      {/* 🐶 펫 리스트 슬라이드 */}
+      {/* 펫 리스트 슬라이드 */}
       <motion.div
         ref={scrollRef}
         onScroll={handleScroll}
@@ -106,7 +106,7 @@ export default function OwnerHome() {
         animate={{ opacity: 1 }}
         transition={{ delay: 0.5, duration: 0.3 }}
       >
-        <div className="flex w-full h-full">
+        <div className="flex w-full h-full px-7">
           {petList.map((pet, index) => (
             <motion.div
               key={pet.id}
@@ -117,12 +117,7 @@ export default function OwnerHome() {
               transition={{ delay: 0.6 + index * 0.1, duration: 0.3 }}
               whileTap={{ scale: 0.95 }}
             >
-              <PetProfileCard
-                name={pet.name}
-                genderAge={pet.genderAge}
-                breedAge={pet.breedAge}
-                weight={pet.weight}
-              />
+              <PetProfileCard name={pet.name} genderAge={pet.genderAge} breedAge={pet.breedAge} weight={pet.weight} />
             </motion.div>
           ))}
         </div>
