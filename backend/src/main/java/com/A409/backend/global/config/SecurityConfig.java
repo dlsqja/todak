@@ -24,19 +24,19 @@ public class SecurityConfig {
     private String VERSION;
 
 
-    @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http
-                .csrf(csrf -> csrf.disable())
-                .formLogin(form -> form.disable())
-                .httpBasic(httpBasic -> httpBasic.disable())
-                .authorizeHttpRequests(auth -> auth
-                        .anyRequest().permitAll() // 모든 요청 허용
-                );
-        return http.build();
-    }
+//    @Bean
+//    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+//        http
+//                .csrf(csrf -> csrf.disable())
+//                .formLogin(form -> form.disable())
+//                .httpBasic(httpBasic -> httpBasic.disable())
+//                .authorizeHttpRequests(auth -> auth
+//                        .anyRequest().permitAll() // 모든 요청 허용
+//                );
+//        return http.build();
+//    }
 
-     /*
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
@@ -76,5 +76,5 @@ public class SecurityConfig {
 
         return http.build();
     }
-     */
+
 }
