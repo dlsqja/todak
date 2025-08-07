@@ -30,9 +30,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String path = request.getRequestURI();
         log.info(path);
-        // permitAll 경로는 JWT 검증 없이 통과
+
         if (isPermitAllPath(path)) {
-            log.info("Permit all path, skipping JWT validation: {}", path);
             filterChain.doFilter(request, response);
             return;
         }
@@ -41,7 +40,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         if(authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);
-            log.info("Authentication Token: {}", token);
             if(jwtService.validateToken(token)){
                 Long id = jwtService.getUserId(token);
                 String username = jwtService.getUsername(token);

@@ -60,7 +60,7 @@ public class LoginController {
 
         String username = (String) kakaoAccount.get("email");
         Auth auth = authRepository.findByEmail(username).orElse(null);
-        String signRedirectURL = String.format("https://i13a409.p.ssafy.io/auth/%s?authId=", role);
+        String signRedirectURL = String.format("https://i13a409.p.ssafy.io/auth/%s/", role);
         if(auth==null){
             auth = Auth.builder()
                     .email(username)
