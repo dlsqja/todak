@@ -164,7 +164,7 @@ export default function OwnerSignup() {
 
   return (
     <>
-      <BackHeader text="추가 정보 입력" />
+      <BackHeader text="회원 가입" />
       <div className="flex flex-col gap-6 px-7 mt-11">
         <div>
           <Input

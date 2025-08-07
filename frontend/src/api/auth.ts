@@ -17,6 +17,18 @@ export const authAPI = {
     return response.data;
   },
 
+  // vet 회원가입
+  vetSignup: async (userData: { hospital_code: string; name: string; license_number: string }) => {
+    const response = await apiClient.post('/public/signup/vet', userData);
+    return response.data;
+  },
+
+  // staff 회원가입
+  staffSignup: async (userData: { hospital_code: string; name: string }) => {
+    const response = await apiClient.post('/public/signup/staff', userData);
+    return response.data;
+  },
+
   // 토큰 저장
   saveTokens: (accessToken: string, refreshToken?: string) => {
     localStorage.setItem('accessToken', accessToken);
