@@ -2,7 +2,10 @@ package com.A409.backend.domain.reservation.controller;
 
 
 import com.A409.backend.domain.hospital.service.HospitalService;
+import com.A409.backend.domain.reservation.dto.RejectionRequest;
+import com.A409.backend.domain.reservation.dto.RejectionResponse;
 import com.A409.backend.domain.reservation.dto.ReservationResponse;
+import com.A409.backend.domain.reservation.entity.Rejection;
 import com.A409.backend.domain.reservation.service.ReservationService;
 import com.A409.backend.domain.user.staff.repository.StaffRepository;
 import com.A409.backend.global.enums.ErrorCode;
@@ -69,11 +72,30 @@ public class StaffReservationController {
         return APIResponse.ofSuccess(reservationResponse);
     }
 
+
     @Operation(summary = "예약 승인")
     @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = ReservationResponse.class)))
     @PatchMapping("/approve/{reservation_id}")
     public APIResponse<?> approveReservation(@AuthenticationPrincipal User user, @PathVariable("reservation_id") Long reservationId){
         reservationService.approveReservation(user.getId(), reservationId);
         return APIResponse.ofSuccess(null);
+    }
+
+    @Operation(summary = "예약 반려")
+    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = ReservationResponse.class)))
+    @PatchMapping("/rejection/{reservation_id}")
+    public APIResponse<?> rejectReservation(@AuthenticationPrincipal User user, @PathVariable("reservation_id") Long reservationId,@RequestBody RejectionRequest rejectionRequest){
+        reservationService.rejectReservation(user.getId(), reservationId,rejectionRequest);
+
+        return APIResponse.ofSuccess(null);
+    }
+
+    @Operation(summary = "반려 목록")
+    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = ReservationResponse.class)))
+    @GetMapping("/rejections/{reservation_id}")
+    public APIResponse<?> getRejection(@AuthenticationPrincipal User user,@PathVariable("reservation_id") Long reservationId){
+        RejectionResponse rejectionResponse = reservationService.getRejection(user.getId(), reservationId);
+
+        return APIResponse.ofSuccess(rejectionResponse);
     }
 }
