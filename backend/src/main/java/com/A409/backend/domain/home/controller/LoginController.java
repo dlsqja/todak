@@ -21,6 +21,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.Map;
@@ -56,17 +57,30 @@ public class LoginController {
         Map<String, Object> kakaoAccount = (Map<String, Object>) userInfo.get("kakao_account");
 
         String username = (String) kakaoAccount.get("email");
-        Auth auth = authRepository.findByEmail(username).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        Auth auth = authRepository.findByEmail(username).orElse(null);
+        if(auth==null){
+            auth = Auth.builder()
+                    .email(username)
+                    .build();
+            authRepository.save(auth);
+
+            return  APIResponse.ofSuccess(HttpStatus.NO_CONTENT, auth.getAuthId());
+        }
+
+        Long authId = auth.getAuthId();
         Long id = 0L;
 
         if(selectedRole == Role.OWNER) {
-            Owner owner = ownerRepository.findByAuth(auth).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+            Owner owner = ownerRepository.findByAuth(auth).orElse(null);
+            if(owner == null) return APIResponse.ofSuccess(HttpStatus.NO_CONTENT, authId);
             id = owner.getOwnerId();
         } else if(selectedRole == Role.VET) {
-            Vet vet = vetRepository.findByAuth(auth).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+            Vet vet = vetRepository.findByAuth(auth).orElse(null);
+            if(vet == null) return APIResponse.ofSuccess(HttpStatus.NO_CONTENT, authId);
             id = vet.getVetId();
         } else if(selectedRole == Role.STAFF) {
-            Staff staff = staffRepository.findByAuth(auth).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+            Staff staff = staffRepository.findByAuth(auth).orElse(null);
+            if(staff == null) return APIResponse.ofSuccess(HttpStatus.NO_CONTENT, authId);
             Hospital hospital = staff.getHospital();
             id = hospital.getHospitalId();
         }
