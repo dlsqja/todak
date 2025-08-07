@@ -1,13 +1,11 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
 
-interface MobileAuthLayoutProps {
-  children?: React.ReactNode;
-}
-
-const MobileAuthLayout: React.FC<MobileAuthLayoutProps> = ({ children }) => (
-  <div className="min-h-[956px] mx-auto max-w-md bg-green-100 relative pt-16">
-    <main>{children}</main>
+const MobileAuthLayout = () => (
+  <div className="max-h-screen w-full mx-auto max-w-md bg-green-100 flex flex-col pt-7">
+    <main className="h-screen overflow-y-auto pb-2">
+      <Outlet />
+    </main>
   </div>
 );
 export default MobileAuthLayout;

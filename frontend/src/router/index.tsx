@@ -1,10 +1,11 @@
 import React from 'react';
 import { createBrowserRouter } from 'react-router-dom';
-import MainPage from '@/component/pages/MainPage';
 import ownerRoutes from '@/router/ownerRoutes';
 import vetRoutes from '@/router/vetRoutes';
 import staffRoutes from '@/router/staffRoutes';
-import MobileAuthLayout from '@/layouts/MobileAuthLayout';
+import authRoutes from '@/router/authRoutes';
+import MobileLayout from '@/layouts/MobileLayout';
+import MainPage from '@/component/pages/MainPage';
 
 // 역할 분기
 function RoleRedirect() {
@@ -16,19 +17,12 @@ function RoleRedirect() {
   return null;
 }
 
-const router = createBrowserRouter([
-  {
-    path: '/',
-    element: (
-      <MobileAuthLayout>
-        <MainPage />
-      </MobileAuthLayout>
-    ),
-  },
-  { path: '/role-redirect', element: <RoleRedirect /> },
-  ownerRoutes,
-  vetRoutes,
-  staffRoutes,
-]);
+const mainRoutes = {
+  path: '/',
+  element: <MobileLayout />,
+  children: [{ path: '', element: <MainPage /> }],
+};
+
+const router = createBrowserRouter([mainRoutes, authRoutes, ownerRoutes, vetRoutes, staffRoutes]);
 
 export default router;

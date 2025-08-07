@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
 import { OpenVidu, Session } from 'openvidu-browser';
 import axios from 'axios';
-import myaxios from '@/api/axios-common';
+import myaxios from '@/api/auth';
 
 const VideoCall = () => {
   const [sessionId, setSessionId] = useState('');
