@@ -8,6 +8,8 @@ import BackHeader from '@/component/header/BackHeader';
 import ImageInputBox from '@/component/input/ImageInputBox';
 import Input from '@/component/input/Input';
 import Button from '@/component/button/Button';
+import SelectionDropdown from '@/component/selection/SelectionDropdown';
+
 import { petMockList } from './petMockList';
 
 export default function OwnerPetEdit() {
@@ -59,55 +61,51 @@ export default function OwnerPetEdit() {
           <Input id="weight" label="무게" placeholder="0" value={weight} onChange={(e) => setWeight(e.target.value)} />
         </div>
 
+        {/* 성별 선택 */}
         <div className="flex gap-4">
           <div className="flex flex-col w-full">
-            <label htmlFor="gender" className="h4 mb-2 text-black">
-              성별
-            </label>
-            <select
-              id="gender"
-              className="w-full h-12 rounded-[12px] border border-gray-400 px-4 p text-black"
-              value={gender}
-              onChange={(e) => setGender(e.target.value)}
-            >
-              <option value="">선택</option>
-              <option value="남">남</option>
-              <option value="여">여</option>
-            </select>
+          <label htmlFor="gender" className="h4 mb-2 text-black">성별</label>
+          <SelectionDropdown
+            value={gender}
+            onChange={(val) => setGender(val)}
+            options={[
+              { value: '남', label: '남' },
+              { value: '여', label: '여' },
+            ]}
+            placeholder="성별을 선택해주세요"
+          />
           </div>
+
+        {/* 중성화 여부 선택 */}
           <div className="flex flex-col w-full">
-            <label htmlFor="neutered" className="h4 mb-2 text-black">
-              중성화 여부
-            </label>
-            <select
-              id="neutered"
-              className="w-full h-12 rounded-[12px] border border-gray-400 px-4 p text-black"
+            <label htmlFor="neutered" className="h4 mb-2 text-black">중성화 여부</label>
+            <SelectionDropdown
               value={neutered}
-              onChange={(e) => setNeutered(e.target.value)}
-            >
-              <option value="">선택</option>
-              <option value="예">예</option>
-              <option value="아니오">아니오</option>
-            </select>
+              onChange={(val) => setNeutered(val)}
+              options={[
+                { value: '예', label: '예' },
+                { value: '아니오', label: '아니오' },
+              ]}
+              placeholder="중성화 여부 선택"
+            />
           </div>
         </div>
 
+        {/* 종 선택 */}
         <div className="flex flex-col">
-          <label htmlFor="type" className="h4 mb-2 text-black">
-            종
-          </label>
-          <select
-            id="type"
-            className="w-full h-12 rounded-[12px] border border-gray-400 px-4 p text-black"
+          <label htmlFor="type" className="h4 mb-2 text-black">종</label>
+          <SelectionDropdown
             value={type}
-            onChange={(e) => setType(e.target.value)}
-          >
-            <option value="">반려동물 종을 선택해주세요</option>
-            <option value="강아지">강아지</option>
-            <option value="고양이">고양이</option>
-            <option value="기타">기타</option>
-          </select>
+            onChange={(val) => setType(val)}
+            options={[
+              { value: '강아지', label: '강아지' },
+              { value: '고양이', label: '고양이' },
+              { value: '기타', label: '기타' },
+            ]}
+            placeholder="반려동물 종을 선택해주세요"
+          />
         </div>
+
       </div>
 
       {/* 수정 완료 버튼 */}
