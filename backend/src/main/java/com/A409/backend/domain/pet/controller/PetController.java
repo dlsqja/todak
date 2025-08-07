@@ -37,7 +37,7 @@ public class PetController {
     @GetMapping()
     public APIResponse<?> getMyPets(@AuthenticationPrincipal User user) {
 
-        List<Pet> petList = petService.getMyPets(user.getId());
+        List<PetResponse> petList = petService.getMyPets(user.getId());
 
         return APIResponse.ofSuccess(petList);
     }

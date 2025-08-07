@@ -1,6 +1,7 @@
 package com.A409.backend.domain.pet.service;
 
 import com.A409.backend.domain.pet.dto.PetRequest;
+import com.A409.backend.domain.pet.dto.PetResponse;
 import com.A409.backend.domain.pet.entity.OwnerPet;
 import com.A409.backend.domain.pet.entity.Pet;
 import com.A409.backend.domain.pet.repository.OwnerPetRepository;
@@ -38,16 +39,17 @@ public class PetService {
         return petRepository.findById(petId).orElseThrow(() -> new CustomException(ErrorCode.RESOURCE_NOT_FOUND));
     }
 
-    public List<Pet> getMyPets(Long ownerId){
+    public List<PetResponse> getMyPets(Long ownerId){
 
         //결과 없다면 빈 배열
         List<OwnerPet> ownerPetsList = ownerPetRepository
-                .findOwnerPetByOwner_OwnerId(ownerId).orElseGet(Collections::emptyList);
+                .findOwnerPetByOwner_OwnerId(ownerId);
 
-        //pet list 리턴
-        return ownerPetsList.stream()
+        List<Pet> petList = ownerPetsList.stream()
                 .map(OwnerPet::getPet)
-                .collect(Collectors.toList());
+                .toList();
+        //pet list 리턴
+        return petList.stream().map(PetResponse::toResponse).toList();
     }
 
     public void registerPet(Long ownerId, PetRequest petRequest, MultipartFile photo){
