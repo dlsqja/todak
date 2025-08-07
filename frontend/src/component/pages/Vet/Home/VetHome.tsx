@@ -121,6 +121,21 @@ export default function VetHome() {
       petName: '구름이',
       petInfo: '강아지 / 5세 / 남(중성화)',
     },
+    {
+      reservation_id: 4,
+      owner_id: 1,
+      pet_id: 2,
+      hospital_id: 1,
+      vet_id: 2,
+      reservation_day: '2025-01-14',
+      reservation_time: 29, // 14:30
+      photo: '/images/미료 _test.jpg',
+      description: '식욕이 없고 설사를 하고 있습니다. 소화제를 처방받았습니다.',
+      subject: '치과',
+      status: '완료',
+      petName: '구름이',
+      petInfo: '강아지 / 5세 / 남(중성화)',
+    },
   ];
 
   return (
@@ -136,7 +151,7 @@ export default function VetHome() {
       </button>
       <h3 className="mx-7 h3 mt-11">비대면 진료 예정 목록</h3>
       <div className="overflow-x-auto overflow-visible snap-x snap-mandatory scroll-smooth hide-scrollbar mx-7 pt-3 pb-6">
-        <div className="w-full overflow-x-auto hide-scrollbar flex gap-4 h-full p-3">
+        <div className="w-max flex gap-4 h-full p-3">
           {reservations.map((reservation) => (
             <div key={reservation.reservation_id}>
               <OwnerTreatmentSimpleCard

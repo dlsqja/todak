@@ -5,7 +5,7 @@ import BackHeader from '@/component/header/BackHeader';
 import Input from '@/component/input/Input';
 import Button from '@/component/button/Button';
 
-export default function VetMypage() {
+export default function VetHospital() {
   const navigate = useNavigate();
   const [profile, setProfile] = useState('테스트 소개글');
 
