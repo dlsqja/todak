@@ -19,10 +19,13 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 @Slf4j
@@ -41,8 +44,7 @@ public class LoginController {
     @Operation(summary = "카카오 로그인")
     @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = Map.class)))
     @GetMapping("/{role}")
-    public APIResponse<?> login(@PathVariable("role") String role, @RequestParam("code") String code) {
-
+    public void login(@PathVariable("role") String role, @RequestParam("code") String code, HttpServletResponse response) throws IOException {
 
 
         Role selectedRole = switch (role) {
@@ -58,29 +60,30 @@ public class LoginController {
 
         String username = (String) kakaoAccount.get("email");
         Auth auth = authRepository.findByEmail(username).orElse(null);
+        String signRedirectURL = String.format("https://i13a409.p.ssafy.io/auth/%s?authId=", role);
         if(auth==null){
             auth = Auth.builder()
                     .email(username)
                     .build();
             authRepository.save(auth);
 
-            return  APIResponse.ofSuccess(HttpStatus.NO_CONTENT, auth.getAuthId());
+            response.sendRedirect(signRedirectURL+auth.getAuthId());
         }
 
         Long authId = auth.getAuthId();
-        Long id = 0L;
+        Long id = null;
 
         if(selectedRole == Role.OWNER) {
             Owner owner = ownerRepository.findByAuth(auth).orElse(null);
-            if(owner == null) return APIResponse.ofSuccess(HttpStatus.NO_CONTENT, authId);
+            if(owner == null) response.sendRedirect(signRedirectURL+authId);
             id = owner.getOwnerId();
         } else if(selectedRole == Role.VET) {
             Vet vet = vetRepository.findByAuth(auth).orElse(null);
-            if(vet == null) return APIResponse.ofSuccess(HttpStatus.NO_CONTENT, authId);
+            if(vet == null) response.sendRedirect(signRedirectURL+authId);
             id = vet.getVetId();
         } else if(selectedRole == Role.STAFF) {
             Staff staff = staffRepository.findByAuth(auth).orElse(null);
-            if(staff == null) return APIResponse.ofSuccess(HttpStatus.NO_CONTENT, authId);
+            if(staff == null) response.sendRedirect(signRedirectURL+authId);
             Hospital hospital = staff.getHospital();
             id = hospital.getHospitalId();
         }
@@ -92,8 +95,8 @@ public class LoginController {
         tokens.put("accessToken", accessToken);
         tokens.put("refreshToken", refreshToken);
 
-        log.info("Access Token: {}", accessToken);
-        log.info("Refresh Token: {}", refreshToken);
-        return APIResponse.ofSuccess(tokens);
+        String successRedirectURL = String.format("https://i13a409.p.ssafy.io/%s?accessToken=%s&refreshToken=%s", role,accessToken,refreshToken);
+
+        response.sendRedirect(successRedirectURL);
     }
 }
