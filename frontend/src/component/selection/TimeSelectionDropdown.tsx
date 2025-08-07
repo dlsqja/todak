@@ -56,7 +56,7 @@ export default function TimeSelectionDropdown({
           className="appearance-none 
         w-full border 
         border-gray-400 h-12 
-        focus:outline-none
+        focus:outline-none focus:ring-0 focus:border-green-300  focus:border-2
         hover:outline-none
         bg-white 
         rounded-2xl 
@@ -65,7 +65,7 @@ export default function TimeSelectionDropdown({
           onChange={(e) => setSelectedTime(e.target.value)}
         >
           {filteredTimeList.map((time) => (
-            <option className="text-black bg-white h4" key={time} value={time}>
+            <option className="text-black bg-white p" key={time} value={time}>
               {time}
             </option>
           ))}

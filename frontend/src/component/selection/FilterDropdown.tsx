@@ -37,6 +37,9 @@ export default function FilterDropdown({
           ${hasDetail ? 'h-16' : 'h-12'} 
           rounded-2xl border border-gray-300 px-4 
           flex items-center justify-between bg-white
+          focus:outline-none focus:ring-0 focus:border-green-300 focus:border-2
+          transition-colors duration-200
+          ${open ? 'border-green-300' : 'border-gray-300'}
         `}
       >
         <div className="flex items-center gap-3 text-left">
