@@ -1,6 +1,3 @@
-// 주소 : /owner/pet/edit/:id
-// 주소 : /owner/pet/edit/:id
-
 import '@/styles/main.css';
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
@@ -32,6 +29,9 @@ export default function OwnerPetEdit() {
   const { state } = useLocation();
   const selectedPet = state?.pet;
 
+  // DB에서 사용하는 Enum 값
+  const genderMap = { 남: 'MALE', 여: 'FEMALE', '': 'NON' }; // `MALE`, `FEMALE`, `NON`
+  const typeMap = { 강아지: 'DOG', 고양이: 'CAT', 기타: 'OTHER' }; // `DOG`, `CAT`, `OTHER`
 
   // 데이터 불러오기
   useEffect(() => {
@@ -39,16 +39,23 @@ export default function OwnerPetEdit() {
       try {
         const res = await getPetDetail(id);
         const pet = res.data;
+
+        console.log("Pet Details:", pet);
+        console.log("Pet Photo:", pet.photo); // pet.photo 값 확인
+
+        const photoUrl = pet.photo ? `${import.meta.env.VITE_PHOTO_URL}${pet.photo}` : DEFAULT_IMAGE;
+
         setName(pet.name);
         setAge(String(pet.age));
         setWeight(pet.weight);
-        setGender(pet.gender);
-        setNeutered(pet.neutered);
-        setType(pet.type);
-        setSelectedImage(pet.photoUrl || DEFAULT_IMAGE);
-        setIsDefaultImage(!pet.photoUrl);
+        setGender(pet.gender);  // `MALE`, `FEMALE`, `NON`으로 매핑된 값 설정
+        setNeutered(pet.neutered); // `MALE_NEUTERING`, `FEMALE_NEUTERING`으로 매핑된 값 설정
+        setType(pet.species); // `DOG`, `CAT`, `OTHER`로 매핑된 값 설정
+
+        setSelectedImage(photoUrl);
+        setIsDefaultImage(!pet.photo); // photo 값이 없으면 기본 이미지로 처리
       } catch (err) {
-        console.log(err)
+        console.log(err);
         alert('반려동물 정보를 불러오지 못했습니다.');
       }
     };
@@ -59,7 +66,6 @@ export default function OwnerPetEdit() {
     const file = event.target.files?.[0];
     if (file) {
       const imageUrl = URL.createObjectURL(file);
-
       setSelectedImage(imageUrl);
       setSelectedFile(file);
       setIsDefaultImage(false);
@@ -74,7 +80,6 @@ export default function OwnerPetEdit() {
   const handleRemoveImage = () => {
     if (window.confirm('사진을 제거하시겠습니까?')) {
       setSelectedImage(DEFAULT_IMAGE);
-
       setSelectedFile(null);
       setIsDefaultImage(true);
     }
@@ -86,13 +91,15 @@ export default function OwnerPetEdit() {
         name,
         age: Number(age),
         weight,
-        gender,
-        neutered,
-        type,
+        gender: genderMap[gender],  // 변환된 gender 값 확인 (MALE, FEMALE, NON)
+        species: typeMap[type],      // 변환된 type 값 확인 (DOG, CAT, OTHER)
+        neutered,                   // 변환된 neutered 값 (MALE_NEUTERING, FEMALE_NEUTERING)
       };
 
+      console.log("Pet Request:", petRequest); // 로그로 요청값 확인
+
       await updatePet({
-        id : Number(id),
+        id: Number(id),
         petRequest,
         photo: isDefaultImage ? null : selectedFile,
       });
@@ -100,11 +107,10 @@ export default function OwnerPetEdit() {
       alert('수정되었습니다');
       navigate('/owner/pet');
     } catch (err) {
-      console.error('🛑 반려동물 수정 실패:', err); 
+      console.error('🛑 반려동물 수정 실패:', err);
       alert('수정에 실패했습니다.');
     }
   };
-
 
   return (
     <div className="pb-20 space-y-6">
@@ -112,13 +118,22 @@ export default function OwnerPetEdit() {
       <div className="px-7 space-y-6">
         {/* 이미지 */}
         <div className="flex justify-center gap-3">
-          <ImageInputBox src={selectedImage} stroke={isDefaultImage ? 'border-pink-100' : 'border-green-100'} />
+          <ImageInputBox
+            src={selectedImage}  // 선택된 이미지 미리보기
+            stroke={isDefaultImage ? 'border-pink-100' : 'border-green-100'}
+          />
           <input type="file" ref={fileInputRef} onChange={handleImageSelect} accept="image/*" className="hidden" />
           <div className="pt-4">
-            <button className="w-full h-6 rounded-[12px] h5 bg-green-300 text-green-100" onClick={handleImageUpload}>
+            <button
+              className="w-full h-6 rounded-[12px] h5 bg-green-300 text-green-100"
+              onClick={handleImageUpload}
+            >
               사진 등록
             </button>
-            <button className="w-full h-6 rounded-[12px] h5 bg-gray-100 text-gray-500" onClick={handleRemoveImage}>
+            <button
+              className="w-full h-6 rounded-[12px] h5 bg-gray-100 text-gray-500"
+              onClick={handleRemoveImage}
+            >
               사진 제거
             </button>
           </div>
@@ -135,7 +150,6 @@ export default function OwnerPetEdit() {
           <div className="flex gap-4">
             <div className="w-full flex flex-col">
               <label className="h4 mb-2 text-black">성별</label>
-
               <SelectionDropdown
                 value={gender}
                 onChange={(val) => setGender(val)}
@@ -146,15 +160,16 @@ export default function OwnerPetEdit() {
                 placeholder="성별을 선택해주세요"
               />
             </div>
+
             <div className="w-full flex flex-col">
               <label className="h4 mb-2 text-black">중성화 여부</label>
-
               <SelectionDropdown
                 value={neutered}
                 onChange={(val) => setNeutered(val)}
                 options={[
-                  { value: '예', label: '예' },
-                  { value: '아니오', label: '아니오' },
+                  { value: 'MALE_NEUTERING', label: '남 (중성화)' },
+                  { value: 'FEMALE_NEUTERING', label: '여 (중성화)' },
+                  { value: 'NON', label: '중성화 안함' },
                 ]}
                 placeholder="중성화 여부 선택"
               />
@@ -167,9 +182,9 @@ export default function OwnerPetEdit() {
               value={type}
               onChange={(val) => setType(val)}
               options={[
-                { value: '강아지', label: '강아지' },
-                { value: '고양이', label: '고양이' },
-                { value: '기타', label: '기타' },
+                { value: 'DOG', label: '강아지' },
+                { value: 'CAT', label: '고양이' },
+                { value: 'OTHER', label: '기타' },
               ]}
               placeholder="종 선택"
             />
