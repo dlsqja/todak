@@ -51,7 +51,12 @@ public class ReservationService {
         Reservation reservation = reservationReqeust.toEntity();
         reservation.setOwner(owner);
 
+        Long hospitalId = reservation.getHospital().getHospitalId();
+        Long petId = reservation.getPet().getPetId();
         //TODO:: 최초 진료 기록 추가
+        if(firstTreatmentRepository.existsByHospital_HospitalIdAndPet_PetId(hospitalId,petId)){
+            reservation.setIsRevisit(true);
+        }
 
 
         if(photo != null){

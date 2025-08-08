@@ -63,6 +63,6 @@ public class Reservation {
 
     @Column(name = "is_first",nullable = false)
     @Builder.Default
-    private Boolean isFirst = false;
+    private Boolean isRevisit = false;
 }
 
