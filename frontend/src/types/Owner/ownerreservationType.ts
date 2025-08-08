@@ -1,30 +1,23 @@
-import OwnerResponse from "@/types/Owner/ownermypageType"
-import Pet from "@/types/Owner/ownerpetType"
-
-export interface ReservationRequest {
-  ownerId: number
-  petId: number
-  hospitalId: number
-  vetId: number
-  reservationDay: string
-  reservationTime: number
-  description: string
-  subject: 'DENTAL' | 'DERMATOLOGY' | 'ORTHOPEDICS' | 'OPHTHALMOLOGY'
-  status: 'REQUESTED' | 'APPROVED' | 'REJECTED' | 'COMPLETED'
+export interface OwnerReservationList {
+  petResponse: PetResponse;
+  reservations: ReservationsResponse[];
 }
 
-export interface ReservationResponse {
-  reservationId: number
-  owner: OwnerResponse
-  pet: Pet
-  hospitalName: string
-  vetName: string
-  reservationDay: string
-  reservationTime: number
-  photo: string
-  description: string
-  subject: 'DENTAL' | 'DERMATOLOGY' | 'ORTHOPEDICS' | 'OPHTHALMOLOGY'
-  status: 'REQUESTED' | 'APPROVED' | 'REJECTED' | 'COMPLETED'
+export interface PetResponse {
+  age: number;
+  gender: string;
+  name: string;
+  petId: number;
+  photo: string;
+  species: string;
 }
 
-export type ReservationListResponse = ReservationResponse[]
+export interface ReservationsResponse {
+  hospitalName: string;
+  reservationDay: string;
+  reservationId: number;
+  reservationTime: number;
+  status: string;
+  subject: string;
+  vetName: string;
+}

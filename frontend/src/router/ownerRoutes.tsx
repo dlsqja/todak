@@ -34,13 +34,12 @@ const ownerRoutes = {
     { path: 'pet', element: <OwnerPet /> },
     { path: 'pet/register', element: <OwnerPetRegister /> },
     { path: 'pet/edit/:id', element: <OwnerPetEdit /> },
-    { path: 'pet/treatment/detail/:id', element: <TreatmentDetailPage /> },
+    { path: 'pet/treatment/detail/:id', element: <OwnerTreatmentDetail /> },
     { path: 'reservation', element: <OwnerReservationHome /> },
     { path: 'reservation/:id', element: <OwnerReservationDetail /> },
     { path: 'mypage', element: <OwnerMyPage /> },
     { path: 'treatment', element: <OwnerTreatment /> },
     { path: 'treatment/rtc/:id', element: <OwnerTreatmentRTC /> },
- 
   ],
 };
 
