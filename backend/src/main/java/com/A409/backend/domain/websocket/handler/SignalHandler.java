@@ -11,6 +11,7 @@ import org.kurento.client.KurentoClient;
 import org.kurento.client.MediaPipeline;
 import org.kurento.client.WebRtcEndpoint;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
@@ -25,6 +26,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public class SignalHandler extends TextWebSocketHandler {
 
     private final KurentoClient kurentoClient;
+
+    private final RestTemplate restTemplate = new RestTemplate();
 
     // 방 ID -> Pipeline
     private final Map<String, MediaPipeline> pipelines = new ConcurrentHashMap<>();
