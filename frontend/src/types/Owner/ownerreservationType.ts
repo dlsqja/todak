@@ -23,18 +23,19 @@ export interface ReservationsResponse {
   status: string;
   subject: string;
   vetName: string;
+  isRevisit: boolean;
 }
 
 export interface ReservationDetail {
-  reservationId: number;
-  owner: OwnerResponse;
-  pet: Pet;
-  vetName: string;
+  description: string;
   hospitalName: string;
+  reservationId: number;
+  pet: Pet;
+  photo: string;
   reservationDay: string;
   reservationTime: number;
-  photo: string;
-  description: string;
-  subject: string;
   status: string;
+  subject: string;
+  vetName: string;
+  isRevisit: boolean;
 }
