@@ -4,7 +4,7 @@ import SimpleHeader from '@/component/header/SimpleHeader';
 import ImageInputBox from '@/component/input/ImageInputBox';
 import { useState } from 'react';
 import TabGroupWaiting from '@/component/navbar/TabGroupWaiting';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { getReservations } from '@/services/api/Owner/ownerreservation';
 import { timeMapping } from '@/utils/timeMapping';
 import { subjectmapping } from '@/utils/subjectMapping';
@@ -15,34 +15,49 @@ import { statusMapping } from '@/utils/statusMapping';
 export default function OwnerReservationHome() {
   const VITE_PHOTO_URL = import.meta.env.VITE_PHOTO_URL;
   const navigate = useNavigate();
-  const [selectedPet, setSelectedPet] = useState<number>(-1);
+
   const [currentTab, setCurrentTab] = useState<string>('대기');
   const [reservations, setReservations] = useState<ReservationsResponse[]>([]);
   const [petList, setPetList] = useState<PetResponse[]>([]);
   const data = useRef<OwnerReservationList[]>([]);
+  const { selectedPetIndex } = useParams<{ selectedPetIndex: string }>();
+  const [selectedPet, setSelectedPet] = useState<number>(selectedPetIndex ? Number(selectedPetIndex) : 0);
 
   // 마운트 될 떄 반려동물 목록 조회
   useEffect(() => {
     const getReservationList = async () => {
       data.current = await getReservations();
+      console.log('data:', data);
       const petList = data.current.map((reservation) => reservation.petResponse);
       setPetList(petList);
-      setSelectedPet(0);
+      const initialIndex = selectedPetIndex ? Number(selectedPetIndex) : 0;
+      setSelectedPet(initialIndex);
+
+      // 데이터 로딩 후 즉시 필터링
+      if (data.current.length > 0) {
+        const allReservation = data.current[initialIndex];
+        if (allReservation?.reservations) {
+          const filteredReservations = allReservation.reservations.filter(
+            (res) => statusMapping[res.status] === currentTab,
+          );
+          setReservations(filteredReservations);
+        }
+      }
     };
     getReservationList();
   }, []);
 
-  // 반려동물 선택할 때마다 그 동물의 전체 예약 내역 조회
-  useEffect(() => {
-    if (data.current != undefined) {
-      console.log('data:', data);
-      const allReservation = data.current[selectedPet];
-      if (allReservation != undefined) {
-        setReservations(allReservation.reservations);
-        console.log('reservations:', reservations);
-      }
-    }
-  }, [selectedPet]);
+  // // 반려동물 선택할 때마다 그 동물의 전체 예약 내역 조회
+  // useEffect(() => {
+  //   if (data.current != undefined) {
+  //     console.log('data:', data);
+  //     const allReservation = data.current[selectedPet];
+  //     if (allReservation != undefined) {
+  //       setReservations(allReservation.reservations);
+  //       console.log('reservations:', reservations);
+  //     }
+  //   }
+  // }, [selectedPet]);
 
   // 대기, 승인, 반려 탭 누를때마다 필터링한 데이터 저장
   useEffect(() => {
@@ -55,7 +70,7 @@ export default function OwnerReservationHome() {
         setReservations(filteredReservations);
       }
     }
-  }, [currentTab]);
+  }, [currentTab, selectedPet]);
 
   return (
     <div>

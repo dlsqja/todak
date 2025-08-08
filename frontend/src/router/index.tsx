@@ -14,6 +14,13 @@ const mainRoutes = {
   children: [{ path: '', element: <MainPage /> }],
 };
 
-const router = createBrowserRouter([mainRoutes, authRoutes, ownerRoutes, vetRoutes, staffRoutes]);
+const router = createBrowserRouter([
+  mainRoutes,
+  authRoutes,
+  ownerRoutes.ownerRoutes,
+  ownerRoutes.ownerRoutesWithoutMenu,
+  vetRoutes,
+  staffRoutes,
+]);
 
 export default router;
