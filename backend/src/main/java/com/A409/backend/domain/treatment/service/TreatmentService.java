@@ -1,6 +1,10 @@
 package com.A409.backend.domain.treatment.service;
 
+import com.A409.backend.domain.hospital.dto.HospitalResponse;
 import com.A409.backend.domain.pet.dto.PetResponse;
+import com.A409.backend.domain.pet.entity.Pet;
+import com.A409.backend.domain.pet.service.PetService;
+import com.A409.backend.domain.treatment.dto.TreatementResponse;
 import com.A409.backend.domain.treatment.entity.Treatment;
 import com.A409.backend.domain.treatment.entity.TreatmentResponse;
 import com.A409.backend.domain.treatment.repository.TreatmentRepository;
@@ -19,6 +23,7 @@ import java.util.Map;
 public class TreatmentService {
 
     private final TreatmentRepository treatmentRepository;
+    private final PetService petService;
 
     public void saveAISummary(Long treatmentId,String summary){
 
@@ -32,27 +37,41 @@ public class TreatmentService {
     public List<Map<String,Object>> getTreatmentsByOwnerIdAndType(Long ownerId,Integer type){
 
         List<Treatment> treatmentList = new ArrayList<>();
-
+        List<Map<String, Object>> result = new ArrayList<>();
         if(type==0){
+            //진료 대기 목록
             treatmentList = treatmentRepository.findAllByOwner_OwnerIdAndIsCompleted(ownerId,false);
         }
         else if(type==1){
-            treatmentList = treatmentRepository.findAllByOwner_OwnerIdAndIsCompleted(ownerId,true);
+            List<PetResponse> petList = petService.getMyPets(ownerId);
+
+            for(PetResponse pet : petList){
+
+                treatmentList = treatmentRepository.findAllByOwner_OwnerIdAndIsCompletedAndPet_PetId(ownerId,true,pet.getPetId());
+                List<Map<String, Object>> treatmentsList  = treatmentList.stream()
+                        .map(treatments -> {
+                            Map<String, Object> map = new HashMap<>();
+                            map.put("treatementInfo", TreatementResponse.toResponse(treatments));
+                            map.put("reservationId",treatments.getReservation().getReservationId());
+                            map.put("vetName",treatments.getVet().getName());
+                            map.put("reservationDay", treatments.getReservation().getReservationDay());
+                            map.put("subject", treatments.getReservation().getSubject());
+                            return map;
+                        })
+                        .toList();
+
+                Map<String, Object> map = new HashMap<>();
+                map.put("petResponse", pet);
+                map.put("treatments", treatmentsList);
+
+                result.add(map);
+            }
         }
         else{
             throw new CustomException(ErrorCode.INVALID_INPUT_VALUE);
         }
 
-        List<Map<String, Object>> result = treatmentList.stream()
-                .map(treatments -> {
-                    Map<String, Object> map = new HashMap<>();
-                    map.put("reservationId", treatments.getReservation().getReservationId());
-                    map.put("petInfo", PetResponse.toResponse(treatments.getPet()));
-                    map.put("subject", treatments.getReservation().getSubject());
-                    map.put("reservationTime", treatments.getReservation().getReservationTime());
-                    return map;
-                })
-                .toList();
+
 
         return result;
     }

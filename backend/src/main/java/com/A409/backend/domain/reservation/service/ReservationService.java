@@ -188,6 +188,7 @@ public class ReservationService {
         Treatment treatment = Treatment.builder()
                         .pet(reservation.getPet())
                         .reservation(reservation)
+                        .hospital(reservation.getHospital())
                         .isCompleted(false)
                         .owner(reservation.getOwner())
                         .vet(reservation.getVet())
