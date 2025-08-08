@@ -10,6 +10,7 @@ import { timeMapping } from '@/utils/timeMapping';
 import { subjectmapping } from '@/utils/subjectMapping';
 
 import type { ReservationsResponse, PetResponse, OwnerReservationList } from '@/types/Owner/ownerreservationType';
+import { statusMapping } from '@/utils/statusMapping';
 
 export default function OwnerReservationHome() {
   const VITE_PHOTO_URL = import.meta.env.VITE_PHOTO_URL;
@@ -20,6 +21,7 @@ export default function OwnerReservationHome() {
   const [petList, setPetList] = useState<PetResponse[]>([]);
   const data = useRef<OwnerReservationList[]>([]);
 
+  // 마운트 될 떄 반려동물 목록 조회
   useEffect(() => {
     const getReservationList = async () => {
       data.current = await getReservations();
@@ -30,32 +32,53 @@ export default function OwnerReservationHome() {
     getReservationList();
   }, []);
 
+  // 반려동물 선택할 때마다 그 동물의 전체 예약 내역 조회
   useEffect(() => {
     if (data.current != undefined) {
       console.log('data:', data);
       const allReservation = data.current[selectedPet];
       if (allReservation != undefined) {
         setReservations(allReservation.reservations);
+        console.log('reservations:', reservations);
       }
     }
   }, [selectedPet]);
+
+  // 대기, 승인, 반려 탭 누를때마다 필터링한 데이터 저장
+  useEffect(() => {
+    if (data.current.length > 0 && selectedPet >= 0) {
+      const allReservation = data.current[selectedPet];
+      if (allReservation?.reservations) {
+        const filteredReservations = allReservation.reservations.filter(
+          (res) => statusMapping[res.status] === currentTab,
+        );
+        setReservations(filteredReservations);
+      }
+    }
+  }, [currentTab]);
 
   return (
     <div>
       <div className="sticky top-0 z-10 bg-green-100">
         <SimpleHeader text="나의 예약" />
         {/* 반려동물 선택 */}
-        <div className="flex gap-4 pt-6 overflow-x-auto hide-scrollbar">
-          {Object.keys(petList).map((pet, idx) => (
+        <div className="flex gap-4 pt-6 px-7 overflow-x-auto hide-scrollbar">
+          {petList.map((pet, idx) => (
             <div key={idx} className="flex flex-col items-center cursor-pointer" onClick={() => setSelectedPet(idx)}>
               <ImageInputBox
-                src={`${VITE_PHOTO_URL}${petList[pet].photo}`}
-                stroke={selectedPet === idx ? 'border-5 border-pink-200' : 'border border-gray-300'}
+                src={`${VITE_PHOTO_URL}${pet.photo}`}
+                stroke={
+                  selectedPet === idx
+                    ? 'border-5 border-pink-200'
+                    : pet.photo && pet.photo !== ''
+                    ? 'border border-gray-300'
+                    : 'border border-pink-100'
+                }
               />
               {selectedPet === idx ? (
-                <div className="h4 mt-1">{petList[pet].name}</div>
+                <div className="h4 mt-1">{pet.name}</div>
               ) : (
-                <div className="p mt-1">{petList[pet].name}</div>
+                <div className="p mt-1">{pet.name}</div>
               )}
             </div>
           ))}
