@@ -36,7 +36,9 @@ public enum ErrorCode {
     RESOURCE_NOT_FOUND(HttpStatus.NOT_FOUND,  "해당 리소스를 찾을 수 없습니다."),
 
     INVALID_ROLE(HttpStatus.BAD_REQUEST, "유효하지 않은 사용자 역할(Role) 값입니다."),
-    INVALID_STATUS(HttpStatus.BAD_REQUEST, "유효하지 않은 예약 상태(status) 값입니다.");
+    INVALID_STATUS(HttpStatus.BAD_REQUEST, "유효하지 않은 예약 상태(status) 값입니다."),
+
+    USER_PET_DUPLICATED(HttpStatus.CONFLICT, "이미 등록한 Pet 입니다.");
 
 
 
