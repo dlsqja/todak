@@ -13,8 +13,10 @@ import com.A409.backend.domain.reservation.entity.Rejection;
 import com.A409.backend.domain.reservation.entity.Reservation;
 import com.A409.backend.domain.reservation.repository.RejectionRepository;
 import com.A409.backend.domain.reservation.repository.ReservationRepository;
+import com.A409.backend.domain.treatment.entity.FirstTreatment;
 import com.A409.backend.domain.treatment.entity.Treatment;
 import com.A409.backend.domain.treatment.entity.TreatmentResponse;
+import com.A409.backend.domain.treatment.repository.FirstTreatmentRepository;
 import com.A409.backend.domain.treatment.repository.TreatmentRepository;
 import com.A409.backend.domain.user.owner.dto.OwnerResponse;
 import com.A409.backend.domain.user.owner.entity.Owner;
@@ -42,7 +44,7 @@ public class ReservationService {
     private final TreatmentRepository treatmentRepository;
     private final RejectionRepository rejectionRepository;
     private final PetService petService;
-
+    private final FirstTreatmentRepository firstTreatmentRepository;
 
     public void createReservation(Long ownerId, ReservationReqeust reservationReqeust, MultipartFile photo) {
         Owner owner = Owner.builder().ownerId(ownerId).build();
@@ -195,6 +197,14 @@ public class ReservationService {
                         .build();
         treatmentRepository.save(treatment);
         reservationRepository.save(reservation);
+        if(!firstTreatmentRepository.existsByOwner_OwnerId(reservation.getOwner().getOwnerId())){
+            FirstTreatment firstTreatment = FirstTreatment.builder()
+                    .hospital(reservation.getHospital())
+                    .pet(reservation.getPet())
+                    .owner(reservation.getOwner())
+                    .build();
+            firstTreatmentRepository.save(firstTreatment);
+        }
     }
     public void rejectReservation(Long hospitalId, Long reservationId, RejectionRequest rejectionRequest) {
 
