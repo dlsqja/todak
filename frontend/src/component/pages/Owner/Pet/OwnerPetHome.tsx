@@ -120,7 +120,7 @@ export default function OwnerPetHome() {
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.3 }}
             >
-              <OwnerPetTabInfo selectedPet={selectedPet} setPets={setPets} setSelectedPet={setSelectedPet} />
+              <OwnerPetTabInfo selectedPet={selectedPet} setSelectedPet={setSelectedPet} pets={pets} setPets={setPets}/>
             </motion.div>
           )}
           {selectedTab === '진료 내역' && (

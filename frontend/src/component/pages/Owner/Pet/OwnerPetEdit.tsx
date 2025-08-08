@@ -14,10 +14,10 @@ export default function OwnerPetEdit() {
   const DEFAULT_IMAGE = '/images/pet_default.png';
   const { id } = useParams();
   const navigate = useNavigate();
-  const fileInputRef = useRef(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const [selectedImage, setSelectedImage] = useState(DEFAULT_IMAGE);
-  const [selectedFile, setSelectedFile] = useState(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isDefaultImage, setIsDefaultImage] = useState(true);
 
   const [name, setName] = useState('');
@@ -26,11 +26,18 @@ export default function OwnerPetEdit() {
   const [gender, setGender] = useState('');
   const [neutered, setNeutered] = useState('');
   const [type, setType] = useState('');
+  
   const { state } = useLocation();
   const selectedPet = state?.pet;
 
-  // DB에서 사용하는 Enum 값
-  const genderMap = { 남: 'MALE', 여: 'FEMALE', '': 'NON' }; // `MALE`, `FEMALE`, `NON`
+  const genderMap = {
+    '남(중성화)': 'MALE_NEUTERING',
+    '여(중성화)': 'FEMALE_NEUTERING',
+    '남': 'MALE',
+    '여': 'FEMALE',
+    '성별 없음': 'NON',
+  };
+  
   const typeMap = { 강아지: 'DOG', 고양이: 'CAT', 기타: 'OTHER' }; // `DOG`, `CAT`, `OTHER`
 
   // 데이터 불러오기
@@ -49,7 +56,6 @@ export default function OwnerPetEdit() {
         setAge(String(pet.age));
         setWeight(pet.weight);
         setGender(pet.gender);  // `MALE`, `FEMALE`, `NON`으로 매핑된 값 설정
-        setNeutered(pet.neutered); // `MALE_NEUTERING`, `FEMALE_NEUTERING`으로 매핑된 값 설정
         setType(pet.species); // `DOG`, `CAT`, `OTHER`로 매핑된 값 설정
 
         setSelectedImage(photoUrl);
@@ -62,7 +68,7 @@ export default function OwnerPetEdit() {
     fetchPetDetail();
   }, [id]);
 
-  const handleImageSelect = (event) => {
+  const handleImageSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       const imageUrl = URL.createObjectURL(file);
@@ -70,7 +76,7 @@ export default function OwnerPetEdit() {
       setSelectedFile(file);
       setIsDefaultImage(false);
     }
-    event.target.value = '';
+    event.target.value = '';  // Reset file input
   };
 
   const handleImageUpload = () => {
@@ -91,9 +97,8 @@ export default function OwnerPetEdit() {
         name,
         age: Number(age),
         weight,
-        gender: genderMap[gender],  // 변환된 gender 값 확인 (MALE, FEMALE, NON)
-        species: typeMap[type],      // 변환된 type 값 확인 (DOG, CAT, OTHER)
-        neutered,                   // 변환된 neutered 값 (MALE_NEUTERING, FEMALE_NEUTERING)
+        gender: gender,  
+        species: type,      
       };
 
       console.log("Pet Request:", petRequest); // 로그로 요청값 확인
@@ -147,33 +152,20 @@ export default function OwnerPetEdit() {
             <Input id="weight" label="무게" placeholder="0" value={weight} onChange={(e) => setWeight(e.target.value)} />
           </div>
 
-          <div className="flex gap-4">
-            <div className="w-full flex flex-col">
-              <label className="h4 mb-2 text-black">성별</label>
-              <SelectionDropdown
-                value={gender}
-                onChange={(val) => setGender(val)}
-                options={[
-                  { value: '남', label: '남' },
-                  { value: '여', label: '여' },
-                ]}
-                placeholder="성별을 선택해주세요"
-              />
-            </div>
-
-            <div className="w-full flex flex-col">
-              <label className="h4 mb-2 text-black">중성화 여부</label>
-              <SelectionDropdown
-                value={neutered}
-                onChange={(val) => setNeutered(val)}
-                options={[
-                  { value: 'MALE_NEUTERING', label: '남 (중성화)' },
-                  { value: 'FEMALE_NEUTERING', label: '여 (중성화)' },
-                  { value: 'NON', label: '중성화 안함' },
-                ]}
-                placeholder="중성화 여부 선택"
-              />
-            </div>
+          <div className="w-full flex flex-col">
+            <label className="h4 mb-2 text-black">중성화 여부</label>
+            <SelectionDropdown
+              value={neutered}
+              onChange={(val) => setNeutered(val)}
+              options={[
+                { value: 'MALE_NEUTERING', label: '남 (중성화)' },
+                { value: 'FEMALE_NEUTERING', label: '여 (중성화)' },
+                { value: 'NON', label: '성별 없음' },
+                { value: 'MALE', label: '남' },
+                { value: 'FEMALE', label: '여' },
+              ]}
+              placeholder="중성화 여부 선택"
+            />
           </div>
 
           <div className="flex flex-col">
