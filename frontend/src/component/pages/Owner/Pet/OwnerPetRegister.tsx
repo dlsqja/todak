@@ -47,12 +47,12 @@ export default function OwnerPetRegister() {
     try {
       // genderMap을 통해 결합된 성별 + 중성화 여부 처리
       const genderValue = genderMap[gender];
-
+      console.log("type",type)
       const petRequest = {
         name,
         age: parseInt(age),
         gender: genderValue, // 변환된 gender 값
-        species: typeMap[type], // 변환된 type 값
+        species: type, // 변환된 type 값
       };
 
       console.log('Pet Request:', petRequest); // 요청 값 확인

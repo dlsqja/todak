@@ -5,22 +5,31 @@ import { useNavigate } from 'react-router-dom';
 import Button from '@/component/button/Button';
 import CopyButton from '@/component/button/CopyButton';
 
-export default function OwnerPetTabInfo({ selectedPet, setPets, setSelectedPet }) {
+export default function OwnerPetTabInfo({ selectedPet, setSelectedPet, pets, setPets  }) {
   const navigate = useNavigate();
 
   const handleDelete = () => {
-    const confirmDelete = window.confirm(`정말 삭제할까요?`);
-    if (confirmDelete) {
-      const updated = (prev) => prev.filter((pet) => pet.id !== selectedPet.id);
-      setPets(updated);
-      setSelectedPet(null); // 이전 값 참조 필요 없음
-    }
-  };
+  const confirmDelete = window.confirm(`정말 삭제할까요?`);
+  if (confirmDelete) {
+    // 반려동물 삭제
+    const updatedPets = pets.filter((pet) => pet.petId !== selectedPet.petId);
+    
+    // pets 상태를 업데이트
+    setPets(updatedPets);
+
+    // selectedPet도 null로 설정 (선택된 반려동물이 없어야 하므로)
+    setSelectedPet(null);
+
+    // 삭제 후 페이지 리디렉션
+    navigate('/owner/pet'); // 삭제 후 다시 /owner/pet 페이지로 이동
+  }
+};
+
 
   const handleEdit = () => {
     navigate(`/owner/pet/edit/${selectedPet.petId}`, {
-  state: { pet: selectedPet }, 
-});
+      state: { pet: selectedPet }, 
+    });
   };
 
   return (
