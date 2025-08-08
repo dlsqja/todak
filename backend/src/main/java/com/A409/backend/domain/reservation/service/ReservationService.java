@@ -49,6 +49,9 @@ public class ReservationService {
         Reservation reservation = reservationReqeust.toEntity();
         reservation.setOwner(owner);
 
+        //TODO:: 최초 진료 기록 추가
+
+
         if(photo != null){
             try{
                 String url = s3Uploader.upload(photo,"reservation");
@@ -187,7 +190,6 @@ public class ReservationService {
                         .pet(reservation.getPet())
                         .reservation(reservation)
                         .hospital(reservation.getHospital())
-                        .isCompleted(false)
                         .owner(reservation.getOwner())
                         .vet(reservation.getVet())
                         .build();

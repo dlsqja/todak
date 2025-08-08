@@ -24,6 +24,7 @@ public class ReservationResponse {
     private String photo;
     private String description;
     private Subject subject;
+    private Boolean isFirst;
     private ReservationStatus status;
 
 
@@ -40,6 +41,7 @@ public class ReservationResponse {
                 .description(reservation.getDescription())
                 .subject(reservation.getSubject())
                 .status(reservation.getStatus())
+                .isFirst(reservation.getIsFirst())
                 .build();
     }
 
