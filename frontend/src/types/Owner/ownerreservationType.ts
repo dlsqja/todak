@@ -1,17 +1,5 @@
-import type OwnerResponse from "@/types/Owner/ownermypageType"
-import type Pet from "@/types/Owner/ownerpetType"
-
-export interface ReservationDetail {
-  ownerId: number
-  petId: number
-  hospitalId: number
-  vetId: number
-  reservationDay: string
-  reservationTime: number
-  description: string
-  subject: 'DENTAL' | 'DERMATOLOGY' | 'ORTHOPEDICS' | 'OPHTHALMOLOGY'
-  status: 'REQUESTED' | 'APPROVED' | 'REJECTED' | 'COMPLETED'
-}
+import type { OwnerResponse } from '@/types/Owner/ownermypageType';
+import type { Pet } from '@/types/Owner/ownerpetType';
 
 export interface OwnerReservationList {
   petResponse: PetResponse;
@@ -35,4 +23,18 @@ export interface ReservationsResponse {
   status: string;
   subject: string;
   vetName: string;
+}
+
+export interface ReservationDetail {
+  reservationId: number;
+  owner: OwnerResponse;
+  pet: Pet;
+  vetName: string;
+  hospitalName: string;
+  reservationDay: string;
+  reservationTime: number;
+  photo: string;
+  description: string;
+  subject: string;
+  status: string;
 }
