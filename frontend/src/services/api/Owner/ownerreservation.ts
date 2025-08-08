@@ -5,20 +5,18 @@ import type {} from '@/types/Owner/ownerreservationType';
 export const getReservations = async (): Promise<any> => {
   const response = await apiClient.get('/reservations/owner');
   return response.data.data;
+}
+
+/**
+ * 🟢 반려인 예약 상세 조회
+ * GET /reservations/owner/{reservation_id}
+ */
+export const getReservationDetail = async (
+  reservationId: number
+): Promise<ReservationResponse> => {
+  const res = await apiClient.get(`/reservations/owner/${reservationId}`);
+  return res.data?.data ?? res.data; // ← 래핑/비래핑 모두 대응
 };
-
-getReservations();
-
-// /**
-//  * 🟢 반려인 예약 상세 조회
-//  * GET /reservations/owner/{reservation_id}
-//  */
-// export const getReservationDetail = async (
-//   reservationId: number
-// ): Promise<ReservationResponse> => {
-//   const response = await apiClient.get(`/reservations/owner/${reservationId}`)
-//   return response.data
-// }
 
 // /**
 //  * 🟡 반려인 예약 신청
