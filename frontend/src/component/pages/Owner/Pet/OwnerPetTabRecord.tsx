@@ -1,69 +1,95 @@
+// OwnerPetTabRecord.tsx
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import SelectionDropdown from '@/component/selection/SelectionDropdown';
 import TreatmentRecordCard from '@/component/card/TreatmentRecordCard';
-import { getReservations } from '@/services/api/Owner/ownerreservation';
-import type { ReservationResponse } from '@/types/Owner/ownerreservationType';
+import { getTreatments } from '@/services/api/Owner/ownertreatment';
 import type { Pet } from '@/types/Owner/ownerpetType';
+
+type Subject = 'DENTAL' | 'DERMATOLOGY' | 'ORTHOPEDICS' | 'OPHTHALMOLOGY';
 
 interface OwnerPetTabRecordProps {
   selectedPet: Pet;
 }
 
+type UIRecord = {
+  id: number;
+  vetName: string;
+  hospitalName?: string;
+  subject: Subject;
+  treatmentDay: string;
+};
+
+// 🔧 순환 의존 방지: 필요할 때만 ownerreservation을 동적 로드
+async function buildHospitalMap() {
+  try {
+    const { getReservations } = await import('@/services/api/Owner/ownerreservation');
+    const resGroups = await getReservations(); // [{ petResponse, reservations }, ...]
+    const map = new Map<number, string>();
+    resGroups?.forEach((g: any) =>
+      g?.reservations?.forEach((r: any) => map.set(r.reservationId, r.hospitalName))
+    );
+    return map;
+  } catch (e) {
+    console.warn('병원명 맵 생성 실패, 병원명 미표시로 진행:', e);
+    return new Map<number, string>();
+  }
+}
+
 export default function OwnerPetTabRecord({ selectedPet }: OwnerPetTabRecordProps) {
   const [selectedSubject, setSelectedSubject] = useState('');
   const [selectedDate, setSelectedDate] = useState('');
-  const [records, setRecords] = useState<ReservationResponse[]>([]);
+  const [records, setRecords] = useState<UIRecord[]>([]);
   const navigate = useNavigate();
 
   useEffect(() => {
-  if (!selectedPet || !selectedPet.petId) return;
+    if (!selectedPet?.petId) return;
 
-  const fetchData = async () => {
-    try {
-      const data = await getReservations(); // [{ petResponse, reservations }, ...]
-      
-      // 1. 선택된 petId에 해당하는 항목만 찾기
-      const matched = data.find((entry) => entry.petResponse.petId === selectedPet.petId);
-      
-      // 2. 없으면 빈 배열 반환
-      const extractedRecords = matched?.reservations ?? [];
+    const fetchData = async () => {
+      try {
+        const [treats, hospitalMap] = await Promise.all([
+          getTreatments(),        // [{ petResponse, treatments }]
+          buildHospitalMap(),     // Map<reservationId, hospitalName>
+        ]);
 
-      // 3. 날짜 필터링용 가공 (reservationDay 추가)
-      const withDate = extractedRecords.map((r) => ({
-        ...r,
-        reservationDay: new Date(r.reservationTime).toISOString().slice(0, 10), // "YYYY-MM-DD"
-      }));
+        const matched = treats.find((e) => e.petResponse.petId === selectedPet.petId);
+        const rows: UIRecord[] = (matched?.treatments ?? []).map((t: any) => {
+          const day =
+            t?.reservationDay ??
+            (t?.treatmentInfo?.startTime ? t.treatmentInfo.startTime.slice(0, 10) : '');
 
-      setRecords(withDate);
-    } catch (error) {
-      console.error('예약 불러오기 실패:', error);
-    }
-  };
+          return {
+            id: t.reservationId,
+            vetName: t.vetName,
+            subject: t.subject,
+            treatmentDay: day,
+            hospitalName: t.hospitalName ?? hospitalMap.get(t.reservationId) ?? '-', // 보강
+          };
+        });
 
-  fetchData();
-}, [selectedPet]);
+        setRecords(rows);
+      } catch (e) {
+        console.error('진료 내역 불러오기 실패:', e);
+      }
+    };
 
+    fetchData();
+  }, [selectedPet]);
 
-
-  // 상세보기 페이지로 이동
   const handleClickDetail = (reservationId: number) => {
     navigate(`/owner/pet/treatment/detail/${reservationId}`);
   };
 
-  // 드롭다운 필터링
   const filtered = records.filter(
-    (r) =>
-      (!selectedSubject || r.subject === selectedSubject) &&
-      (!selectedDate || r.reservationDay === selectedDate)
+    (t) =>
+      (!selectedSubject || t.subject === selectedSubject) &&
+      (!selectedDate || t.treatmentDay === selectedDate)
   );
 
-  // 드롭다운 날짜 옵션 생성
-  const uniqueDates = Array.from(new Set(records.map((r) => r.reservationDay)));
+  const uniqueDates = Array.from(new Set(records.map((t) => t.treatmentDay))).filter(Boolean);
 
   return (
     <div className="space-y-6">
-      {/* 드롭다운 필터 */}
       <div className="flex gap-4 w-full">
         <div className="w-1/2">
           <SelectionDropdown
@@ -83,29 +109,23 @@ export default function OwnerPetTabRecord({ selectedPet }: OwnerPetTabRecordProp
           <SelectionDropdown
             value={selectedDate}
             onChange={setSelectedDate}
-            options={[
-              { value: '', label: '전체 날짜' },
-              ...uniqueDates.map((date) => ({ value: date, label: date })),
-            ]}
+            options={[{ value: '', label: '전체 날짜' }, ...uniqueDates.map((d) => ({ value: d, label: d }))]}
             placeholder="날짜 필터"
           />
         </div>
       </div>
 
-      {/* 진료 카드 리스트 */}
       <div className="space-y-4">
-        {filtered.length === 0 && (
-          <p className="text-center text-gray-400">진료 내역이 없습니다.</p>
-        )}
-        {filtered.map((r) => (
+        {filtered.length === 0 && <p className="text-center text-gray-400">진료 내역이 없습니다.</p>}
+        {filtered.map((t) => (
           <TreatmentRecordCard
-          key={r.reservationId}
-          doctorName={r.vetName}
-          hospitalName={r.hospitalName}
-          treatmentDate={r.reservationDay}
-          department={r.subject}
-          onClickDetail={() => handleClickDetail(r.reservationId)}
-        />
+            key={t.id}
+            doctorName={t.vetName}
+            hospitalName={t.hospitalName}
+            treatmentDate={t.treatmentDay}
+            department={t.subject}
+            onClickDetail={() => handleClickDetail(t.id)}
+          />
         ))}
       </div>
     </div>

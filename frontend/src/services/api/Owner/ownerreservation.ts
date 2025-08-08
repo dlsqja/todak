@@ -21,9 +21,9 @@ export const getReservations = async (): Promise<ReservationListResponse> => {
 export const getReservationDetail = async (
   reservationId: number
 ): Promise<ReservationResponse> => {
-  const response = await apiClient.get(`/reservations/owner/${reservationId}`)
-  return response.data
-}
+  const res = await apiClient.get(`/reservations/owner/${reservationId}`);
+  return res.data?.data ?? res.data; // ← 래핑/비래핑 모두 대응
+};
 
 /**
  * 🟡 반려인 예약 신청

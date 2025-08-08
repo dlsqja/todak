@@ -1,5 +1,5 @@
-import OwnerResponse from "@/types/Owner/ownermypageType"
-import Pet from "@/types/Owner/ownerpetType"
+import type OwnerResponse from "@/types/Owner/ownermypageType"
+import type Pet from "@/types/Owner/ownerpetType"
 
 export interface ReservationRequest {
   ownerId: number
