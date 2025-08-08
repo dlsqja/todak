@@ -1,4 +1,4 @@
-// src/api/pet.js
+// src/api/Owner/ownerpet.ts
 import apiClient from '@/plugins/axios';
 import axios from 'axios';
 
@@ -57,7 +57,6 @@ for (const [key, value] of formData.entries()) {
 };
 
 // 4. 반려동물 수정 (multipart/form-data)
-// 반려동물 수정
 export const updatePet = async ({ id, petRequest, photo }) => {
   const formData = new FormData();
 
@@ -96,3 +95,4 @@ export const getPets = async () => {
   const res = await apiClient.get('/pets');
   return res.data;
 };
+
