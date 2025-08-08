@@ -37,7 +37,7 @@ export default function VideoCall() {
   useEffect(() => {
     const wsProtocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
     const wsUrl =
-      wsProtocol === 'wss' ? `${wsProtocol}://${window.location.host}/ws` : `${wsProtocol}://localhost:8080/ws`;
+      wsProtocol === 'wss' ? `${wsProtocol}://${window.location.host}/ws` : `${wsProtocol}://localhost:8080/api/v1/ws`;
     // console.log('socket url:', wsUrl);
     const ws = new WebSocket(wsUrl);
     ws.onopen = () => {
