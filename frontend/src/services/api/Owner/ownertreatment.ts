@@ -2,14 +2,13 @@
 import apiClient from '@/plugins/axios';
 import type { OwnerTreatmentsByPet, TreatmentResponse } from '@/types/Owner/ownertreatmentType';
 
-export const getTreatments = async (): Promise<OwnerTreatmentsByPet[]> => {
+export const getTreatments = async () => {
   const res = await apiClient.get('/treatments/owner?type=1');
   return res.data?.data ?? [];
 };
 
-export const getTreatmentDetail = async (
-  treatmentId: number
-): Promise<TreatmentResponse | null> => {
+
+export const getTreatmentDetail = async (treatmentId: number) => {
   const buckets = await getTreatments();
 
   for (const bucket of buckets) {
