@@ -13,7 +13,6 @@ export default function OwnerSignup() {
   const [birth, setBirth] = useState('');
   const [authCode, setAuthCode] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [isPhoneAuth, setIsPhoneAuth] = useState(false);
 
   // 각 필드별 에러 상태 관리
   const [errors, setErrors] = useState({
@@ -114,7 +113,6 @@ export default function OwnerSignup() {
       const formattedValue = formatBirthDate(value);
       setBirth(formattedValue);
     }
-    if (fieldName === 'authCode') setAuthCode(value);
 
     // 실시간 유효성 검사
     validateField(
@@ -124,6 +122,11 @@ export default function OwnerSignup() {
   };
 
   const handleSubmit = async () => {
+    console.log('handleSubmit 호출됨');
+    console.log('name:', name, 'type:', typeof name);
+    console.log('phone:', phone, 'type:', typeof phone);
+    console.log('birth:', birth, 'type:', typeof birth);
+
     // 최종 유효성 검사
     validateField('name', name);
     validateField('phone', phone);
@@ -141,24 +144,27 @@ export default function OwnerSignup() {
       !birth.trim() ||
       !authCode.trim()
     ) {
+      console.log('유효성 검사 실패');
       return;
     }
 
-    setIsLoading(true);
-    try {
-      await authAPI.ownerSignup({
-        name: name.trim(),
-        phone: phone.trim(),
-        birth: birth.trim(),
-      });
+    console.log('유효성 검사 통과');
 
+    setIsLoading(true);
+
+    const response = await authAPI.ownerSignup({
+      name: name.trim(),
+      phone: Number(phone.trim()),
+      birth: Number(birth.trim()),
+    });
+
+    console.log('response', response);
+
+    if (response.success) {
       alert('회원가입이 완료되었습니다!');
       navigate('/owner/home');
-    } catch (error) {
-      console.error('회원가입 실패:', error);
+    } else {
       alert('회원가입에 실패했습니다. 다시 시도해주세요.');
-    } finally {
-      setIsLoading(false);
     }
   };
 

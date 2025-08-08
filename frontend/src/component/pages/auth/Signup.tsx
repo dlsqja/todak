@@ -76,9 +76,9 @@ function SignupPage() {
 
   return (
     <div>
-      <div className="flex flex-col items-center justify-center">
-        <h3 className="h3">화면 하단에서 본인의 역할을</h3>
-        <h3 className="h3">선택하여 이용해주세요</h3>
+      <div className="flex flex-col items-center justify-center pt-30">
+        <h3 className="h3 text-center">로그인을 원하는 역할을</h3>
+        <h3 className="h3 text-center">선택해주세요</h3>
       </div>
       <nav className="px-5 w-full flex justify-center gap-12 mt-11 border-b-2 border-gray-100">
         {navList.map((label, idx) => (
