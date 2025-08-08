@@ -24,6 +24,17 @@ const ownerRoutes = {
   element: <MobileLayout menuBar={<OwnerMenuBar />} />,
   children: [
     { path: 'home', element: <OwnerHome /> },
+    { path: 'pet', element: <OwnerPet /> },
+    { path: 'reservation', element: <OwnerReservationHome /> },
+    { path: 'treatment', element: <OwnerTreatment /> },
+    { path: 'mypage', element: <OwnerMyPage /> },
+  ],
+};
+
+const ownerRoutesWithoutMenu = {
+  path: '/owner',
+  element: <MobileLayout />, // menuBar prop 제거
+  children: [
     { path: 'home/guide', element: <OwnerHomeGuide /> },
     { path: 'home/hospital', element: <SelectHospitalPage /> },
     { path: 'home/vet', element: <SelectVetPage /> },
@@ -31,16 +42,16 @@ const ownerRoutes = {
     { path: 'home/form', element: <ApplyFormPage /> },
     { path: 'home/payment', element: <PaymentMethodPage /> },
     { path: 'home/apply-complete', element: <ApplyCompletePage /> },
-    { path: 'pet', element: <OwnerPet /> },
+
     { path: 'pet/register', element: <OwnerPetRegister /> },
     { path: 'pet/edit/:id', element: <OwnerPetEdit /> },
-    { path: 'pet/treatment/detail/:id', element: <TreatmentDetailPage  /> },
-    { path: 'reservation', element: <OwnerReservationHome /> },
+    { path: 'pet/treatment/detail/:id', element: <TreatmentDetailPage /> },
+
     { path: 'reservation/:reservationId', element: <OwnerReservationDetail /> },
-    { path: 'mypage', element: <OwnerMyPage /> },
-    { path: 'treatment', element: <OwnerTreatment /> },
+
+    { path: 'treatment/detail/:id', element: <OwnerTreatmentDetail /> },
     { path: 'treatment/rtc/:id', element: <OwnerTreatmentRTC /> },
   ],
 };
 
-export default ownerRoutes;
+export default { ownerRoutes, ownerRoutesWithoutMenu };
