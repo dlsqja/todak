@@ -19,8 +19,10 @@ const router = createBrowserRouter([
   authRoutes,
   ownerRoutes.ownerRoutes,
   ownerRoutes.ownerRoutesWithoutMenu,
-  vetRoutes,
-  staffRoutes,
+  vetRoutes.vetRoutes,
+  vetRoutes.vetRoutesWithoutMenu,
+  staffRoutes.staffRoutes,
+  staffRoutes.staffRoutesWithoutMenu,
 ]);
 
 export default router;

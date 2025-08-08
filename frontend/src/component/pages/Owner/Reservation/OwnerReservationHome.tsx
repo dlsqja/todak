@@ -47,18 +47,6 @@ export default function OwnerReservationHome() {
     getReservationList();
   }, []);
 
-  // // 반려동물 선택할 때마다 그 동물의 전체 예약 내역 조회
-  // useEffect(() => {
-  //   if (data.current != undefined) {
-  //     console.log('data:', data);
-  //     const allReservation = data.current[selectedPet];
-  //     if (allReservation != undefined) {
-  //       setReservations(allReservation.reservations);
-  //       console.log('reservations:', reservations);
-  //     }
-  //   }
-  // }, [selectedPet]);
-
   // 대기, 승인, 반려 탭 누를때마다 필터링한 데이터 저장
   useEffect(() => {
     if (data.current.length > 0 && selectedPet >= 0) {
@@ -70,7 +58,20 @@ export default function OwnerReservationHome() {
         setReservations(filteredReservations);
       }
     }
-  }, [currentTab, selectedPet]);
+  }, [currentTab]);
+
+  useEffect(() => {
+    setCurrentTab('대기');
+    if (data.current.length > 0 && selectedPet >= 0) {
+      const allReservation = data.current[selectedPet];
+      if (allReservation?.reservations) {
+        const filteredReservations = allReservation.reservations.filter(
+          (res) => statusMapping[res.status] === currentTab,
+        );
+        setReservations(filteredReservations);
+      }
+    }
+  }, [selectedPet]);
 
   return (
     <div>
