@@ -63,7 +63,10 @@ public class SecurityConfig {
                                 "/webjars/**",
                                 "/signup/**",
                                 "/staffs/mypage/**",
-                                "/ws"
+                                "/api/v1/ws/",
+                                "/api/v1/ws/**",
+                                "/ws/**",
+                                "/ws/"
                         ).permitAll()
                         .requestMatchers("/api/v1/public/**").permitAll()
                         .requestMatchers("/public/**").permitAll()
@@ -98,7 +101,7 @@ public class SecurityConfig {
         // Vite ↔ React DevServer ↔ CRA 등 포트만 다른 경우도 모두 추가하세요.
         // ------------------------------------------------------------------
         config.setAllowedOriginPatterns(List.of(
-                "http://localhost:5173"           // Vite
+                "*"
         ));
 
         // ------------------------------------------------------------------

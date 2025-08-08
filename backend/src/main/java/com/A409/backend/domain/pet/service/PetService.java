@@ -1,5 +1,6 @@
 package com.A409.backend.domain.pet.service;
 
+import ch.qos.logback.core.net.ObjectWriter;
 import com.A409.backend.domain.pet.dto.PetRequest;
 import com.A409.backend.domain.pet.dto.PetResponse;
 import com.A409.backend.domain.pet.entity.OwnerPet;
@@ -105,9 +106,16 @@ public class PetService {
         ownerPetRepository.save(ownerPet);
     }
 
+
     public void registerPetByCode(Long userId,String petCode){
         log.info(petCode);
+
         Pet findPet = petRepository.findPetByPetCode(petCode).orElseThrow();
+
+        if(ownerPetRepository.existsByOwner_OwnerIdAndPet_PetId(userId, findPet.getPetId())) {
+            throw new CustomException(ErrorCode.USER_PET_DUPLICATED);
+        }
+
         Owner owner = Owner.builder()
                 .ownerId(userId)
                 .build();
