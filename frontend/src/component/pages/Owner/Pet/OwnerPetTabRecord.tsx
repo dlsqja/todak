@@ -5,6 +5,7 @@ import SelectionDropdown from '@/component/selection/SelectionDropdown';
 import TreatmentRecordCard from '@/component/card/TreatmentRecordCard';
 import { getTreatments } from '@/services/api/Owner/ownertreatment';
 import type { Pet } from '@/types/Owner/ownerpetType';
+import { subjectmapping } from '@/utils/subjectMapping'; // ✅ 추가
 
 type Subject = 'DENTAL' | 'DERMATOLOGY' | 'ORTHOPEDICS' | 'OPHTHALMOLOGY';
 
@@ -123,7 +124,7 @@ export default function OwnerPetTabRecord({ selectedPet }: OwnerPetTabRecordProp
             doctorName={t.vetName}
             hospitalName={t.hospitalName}
             treatmentDate={t.treatmentDay}
-            department={t.subject}
+            department={subjectmapping[t.subject] ?? t.subject} // ✅ 한글 변환 적용
             onClickDetail={() => handleClickDetail(t.id)}
           />
         ))}
