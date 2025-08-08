@@ -1,7 +1,7 @@
 // src/types/Owner/ownerpetType.ts
 
 // 성별 타입
-export type PetGender = 'MALE' | 'FEMALE' | 'NON';
+export type PetGender = 'MALE' | 'FEMALE' | 'NON' | 'MALE_NEUTERING' | 'FEMALE_NEUTERING';
 
 // 종 타입
 export type PetSpecies = 'DOG' | 'CAT' | 'OTHER';
@@ -20,6 +20,6 @@ export interface Pet {
 export interface PetRequest {
   name: string;
   species: PetSpecies;
-  gender: PetGender;
+  gender: PetGender;       // 성별 (성별과 중성화 여부가 결합된 값으로 받음)
   age: number;
 }

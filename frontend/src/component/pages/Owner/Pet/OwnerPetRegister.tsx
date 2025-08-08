@@ -15,15 +15,21 @@ export default function OwnerPetRegister() {
   const [name, setName] = useState('');
   const [age, setAge] = useState('');
   const [weight, setWeight] = useState(''); // 아직 사용되지 않지만 보존
-  const [gender, setGender] = useState('');
-  const [neutered, setNeutered] = useState(''); // 아직 사용되지 않지만 보존
+  const [gender, setGender] = useState('');  // 성별 + 중성화 여부
   const [type, setType] = useState('');
 
   const fileInputRef = useRef<HTMLInputElement | null>(null); // file input에 접근하기 위한 ref
 
-  // gender / species enum 변환
-  const genderMap = { 남: 'MALE', 여: 'FEMALE', '': 'NON' };
-  const typeMap = { 강아지: 'DOG', 고양이: 'CAT', 기타: 'OTHER' };
+  // 성별 + 중성화 여부 결합
+  const genderMap = {
+    '남(중성화)': 'MALE_NEUTERING',
+    '여(중성화)': 'FEMALE_NEUTERING',
+    '남': 'MALE',
+    '여': 'FEMALE',
+    '성별 없음': 'NON',
+  };
+
+  const typeMap = { 강아지: 'DOG', 고양이: 'CAT', 기타: 'OTHER' }; // `DOG`, `CAT`, `OTHER`
 
   const handleImageChange = (newImage: File | null) => {
     setImage(newImage); // 선택된 이미지 파일을 상태로 저장
@@ -39,12 +45,17 @@ export default function OwnerPetRegister() {
 
   const handleSubmit = async () => {
     try {
+      // genderMap을 통해 결합된 성별 + 중성화 여부 처리
+      const genderValue = genderMap[gender];
+
       const petRequest = {
         name,
         age: parseInt(age),
-        gender: genderMap[gender],
-        species: typeMap[type],
+        gender: genderValue, // 변환된 gender 값
+        species: typeMap[type], // 변환된 type 값
       };
+
+      console.log('Pet Request:', petRequest); // 요청 값 확인
 
       await registerPet({ petRequest, photo: image }); // ✅ API 호출
       alert('등록되었습니다');
@@ -127,21 +138,9 @@ export default function OwnerPetRegister() {
                 <option value="">선택</option>
                 <option value="남">남</option>
                 <option value="여">여</option>
-              </select>
-            </div>
-            <div className="flex flex-col w-full">
-              <label htmlFor="neutered" className="h4 mb-2 text-black">
-                중성화 여부
-              </label>
-              <select
-                id="neutered"
-                className="w-full h-12 rounded-[12px] border border-gray-400 px-4 p text-black"
-                value={neutered}
-                onChange={(e) => setNeutered(e.target.value)}
-              >
-                <option value="">선택</option>
-                <option value="예">예</option>
-                <option value="아니오">아니오</option>
+                <option value="남(중성화)">남(중성화)</option>
+                <option value="여(중성화)">여(중성화)</option>
+                <option value="성별 없음">성별 없음</option>
               </select>
             </div>
           </div>
@@ -157,9 +156,9 @@ export default function OwnerPetRegister() {
               onChange={(e) => setType(e.target.value)}
             >
               <option value="">반려동물 종을 선택해주세요</option>
-              <option value="강아지">강아지</option>
-              <option value="고양이">고양이</option>
-              <option value="기타">기타</option>
+              <option value="DOG">강아지</option>
+              <option value="CAT">고양이</option>
+              <option value="OTHER">기타</option>
             </select>
           </div>
         </div>

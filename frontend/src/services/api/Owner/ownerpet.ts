@@ -39,22 +39,24 @@ export const registerPet = async ({ petRequest, photo }) => {
     formData.append('photo', photo);
   }
 
-//   확인용 로그
-for (const [key, value] of formData.entries()) {
-    console.log('${key}:', value)
-}
+  // 확인용 로그
+  for (const [key, value] of formData.entries()) {
+    console.log(`${key}:`, value);
+  }
 
-  console.log('formData', formData)
+  console.log('formData', formData);
   console.log('✅ baseURL 확인:', apiClient.defaults.baseURL);
 
+  // 요청 경로 수정: /owner/pets로 변경
   const res = await apiClient.post('/pets', formData, {
-  headers: {
-    'Content-Type': 'multipart/form-data',
-  },
-});
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
 
   return res.data;
 };
+
 
 // 4. 반려동물 수정 (multipart/form-data)
 export const updatePet = async ({ id, petRequest, photo }) => {
