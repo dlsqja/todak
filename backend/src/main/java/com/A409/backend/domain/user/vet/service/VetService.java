@@ -36,9 +36,9 @@ public class VetService {
 
         List<VetResponse>  vetResponses = vetRepository.findVetsByHospital_HospitalId(hospitalId).stream().map(VetResponse::toResponse).toList();
         for (VetResponse vet : vetResponses) {
-
-            List<WorkingHourDto> workingHours = workingHourRepository.findAllByVet_VetId(vet.getVetId());
-            vet.setWorkingHours(workingHours);
+            List<WorkingHour> workingHours = workingHourRepository.findAllByVet_VetId(vet.getVetId());
+            List<WorkingHourDto> workingHourDtos = workingHours.stream().map(WorkingHourDto::toResponse).toList();
+            vet.setWorkingHours(workingHourDtos);
         }
 
         return vetResponses;

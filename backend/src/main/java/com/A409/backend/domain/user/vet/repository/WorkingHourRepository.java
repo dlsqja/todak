@@ -12,5 +12,5 @@ public interface WorkingHourRepository extends JpaRepository<WorkingHour,Long> {
 
     List<WorkingHour> findAllByVet(Vet vet);
 
-    List<WorkingHourDto> findAllByVet_VetId(Long vetId);
+    List<WorkingHour> findAllByVet_VetId(Long vetId);
 }
