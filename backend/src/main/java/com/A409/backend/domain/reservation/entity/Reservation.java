@@ -61,7 +61,7 @@ public class Reservation {
     @Column(nullable = false)
     private ReservationStatus status;
 
-    @Column(name = "is_first",nullable = false)
+    @Column(name = "is_revisit",nullable = false)
     @Builder.Default
     private Boolean isRevisit = false;
 }
