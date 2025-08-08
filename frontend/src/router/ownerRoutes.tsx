@@ -34,7 +34,7 @@ const ownerRoutes = {
     { path: 'pet', element: <OwnerPet /> },
     { path: 'pet/register', element: <OwnerPetRegister /> },
     { path: 'pet/edit/:id', element: <OwnerPetEdit /> },
-    { path: 'pet/treatment/detail/:id', element: <OwnerTreatmentDetail /> },
+    { path: 'pet/treatment/detail/:id', element: <TreatmentDetailPage  /> },
     { path: 'reservation', element: <OwnerReservationHome /> },
     { path: 'reservation/:reservationId', element: <OwnerReservationDetail /> },
     { path: 'mypage', element: <OwnerMyPage /> },

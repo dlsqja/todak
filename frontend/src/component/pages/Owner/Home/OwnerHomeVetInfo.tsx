@@ -5,6 +5,7 @@ import SingleContent from '@/component/text/SingleContent';
 import TimeSelectionButton from '@/component/selection/TimeSelectionButton';
 import Button from '@/component/button/Button';
 import { useTimeStore } from '@/store/timeStore';
+
 export default function VetInfoPage() {
   const location = useLocation();
   const navigate = useNavigate();
