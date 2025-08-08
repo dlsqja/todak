@@ -160,19 +160,22 @@ export default function SelectHospitalPage() {
         )}
 
         {/* 전체 병원(참고용 목록) */}
-        <div className="mt-8">
-          <h4 className="p text-black mb-3">병원 목록</h4>
-          <div className="bg-green-100 rounded-xl overflow-hidden">
-            {hospitals.map(h => (
-              <SearchListItem
-                key={h.hospitalId}
-                name={h.name}
-                description={h.location}
-                onClick={() => handleHospitalClick(h)}
-              />
-            ))}
+        {!search.trim() && (
+          <div className="mt-8">
+            <h4 className="p text-black mb-3">병원 목록</h4>
+            <div className="bg-green-100 rounded-xl overflow-hidden">
+              {hospitals.map(h => (
+                <SearchListItem
+                  key={h.hospitalId}
+                  name={h.name}
+                  description={h.location}
+                  onClick={() => handleHospitalClick(h)}
+                />
+              ))}
+            </div>
           </div>
-        </div>
+        )}
+
       </div>
     </div>
   );

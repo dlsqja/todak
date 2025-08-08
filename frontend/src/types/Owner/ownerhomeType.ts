@@ -1,36 +1,35 @@
-// 병원 공개 리스트 (/public/hospitals)
+// 병원: /public/hospitals
 export interface HospitalPublic {
   hospitalId: number;
   name: string;
   profile?: string;
-  location: string;  // 주소
-  contact?: string;  // 전화 등
+  location: string;   // 주소
+  contact?: string;
 }
 
-// 특정 병원 수의사 목록 (/public/hospitals/{hospital_id}/vets)
-export interface VetPublic {
-  vetId: number;
-  name: string;
-  profile?: string;
-  photo?: string;
-}
-
-// 자동완성 결과 (/public/autocomplete/{keyword})
+// 자동완성: /public/autocomplete/{keyword}
 export interface HospitalSuggest {
   hospitalId: number;
   name: string;
   location: string;
 }
 
-// (선택) 병원 소속 수의사 근무시간 (/hospitals/working-hours)
-export type DayKey = 'MON'|'TUE'|'WED'|'THU'|'FRI'|'SAT'|'SUN';
-export interface WorkingHour {
+// 요일/근무시간 공통
+export type DayCode = 'MON'|'TUE'|'WED'|'THU'|'FRI'|'SAT'|'SUN';
+
+export interface WorkingHourResponse {
   workingId: number;
-  day: DayKey;
-  startTime: string; // "HH:mm" 식으로 내려옴 (API 스키마는 byte지만 문자열 취급)
-  endTime: string;
+  day: DayCode;
+  startTime: number; // 0~47 (30분 인덱스)
+  endTime: number;   // 0~47
 }
-export interface VetWorkingHourResponse {
+
+// 수의사: /public/hospitals/{hospital_id}/vets
+// ↑ 서버가 근무시간을 같이 내려주므로 필드 추가
+export interface VetPublic {
   vetId: number;
-  workingHourResponseList: WorkingHour[];
+  name: string;
+  profile?: string;
+  photo?: string;
+  workingHours?: WorkingHourResponse[]; // <= 여기!
 }
