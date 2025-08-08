@@ -1,6 +1,6 @@
 // src/api/auth.ts
 import apiClient from '@/plugins/axios';
-import type { LoginResponse, KakaoLoginParams } from '@/types/auth';
+import type { LoginResponse, KakaoLoginParams, OwnerSignup, VetSignup, StaffSignup } from '@/types/auth';
 
 export const authAPI = {
   // 카카오 로그인
@@ -12,19 +12,19 @@ export const authAPI = {
   },
 
   // owner 회원가입
-  ownerSignup: async (userData: { name: string; phone: string; birth: string }) => {
+  ownerSignup: async (userData: OwnerSignup) => {
     const response = await apiClient.post('/public/signup/owner', userData);
     return response.data;
   },
 
   // vet 회원가입
-  vetSignup: async (userData: { hospital_code: string; name: string; license_number: string }) => {
+  vetSignup: async (userData: VetSignup) => {
     const response = await apiClient.post('/public/signup/vet', userData);
     return response.data;
   },
 
   // staff 회원가입
-  staffSignup: async (userData: { hospital_code: string; name: string }) => {
+  staffSignup: async (userData: StaffSignup) => {
     const response = await apiClient.post('/public/signup/staff', userData);
     return response.data;
   },
