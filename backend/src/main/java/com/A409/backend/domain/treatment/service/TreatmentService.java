@@ -122,20 +122,19 @@ public class TreatmentService {
         return TreatmentResponse.toVetResponse(treatment);
     }
 
-    public List<Map<String,Object>> getRencetTreatments(Long ownerId){
+    public List<VetResponse> getRencetTreatments(Long ownerId){
 
         List<Treatment> treatmentList = treatmentRepository.findAllByOwner_OwnerId(ownerId);
-        List<Map<String, Object>> result = new ArrayList<>();
+        List<VetResponse> result = new ArrayList<>();
 
         for (Treatment treatment : treatmentList) {
 
             List<WorkingHourDto> workingHours = workingHourService.getWorkingHourByVetId(treatment.getVet().getVetId());
 
-            Map<String, Object> map = new HashMap<>();
-            map.put("vetInfo", VetResponse.toResponse(treatment.getVet()));
-            map.put("workingHour", workingHours);
+            VetResponse vetResponse = VetResponse.toResponse(treatment.getVet());
+            vetResponse.setWorkingHours(workingHours);
 
-            result.add(map);
+            result.add(vetResponse);
         }
 
 
