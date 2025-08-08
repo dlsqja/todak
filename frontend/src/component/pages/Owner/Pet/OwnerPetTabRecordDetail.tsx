@@ -12,41 +12,56 @@ export default function TreatmentDetailPage() {
   const [record, setRecord] = useState<TreatmentResponse | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (!id) return;
+  // OwnerPetTabRecordDetail.tsx (TreatmentDetailPage)
+useEffect(() => {
+  if (!id) return;
 
-    (async () => {
-      try {
-        // id = reservationId 이므로 같은 값으로 두 API 병렬 호출
-        const [treat, reservation] = await Promise.all([
-          getTreatmentDetail(Number(id)),
-          getReservationDetail(Number(id)),
-        ]);
-
-        console.log('치료!!!!!!',treat)
-        if (!treat) {
-          setRecord(null);
-          return;
-        }
-
-        // 병원명/수의사명은 예약 상세에서 보강(없을 때만)
+  (async () => {
+    try {
+      const [treat, reservation] = await Promise.all([
+        getTreatmentDetail(Number(id)),
+        getReservationDetail(Number(id)),
+      ])
+      
+      if (!treat) {
+        // ✅ 목록에서 못 찾는 경우: 예약 상세로 화면을 채움(시간/요약은 비워둠)
         setRecord({
-          ...treat,
-          hospitalName: treat.hospitalName ?? reservation.hospitalName,
-          vetName: treat.vetName || reservation.vetName,
+          treatmentId: reservation.reservationId,
           reservation: {
-            photo: reservation.photo,
-            description: reservation.description,
+            photo: reservation.photo ?? undefined,
+            description: reservation.description.trim() ?? '',
           },
-        });
-      } catch (e) {
-        console.error('상세 불러오기 실패:', e);
-        
-      } finally {
-        setLoading(false);
+          vetName: reservation.vetName ?? '',
+          pet: reservation.pet,                    // ← 타입 보강했으니 사용 가능
+          hospitalName: reservation.hospitalName,  // ← 예약에서 보강
+          subject: reservation.subject as any,
+          startTime: '',                           // 목록에서만 오는 값이라 비움
+          endTime: '',
+          aiSummary: '',                           // 없으면 빈 문자열
+        })
+        return
       }
-    })();
-  }, [id]);
+
+      // ✅ 정상 케이스: treat에 예약 정보 보강
+      setRecord({
+        ...treat,
+        hospitalName: treat.hospitalName ?? reservation.hospitalName,
+        vetName: treat.vetName || reservation.vetName,
+        reservation: {
+          photo: reservation.photo ?? undefined,
+          description: reservation.description?.trim() || undefined,
+        },
+      })
+
+    } catch (e) {
+      console.error('상세 불러오기 실패:', e)
+      setRecord(null)
+    } finally {
+      setLoading(false)
+    }
+  })()
+}, [id])
+
 
   if (loading) return <div className="text-center mt-20">불러오는 중...</div>;
   if (!record) return <div className="text-center mt-20">진료 기록을 찾을 수 없습니다.</div>;
@@ -127,7 +142,8 @@ const formattedTime =
 
           {/* 오른쪽 텍스트 */}
           <p className="p text-black leading-relaxed whitespace-pre-wrap flex-1">
-            {record.reservation?.description ?? '증상이 입력되지 않았습니다.'}
+            {(record.reservation?.description ?? '').trim() || '증상이 입력되지 않았습니다.'}
+
           </p>
         </div>
       </div>

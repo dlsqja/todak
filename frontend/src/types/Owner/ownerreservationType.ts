@@ -2,15 +2,17 @@ import type OwnerResponse from "@/types/Owner/ownermypageType"
 import type Pet from "@/types/Owner/ownerpetType"
 
 export interface ReservationDetail {
-  ownerId: number
-  petId: number
-  hospitalId: number
-  vetId: number
+  reservationId: number
   reservationDay: string
   reservationTime: number
-  description: string
   subject: 'DENTAL' | 'DERMATOLOGY' | 'ORTHOPEDICS' | 'OPHTHALMOLOGY'
   status: 'REQUESTED' | 'APPROVED' | 'REJECTED' | 'COMPLETED'
+  photo: string | null
+  description: string
+  vetName: string
+  hospitalName?: string
+  owner?: OwnerResponse
+  pet: Pet
 }
 
 export interface OwnerReservationList {
