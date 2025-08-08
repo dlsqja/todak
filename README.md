@@ -1,6 +1,12 @@
 # 토닥
 > 반려인의 병원 방문 번거로움을 해결하기 위한 비대면 의료 서비스
 
+## 현재 진행상황
+- [토닥](https://i13a409.p.ssafy.io/)
+- [Swagger](http://i13a409.p.ssafy.io:8081/api/v1/swagger-ui/index.html#/)
+- [팀 노션](https://www.notion.so/22c188d2e1888012a8ecfe2b19f1a7ea)
+
+
 # 목차
 - [서비스 개요](#서비스-개요)
 - [주요 기능](#주요-기능)
@@ -49,8 +55,6 @@
 - 수의사별 예약 가능 시간 관리
 - 예약 신청 목록에서 승인 / 반려 선택
 
-
-
 # 🛠 기술 스텍
 
 ### Frontend
@@ -79,7 +83,7 @@
 - CI/CD: Jenkins
 - Cloud: AWS ,S3 Bucket
 
-# 📐 아키텍처 구성
+# 📐 아키텍처 구성 
 ### 시스템 아키텍처
 ![alt text](images/System%20architecture.png)
 
@@ -228,9 +232,6 @@ src/
                 │
                 └── global/
 ```
-
-
-
 
 # 👥 팀원 소개
 | 이대연 | 김유성 | 송인범 | 안성수 | 전윤지 | 한진경 |
