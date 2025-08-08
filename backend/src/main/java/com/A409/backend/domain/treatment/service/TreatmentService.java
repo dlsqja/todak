@@ -8,6 +8,10 @@ import com.A409.backend.domain.treatment.dto.TreatementResponse;
 import com.A409.backend.domain.treatment.entity.Treatment;
 import com.A409.backend.domain.treatment.entity.TreatmentResponse;
 import com.A409.backend.domain.treatment.repository.TreatmentRepository;
+import com.A409.backend.domain.user.vet.dto.VetResponse;
+import com.A409.backend.domain.user.vet.dto.WorkingHourDto;
+import com.A409.backend.domain.user.vet.entity.WorkingHour;
+import com.A409.backend.domain.user.vet.service.WorkingHourService;
 import com.A409.backend.global.enums.ErrorCode;
 import com.A409.backend.global.exception.CustomException;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +28,7 @@ public class TreatmentService {
 
     private final TreatmentRepository treatmentRepository;
     private final PetService petService;
+    private final WorkingHourService workingHourService;
 
     public void saveAISummary(Long treatmentId,String summary){
 
@@ -115,5 +120,26 @@ public class TreatmentService {
             throw  new CustomException(ErrorCode.ACCESS_DENIED);
         }
         return TreatmentResponse.toVetResponse(treatment);
+    }
+
+    public List<Map<String,Object>> getRencetTreatments(Long ownerId){
+
+        List<Treatment> treatmentList = treatmentRepository.findAllByOwner_OwnerId(ownerId);
+        List<Map<String, Object>> result = new ArrayList<>();
+
+        for (Treatment treatment : treatmentList) {
+
+            List<WorkingHourDto> workingHours = workingHourService.getWorkingHourByVetId(treatment.getVet().getVetId());
+
+            Map<String, Object> map = new HashMap<>();
+            map.put("vetInfo", VetResponse.toResponse(treatment.getVet()));
+            map.put("workingHour", workingHours);
+
+            result.add(map);
+        }
+
+
+
+        return result;
     }
 }

@@ -42,4 +42,19 @@ public class OwnerTreatmentController {
 
         return APIResponse.ofSuccess(treatments);
     }
+
+    @Operation(summary = "최근 진료 의사 리스트")
+    @ApiResponse(responseCode = "200",
+            content = @Content(
+                    mediaType = "application/json",
+                    array = @ArraySchema(schema = @Schema(implementation = Map.class))
+            )
+    )
+    @GetMapping("/recent")
+    public APIResponse<?> getTreatments(@AuthenticationPrincipal User user){
+
+        List<Map<String,Object>> treatments = treatmentService.getRencetTreatments(user.getId());
+
+        return APIResponse.ofSuccess(treatments);
+    }
 }
