@@ -1,11 +1,12 @@
 import apiClient from '@/plugins/axios';
+import type { OwnerReservationList } from '@/types/Owner/ownerreservationType';
 import type {ReservationDetail} from '@/types/Owner/ownerreservationType';
 
-//  반려인 예약 목록 조회
-export const getReservations = async (): Promise<any> => {
+//  예약 목록 조회
+export const getReservations = async (): Promise<OwnerReservationList> => {
   const response = await apiClient.get('/reservations/owner');
   return response.data.data;
-}
+};
 
 /**
  * 🟢 반려인 예약 상세 조회

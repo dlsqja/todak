@@ -1,7 +1,4 @@
-// 주소 : owner/pet/register
-
-import '@/styles/main.css';
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import BackHeader from '@/component/header/BackHeader';
@@ -14,7 +11,7 @@ import { registerPet } from '@/services/api/Owner/ownerpet'; // ✅ API import
 export default function OwnerPetRegister() {
   const navigate = useNavigate();
 
-  const [image, setImage] = useState(null); // ✅ string → File(null 가능)
+  const [image, setImage] = useState<File | null>(null); // File 객체로 저장
   const [name, setName] = useState('');
   const [age, setAge] = useState('');
   const [weight, setWeight] = useState(''); // 아직 사용되지 않지만 보존
@@ -22,9 +19,23 @@ export default function OwnerPetRegister() {
   const [neutered, setNeutered] = useState(''); // 아직 사용되지 않지만 보존
   const [type, setType] = useState('');
 
-  // ✅ gender / species enum 변환
+  const fileInputRef = useRef<HTMLInputElement | null>(null); // file input에 접근하기 위한 ref
+
+  // gender / species enum 변환
   const genderMap = { 남: 'MALE', 여: 'FEMALE', '': 'NON' };
   const typeMap = { 강아지: 'DOG', 고양이: 'CAT', 기타: 'OTHER' };
+
+  const handleImageChange = (newImage: File | null) => {
+    setImage(newImage); // 선택된 이미지 파일을 상태로 저장
+  };
+
+  const handleImageUpload = () => {
+    fileInputRef.current?.click(); // 파일 선택 창 열기
+  };
+
+  const handleRemoveImage = () => {
+    setImage(null); // 선택된 이미지 제거
+  };
 
   const handleSubmit = async () => {
     try {
@@ -50,16 +61,26 @@ export default function OwnerPetRegister() {
       <div className="px-7">
         {/* 이미지 등록 */}
         <div className="flex flex-col items-center space-y-2 pb-6">
-          <ImageInputBox src={image} onChange={(newImg) => setImage(newImg)} />
+          <ImageInputBox
+            src={image ? URL.createObjectURL(image) : ''} // 이미지 미리보기
+            onChange={handleImageChange} // 이미지 선택 시 상태 업데이트
+          />
+          <input
+            type="file"
+            ref={fileInputRef} // 파일 선택에 사용할 input
+            onChange={(e) => handleImageChange(e.target.files?.[0] ?? null)} // 파일 선택 후 처리
+            accept="image/*" // 이미지 파일만 허용
+            className="hidden" // input은 숨겨놓고 버튼을 통해 클릭
+          />
           <button
             className="text-white bg-green-300 px-4 py-1 rounded-xl h5"
-            onClick={() => alert('사진 등록 기능은 ImageInputBox에서 처리됩니다.')}
+            onClick={handleImageUpload} // 사진 등록 버튼 클릭 시 파일 선택 창 열기
           >
             사진 등록
           </button>
           <button
             className="text-gray-400 bg-gray-100 px-4 py-1 rounded-xl h5"
-            onClick={() => setImage(null)}
+            onClick={handleRemoveImage} // 사진 제거 버튼 클릭 시 이미지 제거
           >
             사진 제거
           </button>
