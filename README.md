@@ -10,7 +10,7 @@
 
 
 # 📝서비스 개요
-병원 방문이 어려운 바쁜 반려인들을 위한  반려견 비대면 의료 서비스입니다.
+병원 방문이 어려운 바쁜 반려인들을 위한 반려동물 비대면 의료 서비스입니다.
 
 ###  페르소나
 **구름이를 키우는 반려인 '이반려'**
@@ -45,6 +45,9 @@
 - 수의사별 예약 가능 시간 관리
 - 예약 신청 목록에서 승인 / 반려 선택
 
+### 목업
+![alt text](image.png)
+
 # 🛠 기술 스텍
 
 ### Frontend
@@ -55,10 +58,113 @@
 - 라우팅: React Router Dom
 - 개발 도구: Vit
 
-# 아키텍처 구성
+# 📐 아키텍처 구성
 ### 시스템 아키텍처
-![alt text](image-3.png)
+![alt text](images/System%20architecture.png)
 
 ### ERD
-![alt text](image.png)
+![alt text](images/ERD.png)
+
+# 폴더 구조
+```
+src/
+ └── component/
+     ├── button/
+     │    ├── Button.tsx
+     │    └── CopyButton.tsx
+     ├── card/
+     │    ├── OwnerTreatmentSimpleCard.tsx
+     │    ├── PetProfileCard.tsx
+     │    ├── RemoteTreatmentCard.tsx
+     │    ├── SearchListItem.tsx
+     │    ├── TreatmentRecordCard.tsx
+     │    ├── TreatmentSlideCard.tsx
+     │    └── TreatmentSlideList.tsx
+     ├── header/
+     │    ├── BackHeader.tsx
+     │    └── SimpleHeader.tsx
+     ├── icon/
+     │    ├── AnimalIcon.tsx
+     │    ├── Dropdown_Arrow.tsx
+     │    ├── HomelIcon.tsx
+     │    ├── HospitalIcon.tsx
+     │    ├── kakao_login.png
+     │    ├── MyPageIcon.tsx
+     │    ├── PlusIcon.tsx
+     │    ├── RecordIcon.tsx
+     │    ├── ReservationIcon.tsx
+     │    ├── ReservationManagementIcon.tsx
+     │    ├── TreatmentIcon.tsx
+     │    └── VetManagementIcon.tsx
+     ├── menubar/
+     │    ├── OwnerMenuBar.tsx
+     │    ├── StaffMenuBar.tsx
+     │    └── VetMenuBar.tsx
+     ├── navbar/
+     │    ├── TabGroupPet.tsx
+     │    ├── TabGroupRoles.tsx
+     │    ├── TabGroupTime.tsx
+     │    ├── TabGroupTreatList.tsx
+     │    └── TabGroupWaiting.tsx
+     ├── pages/
+     │    ├── Owner/
+     │    │    ├── OwnerHome.tsx
+     │    │    ├── OwnerHomeApplyForm.tsx
+     │    │    ├── OwnerHomeSelectHospital.tsx
+     │    │    ├── OwnerHomeSelectVet.tsx
+     │    │    ├── OwnerHomeVetInfo.tsx
+     │    │    ├── OwnerPetEdit.tsx
+     │    │    ├── OwnerPetHome.tsx
+     │    │    ├── OwnerPetRegister.tsx
+     │    │    └── petMockList.ts
+     │    ├── Reservation/
+     │    │    ├── OwnerReservationDetail.tsx
+     │    │    └── OwnerReservationHome.tsx
+     │    └── Treatment/
+     │         ├── OwnerTreatment.tsx
+     │         ├── OwnerTreatmentDetail.tsx
+     │         ├── OwnerMyPage.tsx
+     │         └── OwnerTreatment.tsx
+     ├── selection/
+     │    ├── FilterDropdown.tsx
+     │    ├── SelectionDropdown.tsx
+     │    ├── TimeSelectionButton.tsx
+     │    ├── TimeSelectionDropdown.tsx
+     ├── state/
+     │    ├── StatusBadge.tsx
+     │    └── ReservationTimeTable.tsx
+     ├── table/
+     │    └── ReservationTimeTable.tsx
+     ├── template/
+     │    ├── AiSummaryForVet.tsx
+     │    └── ModalTemplate.tsx
+     ├── text/
+     │    ├── ImageContent.tsx
+     │    ├── MultipleContent.tsx
+     │    ├── MultipleContentApi.tsx
+     │    ├── SingleContent.tsx
+     │    ├── SummaryContent.tsx
+     │    └── TreatmentListContent.tsx
+ ├── fonts/
+ ├── layouts/
+ ├── router/
+ ├── RTC/
+ ├── store/
+ ├── styles/
+ ├── App.css
+ ├── App.tsx
+ ├── index.css
+ └── main.tsx
+ ```
+
+
+
+
+# 👥 팀원 소개
+| 이대연 | 김유성 | 송인범 | 안성수 | 전윤지 | 한진경 |
+|-------------|--------|--------|--------|--------|--------|
+| FE, 팀장         | BE     | BE     | BE     | FE     | FE     |
+
+
+
 
