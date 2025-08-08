@@ -16,12 +16,20 @@ const vetRoutes = {
     { path: 'home', element: <VetHome /> },
     { path: 'hospital', element: <VetHospital /> },
     { path: 'treatment', element: <VetTreatment /> },
+    { path: 'records', element: <VetRecord /> },
+    { path: 'mypage', element: <VetMyPage /> },
+
+  
+  ],
+};
+const vetRoutesWithoutMenu = {
+  path: '/vet',
+  element: <MobileLayout />,
+  children: [
     { path: 'treatment/detail/:reservationId', element: <VetTreatmentDetail /> },
     { path: 'treatment/rtc/:reservationId', element: <VetTreatmentRTC /> },
-    { path: 'records', element: <VetRecord /> },
     { path: 'records/detail/:treatmentId', element: <VetRecordDetail /> },
-    { path: 'mypage', element: <VetMyPage /> },
   ],
 };
 
-export default vetRoutes;
+export default { vetRoutes, vetRoutesWithoutMenu };
