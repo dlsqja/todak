@@ -16,7 +16,7 @@ import OwnerTreatmentDetail from '@/component/pages/Owner/Treatment/OwnerTreatme
 import PaymentMethodPage from '@/component/pages/Owner/Home/OwnerHomePaymentMethod';
 import ApplyCompletePage from '@/component/pages/Owner/Home/OwnerHomeApplyComplete';
 import OwnerTreatmentRTC from '@/component/pages/Owner/Treatment/OwnerTreatmentRTC';
-import OwnerHomeGuide from '@/component/pages/Owner/Home/OwnerHomeGuide';
+import OwnerHomeGuide from '@/component/pages/HomeGuidePage';
 import TreatmentDetailPage from '@/component/pages/Owner/Pet/OwnerPetTabRecordDetail';
 
 const ownerRoutes = {
@@ -33,9 +33,8 @@ const ownerRoutes = {
 
 const ownerRoutesWithoutMenu = {
   path: '/owner',
-  element: <MobileLayout />, // menuBar prop 제거
+  element: <MobileLayout />, // menuBar 제거
   children: [
-    { path: 'home/guide', element: <OwnerHomeGuide /> },
     { path: 'home/hospital', element: <SelectHospitalPage /> },
     { path: 'home/vet', element: <SelectVetPage /> },
     { path: 'home/vet-info', element: <VetInfoPage /> },

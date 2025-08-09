@@ -19,12 +19,17 @@ type CardPet = {
 const speciesKo = { DOG: '강아지', CAT: '고양이', OTHER: '기타' } as const;
 const genderToText = (g: PetGender) => {
   switch (g) {
-    case 'MALE': return '남';
-    case 'FEMALE': return '여';
-    case 'MALE_NEUTERING': return '남(중성화)';
-    case 'FEMALE_NEUTERING': return '여(중성화)';
+    case 'MALE':
+      return '남';
+    case 'FEMALE':
+      return '여';
+    case 'MALE_NEUTERING':
+      return '남(중성화)';
+    case 'FEMALE_NEUTERING':
+      return '여(중성화)';
     case 'NON':
-    default: return '성별 없음';
+    default:
+      return '성별 없음';
   }
 };
 
@@ -38,14 +43,16 @@ export default function OwnerHome() {
     (async () => {
       try {
         const data: ApiPet[] = await getMyPets();
-        setPetList((data ?? []).map(p => ({
-          id: p.petId,
-          name: p.name,
-          genderText: genderToText(p.gender),
-          breedAge: `${speciesKo[p.species]} ${p.age ?? 0}세`,
-          weight: '-',
-          raw: p,
-        })));
+        setPetList(
+          (data ?? []).map((p) => ({
+            id: p.petId,
+            name: p.name,
+            genderText: genderToText(p.gender),
+            breedAge: `${speciesKo[p.species]} ${p.age ?? 0}세`,
+            weight: '-',
+            raw: p,
+          })),
+        );
       } catch (e) {
         console.warn('펫 목록 불러오기 실패:', e);
         setPetList([]);
@@ -79,10 +86,38 @@ export default function OwnerHome() {
   };
 
   return (
-    <motion.div className="pb-10" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-      <motion.h3 className="h3 mx-7 pt-13">ㅇㅇㅇ님 반가워요!</motion.h3>
-      <motion.h3 className="h3 mx-7 mb-2">비대면 진료가 처음이신가요?</motion.h3>
-      <motion.button onClick={() => navigate('/owner/home/guide')} className="h5 mx-7 px-5 py-1 rounded-full inline-block bg-green-300 text-green-100">
+    <motion.div
+      className="pb-10"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+    >
+      {/* 상단 텍스트 */}
+      <motion.h3
+        className="h3 mx-7 pt-13"
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1, duration: 0.4 }}
+      >
+        ㅇㅇㅇ님 반가워요!
+      </motion.h3>
+
+      <motion.h3
+        className="h3 mx-7 mb-2"
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2, duration: 0.4 }}
+      >
+        비대면 진료가 처음이신가요?
+      </motion.h3>
+
+      <motion.button
+        onClick={() => navigate('/owner/home/guide')}
+        className="h5 mx-7 px-5 py-1 rounded-full inline-block bg-green-300 text-green-100 cursor-pointer"
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ delay: 0.3, duration: 0.3 }}
+      >
         비대면 진료 가이드
       </motion.button>
 
@@ -94,15 +129,19 @@ export default function OwnerHome() {
           ref={scrollRef}
           onScroll={handleScroll}
           className="overflow-x-auto snap-x snap-mandatory scroll-smooth hide-scrollbar pt-3 pb-4 px-0"
-          initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2, duration: 0.3 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.2, duration: 0.3 }}
         >
           <div className="flex w-full h-full">
             {petList.map((pet, index) => (
               <motion.div
                 key={pet.id}
-                className="w-full flex-shrink-0 snap-start"   // ← 내부 padding 제거
+                className="w-full flex-shrink-0 snap-start" // ← 내부 padding 제거
                 onClick={() => handlePetClick(pet)}
-                initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.3 + index * 0.05, duration: 0.25 }}
+                initial={{ opacity: 0, scale: 0.98 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.3 + index * 0.05, duration: 0.25 }}
                 whileTap={{ scale: 0.97 }}
               >
                 {/* 카드 자체에 마진만 살짝 */}
@@ -120,13 +159,20 @@ export default function OwnerHome() {
         </motion.div>
 
         {/* 인디케이터: 슬라이드 개수와 정확히 동일 + 범위 클램프 */}
-        <motion.div className="flex justify-center gap-4 mb-8" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3, duration: 0.2 }}>
+        <motion.div
+          className="flex justify-center gap-4 mb-8"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.3, duration: 0.2 }}
+        >
           {Array.from({ length: totalSlides }).map((_, idx) => (
             <button
               key={idx}
               onClick={() => scrollToIndex(idx)}
               aria-label={`slide ${idx + 1}`}
-              className={`w-2 h-2 rounded-full cursor-pointer transition-all ${idx === currentIndex ? 'bg-green-300 scale-125' : 'bg-green-200'}`}
+              className={`w-2 h-2 rounded-full cursor-pointer transition-all ${
+                idx === currentIndex ? 'bg-green-300 scale-125' : 'bg-green-200'
+              }`}
             />
           ))}
         </motion.div>
