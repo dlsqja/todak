@@ -31,7 +31,7 @@
 ### 서비스 화면
 ![alt text](images/목업.png)
 
-# 🪧주요 기능        
+# ⚡주요 기능        
 
 ### 비대면 진료
 - **비대면 진료** : RTC를 활용한 실시간 1:1 비대면 진료 
@@ -58,7 +58,7 @@
 
 ### Frontend
 - Language: TypeScript
-- Framework: React 18
+- Framework: React 19
 - UI/스타일링: TailwindCSS
 - 상태 관리: Zustand
 - 라우팅: React Router Dom
