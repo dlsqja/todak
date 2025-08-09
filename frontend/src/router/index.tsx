@@ -7,16 +7,25 @@ import authRoutes from '@/router/authRoutes';
 import MobileLayout from '@/layouts/MobileLayout';
 import MainPage from '@/component/pages/MainPage';
 import MainLayout from '@/layouts/MainLayout';
+import HomeGuidePage from '@/component/pages/HomeGuidePage';
 
 const mainRoutes = {
   path: '/',
   element: <MainLayout />,
   children: [{ path: '', element: <MainPage /> }],
+
+};
+
+const homeGuideRoutes = {
+  path: '/home/guide',
+  element: <MobileLayout />,
+  children: [{ path: '', element: <HomeGuidePage /> }],
 };
 
 const router = createBrowserRouter([
   mainRoutes,
   authRoutes,
+  homeGuideRoutes,
   ownerRoutes.ownerRoutes,
   ownerRoutes.ownerRoutesWithoutMenu,
   vetRoutes.vetRoutes,
