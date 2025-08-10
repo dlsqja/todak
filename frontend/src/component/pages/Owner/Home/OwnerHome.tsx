@@ -112,7 +112,7 @@ export default function OwnerHome() {
       </motion.h3>
 
       <motion.button
-        onClick={() => navigate('/owner/home/guide')}
+        onClick={() => navigate('/home/guide')}
         className="h5 mx-7 px-5 py-1 rounded-full inline-block bg-green-300 text-green-100 cursor-pointer"
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
