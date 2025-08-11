@@ -51,7 +51,12 @@ VALUES (1, 'MON', 9, 18),
 INSERT INTO reservation (owner_id, pet_id, hospital_id, vet_id, reservation_day, reservation_time, photo, description,
                          subject, status,is_revisit)
 VALUES (1, 1, 1, 1, '2025-08-01', 10, NULL, '정기검진', 'DENTAL', 'COMPLETED',FALSE),
-       (1, 1, 1, 1, '2025-08-02', 10, NULL, '정기검진', 'OPHTHALMOLOGY', 'REQUESTED',TRUE)	;
+       (1, 1, 1, 1, '2025-08-02', 10, NULL, '정기검진', 'OPHTHALMOLOGY', 'REQUESTED',TRUE),
+       (1, 2, 1, 1, '2025-08-03', 10, NULL, '정기검진', 'DERMATOLOGY', 'REJECTED',FALSE),
+       (1, 3, 1, 1, '2025-08-04', 10, NULL, '정기검진', 'ORTHOPEDICS', 'APPROVED',FALSE);
+
+INSERT INTO rejection (reservation_id, reason)
+VALUES (3,'환자가 진상임 없음');
 
 INSERT INTO first_treatment (hospital_id, pet_id, owner_id)
 VALUES (1, 1, 1);
