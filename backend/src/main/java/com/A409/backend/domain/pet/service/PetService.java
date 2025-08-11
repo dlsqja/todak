@@ -138,4 +138,11 @@ public class PetService {
         }
         ownerPetRepository.deleteByPet_petId(petId); //수정
     }
+
+    public String getPetCode(Long ownerId, Long petId){
+        if(!ownerPetRepository.existsByOwner_OwnerIdAndPet_PetId(ownerId, petId)) {
+            throw new CustomException(ErrorCode.RESOURCE_NOT_FOUND);
+        }
+        return petRepository.findPetByPetId(petId).orElseThrow(() -> new CustomException(ErrorCode.RESOURCE_NOT_FOUND)).getPetCode();
+    }
 }

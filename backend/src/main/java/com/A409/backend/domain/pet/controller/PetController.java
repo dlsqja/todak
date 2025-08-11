@@ -91,4 +91,12 @@ public class PetController {
         petService.disconnectPet(user.getId(), petId);
         return APIResponse.ofSuccess(null);
     }
+
+    @Operation(summary = "반려동물 코드 조회")
+    @GetMapping("/code/{petId}")
+    public APIResponse<?> getPetByCode(
+            @AuthenticationPrincipal User user,
+            @PathVariable("petId") Long petId){
+        return APIResponse.ofSuccess(petService.getPetCode(user.getId(), petId));
+    }
 }
