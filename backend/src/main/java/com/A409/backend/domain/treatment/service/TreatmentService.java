@@ -43,12 +43,35 @@ public class TreatmentService {
 
         List<Treatment> treatmentList = new ArrayList<>();
         List<Map<String, Object>> result = new ArrayList<>();
+        List<PetResponse> petList = petService.getMyPets(ownerId);
+
         if(type==0){
             //진료 대기 목록
-            treatmentList = treatmentRepository.findAllByOwner_OwnerIdAndIsCompleted(ownerId,false);
+            for(PetResponse pet:petList){
+                treatmentList = treatmentRepository.findAllByOwner_OwnerIdAndIsCompletedAndPet_PetId(ownerId,false, pet.getPetId());
+                List<Map<String, Object>> treatmentsList  = treatmentList.stream()
+                        .map(treatments -> {
+                            Map<String, Object> map = new HashMap<>();
+                            map.put("reservationId",treatments.getReservation().getReservationId());
+                            map.put("vetName",treatments.getVet().getName());
+                            map.put("reservationDay", treatments.getReservation().getReservationDay());
+                            map.put("reservationTime", treatments.getReservation().getReservationTime());
+                            map.put("reservationDescription", treatments.getReservation().getDescription());
+                            map.put("photo", treatments.getPet().getPhoto());
+                            map.put("subject", treatments.getReservation().getSubject());
+                            return map;
+                        })
+                        .toList();
+
+                Map<String, Object> map = new HashMap<>();
+                map.put("petResponse", pet);
+                map.put("treatments", treatmentsList);
+
+                result.add(map);
+            }
+
         }
         else if(type==1){
-            List<PetResponse> petList = petService.getMyPets(ownerId);
 
             for(PetResponse pet : petList){
 
