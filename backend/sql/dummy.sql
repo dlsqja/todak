@@ -56,7 +56,7 @@ VALUES (1, 1, 1, 1, '2025-08-01', 10, NULL, '정기검진', 'DENTAL', 'COMPLETED
        (1, 3, 1, 1, '2025-08-04', 10, NULL, '정기검진', 'ORTHOPEDICS', 'APPROVED',FALSE);
 
 INSERT INTO rejection (reservation_id, reason)
-VALUES (3,'환자가 진상임 없음');
+VALUES (3,'환자가 진상임');
 
 INSERT INTO first_treatment (hospital_id, pet_id, owner_id)
 VALUES (1, 1, 1);

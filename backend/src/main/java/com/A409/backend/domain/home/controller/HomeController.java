@@ -95,6 +95,7 @@ public class HomeController {
     }
 
     @PostMapping("/audio/{treatment_id}")
+    @LogExecutionTime
     public APIResponse<?> uploadAudio(@PathVariable("treatment_id") Long treatmentId, @RequestParam("file") MultipartFile file) {
         if (file.isEmpty()) {
             return APIResponse.ofFail(ErrorCode.INVALID_ERROR,"파일이 유효하지 않습니다");
