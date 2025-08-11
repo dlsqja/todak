@@ -1,9 +1,13 @@
+// src/component/selection/TimeSelectionButton.tsx
+// (기존 파일 교체)
 // 현재 선택된 시간을 store에 저장하고 관리
 import { useTimeStore } from '@/store/timeStore';
 
 interface TimeSelectionButtonProps {
-  start_time: string;
-  end_time: string;
+  start_time: string;           // "HH:mm"
+  end_time: string;             // "HH:mm"
+  /** workingHours - closingHours 로 계산된 실제 예약 가능 슬롯(HH:mm) */
+  available_times?: string[];
 }
 
 const timeList = Array.from({ length: 48 }, (_, i) => {
@@ -12,70 +16,66 @@ const timeList = Array.from({ length: 48 }, (_, i) => {
   return `${hour}:${minute}`;
 });
 
-export default function TimeSelection({ start_time, end_time }: TimeSelectionButtonProps) {
+const toMinutes = (hhmm: string) => {
+  const [h, m] = hhmm.split(':').map(Number);
+  return h * 60 + m;
+};
+
+export default function TimeSelection({
+  start_time,
+  end_time,
+  available_times,
+}: TimeSelectionButtonProps) {
   const selectedTime = useTimeStore((state) => state.selectedTime);
   const setSelectedTime = useTimeStore((state) => state.setSelectedTime);
 
-  console.log('진료 신청서에 선택한 시간:', selectedTime);
-
-  // 현재 시간 구하기
+  // 현재 시간
   const now = new Date();
-  const nowHour = now.getHours();
-  const nowMinute = now.getMinutes();
-  const nowTotal = nowHour * 60 + nowMinute;
+  const nowTotal = now.getHours() * 60 + now.getMinutes();
 
-  // start_time, end_time을 분 단위로 변환
-  const [startHour, startMinute] = start_time.split(':').map(Number);
-  const [endHour, endMinute] = end_time.split(':').map(Number);
-  const startTotal = startHour * 60 + startMinute;
-  const endTotal = endHour * 60 + endMinute;
+  // 범위 계산
+  const startTotal = toMinutes(start_time);
+  const endTotal = toMinutes(end_time);
 
-  // 시작 시간과 현재 시간 중 더 늦은 시간부터 end_time까지 필터링
-  let validStart: number;
-  if (startTotal <= nowTotal) {
-    validStart = nowTotal;
-  } else {
-    validStart = startTotal;
-  }
+  // 시작 시간과 현재 시간 중 더 늦은 시간부터 end_time까지
+  const validStart = Math.max(startTotal, nowTotal);
 
-  const filteredTimeList = timeList.filter((time) => {
-    const [hour, minute] = time.split(':').map(Number);
-    const total = hour * 60 + minute;
+  // 1) 기본 필터: start~end, 현재 시각 이후
+  const baseFiltered = timeList.filter((time) => {
+    const total = toMinutes(time);
     return total >= validStart && total <= endTotal;
   });
+
+  // 2) available_times가 넘어오면 교집합으로 추가 필터링(= closing 제거)
+  const setAvail = new Set((available_times ?? []).map(String)); // 안전 변환
+  const finalSlots =
+    available_times && available_times.length > 0
+      ? baseFiltered.filter((t) => setAvail.has(t))
+      : baseFiltered;
 
   return (
     <div>
       <div
-        className=" flex gap-2 
-      hide-scrollbar 
-      overflow-x-auto
-       whitespace-nowrap 
-       py-2 
-       focus:outline-none 
-       hover:outline-none"
+        className="flex gap-2 hide-scrollbar overflow-x-auto whitespace-nowrap py-2 focus:outline-none hover:outline-none"
       >
-        {filteredTimeList.length === 0 ? (
+        {finalSlots.length === 0 ? (
           <div>선택 가능한 시간이 없습니다.</div>
         ) : (
-          filteredTimeList.map((time) => (
+          finalSlots.map((time) => (
             <button
               key={time}
               onClick={() => setSelectedTime(selectedTime === time ? '' : time)}
-              className={`px-4 py-2 rounded-3xl
-                ${
-                  selectedTime === time
-                    ? 'bg-green-300 text-white h4'
-                    : 'border border-gray-500 text-black cursor-pointer p-2 p'
-                }`}
+              className={`px-4 py-2 rounded-3xl ${
+                selectedTime === time
+                  ? 'bg-green-300 text-white h4'
+                  : 'border border-gray-500 text-black cursor-pointer p-2 p'
+              }`}
             >
               {time}
             </button>
           ))
         )}
       </div>
-      {/* 현재 선택된 시간 확인용 - 지워도 됨 */}
-      {/* <div>{selectedTime ? `선택된 시간: ${selectedTime}` : '시간을 선택하세요.'}</div> */}
     </div>
   );
 }
