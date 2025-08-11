@@ -26,7 +26,7 @@ const RemoteTreatmentCard: React.FC<RemoteTreatmentCardProps> = ({
   onTreatClick,
 }) => {
   return (
-    <div className="w-full h-full bg-green-100 rounded-[12px] shadow-[0px_5px_15px_rgba(0,0,0,0.08)] px-6 py-4 flex flex-col justify-between">
+    <div className="w-full h-full bg-gray-50 rounded-[12px] shadow-[0px_5px_15px_rgba(0,0,0,0.08)] px-6 py-4 flex flex-col justify-between">
       {/* 상단: 이미지 + 이름/정보 + 시간/과 */}
       <div className="flex justify-between">
         <div className="flex gap-4 items-center">

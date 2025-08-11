@@ -75,7 +75,7 @@ export default function OwnerReservationHome() {
 
   return (
     <div>
-      <div className="sticky top-0 z-10 bg-green-100">
+      <div className="sticky top-0 z-10 bg-gray-50">
         <SimpleHeader text="나의 예약" />
         {/* 반려동물 선택 */}
         <div className="flex gap-4 pt-6 px-7 overflow-x-auto hide-scrollbar">

@@ -10,7 +10,7 @@ const SimpleHeader: React.FC<SimpleHeaderProps> = ({ text }) => {
       className="
       h4
         w-full h-16
-        bg-green-100
+        bg-gray-50
         flex items-center justify-center
         px-4
         sticky top-0 z-50

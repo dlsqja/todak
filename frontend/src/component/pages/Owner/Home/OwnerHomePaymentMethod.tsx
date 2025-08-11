@@ -9,7 +9,7 @@ export default function PaymentMethodPage() {
   const navigate = useNavigate()
 
   return (
-    <div className="min-h-screen bg-green-100 flex flex-col">
+    <div className="min-h-screen bg-gray-50 flex flex-col">
       <BackHeader text="결제 수단 선택" />
 
       <div className="px-7 py-6 flex-1 overflow-y-auto flex flex-col gap-6">

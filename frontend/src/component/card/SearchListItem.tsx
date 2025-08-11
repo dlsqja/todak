@@ -9,7 +9,7 @@ interface SearchListItemProps {
 const SearchListItem: React.FC<SearchListItemProps> = ({ name, description, onClick }) => {
   return (
     <div
-      className="flex items-center px-0 py-3 bg-green-100 w-full cursor-pointer"
+      className="flex items-center px-0 py-3 bg-gray-50 w-full cursor-pointer"
       onClick={onClick}
     >
       {/* 동그라미 영역 */}

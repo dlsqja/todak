@@ -32,6 +32,10 @@ export default function VetInfoPage() {
 
   // 수의사 선택이 안 넘어왔으면: 병원 첫 번째 수의사(workingHours 포함) 불러오기
   useEffect(() => {
+    if (vet) {
+    console.log("🐾 수의사 데이터:", vet);
+    console.log("🕒 근무 시간:", vet.workingHours);
+  }
     if (vet?.vetId) return;
     if (!hospital?.hospitalId) return;
 
@@ -73,7 +77,7 @@ export default function VetInfoPage() {
   };
 
   return (
-    <div className="min-h-screen bg-green-100 flex flex-col">
+    <div className="min-h-screen bg-gray-50 flex flex-col">
       <BackHeader text="수의사 정보" />
 
       <div className="flex-1 overflow-y-auto px-7 py-6 flex flex-col gap-3">
@@ -110,7 +114,7 @@ export default function VetInfoPage() {
         </div>
       </div>
 
-      <div className="px-7 bg-green-100">
+      <div className="px-7 bg-gray-50">
         <Button color="green" text="진료 신청서 작성하러 가기" onClick={handleSubmit} />
       </div>
     </div>

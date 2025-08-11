@@ -124,7 +124,7 @@ export default function SelectHospitalPage() {
         {/* 최근 방문한 병원 */}
         <div className="mt-8">
           <h4 className="p text-black mb-3">최근 방문한 병원</h4>
-          <div className="bg-green-100 rounded-xl overflow-hidden">
+          <div className="bg-gray-50 rounded-xl overflow-hidden">
             {recents.length === 0 && (
               <div className="p-4 text-gray-400">최근 방문한 병원이 없습니다.</div>
             )}
@@ -143,7 +143,7 @@ export default function SelectHospitalPage() {
         {search.trim() && (
           <div className="mt-6">
             <h4 className="p text-black mb-3">검색 결과</h4>
-            <div className="bg-green-100 rounded-xl overflow-hidden">
+            <div className="bg-gray-50 rounded-xl overflow-hidden">
               {suggests.length === 0 && (
                 <div className="p-4 text-gray-400">검색 결과가 없습니다.</div>
               )}
@@ -163,7 +163,7 @@ export default function SelectHospitalPage() {
         {!search.trim() && (
           <div className="mt-8">
             <h4 className="p text-black mb-3">병원 목록</h4>
-            <div className="bg-green-100 rounded-xl overflow-hidden">
+            <div className="bg-gray-50 rounded-xl overflow-hidden">
               {hospitals.map(h => (
                 <SearchListItem
                   key={h.hospitalId}
