@@ -51,8 +51,15 @@ export default function OwnerPetTabInfo({ selectedPet, setSelectedPet, pets, set
           <p className="p">
             {selectedPet?.gender === 'MALE' ? '남'
             : selectedPet?.gender === 'FEMALE' ? '여'
-            : '미선택'}
+            : selectedPet?.gender === 'MALE_NEUTERING' ? '남(중성화)'
+            : selectedPet?.gender === 'FEMALE_NEUTERING' ? '여(중성화)'
+            : selectedPet?.gender === 'NON' ? '성별없음' : ''}
           </p>
+        </div>
+        <div className="flex justify-between">
+          <p className="p text-brown-300">체중</p>
+          <p className="p">{selectedPet.weight}kg</p>
+
         </div>
         <div className="flex justify-between">
           <p className="p text-brown-300">동물 종류</p>
