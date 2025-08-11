@@ -1,23 +1,32 @@
 import React, { useEffect, useState } from 'react';
 import Button from '@/component/button/Button';
-import { useParams } from 'react-router-dom';
+import { useParams, useLocation } from 'react-router-dom';
 import BackHeader from '@/component/header/BackHeader';
 import ImageInputBox from '@/component/input/ImageInputBox';
-import { getReservationDetail } from '@/services/api/Owner/ownerreservation';
+import { getReservationDetail, getReservationRejectDetail } from '@/services/api/Owner/ownerreservation';
 import type { ReservationDetail } from '@/types/Owner/ownerreservationType';
 
 import { subjectmapping } from '@/utils/subjectMapping';
 import { timeMapping } from '@/utils/timeMapping';
 import { speciesMapping } from '@/utils/speciesMapping';
-import { genderMapping } from '@/utils/genderMapping';
 import { statusMapping } from '@/utils/statusMapping';
 
 export default function OwnerReservationDetail() {
   const [detail, setDetail] = useState<ReservationDetail>();
   const { reservationId } = useParams<{ reservationId: string }>();
-
+  const { isRejected } = useLocation().state || {};
+  const [rejectDetail, setRejectDetail] = useState<{ reason: string }>();
   useEffect(() => {
     if (reservationId) {
+      if (isRejected) {
+        const getRejectDetail = async () => {
+          const rejectDetail = await getReservationRejectDetail(Number(reservationId));
+          console.log('rejectDetail:', rejectDetail);
+          setRejectDetail(rejectDetail);
+        };
+        getRejectDetail();
+      }
+
       // reservationId로 상세 정보 조회
       const reservationDetail = async (reservationId: number) => {
         const detail = await getReservationDetail(Number(reservationId));
@@ -77,9 +86,15 @@ export default function OwnerReservationDetail() {
             {detail.reservationDay} | <span className="p">{timeMapping[detail.reservationTime]}</span>
           </div>
         </div>
+        {isRejected && rejectDetail && (
+          <div className="flex flex-col border-b-1 border-gray-100 pb-4 gap-2">
+            <div className="h4">반려 사유</div>
+            <div className="p">{rejectDetail.reason}</div>
+          </div>
+        )}
         <div className="flex flex-col border-b-1 border-gray-100 pb-4 gap-2 ">
           <div className="h4">증상</div>
-          <div>{detail.photo && <ImageInputBox src={detail.photo} stroke="border-2 border-green-300" />}</div>
+          <div>{detail.photo && <ImageInputBox src={detail.photo} stroke="border-5 border-green-200" />}</div>
           <div className="p">{detail.description}</div>
         </div>
       </section>
