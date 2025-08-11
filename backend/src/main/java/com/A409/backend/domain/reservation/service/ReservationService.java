@@ -233,4 +233,8 @@ public class ReservationService {
 
         return RejectionResponse.toResponse(rejectionRepository.findByReservation_ReservationId(reservationId));
     }
+    public RejectionResponse rejectionResponseByOwner(Long reservationId){
+
+        return RejectionResponse.toResponse(rejectionRepository.findByReservation_ReservationId(reservationId));
+    }
 }
