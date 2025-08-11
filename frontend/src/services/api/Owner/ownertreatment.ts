@@ -3,7 +3,7 @@ import apiClient from '@/plugins/axios';
 import type { OwnerTreatmentsByPet, TreatmentResponse, OwnerTreatmentItem } from '@/types/Owner/ownertreatmentType';
 
 // 비대면 진료 대기 목록
-export const getTreatmentWaitingList = async (): Promise<OwnerTreatmentItem[]> => {
+export const getTreatmentWaitingList = async (): Promise<OwnerTreatmentsByPet[]> => {
   const res = await apiClient.get('/treatments/owner?type=0');
   console.log('reswait:', res);
   return res.data?.data ?? [];
