@@ -32,6 +32,9 @@ export default function OwnerPetTabInfo({ selectedPet, setSelectedPet, pets, set
     });
   };
 
+  console.log(selectedPet);
+  console.log(Object.keys(selectedPet));
+
   return (
     <>
       <div className="space-y-3 bg-white p-4">
@@ -45,11 +48,19 @@ export default function OwnerPetTabInfo({ selectedPet, setSelectedPet, pets, set
         </div>
         <div className="flex justify-between">
           <p className="p text-brown-300">성별</p>
-          <p className="p">{selectedPet.gender}</p>
+          <p className="p">
+            {selectedPet?.gender === 'MALE' ? '남'
+            : selectedPet?.gender === 'FEMALE' ? '여'
+            : '미선택'}
+          </p>
         </div>
         <div className="flex justify-between">
           <p className="p text-brown-300">동물 종류</p>
-          <p className="p">{selectedPet.species}</p>
+          <p className="p">
+            {selectedPet?.species === 'DOG' ? '강아지'
+            : selectedPet?.species === 'CAT' ? '고양이'
+            : '미선택'}
+           </p>
         </div>
         <div className="flex justify-between items-center">
           <p className="p text-brown-300">등록 코드</p>

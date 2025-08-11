@@ -38,7 +38,7 @@ export default function OwnerPetEdit() {
     '성별 없음': 'NON',
   };
   
-  const typeMap = { 강아지: 'DOG', 고양이: 'CAT', 기타: 'OTHER' }; // `DOG`, `CAT`, `OTHER`
+  const typeMap = { 강아지: 'DOG', 고양이: 'CAT', 기타: 'OTHER' };
 
   // 데이터 불러오기
   useEffect(() => {
