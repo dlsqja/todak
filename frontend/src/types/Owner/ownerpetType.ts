@@ -15,11 +15,13 @@ export interface Pet {
   photo: string;           // 이미지 URL
   gender: PetGender;       // 성별
   age: number;             // 나이
+  weight: number;          // 체중
 }
 
 export interface PetRequest {
   name: string;
   species: PetSpecies;
-  gender: PetGender;       // 성별 (성별과 중성화 여부가 결합된 값으로 받음)
+  gender: PetGender;      
   age: number;
+  weight: number;
 }

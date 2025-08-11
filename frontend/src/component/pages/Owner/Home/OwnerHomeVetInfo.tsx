@@ -7,11 +7,15 @@ import TimeSelectionButton from '@/component/selection/TimeSelectionButton';
 import Button from '@/component/button/Button';
 import { useTimeStore } from '@/store/timeStore';
 
-import { getVetsByHospitalId } from '@/services/api/Owner/ownerhome';
+import { getVetsByHospitalId, getVetClosingHours } from '@/services/api/Owner/ownerhome';
 import type { VetPublic, WorkingHourResponse } from '@/types/Owner/ownerhomeType';
 import { timeMapping } from '@/utils/timeMapping';
 
 const dayMap = ['SUN','MON','TUE','WED','THU','FRI','SAT'] as const;
+
+// 🔹 보조 함수(페이지 내부용): 구간 인덱스 만들기
+const buildIndices = (startIdx: number, endIdx: number) =>
+  Array.from({ length: Math.max(0, endIdx - startIdx) }, (_, i) => startIdx + i);
 
 export default function VetInfoPage() {
   const location = useLocation();
@@ -27,15 +31,12 @@ export default function VetInfoPage() {
   const passedVet = location.state?.vet as (VetPublic | undefined);
 
   const [vet, setVet] = useState<VetPublic | null>(passedVet ?? null);
+  const [closingHours, setClosingHours] = useState<number[]>([]);
 
   const selectedTime = useTimeStore((s) => s.selectedTime);
 
-  // 수의사 선택이 안 넘어왔으면: 병원 첫 번째 수의사(workingHours 포함) 불러오기
+  // 수의사 없으면 병원의 첫 번째 수의사
   useEffect(() => {
-    if (vet) {
-    console.log("🐾 수의사 데이터:", vet);
-    console.log("🕒 근무 시간:", vet.workingHours);
-  }
     if (vet?.vetId) return;
     if (!hospital?.hospitalId) return;
 
@@ -43,30 +44,44 @@ export default function VetInfoPage() {
       try {
         const list = await getVetsByHospitalId(hospital.hospitalId);
         setVet(list?.[0] ?? null);
-      } catch (e) {
-        console.warn('수의사 목록 조회 실패:', e);
+      } catch {
         setVet(null);
       }
     })();
   }, [hospital?.hospitalId, vet?.vetId]);
 
-  // 오늘 요일의 근무시간(첫 구간) 계산 + HH:mm로 변환
+  // 🔹 closing-hours 가져오기 (0~47)
+  useEffect(() => {
+    if (!vet?.vetId) return;
+    (async () => {
+      try {
+        const blocked = await getVetClosingHours(vet.vetId);
+        setClosingHours(Array.isArray(blocked) ? blocked : []);
+      } catch {
+        setClosingHours([]);
+      }
+    })();
+  }, [vet?.vetId]);
+
+  // 오늘 근무시간 + closing 제외한 사용 가능 슬롯
   const todayRange = useMemo(() => {
     const wh: WorkingHourResponse[] | undefined = vet?.workingHours;
     if (!wh || wh.length === 0) return null;
 
-    const today = dayMap[new Date().getDay()]; // 'SUN'..'SAT'
-    const slots = wh.filter(w => w.day === today);
-    if (slots.length === 0) return null;
+    const today = dayMap[new Date().getDay()];
+    const slot = wh.find(w => w.day === today);
+    if (!slot) return null;
 
-    const { startTime, endTime } = slots[0];
+    const allIdx = buildIndices(slot.startTime, slot.endTime);
+    const usableIdx = allIdx.filter(i => !closingHours.includes(i));
+    const usableTimes = usableIdx.map(i => timeMapping[i]).filter(Boolean);
+
     return {
-      startIdx: startTime,
-      endIdx: endTime,
-      startText: timeMapping[startTime] ?? '',
-      endText: timeMapping[endTime] ?? '',
+      startText: timeMapping[slot.startTime] ?? '',
+      endText: timeMapping[slot.endTime] ?? '',
+      usableTimes, // ← 실제 노출할 "HH:mm" 목록
     };
-  }, [vet?.workingHours]);
+  }, [vet?.workingHours, closingHours]);
 
   const handleSubmit = () => {
     if (!selectedTime) {
@@ -110,7 +125,9 @@ export default function VetInfoPage() {
           <TimeSelectionButton
             start_time={todayRange?.startText || '09:00'}
             end_time={todayRange?.endText || '18:00'}
+            available_times={todayRange?.usableTimes ?? []}
           />
+
         </div>
       </div>
 

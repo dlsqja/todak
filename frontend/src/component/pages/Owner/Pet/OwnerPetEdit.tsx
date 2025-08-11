@@ -24,7 +24,7 @@ export default function OwnerPetEdit() {
   const [age, setAge] = useState('');
   const [weight, setWeight] = useState('');
   const [gender, setGender] = useState('');
-  const [neutered, setNeutered] = useState('');
+  // const [neutered, setNeutered] = useState('');
   const [type, setType] = useState('');
   
   const { state } = useLocation();
@@ -55,8 +55,8 @@ export default function OwnerPetEdit() {
         setName(pet.name);
         setAge(String(pet.age));
         setWeight(pet.weight);
-        setGender(pet.gender);  // `MALE`, `FEMALE`, `NON`으로 매핑된 값 설정
-        setType(pet.species); // `DOG`, `CAT`, `OTHER`로 매핑된 값 설정
+        setGender(pet.gender); 
+        setType(pet.species); 
 
         setSelectedImage(photoUrl);
         setIsDefaultImage(!pet.photo); // photo 값이 없으면 기본 이미지로 처리
@@ -96,9 +96,9 @@ export default function OwnerPetEdit() {
       const petRequest = {
         name,
         age: Number(age),
-        weight,
-        gender: gender,  
-        species: type,      
+        gender: String(gender),  
+        species: type,
+        weight: parseFloat(weight)      
       };
 
       console.log("Pet Request:", petRequest); // 로그로 요청값 확인
@@ -153,10 +153,10 @@ export default function OwnerPetEdit() {
           </div>
 
           <div className="w-full flex flex-col">
-            <label className="h4 mb-2 text-black">중성화 여부</label>
+            <label className="h4 mb-2 text-black">성별 선택</label>
             <SelectionDropdown
-              value={neutered}
-              onChange={(val) => setNeutered(val)}
+              value={gender}
+              onChange={(val) => setGender(val)}
               options={[
                 { value: 'MALE_NEUTERING', label: '남 (중성화)' },
                 { value: 'FEMALE_NEUTERING', label: '여 (중성화)' },
@@ -164,7 +164,7 @@ export default function OwnerPetEdit() {
                 { value: 'MALE', label: '남' },
                 { value: 'FEMALE', label: '여' },
               ]}
-              placeholder="중성화 여부 선택"
+              placeholder="성별 선택"
             />
           </div>
 

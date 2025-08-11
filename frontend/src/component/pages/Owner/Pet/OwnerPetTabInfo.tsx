@@ -2,29 +2,36 @@
 
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { deletePet } from '@/services/api/Owner/ownerpet';
+
 import Button from '@/component/button/Button';
 import CopyButton from '@/component/button/CopyButton';
 
-export default function OwnerPetTabInfo({ selectedPet, setSelectedPet, pets, setPets  }) {
+export default function OwnerPetTabInfo({ selectedPet, setSelectedPet, pets, setPets, onDelete  }) {
   const navigate = useNavigate();
 
-  const handleDelete = () => {
-  const confirmDelete = window.confirm(`정말 삭제할까요?`);
-  if (confirmDelete) {
-    // 반려동물 삭제
-    const updatedPets = pets.filter((pet) => pet.petId !== selectedPet.petId);
-    
-    // pets 상태를 업데이트
-    setPets(updatedPets);
-
-    // selectedPet도 null로 설정 (선택된 반려동물이 없어야 하므로)
-    setSelectedPet(null);
-
-    // 삭제 후 페이지 리디렉션
-    navigate('/owner/pet'); // 삭제 후 다시 /owner/pet 페이지로 이동
-  }
-};
-
+  // 반려동물 삭제
+  const handleDelete = async () => {
+    const confirmDelete = window.confirm(`정말 삭제할까요?`);
+    if (confirmDelete) {
+      onDelete(selectedPet.petId);
+      try {
+        const response = await deletePet(selectedPet.petId);  // 서버에 삭제 요청
+        if (response.status === 200) {
+          const updatedPets = pets.filter((pet) => pet.petId !== selectedPet.petId);
+          // pets 상태를 업데이트
+          setPets(updatedPets);
+          // selectedPet도 null로 설정 (선택된 반려동물이 없어야 하므로)
+          setSelectedPet(null);
+          // 삭제 후 페이지 리디렉션
+          navigate('/owner/pet'); // 삭제 후 다시 /owner/pet 페이지로 이동
+        }
+      } catch (err) {
+        console.error('삭제 실패:', err);
+        alert('삭제에 실패했습니다. 다시 시도해주세요.');
+      }
+    }
+  };
 
   const handleEdit = () => {
     navigate(`/owner/pet/edit/${selectedPet.petId}`, {
@@ -51,8 +58,15 @@ export default function OwnerPetTabInfo({ selectedPet, setSelectedPet, pets, set
           <p className="p">
             {selectedPet?.gender === 'MALE' ? '남'
             : selectedPet?.gender === 'FEMALE' ? '여'
-            : '미선택'}
+            : selectedPet?.gender === 'MALE_NEUTERING' ? '남(중성화)'
+            : selectedPet?.gender === 'FEMALE_NEUTERING' ? '여(중성화)'
+            : selectedPet?.gender === 'NON' ? '성별없음' : ''}
           </p>
+        </div>
+        <div className="flex justify-between">
+          <p className="p text-brown-300">체중</p>
+          <p className="p">{selectedPet.weight}kg</p>
+
         </div>
         <div className="flex justify-between">
           <p className="p text-brown-300">동물 종류</p>

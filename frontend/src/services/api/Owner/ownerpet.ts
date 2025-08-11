@@ -89,3 +89,9 @@ export const getPets = async () => {
   return res.data;
 };
 
+// 반려동물 삭제 함수
+export const deletePet = async (petId: number) => {
+    const response = await apiClient.delete(`/pets/${petId}`);
+    console.log(response.data)
+    return response.data;
+}

@@ -14,9 +14,10 @@ export default function OwnerPetRegister() {
   const [image, setImage] = useState<File | null>(null); // File 객체로 저장
   const [name, setName] = useState('');
   const [age, setAge] = useState('');
-  const [weight, setWeight] = useState(''); // 아직 사용되지 않지만 보존
+  const [weight, setWeight] = useState(''); 
   const [gender, setGender] = useState('');  // 성별 + 중성화 여부
   const [type, setType] = useState('');
+
 
   const fileInputRef = useRef<HTMLInputElement | null>(null); // file input에 접근하기 위한 ref
 
@@ -44,6 +45,7 @@ export default function OwnerPetRegister() {
   };
 
   const handleSubmit = async () => {
+
     try {
       // genderMap을 통해 결합된 성별 + 중성화 여부 처리
       const genderValue = genderMap[gender];
@@ -53,6 +55,7 @@ export default function OwnerPetRegister() {
         age: parseInt(age),
         gender: genderValue, // 변환된 gender 값
         species: type, // 변환된 type 값
+        weight: parseFloat(weight),
       };
 
       console.log('Pet Request:', petRequest); // 요청 값 확인
@@ -117,8 +120,8 @@ export default function OwnerPetRegister() {
             />
             <Input
               id="weight"
-              label="무게"
-              placeholder="0"
+              label="체중(kg)"
+              placeholder="예 : 4.1"
               value={weight}
               onChange={(e) => setWeight(e.target.value)}
             />
