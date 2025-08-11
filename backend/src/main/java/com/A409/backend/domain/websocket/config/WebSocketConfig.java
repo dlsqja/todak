@@ -1,6 +1,7 @@
 package com.A409.backend.domain.websocket.config;
 
 import com.A409.backend.domain.websocket.handler.SignalHandler;
+import com.A409.backend.domain.websocket.handler.SignalRecordHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
@@ -12,7 +13,7 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
 @RequiredArgsConstructor
 public class WebSocketConfig implements WebSocketConfigurer {
 
-    private final SignalHandler signalHandler;
+    private final SignalRecordHandler signalHandler;
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {

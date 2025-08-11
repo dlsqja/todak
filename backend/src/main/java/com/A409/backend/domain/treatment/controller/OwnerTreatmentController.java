@@ -2,7 +2,10 @@ package com.A409.backend.domain.treatment.controller;
 
 import com.A409.backend.domain.treatment.service.TreatmentService;
 import com.A409.backend.global.ai.STTData;
+import com.A409.backend.global.enums.ErrorCode;
+import com.A409.backend.global.exception.CustomException;
 import com.A409.backend.global.rabbitmq.SttRequestProducer;
+import com.A409.backend.global.redis.RedisService;
 import com.A409.backend.global.response.APIResponse;
 import com.A409.backend.global.security.model.User;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -27,6 +30,7 @@ public class OwnerTreatmentController {
     private final TreatmentService treatmentService;
     private final SttRequestProducer sttRequestProducer;
     private final ObjectMapper objectMapper;
+    private final RedisService redisService;;
 
     @Operation(summary = "진료 리스트 조회")
     @ApiResponse(responseCode = "200",
@@ -41,5 +45,16 @@ public class OwnerTreatmentController {
         List<Map<String,Object>> treatments = treatmentService.getTreatments(user.getId());
 
         return APIResponse.ofSuccess(treatments);
+    }
+
+    @Operation(summary = "반려인 비대면 진료 시작", description = "비대면 진료 버튼을 누르면, session을 확입합니다.")
+    @PostMapping("/start/{treatment_id}")
+    public APIResponse<?> startTreatment(@PathVariable("treatment_id") Integer treatment_id) {
+        String cacheKey = "treatment" + treatment_id;
+        Integer cachedNum = (Integer) redisService.getByKey(cacheKey);
+        if (cachedNum == null || cachedNum != 1)
+            throw new CustomException(ErrorCode.SESSION_NOT_FOUND);
+        redisService.setByKey(cacheKey, 2);
+        return APIResponse.ofSuccess(null);
     }
 }
