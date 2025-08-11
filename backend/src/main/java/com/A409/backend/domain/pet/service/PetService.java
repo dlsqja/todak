@@ -12,6 +12,7 @@ import com.A409.backend.global.enums.ErrorCode;
 import com.A409.backend.global.exception.CustomException;
 import com.A409.backend.global.util.RandomCodeGenerator;
 import com.A409.backend.global.util.uploader.S3Uploader;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -130,5 +131,11 @@ public class PetService {
         ownerPetRepository.save(ownerPet);
     }
 
-
+    @Transactional
+    public void disconnectPet(Long ownerId, Long petId){
+        if(!ownerPetRepository.existsByOwner_OwnerIdAndPet_PetId(ownerId, petId)) {
+            throw new CustomException(ErrorCode.RESOURCE_NOT_FOUND);
+        }
+        ownerPetRepository.deleteByPet_petId(petId); //수정
+    }
 }
