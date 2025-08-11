@@ -9,12 +9,12 @@ export default function StaffHomeGuide() {
   const navigate = useNavigate();
 
   return (
-    <div className=" bg-green-100 pb-8">
+    <div className=" bg-gray-50 pb-8">
       {/* 상단 고정 헤더 */}
       <BackHeader text="비대면 진료 가이드" />
 
       {/* 본문 */}
-      <div className="px-7 pt-6 bg-green-100">
+      <div className="px-7 pt-6 bg-gray-50">
         {/* 안내 박스 */}
         <div className="bg-gray-100 rounded-xl p-5 mb-6">
           <p className="p text-black leading-relaxed text-center">
