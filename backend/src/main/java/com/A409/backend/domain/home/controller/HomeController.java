@@ -35,7 +35,7 @@ public class HomeController {
     private final VetService vetService;
     private final ElasticService elasticService;
     private final RedisService redisService;
-    private final AIClient aiClient;
+
     private static final long CACHE_TTL_MINUTES = 5;
 
     @Operation(summary = "병원 리스트 조회")
@@ -94,15 +94,5 @@ public class HomeController {
         return APIResponse.ofSuccess(result);
     }
 
-    @PostMapping("/audio/{treatment_id}")
-    @LogExecutionTime
-    public APIResponse<?> uploadAudio(@PathVariable("treatment_id") Long treatmentId, @RequestParam("file") MultipartFile file) {
-        if (file.isEmpty()) {
-            return APIResponse.ofFail(ErrorCode.INVALID_ERROR,"파일이 유효하지 않습니다");
-        }
 
-        aiClient.uploadAudio(treatmentId,file);
-
-        return APIResponse.ofSuccess(null);
-    }
 }

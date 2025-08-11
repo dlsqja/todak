@@ -6,6 +6,8 @@ import com.A409.backend.domain.treatment.entity.Treatment;
 import com.A409.backend.domain.treatment.entity.TreatmentResponse;
 import com.A409.backend.domain.treatment.service.TreatmentService;
 import com.A409.backend.domain.user.vet.dto.VetWorkingHourResponse;
+import com.A409.backend.global.ai.AIClient;
+import com.A409.backend.global.enums.ErrorCode;
 import com.A409.backend.global.response.APIResponse;
 import com.A409.backend.global.security.model.User;
 import io.swagger.v3.oas.annotations.Operation;
@@ -16,6 +18,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Map;
@@ -26,6 +29,7 @@ import java.util.Map;
 public class VetTreatmentController {
 
     private final TreatmentService treatmentService;
+    private final AIClient aiClient;
 
     @Operation(summary = "수의사 진료 필터링 조회")
     @ApiResponse(responseCode = "200",
@@ -48,4 +52,12 @@ public class VetTreatmentController {
         return APIResponse.ofSuccess(treatmentResponse);
     }
 
+    @Operation(summary = "진료종료 후 음성 파일 위치 전송")
+    @PostMapping("/audio/{treatment_id}")
+    public APIResponse<?> uploadAudio(@PathVariable("treatment_id") Long treatmentId) {
+
+        //aiClient.uploadAudio(treatmentId);
+
+        return APIResponse.ofSuccess(null);
+    }
 }
