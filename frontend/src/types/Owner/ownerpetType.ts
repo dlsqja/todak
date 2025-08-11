@@ -9,7 +9,7 @@ export type PetSpecies = 'DOG' | 'CAT' | 'OTHER';
 // API 응답용 반려동물 타입
 export interface Pet {
   petId: number;           // 반려동물 고유 ID
-  petCode?: string;        // 코드 등록 시만 존재
+  pet_code?: string;        // 코드 등록 시만 존재
   name: string;            // 이름
   species: PetSpecies;     // 종(DOG, CAT, OTHER)
   photo: string;           // 이미지 URL
