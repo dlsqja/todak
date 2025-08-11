@@ -8,6 +8,7 @@ import VetRecordDetail from '@/component/pages/Vet/Record/VetRecordDetail';
 import VetMyPage from '@/component/pages/Vet/Mypage/VetMypage';
 import VetTreatmentDetail from '@/component/pages/Vet/Treatment/VetTreatmentDetail';
 import VetTreatmentRTC from '@/component/pages/Vet/Treatment/VetTreatmentRTC';
+import VetHomeGuide from '@/component/pages/Vet/Home/VetHomeGuide';
 
 const vetRoutes = {
   path: '/vet',
@@ -26,6 +27,8 @@ const vetRoutesWithoutMenu = {
   path: '/vet',
   element: <MobileLayout />,
   children: [
+    { path: 'home/guide', element: <VetHomeGuide /> },
+
     { path: 'treatment/detail/:reservationId', element: <VetTreatmentDetail /> },
     { path: 'treatment/rtc/:reservationId', element: <VetTreatmentRTC /> },
     { path: 'records/detail/:treatmentId', element: <VetRecordDetail /> },

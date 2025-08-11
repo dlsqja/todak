@@ -140,10 +140,10 @@ export default function VetHome() {
 
   return (
     <div>
-      <h3 className="h3 mx-7 pt-13">OOO수의사님 반갑습니다!</h3>
+      <h3 className="h3 mx-7 pt-13">OOO 수의사님 반갑습니다!</h3>
       <h3 className="h3 mx-7 mb-2">어플 사용이 처음이신가요?</h3>
       <button
-        onClick={() => navigate('/home/guide')}
+        onClick={() => navigate('/vet/home/guide')}
         className="h5 mx-7 px-5 py-1 rounded-full inline-block 
         bg-green-300 text-green-100 hover:bg-green-200 transition"
       >

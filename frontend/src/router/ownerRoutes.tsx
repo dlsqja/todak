@@ -16,7 +16,7 @@ import OwnerTreatmentDetail from '@/component/pages/Owner/Treatment/OwnerTreatme
 import PaymentMethodPage from '@/component/pages/Owner/Home/OwnerHomePaymentMethod';
 import ApplyCompletePage from '@/component/pages/Owner/Home/OwnerHomeApplyComplete';
 import OwnerTreatmentRTC from '@/component/pages/Owner/Treatment/OwnerTreatmentRTC';
-import OwnerHomeGuide from '@/component/pages/HomeGuidePage';
+import OwnerHomeGuide from '@/component/pages/Owner/Home/OwnerHomeGuide';
 import TreatmentDetailPage from '@/component/pages/Owner/Pet/OwnerPetTabRecordDetail';
 
 const ownerRoutes = {
@@ -41,6 +41,7 @@ const ownerRoutesWithoutMenu = {
     { path: 'home/form', element: <ApplyFormPage /> },
     { path: 'home/payment', element: <PaymentMethodPage /> },
     { path: 'home/apply-complete', element: <ApplyCompletePage /> },
+    { path: 'home/guide', element: <OwnerHomeGuide /> },
 
     { path: 'pet/register', element: <OwnerPetRegister /> },
     { path: 'pet/edit/:id', element: <OwnerPetEdit /> },

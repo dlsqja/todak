@@ -4,6 +4,7 @@ import StaffReservation from '@/component/pages/Staff/Reservation/StaffReservati
 import StaffReservationDetail from '@/component/pages/Staff/Reservation/StaffReservationDetail';
 import StaffPayment from '@/component/pages/Staff/Payment/StaffPayment';
 import StaffMypage from '@/component/pages/Staff/Mypage/StaffMypage';
+import StaffHomeGuide from '@/component/pages/Staff/Home/StaffHomeGuide';
 
 import StaffHospitalInfo from '@/component/pages/Staff/StaffHospital/StaffHospitalInfo';
 import StaffHospitalVet from '@/component/pages/Staff/StaffHospital/StaffHospitalVet';
@@ -28,6 +29,8 @@ const staffRoutesWithoutMenu = {
   path: '/staff',
     element: <MobileLayout />,
     children: [
+      { path: 'home/guide', element: <StaffHomeGuide /> },
+
       { path: 'hospital/info', element: <StaffHospitalInfo /> },
       { path: 'hospital/vet', element: <StaffHospitalVet /> },
       { path: 'reservation/detail', element: <StaffReservationDetail /> },

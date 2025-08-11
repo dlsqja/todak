@@ -7,7 +7,7 @@ import authRoutes from '@/router/authRoutes';
 import MobileLayout from '@/layouts/MobileLayout';
 import MainPage from '@/component/pages/MainPage';
 import MainLayout from '@/layouts/MainLayout';
-import HomeGuidePage from '@/component/pages/HomeGuidePage';
+import HomeGuidePage from '@/component/pages/Owner/Home/OwnerHomeGuide';
 
 const mainRoutes = {
   path: '/',
