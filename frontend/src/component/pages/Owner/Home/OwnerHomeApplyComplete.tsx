@@ -10,7 +10,7 @@ export default function ApplyCompletePage() {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-green-100 flex flex-col">
+    <div className="min-h-screen bg-gray-50 flex flex-col">
       <BackHeader text="비대면 진료" />
 
       <div className="flex-1 flex flex-col justify-center items-center px-7">

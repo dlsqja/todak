@@ -26,12 +26,7 @@ const OwnerMenuBar: React.FC = () => {
   };
 
   return (
-    <div
-      className=" 
-    flex flex-row items-center justify-center
-    rounded-t-4xl 
-    bg-green-100 py-0.5 px-5 gap-4 menu-bar"
-    >
+    <div className="flex flex-row items-center justify-center rounded-t-2xl h-15 bg-gray-50 py-0.5 px-5 gap-4 menu-bar">
       {menuList.map((menu, index) => {
         const Icon = menu.icon;
         // 현재 경로와 메뉴 path가 일치하면 isActive

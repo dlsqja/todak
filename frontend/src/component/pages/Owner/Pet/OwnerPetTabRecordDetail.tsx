@@ -92,7 +92,7 @@ const formattedTime =
 
 
   return (
-    <div className="bg-green-100 min-h-screen pb-28">
+    <div className="bg-gray-50 min-h-screen pb-28">
       <BackHeader text="진료 내역 상세" />
 
       {/* AI 요약 진단서 */}

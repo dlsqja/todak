@@ -19,7 +19,7 @@ const BackHeader: React.FC<BackHeaderProps> = ({ text, onBack }) => {
   };
 
   return (
-    <div className="sticky top-0 z-50 w-full h-16 bg-green-100 flex items-center justify-between px-4">
+    <div className="sticky top-0 z-50 w-full h-16 bg-gray-50 flex items-center justify-between px-4">
       <button onClick={handleBack} className="left-4 text-2xl text-black cursor-pointer" aria-label="뒤로가기">
         <FiChevronLeft />
       </button>

@@ -37,7 +37,7 @@ export default function OwnerPetTabInfo({ selectedPet, setSelectedPet, pets, set
 
   return (
     <>
-      <div className="space-y-3 bg-green-100 p-4">
+      <div className="space-y-3 bg-white p-4">
         <div className="flex justify-between">
           <p className="p text-brown-300">이름</p>
           <p className="p">{selectedPet.name}</p>

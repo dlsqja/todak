@@ -69,7 +69,7 @@ export default function SelectVetPage() {
 
         <div className="mt-8">
           <h4 className="p text-black mb-3">수의사 목록</h4>
-          <div className="bg-green-100 rounded-xl overflow-hidden">
+          <div className="bg-gray-50 rounded-xl overflow-hidden">
             {filtered.length === 0 && (
               <div className="p-4 text-gray-400">수의사가 없습니다.</div>
             )}
