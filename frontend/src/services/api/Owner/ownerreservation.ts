@@ -6,7 +6,7 @@ import type { ReservationDetail } from '@/types/Owner/ownerreservationType';
 export const getReservations = async (): Promise<OwnerReservationList[]> => {
   const response = await apiClient.get('/reservations/owner');
   console.log('allresponse:', response.data.data);
-  return response.data.data;
+  return response.data?.data ?? response.data;
 };
 
 /**

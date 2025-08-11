@@ -47,17 +47,15 @@ export default function OwnerPetHome() {
 
   if (isLoading) return <div className="p">불러오는 중...</div>;
   if (error) return <div className="p">에러 발생: {error.message}</div>;
-  if (pets.length === 0) return (
-    <div className="p flex flex-col items-center justify-center h-[60vh] gap-6 text-center">
-      <p className="p">등록된 반려동물이 없습니다.</p>
-      <button
-        className="text-white bg-green-400 px-6 py-2 rounded-xl h5"
-        onClick={handleRegister}
-      >
-        반려동물 등록하기
-      </button>
-    </div>
-  );
+  if (pets.length === 0)
+    return (
+      <div className="p flex flex-col items-center justify-center h-[60vh] gap-6 text-center">
+        <p className="p">등록된 반려동물이 없습니다.</p>
+        <button className="text-white bg-green-400 px-6 py-2 rounded-xl h5" onClick={handleRegister}>
+          반려동물 등록하기
+        </button>
+      </div>
+    );
 
   return (
     <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
@@ -78,28 +76,28 @@ export default function OwnerPetHome() {
               whileTap={{ scale: 0.95 }}
             >
               <ImageInputBox
-                src={`${import.meta.env.VITE_PHOTO_URL}${pet.photo}`}  // .env에 설정된 이미지 URL 사용
+                src={`${import.meta.env.VITE_PHOTO_URL}${pet.photo}`} // .env에 설정된 이미지 URL 사용
                 stroke={
                   selectedPet?.petId === pet.petId
-                    ? 'border-4 border-pink-200'  // 선택된 반려동물만 pink로 표시
+                    ? 'border-4 border-pink-200' // 선택된 반려동물만 pink로 표시
                     : pet.photo && pet.photo !== '/images/pet_default.png'
-                      ? 'border-1 border-gray-300' // 기본 색상은 회색
-                      : 'border-1 border-pink-100'  // 이미지가 없는 경우 pink로 표시
+                    ? 'border-1 border-gray-300' // 기본 색상은 회색
+                    : 'border-1 border-pink-100' // 이미지가 없는 경우 pink로 표시
                 }
               />
               <p className="p mt-2 text-black">{pet.name}</p>
             </motion.div>
           ))}
 
-        {/* 등록 버튼 */}
-        <motion.div
-          className="flex flex-col items-center mt-5 cursor-pointer"
-          onClick={handleRegister}
-          whileTap={{ scale: 0.95 }}
-        >
-          <PlusIcon fill="#afcf7e" stroke="#fdfcfb" />
+          {/* 등록 버튼 */}
+          <motion.div
+            className="flex flex-col items-center mt-5 cursor-pointer"
+            onClick={handleRegister}
+            whileTap={{ scale: 0.95 }}
+          >
+            <PlusIcon fill="#afcf7e" stroke="#fdfcfb" />
+          </motion.div>
         </motion.div>
-      </motion.div>
 
         {/* 탭 메뉴 */}
         <motion.div
@@ -120,7 +118,12 @@ export default function OwnerPetHome() {
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.3 }}
             >
-              <OwnerPetTabInfo selectedPet={selectedPet} setSelectedPet={setSelectedPet} pets={pets} setPets={setPets}/>
+              <OwnerPetTabInfo
+                selectedPet={selectedPet}
+                setSelectedPet={setSelectedPet}
+                pets={pets}
+                setPets={setPets}
+              />
             </motion.div>
           )}
           {selectedTab === '진료 내역' && (

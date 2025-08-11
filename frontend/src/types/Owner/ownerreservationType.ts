@@ -39,3 +39,7 @@ export interface ReservationDetail {
   vetName: string;
   isRevisit: boolean;
 }
+
+export interface ApprovedReservations extends ReservationsResponse {
+  petInfo: PetResponse;
+}
