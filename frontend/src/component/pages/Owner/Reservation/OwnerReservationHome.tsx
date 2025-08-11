@@ -4,7 +4,7 @@ import SimpleHeader from '@/component/header/SimpleHeader';
 import ImageInputBox from '@/component/input/ImageInputBox';
 import { useState } from 'react';
 import TabGroupWaiting from '@/component/navbar/TabGroupWaiting';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { getReservations } from '@/services/api/Owner/ownerreservation';
 import { timeMapping } from '@/utils/timeMapping';
 import { subjectmapping } from '@/utils/subjectMapping';
@@ -22,6 +22,7 @@ export default function OwnerReservationHome() {
   const data = useRef<OwnerReservationList[]>([]);
   const { selectedPetIndex } = useParams<{ selectedPetIndex: string }>();
   const [selectedPet, setSelectedPet] = useState<number>(selectedPetIndex ? Number(selectedPetIndex) : 0);
+  const { isRejected } = useLocation().state || {};
 
   // 마운트 될 떄 반려동물 목록 조회
   useEffect(() => {
@@ -118,7 +119,17 @@ export default function OwnerReservationHome() {
             <div
               key={res.reservationId}
               className="mb-5 cursor-pointer"
-              onClick={() => navigate(`/owner/reservation/${res.reservationId}`)}
+              onClick={() => {
+                if (res.status === 'REJECTED') {
+                  // 반려 상태면 반려 사유와 함께 전달
+                  navigate(`/owner/reservation/${res.reservationId}`, {
+                    state: { isRejected: true },
+                  });
+                } else {
+                  // 일반 상세 페이지로 이동
+                  navigate(`/owner/reservation/${res.reservationId}`);
+                }
+              }}
             >
               <div className="flex justify-between">
                 <div className="flex flex-col">
