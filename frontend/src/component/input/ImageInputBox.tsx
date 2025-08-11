@@ -5,7 +5,7 @@ interface ImageBoxProps {
   stroke?: string;
 }
 
-export default function ImageInputBox({ src, stroke }: ImageBoxProps) {
+export default function ImageInputBox({ src, stroke = 'border-3 border-green-200' }: ImageBoxProps) {
   const [imageError, setImageError] = useState(false);
   const DEFAULT_IMAGE = '/images/pet_default.png';
 

@@ -10,6 +10,7 @@ export interface OwnerTreatmentsByPet {
 export interface OwnerTreatmentItem {
   reservationId: number;
   subject: string;
+  reservationTime: number;
   reservationDay: string;
   vetName: string;
   hospitalName?: string;

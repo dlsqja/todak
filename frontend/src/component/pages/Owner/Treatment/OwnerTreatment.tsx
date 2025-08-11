@@ -8,7 +8,7 @@ import { speciesMapping } from '@/utils/speciesMapping';
 import { subjectmapping } from '@/utils/subjectMapping'; // 소문자 주의
 import { timeMapping } from '@/utils/timeMapping';
 import { getReservations } from '@/services/api/Owner/ownerreservation';
-import { getTreatments } from '@/services/api/Owner/ownertreatment';
+import { getTreatmentWaitingList } from '@/services/api/Owner/ownertreatment';
 import type { OwnerTreatmentsByPet } from '@/types/Owner/ownertreatmentType';
 
 export default function OwnerTreatment() {
@@ -16,7 +16,7 @@ export default function OwnerTreatment() {
   const navigate = useNavigate();
   // 상세 정보 페이지 이동
   const handleDetailClick = (reservationId: number) => {
-    navigate(`/owner/reservation/${reservationId}`);
+    navigate(`/owner/treatment/${reservationId}`);
   };
   // 비대면 진료(RTC) 페이지 이동
   const handleRTCClick = (reservationId: number) => {
@@ -26,7 +26,7 @@ export default function OwnerTreatment() {
   const [treatmentData, setTreatmentData] = useState<OwnerTreatmentsByPet[]>([]);
   useEffect(() => {
     const getTreatmentList = async () => {
-      const treatmentData = await getTreatments();
+      const treatmentData = await getTreatmentWaitingList();
       console.log('treatmentData:', treatmentData);
       setTreatmentData(treatmentData);
     };
@@ -37,18 +37,20 @@ export default function OwnerTreatment() {
     <div>
       <SimpleHeader text="비대면 진료" />
       <div className="px-4 pb-1 h-max space-y-4 overflow-y-scroll hide-scrollbar">
-        {treatmentData.flatMap((treatment) =>
+        {treatmentData.map((treatment) =>
           treatment.treatments.map((item) => {
+            console.log('treatment:', treatment);
             console.log('item:', item);
             return (
               <RemoteTreatmentCard
                 key={item.reservationId}
                 petName={treatment.petResponse.name}
+                petInfo={`예약 시간 : ${timeMapping[item.reservationTime]}`}
                 department={subjectmapping[item.subject]}
                 photo={`${VITE_PHOTO_URL}${treatment.petResponse.photo}`}
                 onDetailClick={() => handleDetailClick(item.reservationId)}
                 onTreatClick={() => handleRTCClick(item.reservationId)}
-                buttonText="진료 받기"
+                buttonText="상세 정보"
               />
             );
           }),

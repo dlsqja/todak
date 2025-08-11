@@ -79,7 +79,7 @@ export default function OwnerReservationDetail() {
         </div>
         <div className="flex flex-col border-b-1 border-gray-100 pb-4 gap-2 ">
           <div className="h4">증상</div>
-          <div>{detail.photo && <ImageInputBox src={detail.photo} />}</div>
+          <div>{detail.photo && <ImageInputBox src={detail.photo} stroke="border-2 border-green-300" />}</div>
           <div className="p">{detail.description}</div>
         </div>
       </section>

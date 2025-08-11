@@ -81,10 +81,10 @@ export default function OwnerPetHome() {
                 src={`${import.meta.env.VITE_PHOTO_URL}${pet.photo}`} // .env에 설정된 이미지 URL 사용
                 stroke={
                   selectedPet?.petId === pet.petId
-                    ? 'border-4 border-pink-200' // 선택된 반려동물만 pink로 표시
+                    ? 'border-5 border-green-300' // 선택된 반려동물만 pink로 표시
                     : pet.photo && pet.photo !== '/images/pet_default.png'
                     ? 'border-1 border-gray-300' // 기본 색상은 회색
-                    : 'border-1 border-pink-100' // 이미지가 없는 경우 pink로 표시
+                    : 'border-1 border-green-200' // 이미지가 없는 경우 pink로 표시
                 }
               />
               <p className="p mt-2 text-black">{pet.name}</p>

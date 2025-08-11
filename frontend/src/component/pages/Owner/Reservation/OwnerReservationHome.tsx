@@ -85,10 +85,10 @@ export default function OwnerReservationHome() {
                 src={`${VITE_PHOTO_URL}${pet.photo}`}
                 stroke={
                   selectedPet === idx
-                    ? 'border-5 border-pink-200'
+                    ? 'border-5 border-green-300'
                     : pet.photo && pet.photo !== ''
-                    ? 'border border-gray-300'
-                    : 'border border-pink-100'
+                    ? 'border-1 border-gray-300'
+                    : 'border-1 border-green-200'
                 }
               />
               {selectedPet === idx ? (

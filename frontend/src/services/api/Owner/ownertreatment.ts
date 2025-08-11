@@ -13,7 +13,6 @@ getTreatmentWaitingList();
 // 비대면 진료 완료 목록
 export const getTreatments = async () => {
   const res = await apiClient.get('/treatments/owner?type=1');
-  console.log('rescomplete:', res);
   return res.data?.data ?? [];
 };
 getTreatments();
