@@ -116,4 +116,16 @@ public class TreatmentService {
         }
         return TreatmentResponse.toVetResponse(treatment);
     }
+
+    public void saveResult(Long treatmentId,String result){
+        Treatment treatment = treatmentRepository.findByTreatmentId(treatmentId).orElseThrow(() -> new CustomException(ErrorCode.RESOURCE_NOT_FOUND));
+        treatment.setResult(result);
+        treatmentRepository.save(treatment);
+    }
+
+    public void saveAIResult(Long treatmentId,String aiResult){
+        Treatment treatment = treatmentRepository.findByTreatmentId(treatmentId).orElseThrow(() -> new CustomException(ErrorCode.RESOURCE_NOT_FOUND));
+        treatment.setAiSummary(aiResult);
+        treatmentRepository.save(treatment);
+    }
 }

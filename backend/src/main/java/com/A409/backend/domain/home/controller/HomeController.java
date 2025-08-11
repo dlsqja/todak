@@ -4,9 +4,12 @@ import com.A409.backend.domain.hospital.dto.HospitalResponse;
 import com.A409.backend.domain.hospital.service.HospitalService;
 import com.A409.backend.domain.user.vet.dto.VetResponse;
 import com.A409.backend.domain.user.vet.service.VetService;
+import com.A409.backend.global.ai.AIClient;
 import com.A409.backend.global.annotation.LogExecutionTime;
 import com.A409.backend.global.elasticsearch.Entity.HospitalDocument;
 import com.A409.backend.global.elasticsearch.service.ElasticService;
+import com.A409.backend.global.enums.ErrorCode;
+import com.A409.backend.global.rabbitmq.SttRequestProducer;
 import com.A409.backend.global.redis.RedisService;
 import com.A409.backend.global.response.APIResponse;
 import com.A409.backend.global.util.uploader.S3Uploader;
@@ -18,6 +21,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -31,6 +35,7 @@ public class HomeController {
     private final VetService vetService;
     private final ElasticService elasticService;
     private final RedisService redisService;
+    private final AIClient aiClient;
     private static final long CACHE_TTL_MINUTES = 5;
 
     @Operation(summary = "병원 리스트 조회")
@@ -87,5 +92,16 @@ public class HomeController {
         }
 
         return APIResponse.ofSuccess(result);
+    }
+
+    @PostMapping("/audio/{treatment_id}")
+    public APIResponse<?> uploadAudio(@PathVariable("treatment_id") Long treatmentId, @RequestParam("file") MultipartFile file) {
+        if (file.isEmpty()) {
+            return APIResponse.ofFail(ErrorCode.INVALID_ERROR,"파일이 유효하지 않습니다");
+        }
+
+        aiClient.uploadAudio(treatmentId,file);
+
+        return APIResponse.ofSuccess(null);
     }
 }

@@ -7,18 +7,25 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AIClient {
 
+    private static final String AUDIO_URL = "https://gms.ssafy.io/gmsapi/api.openai.com/v1/audio/transcriptions";
     private static final String URL = "https://gms.ssafy.io/gmsapi/api.openai.com/v1/chat/completions";
     private final ObjectMapper objectMapper;
+    private final TreatmentService treatmentService;
 
     @Value("${gms.api.key}")
     private String GMS_KEY;
@@ -60,6 +67,38 @@ public class AIClient {
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("OpenAI 요청 실패", e);
+        }
+    }
+
+    @Async
+    public void uploadAudio(Long treatmentId,MultipartFile file) {
+        try {
+
+            RestTemplate restTemplate = new RestTemplate();
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+            headers.setBearerAuth(GMS_KEY);
+
+            // Multipart body
+            MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+            body.add("file", new MultipartInputStreamFileResource(file.getInputStream(), file.getOriginalFilename()));
+            body.add("model", "whisper-1");
+
+            HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
+
+            ResponseEntity<Map> response = restTemplate.exchange(AUDIO_URL, HttpMethod.POST, requestEntity, Map.class);
+
+            String transString = response.getBody().get("text").toString();
+            treatmentService.saveResult(treatmentId,transString);
+
+            String aiSummary = sendChatRequest(transString);
+
+            treatmentService.saveAIResult(treatmentId,aiSummary);
+
+
+        } catch (Exception e) {
+            log.info(e.getMessage());
         }
     }
 }
