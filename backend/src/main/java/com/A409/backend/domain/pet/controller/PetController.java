@@ -82,4 +82,13 @@ public class PetController {
 
         return APIResponse.ofSuccess(null);
     }
+
+    @Operation(summary = "반려동물 삭제")
+    @DeleteMapping(path = "/{petId}")
+    public APIResponse<?> disconnectPet(
+            @AuthenticationPrincipal User user,
+            @PathVariable("petId") Long petId){
+        petService.disconnectPet(user.getId(), petId);
+        return APIResponse.ofSuccess(null);
+    }
 }

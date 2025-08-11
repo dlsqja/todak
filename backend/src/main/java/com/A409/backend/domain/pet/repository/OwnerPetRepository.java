@@ -15,4 +15,6 @@ public interface OwnerPetRepository extends JpaRepository<OwnerPet,Long> {
     Optional<OwnerPet> findOwnerPetByOwner_OwnerIdAndPet_PetId(Long ownerOwnerId, Long petPetId);
 
     boolean existsByOwner_OwnerIdAndPet_PetId(Long ownerId, Long petPetId);
+
+    void deleteByPet_petId(Long petPetId);
 }
