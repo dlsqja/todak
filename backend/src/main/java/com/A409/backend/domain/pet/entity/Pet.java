@@ -40,5 +40,7 @@ public class Pet {
     @Column(nullable = false)
     private Integer age;
 
+    private Float weight;
+
 }
 

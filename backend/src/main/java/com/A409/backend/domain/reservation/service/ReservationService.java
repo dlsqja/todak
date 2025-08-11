@@ -40,7 +40,6 @@ public class ReservationService {
 
     private final S3Uploader s3Uploader;
     private final ReservationRepository reservationRepository;
-    private final HospitalRepository hospitalRepository;
     private final TreatmentRepository treatmentRepository;
     private final RejectionRepository rejectionRepository;
     private final PetService petService;
@@ -51,6 +50,14 @@ public class ReservationService {
 
         Reservation reservation = reservationReqeust.toEntity();
         reservation.setOwner(owner);
+
+        Long hospitalId = reservation.getHospital().getHospitalId();
+        Long petId = reservation.getPet().getPetId();
+        //TODO:: 최초 진료 기록 추가
+        if(firstTreatmentRepository.existsByHospital_HospitalIdAndPet_PetId(hospitalId,petId)){
+            reservation.setIsRevisit(true);
+        }
+
 
         if(photo != null){
             try{
@@ -70,7 +77,6 @@ public class ReservationService {
         List<Map<String, Object>> result = new ArrayList<>();
 
         for (PetResponse pet : petList) {
-
             List<Reservation> reservations = reservationRepository.findAllByPet_PetId(pet.getPetId());
 
             List<Map<String, Object>> reservationList = reservations.stream()
@@ -191,7 +197,6 @@ public class ReservationService {
                         .pet(reservation.getPet())
                         .reservation(reservation)
                         .hospital(reservation.getHospital())
-                        .isCompleted(false)
                         .owner(reservation.getOwner())
                         .vet(reservation.getVet())
                         .build();
