@@ -73,31 +73,6 @@ public class HospitalController {
     }
      */
 
-    @Operation(summary = "수의사 불가능 시간 조회")
-    @ApiResponse(responseCode = "200",
-            content = @Content(
-                    mediaType = "application/json",
-                    array = @ArraySchema(schema = @Schema(implementation = Integer.class))
-            )
-    )
-    @GetMapping("/{vet_id}/closing-hours")
-    public APIResponse<?> getClosingHours(@AuthenticationPrincipal User user, @PathVariable("vet_id") Long vetId) {
-        Long hospitalId = user.getId();
-
-        Long hospitalIdByVetId = vetService.getHospitalIdByVetId(vetId);
-        if(hospitalId!=hospitalIdByVetId) {
-            throw new CustomException(ErrorCode.ACCESS_DENIED);
-        }
-
-        String cacheKey = "closinghours:" + vetId;
-
-        List<Integer> cachedTimes = (List<Integer>) redisService.getByKey(cacheKey);
-        if(cachedTimes==null){
-            cachedTimes = new ArrayList<>();
-        }
-        return APIResponse.ofSuccess(cachedTimes);
-    }
-
     @Operation(summary = "수의사 불가능 시간 수정")
     @PostMapping("/{vet_id}/closing-hours")
     public APIResponse<?> updateClosingHours(@AuthenticationPrincipal User user, @PathVariable("vet_id") Long vetId, @RequestBody List<Integer> closingTimes) {

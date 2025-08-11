@@ -2,14 +2,12 @@ package com.A409.backend.domain.user.vet.service;
 
 import com.A409.backend.domain.hospital.entity.Hospital;
 import com.A409.backend.domain.hospital.repository.HospitalRepository;
+import com.A409.backend.domain.treatment.entity.Treatment;
 import com.A409.backend.domain.user.auth.entity.Auth;
 import com.A409.backend.domain.user.auth.repository.AuthRepository;
 import com.A409.backend.domain.user.owner.dto.OwnerRequest;
 import com.A409.backend.domain.user.owner.entity.Owner;
-import com.A409.backend.domain.user.vet.dto.VetRequest;
-import com.A409.backend.domain.user.vet.dto.VetResponse;
-import com.A409.backend.domain.user.vet.dto.VetResponseDetail;
-import com.A409.backend.domain.user.vet.dto.VetUpdateRequest;
+import com.A409.backend.domain.user.vet.dto.*;
 import com.A409.backend.domain.user.vet.entity.Vet;
 import com.A409.backend.domain.user.vet.entity.WorkingHour;
 import com.A409.backend.domain.user.vet.repository.VetRepository;
@@ -35,7 +33,15 @@ public class VetService {
     private final WorkingHourRepository workingHourRepository;
 
     public List<VetResponse> getVetsByHospitalId(Long hospitalId){
-        return vetRepository.findVetsByHospital_HospitalId(hospitalId).stream().map(VetResponse::toResponse).toList();
+
+        List<VetResponse>  vetResponses = vetRepository.findVetsByHospital_HospitalId(hospitalId).stream().map(VetResponse::toResponse).toList();
+        for (VetResponse vet : vetResponses) {
+            List<WorkingHour> workingHours = workingHourRepository.findAllByVet_VetId(vet.getVetId());
+            List<WorkingHourDto> workingHourDtos = workingHours.stream().map(WorkingHourDto::toResponse).toList();
+            vet.setWorkingHours(workingHourDtos);
+        }
+
+        return vetResponses;
     }
 
 

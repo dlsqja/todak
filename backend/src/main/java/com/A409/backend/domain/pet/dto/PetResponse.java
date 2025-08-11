@@ -16,6 +16,7 @@ public class PetResponse {
     private String photo;
     private Gender gender;
     private Integer age;
+    private Float weight;
 
     public static PetResponse toResponse(Pet pet){
         return PetResponse.builder()
@@ -25,6 +26,7 @@ public class PetResponse {
                 .photo(pet.getPhoto())
                 .gender(pet.getGender())
                 .age(pet.getAge())
+                .weight(pet.getWeight())
                 .build();
     }
 }

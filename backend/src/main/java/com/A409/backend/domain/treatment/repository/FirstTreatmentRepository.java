@@ -5,4 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface FirstTreatmentRepository extends JpaRepository<FirstTreatment,Long> {
     boolean existsByOwner_OwnerId(Long ownerId);
+
+    boolean existsByHospital_HospitalIdAndPet_PetId(Long hospitalHospitalId, Long petPetId);
 }

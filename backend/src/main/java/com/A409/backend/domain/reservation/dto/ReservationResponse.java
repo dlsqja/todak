@@ -17,19 +17,23 @@ public class ReservationResponse {
     private Long reservationId;
     private OwnerResponse owner;
     private PetResponse pet;
+    private String hospitalName;
     private String vetName;
     private LocalDate reservationDay;
     private Byte reservationTime;
     private String photo;
     private String description;
     private Subject subject;
+    private Boolean isRevisit;
     private ReservationStatus status;
+
 
     public static ReservationResponse toOwnerResponse(Reservation reservation){
         return ReservationResponse.builder()
                 .reservationId(reservation.getReservationId())
                 .owner(OwnerResponse.toResponse(reservation.getOwner()))
                 .pet(PetResponse.toResponse(reservation.getPet()))
+                .hospitalName(reservation.getHospital().getName())
                 .vetName(reservation.getVet().getName())
                 .reservationDay(reservation.getReservationDay())
                 .reservationTime(reservation.getReservationTime())
@@ -37,6 +41,7 @@ public class ReservationResponse {
                 .description(reservation.getDescription())
                 .subject(reservation.getSubject())
                 .status(reservation.getStatus())
+                .isRevisit(reservation.getIsRevisit())
                 .build();
     }
 

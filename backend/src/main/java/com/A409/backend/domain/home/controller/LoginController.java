@@ -44,7 +44,6 @@ public class LoginController {
     @Operation(summary = "카카오 로그인")
     @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = Map.class)))
     @GetMapping("/{role}")
-    // TODO::배포시 수정
     public void login(@PathVariable("role") String role, @RequestParam("code") String code, HttpServletResponse response) throws IOException {
 
 
