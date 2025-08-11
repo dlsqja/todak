@@ -56,23 +56,23 @@ export default function TimeSelectionDropdown({
           className="appearance-none 
         w-full border 
         border-gray-400 h-12 
-        focus:outline-none
+        focus:outline-none focus:ring-0 focus:border-green-300  focus:border-2
         hover:outline-none
-        bg-green-100 
+        bg-white 
         rounded-2xl 
         px-4 py-2"
           value={selectedTime}
           onChange={(e) => setSelectedTime(e.target.value)}
         >
           {filteredTimeList.map((time) => (
-            <option className="text-black bg-white h4" key={time} value={time}>
+            <option className="text-black bg-white p" key={time} value={time}>
               {time}
             </option>
           ))}
         </select>
-        <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2">
-          <DropdownArrow width={24} height={24} />
-        </span>
+        <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 z-10 text-gray-500">
+  <DropdownArrow width={24} height={24} stroke="currentColor" />
+</span>
         {/* 현재 선택된 시간 확인용 - 지워도 됨 */}
         {/* {selectedTime ? `선택된 시간: ${selectedTime}` : '시간을 선택하세요.'} */}
       </div>

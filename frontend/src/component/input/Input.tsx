@@ -7,9 +7,18 @@ interface InputProps {
   value?: string;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   disabled?: boolean;
+  className?: string;
 }
 
-export default function Input({ id = '', label = '', placeholder, value, onChange, disabled = false }: InputProps) {
+export default function Input({
+  id = '',
+  label = '',
+  placeholder,
+  value,
+  onChange,
+  disabled = false,
+  className = '',
+}: InputProps) {
   return (
     <div className="flex flex-col">
       <div>
@@ -21,13 +30,14 @@ export default function Input({ id = '', label = '', placeholder, value, onChang
             id={id}
             type="text"
             name={id}
-            value={value}
+            value={value ?? ''}
             onChange={onChange}
             disabled={disabled}
             placeholder={placeholder}
             className={`w-full h-12 block border-1 rounded-[12px]
                          border-gray-400 py-4 px-5 p text-black 
-                         placeholder:text-gray-500
+                         placeholder:text-gray-500 focus:outline-none focus:border-green-300 focus:border-2
+                         ${className}
                          ${disabled ? 'bg-gray-200 text-gray-500 cursor-not-allowed' : ''}`}
           />
         </div>

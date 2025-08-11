@@ -1,105 +1,141 @@
-// 주소 : owner/pet
-
-import '@/styles/main.css';
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { petMockList } from './petMockList';
 import SimpleHeader from '@/component/header/SimpleHeader';
 import ImageInputBox from '@/component/input/ImageInputBox';
 import TabGroupPet from '@/component/navbar/TabGroupPet';
-import Button from '@/component/button/Button';
-import CopyButton from '@/component/button/CopyButton';
+import OwnerPetTabInfo from './OwnerPetTabInfo';
+import OwnerPetTabRecord from './OwnerPetTabRecord';
+
+import { motion, AnimatePresence } from 'framer-motion';
+import PlusIcon from '@/component/icon/PlusIcon';
+
+import { getMyPets } from '@/services/api/Owner/ownerpet'; // ✅ API 함수 import
 
 export default function OwnerPetHome() {
   const navigate = useNavigate();
-  const [pets, setPets] = useState(petMockList);                  // 반려동물 전체 목록
-  const [selectedPet, setSelectedPet] = useState(petMockList[0]); // 선택된 반려동물
-  const [selectedTab, setSelectedTab] = useState('상세 정보');     // 현재 탭
+  const [pets, setPets] = useState([]);
+  const [selectedPet, setSelectedPet] = useState(null);
+  const [selectedTab, setSelectedTab] = useState('상세 정보');
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const handleRegister = () => {
     navigate('/owner/pet/register');
   };
 
-  const handleEdit = () => {
-    navigate(`/owner/pet/edit/${selectedPet.id}`);
-  };
+  // ✅ API 호출 로직
+  useEffect(() => {
+    const fetchPets = async () => {
+      try {
+        const data = await getMyPets();
+        if (Array.isArray(data)) {
+          setPets(data);
+          setSelectedPet(data[0]); // 첫 번째 pet 선택
+        } else {
+          console.error('❌ 응답이 배열이 아님:', data);
+          setPets([]); // fallback
+        }
+      } catch (err) {
+        setError(err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-  const handleDelete = () => {
-    const confirmDelete = window.confirm(`${selectedPet.name}을 정말 삭제할까요?`);
-    if (confirmDelete) {
-      const updatedPets = pets.filter((pet) => pet.id !== selectedPet.id);
-      setPets(updatedPets);
-      setSelectedPet(updatedPets[0] || null);
-    }
-  };
+    fetchPets();
+  }, []);
+
+  if (isLoading) return <div className="p">불러오는 중...</div>;
+  if (error) return <div className="p">에러 발생: {error.message}</div>;
+  if (pets.length === 0) return (
+    <div className="p flex flex-col items-center justify-center h-[60vh] gap-6 text-center">
+      <p className="p">등록된 반려동물이 없습니다.</p>
+      <button
+        className="text-white bg-green-400 px-6 py-2 rounded-xl h5"
+        onClick={handleRegister}
+      >
+        반려동물 등록하기
+      </button>
+    </div>
+  );
 
   return (
-    <div className="p-4 pt-4 pb-20 px-5 space-y-6">
+    <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
       <SimpleHeader text="반려동물 관리" />
+      <div className="px-7 space-y-6 pt-6">
+        {/* 1. 반려동물 이미지 리스트 */}
+        <motion.div
+          className="flex px-7 gap-4 overflow-x-auto hide-scrollbar"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2, duration: 0.4 }}
+        >
+          {pets.map((pet, index) => (
+            <motion.div
+              key={`${pet.petId}-${index}`}
+              className="flex flex-col items-center cursor-pointer"
+              onClick={() => setSelectedPet(pet)} // 클릭 시 선택된 반려동물 설정
+              whileTap={{ scale: 0.95 }}
+            >
+              <ImageInputBox
+                src={`${import.meta.env.VITE_PHOTO_URL}${pet.photo}`}  // .env에 설정된 이미지 URL 사용
+                stroke={
+                  selectedPet?.petId === pet.petId
+                    ? 'border-4 border-pink-200'  // 선택된 반려동물만 pink로 표시
+                    : pet.photo && pet.photo !== '/images/pet_default.png'
+                      ? 'border-1 border-gray-300' // 기본 색상은 회색
+                      : 'border-1 border-pink-100'  // 이미지가 없는 경우 pink로 표시
+                }
+              />
+              <p className="p mt-2 text-black">{pet.name}</p>
+            </motion.div>
+          ))}
 
-      {/* 1. 이미지 박스 리스트 */}
-      <div className="flex justify-center gap-4 overflow-x-auto">
-        {pets.map((pet) => (
-          <div key={pet.id} className="flex flex-col items-center cursor-pointer" onClick={() => setSelectedPet(pet)}>
-            <ImageInputBox
-              src={pet.image}
-              stroke={pet.id === selectedPet?.id ? 'border-2 border-pink-200' : ''}
-            />
-            <p className="caption mt-2">{pet.name}</p>
-          </div>
-        ))}
+        {/* 등록 버튼 */}
+        <motion.div
+          className="flex flex-col items-center mt-5 cursor-pointer"
+          onClick={handleRegister}
+          whileTap={{ scale: 0.95 }}
+        >
+          <PlusIcon fill="#afcf7e" stroke="#fdfcfb" />
+        </motion.div>
+      </motion.div>
 
-        {/* 1-1. 동물 등록 버튼 */}
-        <div className="flex flex-col items-center cursor-pointer" onClick={handleRegister}>
-          <ImageInputBox />
-          <p className="caption mt-2">동물 등록</p>
-        </div>
+        {/* 탭 메뉴 */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.98 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.3, duration: 0.3 }}
+        >
+          <TabGroupPet selected={selectedTab} onSelect={setSelectedTab} />
+        </motion.div>
+
+        {/* 탭 콘텐츠 */}
+        <AnimatePresence mode="wait">
+          {selectedTab === '상세 정보' && selectedPet && (
+            <motion.div
+              key="info"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.3 }}
+            >
+              <OwnerPetTabInfo selectedPet={selectedPet} setSelectedPet={setSelectedPet} pets={pets} setPets={setPets}/>
+            </motion.div>
+          )}
+          {selectedTab === '진료 내역' && (
+            <motion.div
+              key="record"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.3 }}
+            >
+              <OwnerPetTabRecord selectedPet={selectedPet} />
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
-
-      {/* 2. 탭 그룹 */}
-      <TabGroupPet selected={selectedTab} onSelect={setSelectedTab} />
-
-      {/* 3. 상세 정보 or 진료 내역 */}
-      {selectedTab === '상세 정보' && selectedPet && (
-        <div className="space-y-3 bg-white p-4">
-          <div className="flex justify-between">
-            <p className="p text-brown-300">이름</p>
-            <p className="p">{selectedPet.name}</p>
-          </div>
-          <div className="flex justify-between">
-            <p className="p text-brown-300">나이</p>
-            <p className="p">{selectedPet.age}세</p>
-          </div>
-          <div className="flex justify-between">
-            <p className="p text-brown-300">성별</p>
-            <p className="p">{selectedPet.gender}</p>
-          </div>
-          <div className="flex justify-between">
-            <p className="p text-brown-300">동물 종류</p>
-            <p className="p">{selectedPet.type}</p>
-          </div>
-          <div className="flex justify-between items-center">
-            <p className="p text-brown-300">등록 코드</p>
-            <div className="flex items-center gap-2">
-              <p className="p">{selectedPet.code}</p>
-              <CopyButton />
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* 4. 삭제 / 수정 버튼 */}
-      {selectedTab === '상세 정보' && (
-        <>
-          <div className="space-y-3">
-            <Button text="동물 삭제하기" color="green" className="h4" onClick={handleDelete} />
-          </div>
-          <div className="space-y-3">
-            <Button text="상세 정보 수정하기" color="green" className="h4 text-white" onClick={handleEdit} />
-          </div>
-        </>
-      )}
-    </div>
+    </motion.div>
   );
 }

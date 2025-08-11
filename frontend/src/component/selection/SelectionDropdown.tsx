@@ -2,40 +2,21 @@ import React, { useState, useEffect } from 'react';
 import DropdownArrow from '@/component/icon/Dropdown_Arrow';
 import { useSubjectStore } from '@/store/SubjectStore';
 
+// 수정된 Dropdown.tsx
 interface DropdownProps {
   options: Array<{ value: string; label: string }>;
   placeholder?: string;
+  value: string;
+  onChange: (value: string) => void;
 }
 
-export default function Dropdown({ options, placeholder = '' }: DropdownProps) {
-  const setSubject = useSubjectStore((state) => state.setSubject);
-
-  //  placeholder가 있으면 "", 없으면 첫 번째 옵션 value
-  const [selectedValue, setSelectedValue] = useState(
-    placeholder !== '' ? '' : options[0]?.value || '',
-  );
-
-  // options나 placeholder가 바뀔 때도 초기화
-  useEffect(() => {
-    setSelectedValue(placeholder !== '' ? '' : options[0]?.value || '');
-  }, [options, placeholder]);
-
-  // 선택값이 바뀔 때마다 store에 저장
-  useEffect(() => {
-    if (selectedValue) {
-      setSubject(selectedValue);
-    }
-  }, [selectedValue, setSubject]);
-
+export default function SelectionDropdown({ options, placeholder = '', value, onChange }: DropdownProps) {
   return (
     <div className="relative">
       <select
-        value={selectedValue}
-        onChange={(e) => setSelectedValue(e.target.value)}
-        className="w-full border border-gray-400 h-12 appearance-none 
-        focus:outline-none 
-        hover:outline-none 
-        bg-green-100 rounded-2xl px-4 py-2"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="w-full border bg-white border-gray-400 h-12 appearance-none rounded-2xl px-4 py-2 focus:outline-none focus:ring-0 focus:border-green-300 focus:border-2"
       >
         {placeholder !== '' && (
           <option value="" disabled hidden>
@@ -48,8 +29,8 @@ export default function Dropdown({ options, placeholder = '' }: DropdownProps) {
           </option>
         ))}
       </select>
-      <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2">
-        <DropdownArrow width={24} height={24} />
+      <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 z-10 text-gray-500">
+        <DropdownArrow width={24} height={24} stroke="currentColor" />
       </span>
     </div>
   );

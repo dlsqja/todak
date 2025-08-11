@@ -1,5 +1,5 @@
-import React from "react";
-import StatusBadge from "@/component/state/StatusBadge";
+import React from 'react';
+import StatusBadge from '@/component/state/StatusBadge';
 
 interface TreatmentSlideCardProps {
   department: string;
@@ -8,6 +8,7 @@ interface TreatmentSlideCardProps {
   time: string;
   isAuthorized: boolean;
   is_signed: boolean;
+  onClick?: () => void;
 }
 
 const TreatmentSlideCard: React.FC<TreatmentSlideCardProps> = ({
@@ -16,10 +17,14 @@ const TreatmentSlideCard: React.FC<TreatmentSlideCardProps> = ({
   petInfo,
   time,
   isAuthorized,
-  is_signed
+  is_signed,
+  onClick,
 }) => {
   return (
-    <div className="w-full h-[96px] shrink-0 bg-white rounded-[12px] shadow-[0px_5px_15px_rgba(0,0,0,0.08)] p-4 overflow-hidden">
+    <div
+      className="w-full h-[96px] shrink-0 bg-white rounded-[12px] shadow-[0px_5px_15px_rgba(0,0,0,0.08)] p-4 overflow-hidden"
+      onClick={onClick}
+    >
       <div className="flex flex-col justify-between h-full">
         {/* 상단: 진료과 / 시간 */}
         <div className="flex justify-between items-start">
@@ -34,7 +39,7 @@ const TreatmentSlideCard: React.FC<TreatmentSlideCardProps> = ({
         <div className="flex justify-between items-end">
           <p className="caption text-black leading-none">{petInfo}</p>
           <div className="flex-shrink-0 leading-none translate-y-[-4px]">
-            <StatusBadge type="treatment" statusKey={is_signed}/>
+            <StatusBadge type="treatment" statusKey={is_signed ? 'true' : 'false'} />
           </div>
         </div>
       </div>
