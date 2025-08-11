@@ -10,6 +10,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import PlusIcon from '@/component/icon/PlusIcon';
 
 import { getMyPets } from '@/services/api/Owner/ownerpet'; // ✅ API 함수 import
+import usePetStore from '@/store/petStore';
 
 export default function OwnerPetHome() {
   const navigate = useNavigate();
@@ -18,6 +19,8 @@ export default function OwnerPetHome() {
   const [selectedTab, setSelectedTab] = useState('상세 정보');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { deletePet } = usePetStore();  // Zustand store 사용
+
 
   const handleRegister = () => {
     navigate('/owner/pet/register');
@@ -43,7 +46,7 @@ export default function OwnerPetHome() {
     };
 
     fetchPets();
-  }, []);
+  }, [setPets, setSelectedPet]);
 
   if (isLoading) return <div className="p">불러오는 중...</div>;
   if (error) return <div className="p">에러 발생: {error.message}</div>;
@@ -120,7 +123,12 @@ export default function OwnerPetHome() {
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.3 }}
             >
-              <OwnerPetTabInfo selectedPet={selectedPet} setSelectedPet={setSelectedPet} pets={pets} setPets={setPets}/>
+              <OwnerPetTabInfo
+              selectedPet={selectedPet}
+              setSelectedPet={setSelectedPet}
+              pets={pets}
+              setPets={setPets}
+              onDelete={deletePet}/>
             </motion.div>
           )}
           {selectedTab === '진료 내역' && (
