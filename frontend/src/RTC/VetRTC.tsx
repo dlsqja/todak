@@ -81,6 +81,7 @@ export default function VetRTC() {
       cancelled = true;
       socket.current?.close();
       socket.current = null;
+      console.log('socket end');
     };
   }, []);
 
@@ -95,7 +96,7 @@ export default function VetRTC() {
     }
   }
 
-  const endCall = () => {
+  const endCall = async () => {
     socket.current?.send(
       JSON.stringify({
         id: 'leave',
@@ -106,12 +107,12 @@ export default function VetRTC() {
     webRtcPeerRef.current = null;
     stopLocalVideo();
     stopRemoteVideo();
-    apiClient
+    await apiClient
       .delete(`treatments/vets/end/${sessionIdRef.current}`)
       .then((res) => console.log(res))
       .catch((err) => console.log(err));
     alert('진료가 종료되었습니다.');
-    navigator(-1);
+    navigator('/vet/treatment');
   };
 
   const stopLocalVideo = () => {
