@@ -12,6 +12,7 @@ import { subjectmapping } from '@/utils/subjectMapping';
 import type { ReservationsResponse, PetResponse, OwnerReservationList } from '@/types/Owner/ownerreservationType';
 import { statusMapping } from '@/utils/statusMapping';
 
+
 export default function OwnerReservationHome() {
   const VITE_PHOTO_URL = import.meta.env.VITE_PHOTO_URL;
   const navigate = useNavigate();
