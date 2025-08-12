@@ -7,14 +7,12 @@ export const getTreatmentWaitingList = async (): Promise<OwnerTreatmentsByPet[]>
   const res = await apiClient.get('/treatments/owner?type=0');
   return res.data?.data ?? [];
 };
-getTreatmentWaitingList();
 
 // 비대면 진료 완료 목록
 export const getTreatments = async () => {
   const res = await apiClient.get('/treatments/owner?type=1');
   return res.data?.data ?? [];
 };
-getTreatments();
 
 // 비대면 상세 목록
 export const getTreatmentDetail = async (treatmentId: number) => {

@@ -4,7 +4,7 @@ import { replace, useLocation, useNavigate } from 'react-router-dom';
 import apiClient from '@/plugins/axios';
 
 // sessionId는 reservatioId로 -> private_key니깐. 웹소켓으로 진행하므로, socketId로 back에서 구분. sessionId만 필요하다.
-export default function VideoCall() {
+export default function OwnerRTC() {
   const localVideoRef = useRef<HTMLVideoElement>(null);
   const remoteVideoRef = useRef<HTMLVideoElement>(null);
   const socket = useRef<WebSocket | null>(null);
@@ -40,33 +40,56 @@ export default function VideoCall() {
   };
 
   useEffect(() => {
-    const treatement_id = location.state;
-    if (!treatement_id) {
-      alert('해당 세션에 접근할 수 없습니다.');
-      navigator(-1);
-      return;
-    }
-    console.log('treatementId: ', treatement_id);
-    const newSessionId = treatement_id.treatmentId.toString();
-    sessionIdRef.current = newSessionId;
-    location.state = null;
+    let cancelled = false;
 
-    const wsProtocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
-    const wsUrl =
-      wsProtocol === 'wss' ? `${wsProtocol}://${window.location.host}/ws` : `${wsProtocol}://localhost:8080/api/v1/ws`;
-    // console.log('socket url:', wsUrl);
-    const ws = new WebSocket(wsUrl);
-    ws.onopen = () => {
-      console.log('WS opened');
+    const run = async () => {
+      const treatment = location.state as { treatmentId: number } | null;
+      if (!treatment) {
+        alert('해당 세션에 접근할 수 없습니다.');
+        navigator(-1);
+        return;
+      }
+      sessionIdRef.current = String(treatment.treatmentId);
+
+      const ok = await checkRoom(sessionIdRef.current);
+      if (!ok || cancelled) return; // ← 실패하면 즉시 종료
+
+      const wsProtocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+      const wsUrl =
+        wsProtocol === 'wss'
+          ? `${wsProtocol}://${window.location.host}/ws`
+          : `${wsProtocol}://localhost:8080/api/v1/ws`;
+
+      const ws = new WebSocket(wsUrl);
       socket.current = ws;
+
+      ws.onopen = () => {
+        if (cancelled) return;
+        console.log('WS opened');
+        startCall();
+      };
+      ws.onmessage = onMessage;
     };
-    ws.onmessage = onMessage;
-    startCall();
+
+    run();
+
     return () => {
-      ws.close();
+      cancelled = true;
+      socket.current?.close();
       socket.current = null;
     };
   }, []);
+
+  async function checkRoom(roomid: string): Promise<boolean> {
+    try {
+      await apiClient.patch(`/treatments/owner/start/${roomid}`);
+      return true;
+    } catch (err) {
+      alert('현재 진료를 할 수 없습니다. 다시 확인해주세요.');
+      navigator(-1);
+      return false;
+    }
+  }
 
   const endCall = () => {
     socket.current?.send(
@@ -79,10 +102,7 @@ export default function VideoCall() {
     webRtcPeerRef.current = null;
     stopLocalVideo();
     stopRemoteVideo();
-    apiClient
-      .delete(`treatments/vets/end/${sessionIdRef.current}`)
-      .then((res) => console.log(res))
-      .catch((err) => console.log(err));
+    alert('진료가 종료되었습니다.');
     navigator(-1);
   };
 

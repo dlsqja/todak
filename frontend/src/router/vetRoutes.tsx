@@ -9,7 +9,7 @@ import VetMyPage from '@/component/pages/Vet/Mypage/VetMypage';
 import VetTreatmentDetail from '@/component/pages/Vet/Treatment/VetTreatmentDetail';
 import VetTreatmentRTC from '@/component/pages/Vet/Treatment/VetTreatmentRTC';
 import VetHomeGuide from '@/component/pages/Vet/Home/VetHomeGuide';
-import VideoCall from '@/RTC/VideoCall';
+import VetRTC from '@/RTC/vetRTC';
 
 const vetRoutes = {
   path: '/vet',
@@ -29,7 +29,7 @@ const vetRoutesWithoutMenu = {
     { path: 'home/guide', element: <VetHomeGuide /> },
 
     { path: 'treatment/detail/:reservationId', element: <VetTreatmentDetail /> },
-    { path: 'treatment/rtc/', element: <VideoCall /> },
+    { path: 'treatment/rtc/', element: <VetRTC /> },
     { path: 'records/detail/:treatmentId', element: <VetRecordDetail /> },
   ],
 };
