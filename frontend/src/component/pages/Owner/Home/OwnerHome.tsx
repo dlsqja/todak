@@ -6,6 +6,15 @@ import PetProfileCard from '@/component/card/PetProfileCard';
 import { motion } from 'framer-motion';
 import { getMyPets } from '@/services/api/Owner/ownerpet';
 import type { Pet as ApiPet, PetGender } from '@/types/Owner/ownerpetType';
+import { getOwnerInfo } from '@/services/api/Owner/ownermypage';
+import { FiChevronRight } from 'react-icons/fi';
+
+const buildPhotoUrl = (photo?: string | null) => {
+  if (!photo) return '/images/pet_default.png';
+  if (photo.startsWith('http')) return photo;
+  const base = import.meta.env.VITE_PHOTO_URL || '';
+  return `${base}${photo}`;
+};
 
 type CardPet = {
   id: number;
@@ -13,6 +22,7 @@ type CardPet = {
   genderText: string;
   breedAge: string;
   weight?: string;
+  photoUrl: string;
   raw: ApiPet;
 };
 
@@ -38,7 +48,17 @@ export default function OwnerHome() {
   const [petList, setPetList] = useState<CardPet[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const scrollRef = useRef<HTMLDivElement>(null);
-
+  const [ownerName, setOwnerName] = useState<string>('');
+  useEffect(() => {
+    (async () => {
+      try {
+        const me = await getOwnerInfo();
+        setOwnerName(me?.name ?? '');
+      } catch {
+        setOwnerName(''); // 실패 시 플레이스홀더로 처리!!!
+      }
+    })();
+  }, []);
   useEffect(() => {
     (async () => {
       try {
@@ -49,7 +69,8 @@ export default function OwnerHome() {
             name: p.name,
             genderText: genderToText(p.gender),
             breedAge: `${speciesKo[p.species]} ${p.age ?? 0}세`,
-            weight: '-',
+            weight: `${p.weight ?? 0}kg`,
+            photoUrl: buildPhotoUrl(p.photo),
             raw: p,
           })),
         );
@@ -94,12 +115,13 @@ export default function OwnerHome() {
     >
       {/* 상단 텍스트 */}
       <motion.h3
-        className="h3 mx-7 pt-13"
+        className="h3-black mx-7 pt-13"
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1, duration: 0.4 }}
       >
-        ㅇㅇㅇ님 반가워요!
+        <span className="h3-black text-green-300">{ownerName ? `${ownerName}님  ` : '사용자 님 '}</span>
+        <span className="h3-black text-black">반가워요!</span>
       </motion.h3>
 
       <motion.h3
@@ -113,12 +135,14 @@ export default function OwnerHome() {
 
       <motion.button
         onClick={() => navigate('/owner/home/guide')}
-        className="h5 mx-7 px-5 py-1 rounded-full inline-block bg-green-300 text-green-100 cursor-pointer"
+        className="h4 mx-7 px-6 py-2 rounded-full inline-block bg-green-300 text-green-100 cursor-pointer"
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 0.3, duration: 0.3 }}
       >
-        비대면 진료 가이드
+        <div className="flex items-center gap-3">
+          비대면 진료 가이드 <FiChevronRight className="w-4 h-4" />
+        </div>
       </motion.button>
 
       <motion.h3 className="mx-7 h3 mt-11">비대면 진료 시작하기</motion.h3>
@@ -151,6 +175,7 @@ export default function OwnerHome() {
                     genderAge={pet.genderText}
                     breedAge={pet.breedAge}
                     weight={pet.weight ?? '-'}
+                    imageUrl={pet.photoUrl}
                   />
                 </div>
               </motion.div>

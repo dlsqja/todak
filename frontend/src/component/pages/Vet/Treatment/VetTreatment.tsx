@@ -1,7 +1,7 @@
 import React from 'react';
 import '@/styles/main.css';
 import SimpleHeader from '@/component/header/SimpleHeader';
-import RemoteTreatmentCard from '@/component/card/RemoteTreatmentCard';
+import RemoteTreatmentCard from '@/component/card/OwnerRemoteTreatmentCard';
 import { useNavigate } from 'react-router-dom';
 
 export default function VetTreatment() {

@@ -19,3 +19,9 @@ export const getVetsByHospitalId = async (hospitalId: number): Promise<VetPublic
   // 서버가 이미 workingHours를 포함해 준다는 전제
   return res.data?.data ?? [];
 };
+
+export const getVetClosingHours = async (vetId: number): Promise<number[]> => {
+  const res = await apiClient.get(`/hospitals/${vetId}/closing-hours`);
+  // 서버가 [int] 배열 반환 (0~47) 가정
+  return res.data?.data ?? res.data ?? [];
+};

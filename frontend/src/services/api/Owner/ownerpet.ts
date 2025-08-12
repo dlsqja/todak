@@ -4,8 +4,7 @@ import axios from 'axios';
 
 // 1. 반려동물 목록 조회
 export const getMyPets = async () => {
-
-const res = await apiClient.get('/pets');
+  const res = await apiClient.get('/pets');
   console.log('🐶 API 응답:', res.data);
   return res.data.data;
 };
@@ -22,10 +21,7 @@ export const registerPet = async ({ petRequest, photo }) => {
 
   console.log('petRequest:', petRequest);
 
-  formData.append(
-    'petRequest',
-    new Blob([JSON.stringify(petRequest)], { type: 'application/json' })
-  );
+  formData.append('petRequest', new Blob([JSON.stringify(petRequest)], { type: 'application/json' }));
 
   if (photo) {
     formData.append('photo', photo);
@@ -48,18 +44,17 @@ export const registerPet = async ({ petRequest, photo }) => {
   return res.data;
 };
 
-
 // 4. 반려동물 수정 (multipart/form-data)
 export const updatePet = async ({ id, petRequest, photo }) => {
   const formData = new FormData();
 
-  formData.append(
-    'petRequest',
-    new Blob([JSON.stringify(petRequest)], { type: 'application/json' })
-  );
+  formData.append('petRequest', new Blob([JSON.stringify(petRequest)], { type: 'application/json' }));
 
-  if (photo) {
+  if (photo && photo !== '') {
     formData.append('photo', photo);
+  } else if (photo === null) {
+    // 기본 이미지로 설정하라는 신호
+    formData.append('photo', '');
   }
 
   const res = await apiClient.patch(`/pets/${id}`, formData, {
@@ -70,8 +65,6 @@ export const updatePet = async ({ id, petRequest, photo }) => {
 
   return res.data;
 };
-
-
 
 // 5. 반려동물 코드 등록
 export const registerPetByCode = async (petCode) => {
@@ -89,3 +82,9 @@ export const getPets = async () => {
   return res.data;
 };
 
+// 반려동물 삭제 함수
+export const deletePet = async (petId: number) => {
+  const response = await apiClient.delete(`/pets/${petId}`);
+  console.log(response.data);
+  return response.data;
+};
