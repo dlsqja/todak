@@ -15,10 +15,8 @@ import OwnerReservationDetail from '@/component/pages/Owner/Reservation/OwnerRes
 import OwnerTreatmentDetail from '@/component/pages/Owner/Treatment/OwnerTreatmentDetail';
 import PaymentMethodPage from '@/component/pages/Owner/Home/OwnerHomePaymentMethod';
 import ApplyCompletePage from '@/component/pages/Owner/Home/OwnerHomeApplyComplete';
-import OwnerTreatmentRTC from '@/component/pages/Owner/Treatment/OwnerTreatmentRTC';
 import OwnerHomeGuide from '@/component/pages/Owner/Home/OwnerHomeGuide';
 import TreatmentDetailPage from '@/component/pages/Owner/Pet/OwnerPetTabRecordDetail';
-import VideoCall from '@/RTC/OwnerRTC';
 import OwnerRTC from '@/RTC/OwnerRTC';
 
 const ownerRoutes = {

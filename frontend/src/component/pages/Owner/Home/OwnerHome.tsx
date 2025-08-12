@@ -146,6 +146,7 @@ export default function OwnerHome() {
       </motion.button>
 
       <motion.h3 className="mx-7 h3 mt-11">비대면 진료 시작하기</motion.h3>
+      <motion.h3 className="mx-7 h4 text-gray-500 mt-1">진료 받고 싶은 반려동물을 선택해주세요</motion.h3>
 
       {/* 슬라이더: 바깥에서만 좌우 padding, 슬라이드는 전체 폭 = 컨테이너 폭 */}
       <div className="px-7">

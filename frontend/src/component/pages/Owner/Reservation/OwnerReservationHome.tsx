@@ -8,10 +8,11 @@ import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { getReservations } from '@/services/api/Owner/ownerreservation';
 import { timeMapping } from '@/utils/timeMapping';
 import { subjectMapping } from '@/utils/subjectMapping';
-import { motion, AnimatePresence } from 'framer-motion';  // 애니메이션 추가
+import { motion, AnimatePresence } from 'framer-motion'; // 애니메이션 추가
 
 import type { ReservationsResponse, PetResponse, OwnerReservationList } from '@/types/Owner/ownerreservationType';
 import { statusMapping } from '@/utils/statusMapping';
+import ReservationListCard from '@/component/card/ReservationListCard';
 
 export default function OwnerReservationHome() {
   const VITE_PHOTO_URL = import.meta.env.VITE_PHOTO_URL;
@@ -80,13 +81,9 @@ export default function OwnerReservationHome() {
       <div className="sticky top-0 z-10 bg-gray-50">
         <SimpleHeader text="나의 예약" />
         {/* 반려동물 선택 */}
-        <div className="flex gap-4 pt-6 px-7 overflow-x-auto hide-scrollbar">
+        <div className="flex gap-4 pt-6 px-7 overflow-x-scroll hide-scrollbar">
           {petList.map((pet, idx) => (
-            <div
-              key={idx}
-              className="flex flex-col items-center cursor-pointer"
-              onClick={() => setSelectedPet(idx)}
-            >
+            <div key={idx} className="flex flex-col items-center cursor-pointer" onClick={() => setSelectedPet(idx)}>
               <ImageInputBox
                 src={`${VITE_PHOTO_URL}${pet.photo}`}
                 stroke={
@@ -118,40 +115,51 @@ export default function OwnerReservationHome() {
       </div>
 
       {/* 필터링 결과 조회 */}
-      <div className="w-full px-7 mt-5 overflow-y-auto h-full hide-scrollbar">
+      <div className="w-full flex flex-col items-center gap-2 px-7 mt-5 overflow-y-auto h-full hide-scrollbar">
         <AnimatePresence>
           {reservations.length > 0 ? (
             reservations.map((res) => (
-              <motion.div
+              // (
+              //   console.log(res),
+              //   // <motion.div
+              <ReservationListCard
                 key={res.reservationId}
-                className="mb-5 cursor-pointer"
-                initial={{ opacity: 0, y: 20 }} // 초기 애니메이션: 위에서 아래로 나타남
-                animate={{ opacity: 1, y: 0 }}  // 애니메이션 끝: 원래 위치로
-                exit={{ opacity: 0, y: -20 }}   // 사라질 때: 위로 사라짐
-                transition={{ duration: 0.3 }}  // 애니메이션 지속 시간
-                onClick={() => {
+                doctorName={res.vetName}
+                hospitalName={res.hospitalName}
+                treatmentDate={timeMapping[res.reservationTime]}
+                department={subjectMapping[res.subject] ?? res.subject}
+                onClickDetail={() => {
                   if (res.status === 'REJECTED') {
                     // 반려 상태면 반려 사유와 함께 전달
                     navigate(`/owner/reservation/${res.reservationId}`, {
-                      state: { isRejected: true },
+                      state: {
+                        isRejected: true,
+                        selectedPetId: selectedPet,
+                        selectedTab: currentTab,
+                      },
                     });
                   } else {
                     // 일반 상세 페이지로 이동
-                    navigate(`/owner/reservation/${res.reservationId}`);
+                    navigate(`/owner/reservation/${res.reservationId}`, {
+                      state: {
+                        selectedPetId: selectedPet,
+                        selectedTab: currentTab,
+                      },
+                    });
                   }
                 }}
-              >
-                <div className="flex justify-between">
-                  <div className="flex flex-col">
-                    <div className="h4 text-black">{subjectMapping[res.subject]}</div>
-                    <div className="p text-black"> {res.vetName} 수의사</div>
-                    <div className="caption text-black">{res.hospitalName}</div>
-                  </div>
-                  <div className="flex flex-col items-center gap-2">
-                    <div className="h4 text-black">{timeMapping[res.reservationTime]}</div>
-                  </div>
-                </div>
-              </motion.div>
+              />
+              //   <div className="flex justify-between">
+              //     <div className="flex flex-col">
+              //       <div className="h4 text-black">{subjectMapping[res.subject]}</div>
+              //       <div className="p text-black"> {res.vetName} 수의사</div>
+              //       <div className="caption text-black">{res.hospitalName}</div>
+              //     </div>
+              //     <div className="flex flex-col items-center gap-2">
+              //     <div className="h4 tex t-black">{timeMapping[res.reservationTime]}</div>
+              //   </div>
+              // </div>
+              // {/* </motion.div> */}
             ))
           ) : (
             <div className="mt-8 h4 text-center text-gray-500"> {currentTab} 내역이 없습니다.</div>

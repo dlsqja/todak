@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useLocation } from 'react-router-dom';
+import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import BackHeader from '@/component/header/BackHeader';
 import ImageInputBox from '@/component/input/ImageInputBox';
 import { getReservationDetail, getReservationRejectDetail } from '@/services/api/Owner/ownerreservation';
@@ -9,12 +9,12 @@ import { subjectMapping } from '@/utils/subjectMapping';
 import { timeMapping } from '@/utils/timeMapping';
 import { speciesMapping } from '@/utils/speciesMapping';
 import { statusMapping } from '@/utils/statusMapping';
-import Button from '@/component/button/Button';
 
 export default function OwnerReservationDetail() {
+  const navigate = useNavigate();
   const [detail, setDetail] = useState<ReservationDetail>();
   const { reservationId } = useParams<{ reservationId: string }>();
-  const { isRejected } = useLocation().state || {};
+  const { isRejected, selectedPetId, selectedTab } = useLocation().state || {};
   const [rejectDetail, setRejectDetail] = useState<{ reason: string }>();
 
   //반려인 경우 반려사유 get 요청
@@ -56,7 +56,14 @@ export default function OwnerReservationDetail() {
 
   return (
     <div>
-      <BackHeader text="상세 정보" />
+      <BackHeader
+        text="상세 정보"
+        onBack={() =>
+          navigate('/owner/reservation', {
+            state: { selectedPetId: selectedPetId, selectedTab: selectedTab },
+          })
+        }
+      />
       <section className="flex flex-col gap-6 mt-4 px-7">
         <div className="flex justify-between border-b-1 border-gray-100 pb-4 py-3 ">
           <div className="flex flex-col gap-2">

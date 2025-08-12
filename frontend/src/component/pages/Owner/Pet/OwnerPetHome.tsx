@@ -20,12 +20,12 @@ const stripVariants = {
     transition: {
       delayChildren: 0.05,
       staggerChildren: 0.17,
-    }
-  }
+    },
+  },
 };
 const itemVariants = {
   hidden: { opacity: 0, x: -24 },
-  show:   { opacity: 1, x: 0, transition: { duration: 0.26, ease: [0.22, 1, 0.36, 1] } }
+  show: { opacity: 1, x: 0, transition: { duration: 0.26, ease: [0.22, 1, 0.36, 1] } },
 };
 
 export default function OwnerPetHome() {

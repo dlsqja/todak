@@ -7,9 +7,8 @@ import VetRecord from '@/component/pages/Vet/Record/VetRecordHome';
 import VetRecordDetail from '@/component/pages/Vet/Record/VetRecordDetail';
 import VetMyPage from '@/component/pages/Vet/Mypage/VetMypage';
 import VetTreatmentDetail from '@/component/pages/Vet/Treatment/VetTreatmentDetail';
-import VetTreatmentRTC from '@/component/pages/Vet/Treatment/VetTreatmentRTC';
 import VetHomeGuide from '@/component/pages/Vet/Home/VetHomeGuide';
-import VetRTC from '@/RTC/vetRTC';
+import VetRTC from '@/RTC/VetRTC';
 
 const vetRoutes = {
   path: '/vet',
