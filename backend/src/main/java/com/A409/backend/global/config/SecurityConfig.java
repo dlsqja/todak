@@ -85,6 +85,8 @@ public class SecurityConfig {
                         .requestMatchers("/staffs/**").hasRole("STAFF")
                         .requestMatchers("/hospitals/**").hasAnyRole("STAFF", "VET")
                         .requestMatchers("/reservations/hospitals/**").hasRole("STAFF")
+
+                        .requestMatchers("/kakao/logout").hasAnyRole("STAFF", "VET", "OWNER")
                         .anyRequest().authenticated())
                 .sessionManagement((session) -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
