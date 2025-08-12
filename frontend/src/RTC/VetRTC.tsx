@@ -2,6 +2,10 @@ import { useEffect, useRef, useState } from 'react';
 import * as KurentoUtils from 'kurento-utils';
 import { replace, useLocation, useNavigate } from 'react-router-dom';
 import apiClient from '@/plugins/axios';
+import SimpleHeader from '@/component/header/SimpleHeader';
+import MikeIcon from '@/component/icon/MikeIcon';
+import CallingEndIcon from '@/component/icon/CallingEndIcon';
+import SpeakerIcon from '@/component/icon/SpeakerIcon';
 
 // sessionId는 reservatioId로 -> private_key니깐. 웹소켓으로 진행하므로, socketId로 back에서 구분. sessionId만 필요하다.
 export default function VetRTC() {
@@ -58,12 +62,12 @@ export default function VetRTC() {
       if (!ok || cancelled) return;
 
       // ✅ 검증 통과 후에만 WS 연결
-      const wsProtocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
-      const wsUrl =
-        wsProtocol === 'wss'
-          ? `${wsProtocol}://${window.location.host}/ws`
-          : `${wsProtocol}://localhost:8080/api/v1/ws`;
-
+      // const wsProtocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+      // const wsUrl =
+      //   wsProtocol === 'wss'
+      //     ? `${wsProtocol}://${window.location.host}/ws`
+      //     : `${wsProtocol}://localhost:8080/api/v1/ws`;
+      const wsUrl = 'wss://70.12.246.252/ws';
       const ws = new WebSocket(wsUrl);
       socket.current = ws;
 
@@ -181,29 +185,37 @@ export default function VetRTC() {
   };
 
   return (
-    <div className="flex-col gap-2 p-4 space-y-2 text-center">
-      <div>
-        <p className="text-sm">내 화면</p>
-        <video ref={localVideoRef} autoPlay playsInline muted className="border w-full h-full bg-gray-200" />
-      </div>
-      <div>
-        <p className="text-sm">상대방 화면</p>
-        <video ref={remoteVideoRef} autoPlay playsInline className="border w-full h-full bg-gray-200" />
-      </div>
-      <div className="flex gap-2 justify-center">
-        {/* <input
-          type="text"
-          placeholder="접속할 방 이름을 적어주세요"
-          value={sessionId}
-          onChange={(e) => setSessionId(e.target.value)}
-          className="mt-2 px-4 py-2 bg-gray-500 rounded w-40"
-        /> */}
-        {/* <button onClick={startCall} className="mt-2 px-4 py-2 bg-blue-500 text-white rounded">
-          통화시작
-        </button> */}
-        <button onClick={endCall} className="mt-2 px-4 py-2 bg-blue-500 text-white rounded">
-          통화 종료
-        </button>
+    <div className="h-full bg-gray-50 flex flex-col rounded-2xl">
+      <SimpleHeader text="비대면 진료 중..." />
+      <div className="relative flex-1 bg-black">
+        {/* 상대방 화면  */}
+        <video ref={remoteVideoRef} autoPlay playsInline className="w-full h-full object-cover bg-gray-50" />
+
+        {/* 내 화면  */}
+        <div className="absolute top-4 right-4 w-32 h-24">
+          <video
+            ref={localVideoRef}
+            autoPlay
+            playsInline
+            muted
+            className="w-full h-full object-cover bg-gray-50 rounded-lg"
+          />
+          <p className="absolute -bottom-6 left-0 text-black caption-bold">내 화면</p>
+        </div>
+
+        {/* 반려인 화면 */}
+        <div className="absolute top-4 left-7">
+          <p className="text-white p bg-pink-200 bg-opacity-50 px-2 py-1 rounded-[12px]">반려인 화면</p>
+        </div>
+
+        {/* 컨트롤 버튼들 */}
+        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2">
+          <div className="flex gap-8 justify-center items-center">
+            <MikeIcon fill="#F0F0F0" iconFill="#B3B3B3" stroke="inherit" width={52} height={52} />
+            <CallingEndIcon fill="#D14D72" stroke="white" width={52} height={52} onClick={endCall} />
+            <SpeakerIcon fill="#F0F0F0" iconFill="#B3B3B3" stroke="inherit" width={52} height={52} />
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -6,6 +6,7 @@ import Button from '@/component/button/Button';
 import CallingEndIcon from '@/component/icon/CallingEndIcon';
 import MikeIcon from '@/component/icon/MikeIcon';
 import SpeakerIcon from '@/component/icon/SpeakerIcon';
+import apiClient from '@/plugins/axios';
 
 // sessionId는 reservatioId로 -> private_key니깐. 웹소켓으로 진행하므로, socketId로 back에서 구분. sessionId만 필요하다.
 export default function VideoCall() {
