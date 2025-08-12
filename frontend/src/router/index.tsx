@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Children } from 'react';
 import { createBrowserRouter } from 'react-router-dom';
 import ownerRoutes from '@/router/ownerRoutes';
 import vetRoutes from '@/router/vetRoutes';
@@ -8,6 +8,8 @@ import MobileLayout from '@/layouts/MobileLayout';
 import MainPage from '@/component/pages/MainPage';
 import MainLayout from '@/layouts/MainLayout';
 import HomeGuidePage from '@/component/pages/Owner/Home/OwnerHomeGuide';
+import path from 'path';
+import VideoCall from '@/RTC/VideoCall';
 
 const mainRoutes = {
   path: '/',
@@ -21,10 +23,17 @@ const homeGuideRoutes = {
   children: [{ path: '', element: <HomeGuidePage /> }],
 };
 
+const rtcRoutes = {
+  path: '/rtc',
+  element: <MobileLayout />,
+  children: [{ path: '', element: <VideoCall /> }],
+};
+
 const router = createBrowserRouter([
   mainRoutes,
   authRoutes,
   homeGuideRoutes,
+  rtcRoutes,
   ownerRoutes.ownerRoutes,
   ownerRoutes.ownerRoutesWithoutMenu,
   vetRoutes.vetRoutes,

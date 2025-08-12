@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import KurentoUtils from 'kurento-utils';
+import { useLocation, useNavigate } from 'react-router-dom';
 
+// sessionId는 reservatioId로 -> private_key니깐. 웹소켓으로 진행하므로, socketId로 back에서 구분. sessionId만 필요하다.
 export default function VideoCall() {
   const localVideoRef = useRef<HTMLVideoElement>(null);
   const remoteVideoRef = useRef<HTMLVideoElement>(null);
@@ -8,6 +10,8 @@ export default function VideoCall() {
   const [sessionId, setSessionId] = useState('');
   const sessionIdRef = useRef('');
   const webRtcPeerRef = useRef<any>(null);
+  const location = useLocation();
+  const navigator = useNavigate();
 
   const publicUrl = import.meta.env.VITE_EC2_PUBLIC;
   const publicPort = import.meta.env.VITE_COTURN_PORT;
@@ -35,6 +39,13 @@ export default function VideoCall() {
   };
 
   useEffect(() => {
+    const treatement_id = location.state;
+    if (!treatement_id) {
+      alert('해당 세션에 접근할 수 없습니다.');
+      navigator(-1);
+      return;
+    }
+
     const wsProtocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
     const wsUrl =
       wsProtocol === 'wss' ? `${wsProtocol}://${window.location.host}/ws` : `${wsProtocol}://localhost:8080/api/v1/ws`;
@@ -135,29 +146,30 @@ export default function VideoCall() {
   };
 
   return (
-    <div className="p-4 space-y-2">
-      <div className="flex gap-2">
-        <div>
-          <p className="text-sm">내 화면</p>
-          <video ref={localVideoRef} autoPlay playsInline muted className="border w-64 h-48 bg-gray-200" />
-        </div>
-        <div>
-          <p className="text-sm">상대방 화면</p>
-          <video ref={remoteVideoRef} autoPlay playsInline className="border w-64 h-48 bg-gray-200" />
-        </div>
+    <div className="flex-col gap-2 p-4 space-y-2 text-center">
+      <div>
+        <p className="text-sm">내 화면</p>
+        <video ref={localVideoRef} autoPlay playsInline muted className="border w-full h-full bg-gray-200" />
       </div>
-      <input
-        type="text"
-        placeholder="접속할 방 이름을 적어주세요"
-        value={sessionId}
-        onChange={(e) => setSessionId(e.target.value)}
-      />
-      <button onClick={startCall} className="mt-2 px-4 py-2 bg-blue-500 text-white rounded">
-        통화시작
-      </button>
-      <button onClick={endCall} className="mt-2 px-4 py-2 bg-blue-500 text-white rounded">
-        통화 종료
-      </button>
+      <div>
+        <p className="text-sm">상대방 화면</p>
+        <video ref={remoteVideoRef} autoPlay playsInline className="border w-full h-full bg-gray-200" />
+      </div>
+      <div className="flex gap-2 justify-center">
+        <input
+          type="text"
+          placeholder="접속할 방 이름을 적어주세요"
+          value={sessionId}
+          onChange={(e) => setSessionId(e.target.value)}
+          className="mt-2 px-4 py-2 bg-gray-500 rounded w-40"
+        />
+        <button onClick={startCall} className="mt-2 px-4 py-2 bg-blue-500 text-white rounded">
+          통화시작
+        </button>
+        <button onClick={endCall} className="mt-2 px-4 py-2 bg-blue-500 text-white rounded">
+          통화 종료
+        </button>
+      </div>
     </div>
   );
 }
