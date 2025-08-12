@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import SimpleHeader from '@/component/header/SimpleHeader';
 import ImageInputBox from '@/component/input/ImageInputBox';
 import TabGroupPet from '@/component/navbar/TabGroupPet';
@@ -14,9 +14,15 @@ import usePetStore from '@/store/petStore';
 
 export default function OwnerPetHome() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const { state } = useLocation();
+
+  // URL 파라미터나 state에서 탭 정보 확인
+  const initialTab = searchParams.get('tab') === 'record' ? '진료 내역' : state?.selectedTab || '상세 정보';
+
   const [pets, setPets] = useState([]);
   const [selectedPet, setSelectedPet] = useState(null);
-  const [selectedTab, setSelectedTab] = useState('상세 정보');
+  const [selectedTab, setSelectedTab] = useState(initialTab);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const { deletePet } = usePetStore(); // Zustand store 사용
@@ -32,7 +38,11 @@ export default function OwnerPetHome() {
         const data = await getMyPets();
         if (Array.isArray(data)) {
           setPets(data);
-          setSelectedPet(data[0]); // 첫 번째 pet 선택
+
+          // state로 전달받은 petId가 있으면 해당 펫을 선택, 없으면 첫 번째 펫
+          const targetPetId = state?.selectedPetId;
+          const targetPet = targetPetId ? data.find((pet) => pet.petId === targetPetId) : null;
+          setSelectedPet(targetPet || data[0]);
         } else {
           console.error('❌ 응답이 배열이 아님:', data);
           setPets([]); // fallback
@@ -87,7 +97,9 @@ export default function OwnerPetHome() {
                     : 'border-1 border-green-200' // 이미지가 없는 경우 pink로 표시
                 }
               />
-              <p className="p mt-2 text-black">{pet.name}</p>
+              <h4 className={selectedPet?.petId === pet.petId ? 'h4 mt-2 text-black' : 'p mt-2 text-black'}>
+                {pet.name}
+              </h4>
             </motion.div>
           ))}
 
