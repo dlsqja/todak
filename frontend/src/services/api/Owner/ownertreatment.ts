@@ -16,9 +16,6 @@ export const getTreatments = async () => {
   return res.data?.data ?? [];
 };
 
-getTreatmentWaitingList();
-getTreatments();
-
 // 비대면 상세 목록
 export const getTreatmentDetail = async (treatmentId: number) => {
   const buckets = await getTreatments();
