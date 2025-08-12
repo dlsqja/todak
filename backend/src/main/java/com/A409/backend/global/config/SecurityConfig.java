@@ -83,7 +83,7 @@ public class SecurityConfig {
                         .requestMatchers("/treatments/vets/**").hasRole("VET")
 
                         .requestMatchers("/staffs/**").hasRole("STAFF")
-                        .requestMatchers("/hospitals/**").hasRole("STAFF")
+                        .requestMatchers("/hospitals/**").hasAnyRole("STAFF", "VET")
                         .requestMatchers("/reservations/hospitals/**").hasRole("STAFF")
                         .anyRequest().authenticated())
                 .sessionManagement((session) -> session
