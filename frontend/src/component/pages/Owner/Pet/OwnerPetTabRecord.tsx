@@ -1,11 +1,10 @@
-// OwnerPetTabRecord.tsx
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import SelectionDropdown from '@/component/selection/SelectionDropdown';
 import TreatmentRecordCard from '@/component/card/TreatmentRecordCard';
 import { getTreatments } from '@/services/api/Owner/ownertreatment';
 import type { Pet } from '@/types/Owner/ownerpetType';
-import { subjectmapping } from '@/utils/subjectMapping'; // ✅ 추가
+import { subjectmapping } from '@/utils/subjectMapping';
 
 type Subject = 'DENTAL' | 'DERMATOLOGY' | 'ORTHOPEDICS' | 'OPHTHALMOLOGY';
 
@@ -21,15 +20,13 @@ type UIRecord = {
   treatmentDay: string;
 };
 
-// 🔧 순환 의존 방지: 필요할 때만 ownerreservation을 동적 로드
+// 필요할 때만 ownerreservation을 동적 로드
 async function buildHospitalMap() {
   try {
     const { getReservations } = await import('@/services/api/Owner/ownerreservation');
     const resGroups = await getReservations(); // [{ petResponse, reservations }, ...]
     const map = new Map<number, string>();
-    resGroups?.forEach((g: any) =>
-      g?.reservations?.forEach((r: any) => map.set(r.reservationId, r.hospitalName))
-    );
+    resGroups?.forEach((g: any) => g?.reservations?.forEach((r: any) => map.set(r.reservationId, r.hospitalName)));
     return map;
   } catch (e) {
     console.warn('병원명 맵 생성 실패, 병원명 미표시로 진행:', e);
@@ -49,15 +46,13 @@ export default function OwnerPetTabRecord({ selectedPet }: OwnerPetTabRecordProp
     const fetchData = async () => {
       try {
         const [treats, hospitalMap] = await Promise.all([
-          getTreatments(),        // [{ petResponse, treatments }]
-          buildHospitalMap(),     // Map<reservationId, hospitalName>
+          getTreatments(), // [{ petResponse, treatments }]
+          buildHospitalMap(), // Map<reservationId, hospitalName>
         ]);
 
         const matched = treats.find((e) => e.petResponse.petId === selectedPet.petId);
         const rows: UIRecord[] = (matched?.treatments ?? []).map((t: any) => {
-          const day =
-            t?.reservationDay ??
-            (t?.treatmentInfo?.startTime ? t.treatmentInfo.startTime.slice(0, 10) : '');
+          const day = t?.reservationDay ?? (t?.treatmentInfo?.startTime ? t.treatmentInfo.startTime.slice(0, 10) : '');
 
           return {
             id: t.reservationId,
@@ -78,13 +73,16 @@ export default function OwnerPetTabRecord({ selectedPet }: OwnerPetTabRecordProp
   }, [selectedPet]);
 
   const handleClickDetail = (reservationId: number) => {
-    navigate(`/owner/pet/treatment/detail/${reservationId}`);
+    navigate(`/owner/pet/treatment/detail/${reservationId}`, {
+      state: {
+        returnTab: '진료 내역',
+        petId: selectedPet?.petId,
+      },
+    });
   };
 
   const filtered = records.filter(
-    (t) =>
-      (!selectedSubject || t.subject === selectedSubject) &&
-      (!selectedDate || t.treatmentDay === selectedDate)
+    (t) => (!selectedSubject || t.subject === selectedSubject) && (!selectedDate || t.treatmentDay === selectedDate),
   );
 
   const uniqueDates = Array.from(new Set(records.map((t) => t.treatmentDay))).filter(Boolean);

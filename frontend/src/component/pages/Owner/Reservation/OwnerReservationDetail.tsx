@@ -16,18 +16,19 @@ export default function OwnerReservationDetail() {
   const { reservationId } = useParams<{ reservationId: string }>();
   const { isRejected } = useLocation().state || {};
   const [rejectDetail, setRejectDetail] = useState<{ reason: string }>();
+
+  //반려인 경우 반려사유 get 요청
   useEffect(() => {
     if (reservationId) {
       if (isRejected) {
         const getRejectDetail = async () => {
           const rejectDetail = await getReservationRejectDetail(Number(reservationId));
-          console.log('rejectDetail:', rejectDetail);
           setRejectDetail(rejectDetail);
         };
         getRejectDetail();
       }
 
-      // reservationId로 상세 정보 조회
+      // 상세 정보 조회
       const reservationDetail = async (reservationId: number) => {
         const detail = await getReservationDetail(Number(reservationId));
         setDetail(detail);
@@ -57,7 +58,7 @@ export default function OwnerReservationDetail() {
     <div>
       <BackHeader text="상세 정보" />
       <section className="flex flex-col gap-6 mt-4 px-7">
-        <h4 className="h4">예약 상세 정보</h4>
+        <h4 className="h3">예약 상세 정보</h4>
         <div className="flex justify-between border-b-1 border-gray-100 pb-4 ">
           <div className="flex flex-col gap-2">
             <div className="h4">{detail.pet.name}</div>
@@ -86,17 +87,17 @@ export default function OwnerReservationDetail() {
             {detail.reservationDay} | <span className="p">{timeMapping[detail.reservationTime]}</span>
           </div>
         </div>
-        {isRejected && rejectDetail && (
-          <div className="flex flex-col border-b-1 border-gray-100 pb-4 gap-2">
-            <div className="h4">반려 사유</div>
-            <div className="p">{rejectDetail.reason}</div>
-          </div>
-        )}
         <div className="flex flex-col border-b-1 border-gray-100 pb-4 gap-2 ">
           <div className="h4">증상</div>
           <div>{detail.photo && <ImageInputBox src={detail.photo} stroke="border-5 border-green-200" />}</div>
           <div className="p">{detail.description}</div>
         </div>
+        {isRejected && rejectDetail && (
+          <div className="flex flex-col pb-4 gap-2">
+            <div className="h3 text-red-400">반려 사유</div>
+            <div className="p text-red-400">{rejectDetail.reason}</div>
+          </div>
+        )}
       </section>
     </div>
   );

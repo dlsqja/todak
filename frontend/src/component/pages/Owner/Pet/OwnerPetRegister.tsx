@@ -14,10 +14,9 @@ export default function OwnerPetRegister() {
   const [image, setImage] = useState<File | null>(null); // File 객체로 저장
   const [name, setName] = useState('');
   const [age, setAge] = useState('');
-  const [weight, setWeight] = useState(''); 
-  const [gender, setGender] = useState('');  // 성별 + 중성화 여부
+  const [weight, setWeight] = useState('');
+  const [gender, setGender] = useState(''); // 성별 + 중성화 여부
   const [type, setType] = useState('');
-
 
   const fileInputRef = useRef<HTMLInputElement | null>(null); // file input에 접근하기 위한 ref
 
@@ -25,8 +24,8 @@ export default function OwnerPetRegister() {
   const genderMap = {
     '남(중성화)': 'MALE_NEUTERING',
     '여(중성화)': 'FEMALE_NEUTERING',
-    '남': 'MALE',
-    '여': 'FEMALE',
+    남: 'MALE',
+    여: 'FEMALE',
     '성별 없음': 'NON',
   };
 
@@ -45,11 +44,10 @@ export default function OwnerPetRegister() {
   };
 
   const handleSubmit = async () => {
-
     try {
       // genderMap을 통해 결합된 성별 + 중성화 여부 처리
       const genderValue = genderMap[gender];
-      console.log("type",type)
+      console.log('type', type);
       const petRequest = {
         name,
         age: parseInt(age),
@@ -77,7 +75,6 @@ export default function OwnerPetRegister() {
         <div className="flex flex-col items-center space-y-2 pb-6">
           <ImageInputBox
             src={image ? URL.createObjectURL(image) : ''} // 이미지 미리보기
-            onChange={handleImageChange} // 이미지 선택 시 상태 업데이트
           />
           <input
             type="file"
@@ -111,13 +108,7 @@ export default function OwnerPetRegister() {
           />
 
           <div className="flex gap-4">
-            <Input
-              id="age"
-              label="나이"
-              placeholder="0"
-              value={age}
-              onChange={(e) => setAge(e.target.value)}
-            />
+            <Input id="age" label="나이" placeholder="0" value={age} onChange={(e) => setAge(e.target.value)} />
             <Input
               id="weight"
               label="체중(kg)"
