@@ -75,7 +75,7 @@ export default function OwnerPetHome() {
       <div className="px-7 space-y-6 pt-6">
         {/* 1. 반려동물 이미지 리스트 */}
         <motion.div
-          className="flex px-7 gap-4 overflow-x-auto hide-scrollbar"
+          className="flex gap-4 overflow-x-auto hide-scrollbar"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2, duration: 0.4 }}

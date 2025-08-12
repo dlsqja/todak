@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import Button from '@/component/button/Button';
 import { useParams, useLocation } from 'react-router-dom';
 import BackHeader from '@/component/header/BackHeader';
 import ImageInputBox from '@/component/input/ImageInputBox';
@@ -10,6 +9,7 @@ import { subjectmapping } from '@/utils/subjectMapping';
 import { timeMapping } from '@/utils/timeMapping';
 import { speciesMapping } from '@/utils/speciesMapping';
 import { statusMapping } from '@/utils/statusMapping';
+import Button from '@/component/button/Button';
 
 export default function OwnerReservationDetail() {
   const [detail, setDetail] = useState<ReservationDetail>();

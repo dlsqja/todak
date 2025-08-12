@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import '@/styles/main.css';
 import SimpleHeader from '@/component/header/SimpleHeader';
-import RemoteTreatmentCard from '@/component/card/RemoteTreatmentCard';
+import OwnerRemoteTreatmentCard from '@/component/card/OwnerRemoteTreatmentCard';
 import { useNavigate } from 'react-router-dom';
 import { genderMapping } from '@/utils/genderMapping';
 import { speciesMapping } from '@/utils/speciesMapping';
@@ -42,15 +42,14 @@ export default function OwnerTreatment() {
             console.log('treatment:', treatment);
             console.log('item:', item);
             return (
-              <RemoteTreatmentCard
+              <OwnerRemoteTreatmentCard
                 key={item.reservationId}
                 petName={treatment.petResponse.name}
-                petInfo={`예약 시간 : ${timeMapping[item.reservationTime]}`}
+                petInfo={`진료 예정 시간 : ${timeMapping[item.reservationTime]}`}
                 department={subjectmapping[item.subject]}
                 photo={`${VITE_PHOTO_URL}${treatment.petResponse.photo}`}
-                onDetailClick={() => handleDetailClick(item.reservationId)}
-                onTreatClick={() => handleRTCClick(item.reservationId)}
                 buttonText="상세 정보"
+                onClick={() => handleDetailClick(item.reservationId)}
               />
             );
           }),

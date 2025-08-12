@@ -14,7 +14,7 @@ interface RemoteTreatmentCardProps {
   photo?: string;
 }
 
-const RemoteTreatmentCard: React.FC<RemoteTreatmentCardProps> = ({
+const VetRemoteTreatmentCard: React.FC<RemoteTreatmentCardProps> = ({
   buttonText = '',
   petName = '',
   petInfo = '',
@@ -63,4 +63,4 @@ const RemoteTreatmentCard: React.FC<RemoteTreatmentCardProps> = ({
   );
 };
 
-export default RemoteTreatmentCard;
+export default VetRemoteTreatmentCard;
