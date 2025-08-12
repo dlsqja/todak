@@ -116,16 +116,21 @@ export default function OwnerPetTabRecord({ selectedPet }: OwnerPetTabRecordProp
 
       <div className="space-y-4">
         {filtered.length === 0 && <p className="text-center text-gray-400">진료 내역이 없습니다.</p>}
-        {filtered.map((t) => (
-          <TreatmentRecordCard
-            key={t.id}
-            doctorName={t.vetName}
-            hospitalName={t.hospitalName}
-            treatmentDate={t.treatmentDay}
-            department={subjectmapping[t.subject] ?? t.subject} // ✅ 한글 변환 적용
-            onClickDetail={() => handleClickDetail(t.id)}
-          />
-        ))}
+        {filtered.map(
+          (t) => (
+            console.log(t),
+            (
+              <TreatmentRecordCard
+                key={t.id}
+                doctorName={t.vetName}
+                hospitalName={t.hospitalName}
+                treatmentDate={t.treatmentDay}
+                department={subjectmapping[t.subject] ?? t.subject} // ✅ 한글 변환 적용
+                onClickDetail={() => handleClickDetail(t.id)}
+              />
+            )
+          ),
+        )}
       </div>
     </div>
   );

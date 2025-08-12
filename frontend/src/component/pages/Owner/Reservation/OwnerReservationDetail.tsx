@@ -58,8 +58,7 @@ export default function OwnerReservationDetail() {
     <div>
       <BackHeader text="상세 정보" />
       <section className="flex flex-col gap-6 mt-4 px-7">
-        <h4 className="h3">예약 상세 정보</h4>
-        <div className="flex justify-between border-b-1 border-gray-100 pb-4 ">
+        <div className="flex justify-between border-b-1 border-gray-100 pb-4 py-3 ">
           <div className="flex flex-col gap-2">
             <div className="h4">{detail.pet.name}</div>
             <div className="flex gap-1">
@@ -89,13 +88,15 @@ export default function OwnerReservationDetail() {
         </div>
         <div className="flex flex-col border-b-1 border-gray-100 pb-4 gap-2 ">
           <div className="h4">증상</div>
-          <div>{detail.photo && <ImageInputBox src={detail.photo} stroke="border-5 border-green-200" />}</div>
+          {detail.photo && (
+            <div>{!detail.photo && <ImageInputBox src={detail.photo} stroke="border-5 border-green-200" />}</div>
+          )}
           <div className="p">{detail.description}</div>
         </div>
         {isRejected && rejectDetail && (
           <div className="flex flex-col pb-4 gap-2">
             <div className="h3 text-red-400">반려 사유</div>
-            <div className="p text-red-400">{rejectDetail.reason}</div>
+            <div className="p text-black">{rejectDetail.reason}</div>
           </div>
         )}
       </section>
