@@ -19,17 +19,17 @@ public class RedisConfig {
 
     //TODO:: 배포용
 
-//    @Bean
-//    public RedisConnectionFactory redisConnectionFactory() {
-//
-//        RedisSentinelConfiguration sentinelConfig = new RedisSentinelConfiguration()
-//                .master("mymaster")
-//                .sentinel("sentinel1", 26379)
-//                .sentinel("sentinel2", 26380)
-//                .sentinel("sentinel3", 26381);
-//
-//        return new LettuceConnectionFactory(sentinelConfig);
-//    }
+    @Bean
+    public RedisConnectionFactory redisConnectionFactory() {
+
+        RedisSentinelConfiguration sentinelConfig = new RedisSentinelConfiguration()
+                .master("mymaster")
+                .sentinel("sentinel1", 26379)
+                .sentinel("sentinel2", 26380)
+                .sentinel("sentinel3", 26381);
+
+        return new LettuceConnectionFactory(sentinelConfig);
+    }
 
 
     @Bean
