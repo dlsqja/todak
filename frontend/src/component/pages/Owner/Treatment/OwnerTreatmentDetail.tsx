@@ -61,21 +61,26 @@ export default function OwnerTreatmentDetail() {
   }
 
   const handleRTCClick = async (treatmentId: number) => {
-    const res = await apiClient
-      .patch(`/treatments/owner/start/${treatmentId}`)
-      .then((response) => {
-        console.log('response:', response);
-        navigate(`/owner/treatment/rtc`, {
-          state: {
-            treatmentId: treatmentId,
-          },
-        });
-      })
-      .catch((err) => {
-        console.log('error', err);
-        alert('아직 비대면 진료가 시작되지 않았습니다.');
-      });
-    console.log('res', res);
+    // const res = await apiClient
+    //   .patch(`/treatments/owner/start/${treatmentId}`)
+    //   .then((response) => {
+    //     console.log('response:', response);
+    //     navigate(`/owner/treatment/rtc`, {
+    //       state: {
+    //         treatmentId: treatmentId,
+    //       },
+    //     });
+    //   })
+    //   .catch((err) => {
+    //     console.log('error', err);
+    //     alert('아직 비대면 진료가 시작되지 않았습니다.');
+    //   });
+    //   console.log('res', res);
+    navigate(`/owner/treatment/rtc`, {
+      state: {
+        treatmentId: treatmentId,
+      },
+    });
   };
 
   return (

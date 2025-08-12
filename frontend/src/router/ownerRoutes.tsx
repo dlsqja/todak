@@ -18,7 +18,8 @@ import ApplyCompletePage from '@/component/pages/Owner/Home/OwnerHomeApplyComple
 import OwnerTreatmentRTC from '@/component/pages/Owner/Treatment/OwnerTreatmentRTC';
 import OwnerHomeGuide from '@/component/pages/Owner/Home/OwnerHomeGuide';
 import TreatmentDetailPage from '@/component/pages/Owner/Pet/OwnerPetTabRecordDetail';
-import VideoCall from '@/RTC/VideoCall';
+import VideoCall from '@/RTC/OwnerRTC';
+import OwnerRTC from '@/RTC/OwnerRTC';
 
 const ownerRoutes = {
   path: '/owner',
@@ -51,7 +52,7 @@ const ownerRoutesWithoutMenu = {
     { path: 'reservation/:reservationId', element: <OwnerReservationDetail /> },
 
     { path: 'treatment/:reservationId', element: <OwnerTreatmentDetail /> },
-    { path: 'treatment/rtc/', element: <VideoCall /> },
+    { path: 'treatment/rtc/', element: <OwnerRTC /> },
   ],
 };
 
