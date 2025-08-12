@@ -49,8 +49,8 @@ const ownerRoutesWithoutMenu = {
 
     { path: 'reservation/:reservationId', element: <OwnerReservationDetail /> },
 
-    { path: 'treatment/:reservationId', element: <OwnerReservationDetail /> },
-    { path: 'treatment/rtc/:id', element: <OwnerTreatmentRTC /> },
+    { path: 'treatment/:reservationId', element: <OwnerTreatmentDetail /> },
+    { path: 'treatment/rtc/:reservationId', element: <OwnerTreatmentRTC /> },
   ],
 };
 
