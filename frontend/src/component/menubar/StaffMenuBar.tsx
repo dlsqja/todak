@@ -35,7 +35,7 @@ const BottomMenuBar: React.FC = () => {
           <div
             key={index}
             className={`flex flex-col items-center cursor-pointer h-10 w-15
-            ${isActive ? 'text-black fill-black' : 'fill-gray-500 text-gray-500'}`}
+            ${isActive ? 'ttext-green-300 fill-green-300' : 'fill-gray-500 text-gray-500'}`}
             onClick={() => handleClick(menu.path)}
           >
             <Icon width={26} height={26} />

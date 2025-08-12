@@ -5,15 +5,18 @@ import type { OwnerTreatmentsByPet, TreatmentResponse, OwnerTreatmentItem } from
 // 비대면 진료 대기 목록
 export const getTreatmentWaitingList = async (): Promise<OwnerTreatmentsByPet[]> => {
   const res = await apiClient.get('/treatments/owner?type=0');
+  console.log('reswait:', res.data.data);
   return res.data?.data ?? [];
 };
-getTreatmentWaitingList();
 
 // 비대면 진료 완료 목록
 export const getTreatments = async () => {
   const res = await apiClient.get('/treatments/owner?type=1');
+  console.log('rescomplete:', res.data.data);
   return res.data?.data ?? [];
 };
+
+getTreatmentWaitingList();
 getTreatments();
 
 // 비대면 상세 목록

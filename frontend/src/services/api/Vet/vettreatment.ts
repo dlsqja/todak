@@ -7,5 +7,3 @@ export const getVetTreatmentList = async (): Promise<VetTreatmentListResponse[]>
   console.log('res:', res);
   return res.data?.data ?? res.data;
 };
-
-getVetTreatmentList();

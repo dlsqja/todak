@@ -100,21 +100,7 @@ export default function TreatmentDetailPage() {
 
       {/* AI 요약 진단서 */}
       <section className="px-6 mt-8 space-y-3">
-        <h4 className="h4 text-black">AI 요약 진단서</h4>
-        <div className="bg-white rounded-[12px] shadow-[0px_5px_15px_rgba(0,0,0,0.08)] px-5 py-6 space-y-5">
-          <p className="h4 text-black leading-relaxed whitespace-pre-wrap">{record.aiSummary || '요약 없음'}</p>
-          <p className="caption text-center text-gray-500 border border-gray-100 bg-gray-100 rounded-[12px] py-2 px-3">
-            본 요약문은 AI로 생성되었으며 수의사의 확인 절차를 통해
-            <br />
-            <span>검증된 내용이지만, 법적 효력은 없는 자료임을 명시합니다.</span>
-          </p>
-        </div>
-      </section>
-      <section className="px-6 mt-8 space-y-3"></section>
-
-      {/* 진료 내용 */}
-      <section className="px-6 mt-9 space-y-3">
-        <h4 className="h4 text-black">진료 내용</h4>
+        <h4 className="h4 text-black">진단서</h4>
         <div className="bg-white rounded-[12px] shadow-[0px_5px_15px_rgba(0,0,0,0.08)] px-5 py-6 space-y-5">
           <div className="space-y-3">
             <div className="flex justify-between">
@@ -129,8 +115,23 @@ export default function TreatmentDetailPage() {
               <p className="p text-black">수의사</p>
               <h4 className="h4 text-black">{record.vetName}</h4>
             </div>
-            <p className="p text-black"> 증상 </p>
-            {record.reservation?.photo && (
+          </div>
+          <p className="h4 text-black leading-relaxed whitespace-pre-wrap">{record.aiSummary || '요약 없음'}</p>
+          <p className="caption text-center text-gray-500 border border-gray-100 bg-gray-100 rounded-[12px] py-2 px-3">
+            본 요약문은 AI로 생성되었으며 수의사의 확인 절차를 통해
+            <br />
+            <span>검증된 내용이지만, 법적 효력은 없는 자료임을 명시합니다.</span>
+          </p>
+        </div>
+      </section>
+      <section className="px-6 mt-8 space-y-3"></section>
+
+      {/* 진료 내용 */}
+      <section className="px-6 mt-9 space-y-3">
+        <h4 className="h4 text-black">신청 내용</h4>
+        <div className="bg-white rounded-[12px] shadow-[0px_5px_15px_rgba(0,0,0,0.08)] px-5 py-6 space-y-5">
+          <div className="space-y-3">
+            {record.reservation?.photo && record.reservation.photo.trim() !== '' && (
               <ImageInputBox src={`${PHOTO_URL}${record.reservation.photo}`} stroke="border-5 border-green-200" />
             )}
             <h4 className="p text-black">{record.reservation?.description}</h4>
