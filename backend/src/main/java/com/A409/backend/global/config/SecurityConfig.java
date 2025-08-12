@@ -1,5 +1,6 @@
 package com.A409.backend.global.config;
 
+import com.A409.backend.global.security.jwt.ExceptionHandlerFilter;
 import com.A409.backend.global.security.jwt.JwtAuthenticationFilter;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -90,7 +91,8 @@ public class SecurityConfig {
                         .anyRequest().authenticated())
                 .sessionManagement((session) -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new ExceptionHandlerFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
