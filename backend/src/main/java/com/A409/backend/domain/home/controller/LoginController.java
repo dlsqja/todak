@@ -101,16 +101,18 @@ public class LoginController {
         ResponseCookie accessTokenCookie = ResponseCookie.from("ACCESSTOKEN", accessToken)
                 .httpOnly(true) //js 에서 document.cookie로 읽어오지 못하게함
                 .secure(false)   //https 에서만 가능
-                .sameSite("None")
+                .sameSite("Lax")
                 .path("/")
+                .domain(".p.ssafy.io")
                 .maxAge(Duration.ofDays(14))
                 .build();
 
         ResponseCookie refreshTokenCookie = ResponseCookie.from("REFRESHTOKEN", refreshToken)
                 .httpOnly(true) //js 에서 document.cookie로 읽어오지 못하게함
                 .secure(false)   //https 에서만 가능
-                .sameSite("None")
+                .sameSite("Lax")
                 .path("/")
+                .domain(".p.ssafy.io")
                 .maxAge(Duration.ofDays(14))
                 .build();
 
