@@ -19,3 +19,16 @@ export const getVetTreatmentList = async (): Promise<VetTreatmentListResponse[]>
   console.log('res:', res);
   return res.data?.data ?? res.data;
 };
+
+/** AI 요약 확인(서명) 처리 (PATCH /treatments/vets/complete/{treatment_id}) */
+export const completeVetTreatment = async (treatmentId: number): Promise<void> => {
+  await apiClient.patch(`/treatments/vets/complete/${treatmentId}`);
+};
+
+/** 진료 내용 수정 (POST /treatments/vets/{treatment_id}) — aiSummary만 받는 스펙 */
+export const updateVetTreatment = async (
+  treatmentId: number,
+  payload: { aiSummary?: string }
+): Promise<void> => {
+  await apiClient.post(`/treatments/vets/${treatmentId}`, payload);
+};
