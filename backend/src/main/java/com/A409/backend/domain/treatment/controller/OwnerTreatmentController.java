@@ -1,6 +1,7 @@
 package com.A409.backend.domain.treatment.controller;
 
 import com.A409.backend.domain.treatment.service.TreatmentService;
+import com.A409.backend.domain.user.vet.dto.VetResponse;
 import com.A409.backend.global.ai.STTData;
 import com.A409.backend.global.rabbitmq.SttRequestProducer;
 import com.A409.backend.global.response.APIResponse;
@@ -39,6 +40,21 @@ public class OwnerTreatmentController {
     public APIResponse<?> getTreatments(@AuthenticationPrincipal User user,@RequestParam Integer type){
 
         List<Map<String,Object>> treatments = treatmentService.getTreatmentsByOwnerIdAndType(user.getId(),type);
+
+        return APIResponse.ofSuccess(treatments);
+    }
+
+    @Operation(summary = "최근 진료 의사 리스트")
+    @ApiResponse(responseCode = "200",
+            content = @Content(
+                    mediaType = "application/json",
+                    array = @ArraySchema(schema = @Schema(implementation = VetResponse.class))
+            )
+    )
+    @GetMapping("/recent")
+    public APIResponse<?> getTreatments(@AuthenticationPrincipal User user){
+
+        List<VetResponse> treatments = treatmentService.getRencetTreatments(user.getId());
 
         return APIResponse.ofSuccess(treatments);
     }

@@ -44,7 +44,8 @@ public class Treatment {
     private Pet pet;
 
     @Column(name = "is_completed", nullable = false)
-    private Boolean isCompleted;
+    @Builder.Default
+    private Boolean isCompleted=false;
 
     private LocalDateTime startTime;
 

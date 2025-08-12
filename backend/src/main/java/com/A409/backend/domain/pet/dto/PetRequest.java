@@ -12,6 +12,7 @@ public class PetRequest {
     private Species species;
     private Gender gender;
     private Integer age;
+    private Float weight;
 
     public Pet toEntity() {
         return Pet.builder()
@@ -19,6 +20,7 @@ public class PetRequest {
                 .species(this.species)
                 .gender(this.gender)
                 .age(this.age)
+                .weight(this.weight)
                 .build();
     }
 

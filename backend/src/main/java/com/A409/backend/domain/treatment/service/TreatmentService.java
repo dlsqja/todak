@@ -8,6 +8,10 @@ import com.A409.backend.domain.treatment.dto.TreatementResponse;
 import com.A409.backend.domain.treatment.entity.Treatment;
 import com.A409.backend.domain.treatment.entity.TreatmentResponse;
 import com.A409.backend.domain.treatment.repository.TreatmentRepository;
+import com.A409.backend.domain.user.vet.dto.VetResponse;
+import com.A409.backend.domain.user.vet.dto.WorkingHourDto;
+import com.A409.backend.domain.user.vet.entity.WorkingHour;
+import com.A409.backend.domain.user.vet.service.WorkingHourService;
 import com.A409.backend.global.enums.ErrorCode;
 import com.A409.backend.global.exception.CustomException;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +28,7 @@ public class TreatmentService {
 
     private final TreatmentRepository treatmentRepository;
     private final PetService petService;
+    private final WorkingHourService workingHourService;
 
     public void saveAISummary(Long treatmentId,String summary){
 
@@ -38,12 +43,35 @@ public class TreatmentService {
 
         List<Treatment> treatmentList = new ArrayList<>();
         List<Map<String, Object>> result = new ArrayList<>();
+        List<PetResponse> petList = petService.getMyPets(ownerId);
+
         if(type==0){
             //진료 대기 목록
-            treatmentList = treatmentRepository.findAllByOwner_OwnerIdAndIsCompleted(ownerId,false);
+            for(PetResponse pet:petList){
+                treatmentList = treatmentRepository.findAllByOwner_OwnerIdAndIsCompletedAndPet_PetId(ownerId,false, pet.getPetId());
+                List<Map<String, Object>> treatmentsList  = treatmentList.stream()
+                        .map(treatments -> {
+                            Map<String, Object> map = new HashMap<>();
+                            map.put("reservationId",treatments.getReservation().getReservationId());
+                            map.put("vetName",treatments.getVet().getName());
+                            map.put("reservationDay", treatments.getReservation().getReservationDay());
+                            map.put("reservationTime", treatments.getReservation().getReservationTime());
+                            map.put("reservationDescription", treatments.getReservation().getDescription());
+                            map.put("photo", treatments.getPet().getPhoto());
+                            map.put("subject", treatments.getReservation().getSubject());
+                            return map;
+                        })
+                        .toList();
+
+                Map<String, Object> map = new HashMap<>();
+                map.put("petResponse", pet);
+                map.put("treatments", treatmentsList);
+
+                result.add(map);
+            }
+
         }
         else if(type==1){
-            List<PetResponse> petList = petService.getMyPets(ownerId);
 
             for(PetResponse pet : petList){
 
@@ -52,6 +80,7 @@ public class TreatmentService {
                         .map(treatments -> {
                             Map<String, Object> map = new HashMap<>();
                             map.put("treatementInfo", TreatementResponse.toResponse(treatments));
+                            map.put("hospitalName", treatments.getHospital().getName());
                             map.put("reservationId",treatments.getReservation().getReservationId());
                             map.put("vetName",treatments.getVet().getName());
                             map.put("reservationDay", treatments.getReservation().getReservationDay());
@@ -115,5 +144,37 @@ public class TreatmentService {
             throw  new CustomException(ErrorCode.ACCESS_DENIED);
         }
         return TreatmentResponse.toVetResponse(treatment);
+    }
+
+    public void saveResult(Long treatmentId,String result){
+        Treatment treatment = treatmentRepository.findByTreatmentId(treatmentId).orElseThrow(() -> new CustomException(ErrorCode.RESOURCE_NOT_FOUND));
+        treatment.setResult(result);
+        treatmentRepository.save(treatment);
+    }
+
+    public void saveAIResult(Long treatmentId,String aiResult) {
+        Treatment treatment = treatmentRepository.findByTreatmentId(treatmentId).orElseThrow(() -> new CustomException(ErrorCode.RESOURCE_NOT_FOUND));
+        treatment.setAiSummary(aiResult);
+        treatmentRepository.save(treatment);
+    }
+
+    public List<VetResponse> getRencetTreatments(Long ownerId){
+
+        List<Treatment> treatmentList = treatmentRepository.findAllByOwner_OwnerId(ownerId);
+        List<VetResponse> result = new ArrayList<>();
+
+        for (Treatment treatment : treatmentList) {
+
+            List<WorkingHourDto> workingHours = workingHourService.getWorkingHourByVetId(treatment.getVet().getVetId());
+
+            VetResponse vetResponse = VetResponse.toResponse(treatment.getVet());
+            vetResponse.setWorkingHours(workingHours);
+
+            result.add(vetResponse);
+        }
+
+
+
+        return result;
     }
 }

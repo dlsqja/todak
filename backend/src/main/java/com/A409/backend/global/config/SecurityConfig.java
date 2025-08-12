@@ -59,6 +59,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/login").permitAll()
                         .requestMatchers(
                                 "/swagger-ui/**",
+                                "/autocomplete",
                                 "/swagger-resources/**",
                                 "/v3/api-docs/**",
                                 "/webjars/**",

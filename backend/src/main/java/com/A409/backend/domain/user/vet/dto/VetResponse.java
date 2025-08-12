@@ -6,6 +6,9 @@ import com.A409.backend.domain.user.vet.entity.Vet;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
+
+import java.util.List;
 
 @Builder
 @Getter
@@ -15,6 +18,8 @@ public class VetResponse {
     private String name;
     private String profile;
     private String photo;
+    @Setter
+    private List<WorkingHourDto> workingHours;
 
     public static VetResponse toResponse(Vet vet){
 
