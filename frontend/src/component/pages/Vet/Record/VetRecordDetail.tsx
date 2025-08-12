@@ -1,66 +1,29 @@
-// src/component/pages/Vet/Record/VetRecordDetail.tsx
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import BackHeader from '@/component/header/BackHeader';
 import AiSummaryForVet from '@/component/template/AiSummaryForVet';
+import ModalTemplate from '@/component/template/ModalTemplate';
+import Button from '@/component/button/Button';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getVetTreatmentDetail } from '@/services/api/Vet/vettreatment';
+import { getVetTreatmentDetail, completeVetTreatment, updateVetTreatment } from '@/services/api/Vet/vettreatment';
 import type { VetTreatmentDetail } from '@/types/Vet/vettreatmentType';
-import { timeMapping } from '@/utils/timeMapping';
-
-// HH:mm로 안전 변환
-const toHHmm = (dt?: unknown): string => {
-  if (!dt) return '';
-  if (typeof dt === 'string') {
-    // "YYYY-MM-DD HH:mm:ss" or ISO
-    const m = dt.match(/\b(\d{2}:\d{2})/);
-    if (m) return m[1];
-    const d = new Date(dt);
-    if (!isNaN(d.getTime())) {
-      const h = String(d.getHours()).padStart(2, '0');
-      const m2 = String(d.getMinutes()).padStart(2, '0');
-      return `${h}:${m2}`;
-    }
-    return '';
-  }
-  if (typeof dt === 'number' || dt instanceof Date) {
-    const d = new Date(dt as any);
-    if (!isNaN(d.getTime())) {
-      const h = String(d.getHours()).padStart(2, '0');
-      const m = String(d.getMinutes()).padStart(2, '0');
-      return `${h}:${m}`;
-    }
-  }
-  return '';
-};
-
-// 시작~끝 시간 범위 만들기: start/end 우선, 없으면 슬롯로직
-const getTimeRange = (d: any): string => {
-  const start = d?.startTime ?? d?.start_time;
-  const end   = d?.endTime   ?? d?.end_time;
-  if (start || end) {
-    const a = toHHmm(start);
-    const b = toHHmm(end);
-    return [a, b].filter(Boolean).join(' - ');
-  }
-  const slot = Number(d?.reservationTime ?? d?.reservation_time);
-  const s = timeMapping[slot];
-  const e = timeMapping[slot + 1]; // 30분 간격 가정
-  return s && e ? `${s} - ${e}` : '';
-};
+import { toTimeRange } from '@/utils/timeMapping';
+import ModalOnLayout from '@/layouts/ModalLayout';
 
 export default function VetRecordDetail() {
-  const { id } = useParams<{ id: string }>();
-  
+  const { treatmentId } = useParams<{ treatmentId: string }>();
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState<string | null>(null);
   const [detail, setDetail] = useState<VetTreatmentDetail | null>(null);
-  const [summary, setSummary] = useState('');
+
+  // --- 모달 상태 ---
+  const [editOpen, setEditOpen] = useState(false);
+  const [editText, setEditText] = useState('');
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    // ✅ id 없거나 숫자 변환 불가 → 즉시 에러 표시(무한 로딩 방지)
-    if (!id || Number.isNaN(Number(id))) {
+    if (!treatmentId || Number.isNaN(Number(treatmentId))) {
       setErr('잘못된 경로예요. 목록에서 다시 진입해주세요.');
       setLoading(false);
       return;
@@ -70,9 +33,9 @@ export default function VetRecordDetail() {
       try {
         setLoading(true);
         setErr(null);
-        const data = await getVetTreatmentDetail(Number(id));
-        setDetail(data);
-        setSummary((data as any).aiSummary ?? (data as any).ai_summary ?? '');
+
+        const data = await getVetTreatmentDetail(Number(treatmentId));
+        setDetail(data ?? null);
       } catch (e) {
         console.error('[VetRecordDetail] fetch error:', e);
         setErr('진료 상세를 불러오지 못했어요.');
@@ -80,7 +43,61 @@ export default function VetRecordDetail() {
         setLoading(false);
       }
     })();
-  }, [id]);
+  }, [treatmentId]);
+
+  const handleSign = async () => {
+    if (!treatmentId) return;
+    try {
+      await completeVetTreatment(Number(treatmentId));
+      setDetail((prev) => (prev ? ({ ...prev, isCompleted: true } as VetTreatmentDetail) : prev));
+      alert('서명이 완료되었습니다.');
+    } catch (e) {
+      console.error('[VetRecordDetail] sign error:', e);
+      alert('서명에 실패했어요. 잠시 후 다시 시도해주세요.');
+    }
+  };
+
+  // --- 수정 모달 열기 ---
+  const openEdit = useCallback(() => {
+    if (!detail) return;
+    const current =
+      (detail as any).aiSummary ??
+      (detail as any).ai_summary ??
+      (detail as any).result ??
+      '';
+    setEditText(current);
+    setEditOpen(true);
+  }, [detail]);
+
+  // --- 수정 저장 ---
+  const saveEdit = async () => {
+    if (!treatmentId) return;
+    try {
+      setSaving(true);
+      await updateVetTreatment(Number(treatmentId), { aiSummary: editText });
+      // 로컬 상태 반영
+      setDetail((prev) =>
+        prev ? ({ ...prev, aiSummary: editText } as VetTreatmentDetail) : prev
+      );
+      setEditOpen(false);
+      alert('저장되었습니다.');
+    } catch (e) {
+      console.error('[VetRecordDetail] save error:', e);
+      alert('저장에 실패했어요. 잠시 후 다시 시도해주세요.');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  // --- ESC로 닫기 ---
+  useEffect(() => {
+    if (!editOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setEditOpen(false);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [editOpen]);
 
   if (loading) return <div className="p px-7 py-6">불러오는 중…</div>;
 
@@ -100,13 +117,35 @@ export default function VetRecordDetail() {
 
   if (!detail) return null;
 
-  const reservationDate =
-    (detail as any).reservationDay ??
-    (detail as any).reservation_day ??
-    ((detail as any).startTime ?? '').slice(0, 10);
+  // 날짜(YYYY-MM-DD)
+  const reservationDate = (() => {
+    const s = (detail as any).startTime ?? (detail as any).start_time ?? '';
+    if (typeof s === 'string') return s.includes('T') ? s.split('T')[0] : s.split(' ')[0] || '';
+    return '';
+  })();
 
-  const range = getTimeRange(detail);
-  const vetName = (detail as any).vetName ?? '';
+  // 시간 범위
+  const timeRange = toTimeRange(
+    (detail as any).startTime ?? (detail as any).start_time,
+    (detail as any).endTime ?? (detail as any).end_time,
+    (detail as any).reservationTime ?? (detail as any).reservation_time
+  );
+
+  const summary =
+    (detail as any).aiSummary ??
+    (detail as any).ai_summary ??
+    (detail as any).result ??
+    '';
+
+  const vetName =
+    (detail as any).vetName ??
+    (detail as any).vet_name ??
+    '';
+
+  const isCompleted =
+    (detail as any).isCompleted ??
+    (detail as any).is_completed ??
+    false;
 
   return (
     <div>
@@ -116,12 +155,33 @@ export default function VetRecordDetail() {
           label="AI 요약 진단서"
           summary={summary}
           reservationDate={reservationDate}
-          reservationTime={range}
-          vetName={vetName}
-          onEditSummary={() => {/* TODO: 수정 핸들러 연결 */}}
-          onSignSummary={() => {/* TODO: 서명 핸들러 연결 */}}
+          reservationTime={timeRange || '—'}
+          vetName={vetName || '—'}
+          isCompleted={isCompleted}
+          onEditSummary={openEdit}         // ✅ 모달 열기
+          onSignSummary={handleSign}
         />
       </div>
+
+      {/* ====== 수정 모달 ====== */}
+          {editOpen && (
+      <ModalOnLayout onClose={() => setEditOpen(false)}>
+        <ModalTemplate title="요약본 수정" onClose={() => setEditOpen(false)}>
+          <textarea
+            value={editText}
+            onChange={(e) => setEditText(e.target.value)}
+            className="w-full h-40 block border-1 rounded-[12px] border-gray-400 px-5 pt-3 pb-3 text-black placeholder:text-gray-500 resize-none"
+          />
+          <div className="flex gap-3 mt-4">
+            <Button color="gray" text="취소" onClick={() => setEditOpen(false)} />
+            <Button color="green" text={saving ? '저장 중…' : '저장하기'} onClick={saveEdit} />
+          </div>
+        </ModalTemplate>
+      </ModalOnLayout>
+    )}
+
+
+
     </div>
   );
 }
