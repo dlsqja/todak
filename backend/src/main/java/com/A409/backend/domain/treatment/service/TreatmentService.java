@@ -52,6 +52,7 @@ public class TreatmentService {
                 List<Map<String, Object>> treatmentsList  = treatmentList.stream()
                         .map(treatments -> {
                             Map<String, Object> map = new HashMap<>();
+                            map.put("treatementInfo", TreatementResponse.toResponse(treatments));
                             map.put("reservationId",treatments.getReservation().getReservationId());
                             map.put("vetName",treatments.getVet().getName());
                             map.put("reservationDay", treatments.getReservation().getReservationDay());
