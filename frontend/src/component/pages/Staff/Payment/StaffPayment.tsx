@@ -1,11 +1,12 @@
 import React from 'react';
 import '@/styles/main.css';
 
-export default function StaffVetManagement() {
+import SimpleHeader from '@/component/header/SimpleHeader';
+
+export default function StaffPayment() {
   return (
-    <div>
-      <h1 className="h1">Staff Vet Management</h1>
-      <p>여기는 관계자 결제관리 화면.</p>
-    </div>
+    <header>
+      <SimpleHeader text="결제 관리" />
+    </header>
   );
 }
