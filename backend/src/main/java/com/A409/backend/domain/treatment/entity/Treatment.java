@@ -1,5 +1,6 @@
 package com.A409.backend.domain.treatment.entity;
 
+import com.A409.backend.domain.hospital.entity.Hospital;
 import com.A409.backend.domain.pet.entity.Pet;
 import com.A409.backend.domain.reservation.entity.Reservation;
 import com.A409.backend.domain.user.owner.entity.Owner;
@@ -31,6 +32,10 @@ public class Treatment {
     private Vet vet;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "hospital_id", nullable = false)
+    private Hospital hospital;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_id", nullable = false)
     private Owner owner;
 
@@ -39,7 +44,8 @@ public class Treatment {
     private Pet pet;
 
     @Column(name = "is_completed", nullable = false)
-    private Boolean isCompleted;
+    @Builder.Default
+    private Boolean isCompleted=false;
 
     private LocalDateTime startTime;
 

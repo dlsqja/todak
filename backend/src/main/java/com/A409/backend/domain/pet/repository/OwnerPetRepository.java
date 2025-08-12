@@ -10,7 +10,11 @@ import java.util.Optional;
 
 public interface OwnerPetRepository extends JpaRepository<OwnerPet,Long> {
 
-    Optional<List<OwnerPet>> findOwnerPetByOwner_OwnerId(Long ownerOwnerId);
+    List<OwnerPet> findOwnerPetByOwner_OwnerId(Long ownerId);
 
     Optional<OwnerPet> findOwnerPetByOwner_OwnerIdAndPet_PetId(Long ownerOwnerId, Long petPetId);
+
+    boolean existsByOwner_OwnerIdAndPet_PetId(Long ownerId, Long petPetId);
+
+    void deleteByPet_petId(Long petPetId);
 }

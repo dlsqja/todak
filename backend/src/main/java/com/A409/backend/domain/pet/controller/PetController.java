@@ -1,5 +1,6 @@
 package com.A409.backend.domain.pet.controller;
 
+import com.A409.backend.domain.pet.dto.PetCodeRequest;
 import com.A409.backend.domain.pet.dto.PetRequest;
 import com.A409.backend.domain.pet.dto.PetResponse;
 import com.A409.backend.domain.pet.entity.Pet;
@@ -36,7 +37,7 @@ public class PetController {
     @GetMapping()
     public APIResponse<?> getMyPets(@AuthenticationPrincipal User user) {
 
-        List<Pet> petList = petService.getMyPets(user.getId());
+        List<PetResponse> petList = petService.getMyPets(user.getId());
 
         return APIResponse.ofSuccess(petList);
     }
@@ -62,21 +63,40 @@ public class PetController {
 
     @Operation(summary = "반려동물 코드등록")
     @PostMapping("/code")
-    public APIResponse<?> registerPetByCode(@AuthenticationPrincipal User user, @RequestBody String petCode) {
-        petService.registerPetByCode(user.getId(),petCode);
+    public APIResponse<?> registerPetByCode(@AuthenticationPrincipal User user, @RequestBody PetCodeRequest petCodeRequest) {
+        petService.registerPetByCode(user.getId(),petCodeRequest.getPetCode());
 
         return APIResponse.ofSuccess(null);
     }
 
 
     @Operation(summary = "반려동물 수정")
-    @PatchMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PatchMapping(path = "/{petId}",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public APIResponse<?> updatePet(
             @AuthenticationPrincipal User user,
+            @PathVariable("petId") Long petId,
             @RequestPart("petRequest") PetRequest petRequest,
             @RequestPart(value = "photo", required = false) MultipartFile photo) {
 
-        petService.registerPet(user.getId(), petRequest, photo);
+        petService.updatePet(user.getId(), petId,petRequest, photo);
+
         return APIResponse.ofSuccess(null);
+    }
+
+    @Operation(summary = "반려동물 삭제")
+    @DeleteMapping(path = "/{petId}")
+    public APIResponse<?> disconnectPet(
+            @AuthenticationPrincipal User user,
+            @PathVariable("petId") Long petId){
+        petService.disconnectPet(user.getId(), petId);
+        return APIResponse.ofSuccess(null);
+    }
+
+    @Operation(summary = "반려동물 코드 조회")
+    @GetMapping("/code/{petId}")
+    public APIResponse<?> getPetByCode(
+            @AuthenticationPrincipal User user,
+            @PathVariable("petId") Long petId){
+        return APIResponse.ofSuccess(petService.getPetCode(user.getId(), petId));
     }
 }

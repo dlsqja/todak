@@ -2,7 +2,7 @@ package com.A409.backend.domain.reservation.dto;
 
 import com.A409.backend.domain.pet.dto.PetResponse;
 import com.A409.backend.domain.reservation.entity.Reservation;
-import com.A409.backend.domain.user.owner.entity.OwnerResponse;
+import com.A409.backend.domain.user.owner.dto.OwnerResponse;
 import com.A409.backend.global.enums.ReservationStatus;
 import com.A409.backend.global.enums.Subject;
 import lombok.Builder;
@@ -17,28 +17,22 @@ public class ReservationResponseToVet {
     private Long reservationId;
     private OwnerResponse owner;
     private PetResponse pet;
-    private String hospitalName;
-    private String vetName;
     private LocalDate reservationDay;
     private Byte reservationTime;
     private String photo;
     private String description;
     private Subject subject;
-    private ReservationStatus status;
 
-    public static ReservationResponseToVet toOwnerResponse(Reservation reservation){
+    public static ReservationResponseToVet toResposne(Reservation reservation){
         return ReservationResponseToVet.builder()
                 .reservationId(reservation.getReservationId())
                 .owner(OwnerResponse.toResponse(reservation.getOwner()))
                 .pet(PetResponse.toResponse(reservation.getPet()))
-                .hospitalName(reservation.getHospital().getName())
-                .vetName(reservation.getVet().getName())
                 .reservationDay(reservation.getReservationDay())
                 .reservationTime(reservation.getReservationTime())
                 .photo(reservation.getPhoto())
                 .description(reservation.getDescription())
                 .subject(reservation.getSubject())
-                .status(reservation.getStatus())
                 .build();
     }
 

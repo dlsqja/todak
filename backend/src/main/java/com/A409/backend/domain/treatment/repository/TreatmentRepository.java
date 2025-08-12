@@ -10,4 +10,10 @@ public interface TreatmentRepository extends JpaRepository<Treatment,Long> {
     List<Treatment> findAllByOwner_OwnerId(Long ownerOwnerId);
     List<Treatment> findAllByVet_VetId(Long vetId);
     Optional<Treatment> findByTreatmentId(Long treatmentId);
+
+    List<Treatment> findAllByVet_VetIdAndIsCompleted(Long vetVetId, Boolean isCompleted);
+
+    List<Treatment> findAllByOwner_OwnerIdAndIsCompleted(Long ownerOwnerId, Boolean isCompleted);
+
+    List<Treatment> findAllByOwner_OwnerIdAndIsCompletedAndPet_PetId(Long ownerId, boolean b, Long petId);
 }

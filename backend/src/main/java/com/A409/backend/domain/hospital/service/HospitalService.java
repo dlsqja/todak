@@ -8,7 +8,6 @@ import com.A409.backend.domain.user.staff.dto.StaffResponse;
 import com.A409.backend.domain.user.staff.entity.Staff;
 import com.A409.backend.domain.user.staff.repository.StaffRepository;
 import com.A409.backend.domain.user.vet.dto.VetWorkingHourResponse;
-import com.A409.backend.domain.user.vet.dto.WorkingHourResponse;
 import com.A409.backend.domain.user.vet.entity.Vet;
 import com.A409.backend.domain.user.vet.entity.WorkingHour;
 import com.A409.backend.domain.user.vet.repository.VetRepository;
@@ -19,9 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor

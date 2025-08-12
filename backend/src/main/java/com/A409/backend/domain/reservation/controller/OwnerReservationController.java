@@ -1,6 +1,7 @@
 package com.A409.backend.domain.reservation.controller;
 
 
+import com.A409.backend.domain.reservation.dto.RejectionResponse;
 import com.A409.backend.domain.reservation.dto.ReservationReqeust;
 import com.A409.backend.domain.reservation.dto.ReservationResponse;
 import com.A409.backend.domain.reservation.service.ReservationService;
@@ -64,6 +65,13 @@ public class OwnerReservationController {
         ReservationResponse reservation = reservationService.getReservationDetail(user.getId(),reservationId);
 
         return APIResponse.ofSuccess(reservation);
+    }
+
+    @Operation(summary = "반려 상세 조회")
+    @GetMapping("/rejection/{reservation_id}")
+    public APIResponse<?> getRejectReservation(@AuthenticationPrincipal User user, @PathVariable("reservation_id")Long reservationId) {
+        RejectionResponse rejection = reservationService.rejectionResponseByOwner(reservationId);
+        return APIResponse.ofSuccess(rejection);
     }
 
     @Operation(summary = "예약 취소")
