@@ -7,7 +7,7 @@ import TabGroupWaiting from '@/component/navbar/TabGroupWaiting';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { getReservations } from '@/services/api/Owner/ownerreservation';
 import { timeMapping } from '@/utils/timeMapping';
-import { subjectmapping } from '@/utils/subjectMapping';
+import { subjectMapping } from '@/utils/subjectMapping';
 
 import type { ReservationsResponse, PetResponse, OwnerReservationList } from '@/types/Owner/ownerreservationType';
 import { statusMapping } from '@/utils/statusMapping';
@@ -133,7 +133,7 @@ export default function OwnerReservationHome() {
             >
               <div className="flex justify-between">
                 <div className="flex flex-col">
-                  <div className="h4 text-black">{subjectmapping[res.subject]}</div>
+                  <div className="h4 text-black">{subjectMapping[res.subject]}</div>
                   <div className="p text-black"> {res.vetName} 수의사</div>
                   <div className="caption text-black">{res.hospitalName}</div>
                 </div>

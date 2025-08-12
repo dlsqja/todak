@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import KurentoUtils from 'kurento-utils';
+import * as KurentoUtils from 'kurento-utils';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 // sessionId는 reservatioId로 -> private_key니깐. 웹소켓으로 진행하므로, socketId로 back에서 구분. sessionId만 필요하다.
@@ -45,10 +45,13 @@ export default function VideoCall() {
       navigator(-1);
       return;
     }
+    const newSessionId = treatement_id.treatmentId.toString();
+    sessionIdRef.current = newSessionId;
 
-    const wsProtocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
-    const wsUrl =
-      wsProtocol === 'wss' ? `${wsProtocol}://${window.location.host}/ws` : `${wsProtocol}://localhost:8080/api/v1/ws`;
+    // const wsProtocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+    // const wsUrl =
+    //   wsProtocol === 'wss' ? `${wsProtocol}://${window.location.host}/ws` : `${wsProtocol}://localhost:8080/api/v1/ws`;
+    const wsUrl = 'wss://70.12.246.252/ws';
     // console.log('socket url:', wsUrl);
     const ws = new WebSocket(wsUrl);
     ws.onopen = () => {
@@ -56,16 +59,12 @@ export default function VideoCall() {
       socket.current = ws;
     };
     ws.onmessage = onMessage;
-
+    startCall();
     return () => {
       ws.close();
       socket.current = null;
     };
   }, []);
-
-  useEffect(() => {
-    sessionIdRef.current = sessionId;
-  }, [sessionId]);
 
   const endCall = () => {
     socket.current?.send(
@@ -95,7 +94,7 @@ export default function VideoCall() {
   };
 
   const startCall = () => {
-    if (sessionId === '') {
+    if (sessionIdRef.current === '') {
       alert('방 이름을 작성하세요');
       return;
     }
@@ -135,7 +134,7 @@ export default function VideoCall() {
         socket.current?.send(
           JSON.stringify({
             id: 'join',
-            sessionId: sessionId,
+            sessionId: sessionIdRef.current,
             sdpOffer,
           }),
         );
@@ -156,16 +155,16 @@ export default function VideoCall() {
         <video ref={remoteVideoRef} autoPlay playsInline className="border w-full h-full bg-gray-200" />
       </div>
       <div className="flex gap-2 justify-center">
-        <input
+        {/* <input
           type="text"
           placeholder="접속할 방 이름을 적어주세요"
           value={sessionId}
           onChange={(e) => setSessionId(e.target.value)}
           className="mt-2 px-4 py-2 bg-gray-500 rounded w-40"
-        />
-        <button onClick={startCall} className="mt-2 px-4 py-2 bg-blue-500 text-white rounded">
+        /> */}
+        {/* <button onClick={startCall} className="mt-2 px-4 py-2 bg-blue-500 text-white rounded">
           통화시작
-        </button>
+        </button> */}
         <button onClick={endCall} className="mt-2 px-4 py-2 bg-blue-500 text-white rounded">
           통화 종료
         </button>

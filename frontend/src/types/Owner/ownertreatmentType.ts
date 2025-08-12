@@ -8,6 +8,7 @@ export interface OwnerTreatmentsByPet {
 }
 // 서버에서 /treatments/owner?type=1 에서 내려주는 구조
 export interface OwnerTreatmentItem {
+  treatmentId: number;
   reservationId: number;
   subject: string;
   reservationTime: number;

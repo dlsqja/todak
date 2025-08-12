@@ -5,11 +5,12 @@ import ImageInputBox from '@/component/input/ImageInputBox';
 import { getReservationDetail, getReservationRejectDetail } from '@/services/api/Owner/ownerreservation';
 import type { ReservationDetail } from '@/types/Owner/ownerreservationType';
 
-import { subjectmapping } from '@/utils/subjectMapping';
+import { subjectMapping } from '@/utils/subjectMapping';
 import { timeMapping } from '@/utils/timeMapping';
 import { speciesMapping } from '@/utils/speciesMapping';
 import { statusMapping } from '@/utils/statusMapping';
 import Button from '@/component/button/Button';
+import apiClient from '@/plugins/axios';
 
 export default function OwnerTreatmentDetail() {
   const navigate = useNavigate();
@@ -17,9 +18,14 @@ export default function OwnerTreatmentDetail() {
   const { reservationId } = useParams<{ reservationId: string }>();
   const { isRejected } = useLocation().state || {};
   const [rejectDetail, setRejectDetail] = useState<{ reason: string }>();
+  const location = useLocation();
+  const [treatmentId, setTreatmentId] = useState<number>();
 
   //반려인 경우 반려사유 get 요청
   useEffect(() => {
+    const { treatmentId } = location.state || {};
+    setTreatmentId(treatmentId);
+    console.log('treatmentId:', treatmentId);
     if (reservationId) {
       if (isRejected) {
         const getRejectDetail = async () => {
@@ -55,6 +61,24 @@ export default function OwnerTreatmentDetail() {
     );
   }
 
+  const handleRTCClick = async (treatmentId: number) => {
+    const res = await apiClient
+      .patch(`/treatments/owner/start/${treatmentId}`)
+      .then((response) => {
+        console.log('response:', response);
+        navigate(`/owner/treatment/rtc`, {
+          state: {
+            treatmentId: treatmentId,
+          },
+        });
+      })
+      .catch((err) => {
+        console.log('error', err);
+        alert('아직 비대면 진료가 시작되지 않았습니다.');
+      });
+    console.log('res', res);
+  };
+
   return (
     <div>
       <BackHeader text="상세 정보" />
@@ -64,7 +88,7 @@ export default function OwnerTreatmentDetail() {
             <div className="h4">{detail.pet.name}</div>
             <div className="flex gap-1">
               <div className="p text-center">{speciesMapping[detail.pet.species]}</div> |
-              <div className="p">{detail.pet.age}세</div> | <div className="p">{subjectmapping[detail.subject]}</div>
+              <div className="p">{detail.pet.age}세</div> | <div className="p">{subjectMapping[detail.subject]}</div>
             </div>
           </div>
         </div>
@@ -97,12 +121,7 @@ export default function OwnerTreatmentDetail() {
         )}
       </section>
       <div>
-        <Button
-          className="px-7"
-          text="진료 하기"
-          color="green"
-          onClick={() => navigate(`/owner/treatment/rtc/${reservationId}`)}
-        />
+        <Button className="px-7" text="진료 하기" color="green" onClick={() => handleRTCClick(treatmentId)} />
       </div>
     </div>
   );

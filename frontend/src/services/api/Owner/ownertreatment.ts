@@ -5,7 +5,6 @@ import type { OwnerTreatmentsByPet, TreatmentResponse, OwnerTreatmentItem } from
 // 비대면 진료 대기 목록
 export const getTreatmentWaitingList = async (): Promise<OwnerTreatmentsByPet[]> => {
   const res = await apiClient.get('/treatments/owner?type=0');
-  console.log('reswait:', res);
   return res.data?.data ?? [];
 };
 getTreatmentWaitingList();
@@ -45,4 +44,10 @@ export const getTreatmentDetail = async (treatmentId: number) => {
   }
 
   return null;
+};
+
+// rtc 세션 확인
+export const getRTCsession = async (treatmentId: number) => {
+  const res = await apiClient.patch(`/treatments/owner/start/${treatmentId}`);
+  return res;
 };

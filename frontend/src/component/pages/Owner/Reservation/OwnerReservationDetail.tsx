@@ -5,7 +5,7 @@ import ImageInputBox from '@/component/input/ImageInputBox';
 import { getReservationDetail, getReservationRejectDetail } from '@/services/api/Owner/ownerreservation';
 import type { ReservationDetail } from '@/types/Owner/ownerreservationType';
 
-import { subjectmapping } from '@/utils/subjectMapping';
+import { subjectMapping } from '@/utils/subjectMapping';
 import { timeMapping } from '@/utils/timeMapping';
 import { speciesMapping } from '@/utils/speciesMapping';
 import { statusMapping } from '@/utils/statusMapping';
@@ -63,7 +63,7 @@ export default function OwnerReservationDetail() {
             <div className="h4">{detail.pet.name}</div>
             <div className="flex gap-1">
               <div className="p text-center">{speciesMapping[detail.pet.species]}</div> |
-              <div className="p">{detail.pet.age}세</div> | <div className="p">{subjectmapping[detail.subject]}</div>
+              <div className="p">{detail.pet.age}세</div> | <div className="p">{subjectMapping[detail.subject]}</div>
             </div>
           </div>
           <div>
