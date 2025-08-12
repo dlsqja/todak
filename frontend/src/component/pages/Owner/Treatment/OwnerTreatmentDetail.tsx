@@ -3,14 +3,13 @@ import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import BackHeader from '@/component/header/BackHeader';
 import ImageInputBox from '@/component/input/ImageInputBox';
 import { getReservationDetail, getReservationRejectDetail } from '@/services/api/Owner/ownerreservation';
-import type { ReservationDetail } from '@/types/Owner/ownerreservationType';
-
 import { subjectMapping } from '@/utils/subjectMapping';
 import { timeMapping } from '@/utils/timeMapping';
 import { speciesMapping } from '@/utils/speciesMapping';
-import { statusMapping } from '@/utils/statusMapping';
+import type { ReservationDetail } from '@/types/Owner/ownerreservationType';
 import Button from '@/component/button/Button';
 import apiClient from '@/plugins/axios';
+import CallingIcon from '@/component/icon/CallingIcon';
 
 export default function OwnerTreatmentDetail() {
   const navigate = useNavigate();
@@ -121,6 +120,7 @@ export default function OwnerTreatmentDetail() {
         )}
       </section>
       <div className="px-7 pt-5">
+        <CallingIcon width={100} height={100} />
         <Button className="px-7" text="진료 하기" color="green" onClick={() => handleRTCClick(treatmentId)} />
       </div>
     </div>
