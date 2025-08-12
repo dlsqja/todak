@@ -80,6 +80,7 @@ public class TreatmentService {
                         .map(treatments -> {
                             Map<String, Object> map = new HashMap<>();
                             map.put("treatementInfo", TreatementResponse.toResponse(treatments));
+                            map.put("hospitalName", treatments.getHospital().getName());
                             map.put("reservationId",treatments.getReservation().getReservationId());
                             map.put("vetName",treatments.getVet().getName());
                             map.put("reservationDay", treatments.getReservation().getReservationDay());
