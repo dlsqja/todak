@@ -100,7 +100,7 @@ public class LoginController {
 
         ResponseCookie accessTokenCookie = ResponseCookie.from("ACCESSTOKEN", accessToken)
                 .httpOnly(true) //js 에서 document.cookie로 읽어오지 못하게함
-                .secure(true)   //https 에서만 가능
+                .secure(false)   //https 에서만 가능
                 .sameSite("None")
                 .path("/")
                 .maxAge(Duration.ofDays(14))
@@ -108,7 +108,7 @@ public class LoginController {
 
         ResponseCookie refreshTokenCookie = ResponseCookie.from("REFRESHTOKEN", refreshToken)
                 .httpOnly(true) //js 에서 document.cookie로 읽어오지 못하게함
-                .secure(true)   //https 에서만 가능
+                .secure(false)   //https 에서만 가능
                 .sameSite("None")
                 .path("/")
                 .maxAge(Duration.ofDays(14))
