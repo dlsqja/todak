@@ -1,30 +1,4 @@
 // src/types/Vet/vettreatmentType.ts
-export type VetSubject =
-  | 'DENTAL' // 치과
-  | 'DERMATOLOGY' // 피부과
-  | 'ORTHOPEDICS' // 정형외과
-  | 'OPHTHALMOLOGY'; // 안과
-
-export interface VetTreatment {
-  treatmentId: number;
-  reservationId: number;
-  vetId: number;
-  petId: number;
-  hospitalId: number;
-  subject: VetSubject;
-  isComplete: boolean;
-  isSigned: boolean;
-  startTime: string; // ISO or "YYYY-MM-DDTHH:mm:ss"
-  endTime: string; // ISO or "YYYY-MM-DDTHH:mm:ss"
-  result?: string;
-  aiSummary?: string;
-
-  // ⚠️ 백엔드가 추가로 보내줄 수도 있는 확장 필드(있으면 사용, 없으면 무시)
-  petName?: string;
-  petInfo?: string;
-}
-
-export interface VetTreatmentDetail extends VetTreatment {}
 
 export interface Pet {
   age: number;
@@ -35,6 +9,34 @@ export interface Pet {
   species: string;
   weight: number;
 }
+export type Species = 'DOG' | 'CAT' | 'OTHER';
+export type Gender =
+  | 'MALE'
+  | 'FEMALE'
+  | 'NON'
+  | 'MALE_NEUTERING'
+  | 'FEMALE_NEUTERING';
+
+export interface VetOwnerMini {
+  name: string;
+  phone: string;
+  birth?: string; // ISO date (선택)
+}
+// type = 2 비대면 리스트 조회 (수의사 진료기록)
+export interface VetTreatment {
+  treatmentId: number;
+  reservationId: number;
+  owner?: VetOwnerMini;   // 리스트에선 없을 수도 있으니 선택
+  vetName?: string;
+  pet: Pet;
+  isCompleted: boolean;
+  startTime: string;      // ISO or "YYYY-MM-DD HH:mm:ss"
+  endTime: string;        // ISO or "YYYY-MM-DD HH:mm:ss"
+  result?: string;
+  aiSummary?: string;
+}
+
+export interface VetTreatmentDetail extends VetTreatment {}
 
 // type = 0 비대면 진료 목록
 export interface VetTreatmentListResponse {

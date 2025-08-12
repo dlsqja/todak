@@ -18,19 +18,20 @@ export default function VetRecord() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    (async () => {
-      try {
-        setLoading(true);
-        const data = await getVetTreatments(Number(historyType) as 0 | 1 | 2);
-        setList(Array.isArray(data) ? data : []);
-      } catch (e) {
-        console.warn('진료 리스트 불러오기 실패:', e);
-        setList([]);
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, [historyType]);
+  (async () => {
+    try {
+      setLoading(true);
+      const data = await getVetTreatments(Number(historyType) as 0|1|2);
+      setList(Array.isArray(data) ? data : []);
+      
+    } catch (e) {
+      console.warn('진료 리스트 불러오기 실패:', e);
+      setList([]);
+    } finally {
+      setLoading(false);
+    }
+  })();
+}, [historyType]);
 
   const handleTabSelect = (tab: string) => {
     setSelectedTab(selectedTab === tab ? '목록형' : tab);
@@ -43,19 +44,7 @@ export default function VetRecord() {
       <SimpleHeader text="진료 기록" />
       <TabGroupTreatList onSelect={handleTabSelect} />
 
-      {/* ✅ 상태 필터: 백엔드 type과 1:1 매칭 */}
-      <div className="px-7">
-        <SelectionDropdown
-          options={[
-            { value: '2', label: '전체' },     // 전체 조회
-            { value: '0', label: '진행중' },   // 완료 전
-            { value: '1', label: '완료' },     // 완료 후
-          ]}
-          value={historyType}
-          onChange={(v) => setHistoryType(v as '0' | '1' | '2')}
-          placeholder="상태 선택"
-        />
-      </div>
+     
 
       {selectedTab === '목록형' ? (
         <VetRecordListFilter
