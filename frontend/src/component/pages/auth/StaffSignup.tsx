@@ -83,7 +83,7 @@ export default function StaffSignup() {
       return;
     }
 
-    {
+    try {
       const response = await authAPI.staffSignup(
         {
           hospitalcode: hospitalCode.trim(),
@@ -98,45 +98,50 @@ export default function StaffSignup() {
         alert('병원 관계자 가입이 완료되었습니다!');
         navigate('/staff/home');
       } else {
-        alert('병원 관계자자 가입에 실패했습니다. 다시 시도해주세요.');
+        alert('병원 관계자 가입에 실패했습니다. 다시 시도해주세요.');
       }
+    } catch (error) {
+      console.error('회원가입 실패:', error);
+      alert('회원가입에 실패했습니다. 다시 시도해주세요.');
+    } finally {
+      setIsLoading(false);
     }
-
-    return (
-      <>
-        <BackHeader text="회원 가입" />
-        <div className="flex flex-col gap-6 px-7 mt-11">
-          <div>
-            <Input
-              id="hospitalCode"
-              label="병원 코드"
-              placeholder="병원 코드를 입력해주세요"
-              value={hospitalCode}
-              onChange={(e) => handleInputChange('hospitalCode', e.target.value)}
-              disabled={false}
-            />
-            <div className="flex justify-between gap-1">
-              {errors.hospitalCode && <p className="text-red-500 caption mt-1 ml-2">{errors.hospitalCode}</p>}
-              <p className="text-gray-500 caption mt-1 ml-2 cursor-pointer">병원코드가 없으신가요?</p>
-            </div>
-          </div>
-          <div>
-            <Input
-              id="name"
-              label="이름"
-              placeholder="이름을 입력해주세요"
-              value={name}
-              onChange={(e) => handleInputChange('name', e.target.value)}
-              disabled={false}
-            />
-            {errors.name && <p className="text-red-500 caption mt-1 ml-2">{errors.name}</p>}
-          </div>
-        </div>
-        <br />
-        <div className="px-7 mt-6">
-          <Button text={isLoading ? '등록 중...' : '등록하기'} onClick={handleSubmit} color="green" />
-        </div>
-      </>
-    );
   };
+
+  return (
+    <>
+      <BackHeader text="회원 가입" />
+      <div className="flex flex-col gap-6 px-7 mt-11">
+        <div>
+          <Input
+            id="hospitalCode"
+            label="병원 코드"
+            placeholder="병원 코드를 입력해주세요"
+            value={hospitalCode}
+            onChange={(e) => handleInputChange('hospitalCode', e.target.value)}
+            disabled={false}
+          />
+          <div className="flex justify-between gap-1">
+            {errors.hospitalCode && <p className="text-red-500 caption mt-1 ml-2">{errors.hospitalCode}</p>}
+            <p className="text-gray-500 caption mt-1 ml-2 cursor-pointer">병원코드가 없으신가요?</p>
+          </div>
+        </div>
+        <div>
+          <Input
+            id="name"
+            label="이름"
+            placeholder="이름을 입력해주세요"
+            value={name}
+            onChange={(e) => handleInputChange('name', e.target.value)}
+            disabled={false}
+          />
+          {errors.name && <p className="text-red-500 caption mt-1 ml-2">{errors.name}</p>}
+        </div>
+      </div>
+      <br />
+      <div className="px-7 mt-6">
+        <Button text={isLoading ? '등록 중...' : '등록하기'} onClick={handleSubmit} color="green" />
+      </div>
+    </>
+  );
 }
