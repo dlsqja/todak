@@ -174,12 +174,13 @@ export default function OwnerSignup() {
       },
       authId,
     );
-    console.log('response', response);
+    console.log('response', response.data);
 
-    if (response.message === '실패') {
+    if (response.data.message === '실패') {
       alert('회원가입에 실패했습니다. 다시 시도해주세요.');
     } else {
       alert('회원가입이 완료되었습니다!');
+      console.log('response', response.data.data);
       navigate('/owner/home');
     }
   };
