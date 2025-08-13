@@ -252,14 +252,6 @@ export default function OwnerMyPage() {
         >
           로그 아웃
         </motion.button>
-        <span className="text-gray-500"> | </span>
-        <motion.button
-          className="h4 text-center text-gray-500 cursor-pointer"
-          whileHover={{ scale: 1.05 }} // hover시 효과 추가
-          transition={{ duration: 0.2 }}
-        >
-          회원 탈퇴
-        </motion.button>
       </motion.div>
     </>
   );
