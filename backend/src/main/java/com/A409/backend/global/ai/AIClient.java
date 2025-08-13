@@ -21,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -79,13 +80,15 @@ public class AIClient {
     }
 
     @Async
-    public void uploadAudio(Long treatmentId, MultipartFile file) {
+    public void uploadAudio(Long treatmentId, File file) {
         try {
             RequestBody requestBody = new MultipartBody.Builder()
                     .setType(MultipartBody.FORM)
                     .addFormDataPart("model", "whisper-1")
-                    .addFormDataPart("file", file.getOriginalFilename(),
-                            RequestBody.create(file.getBytes()))
+                    .addFormDataPart("file", file.getName(),
+                            RequestBody.create(Files.readAllBytes(file.toPath())))
+//                    .addFormDataPart("file", file.getOriginalFilename(),
+//                            RequestBody.create(file.getBytes()))
                     .build();
 
             log.info(GMS_KEY);
