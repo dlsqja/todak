@@ -7,7 +7,7 @@ import { subjectMapping } from '@/utils/subjectMapping'; // 소문자 주의
 import { timeMapping } from '@/utils/timeMapping';
 import { getTreatmentWaitingList } from '@/services/api/Owner/ownertreatment';
 import type { OwnerTreatmentsByPet } from '@/types/Owner/ownertreatmentType';
-import { motion, AnimatePresence } from 'framer-motion';  // 애니메이션 추가
+import { motion, AnimatePresence } from 'framer-motion'; // 애니메이션 추가
 
 export default function OwnerTreatment() {
   const VITE_PHOTO_URL = import.meta.env.VITE_PHOTO_URL;
@@ -28,7 +28,19 @@ export default function OwnerTreatment() {
     const getTreatmentList = async () => {
       const treatmentData = await getTreatmentWaitingList();
       console.log('treatmentData:', treatmentData);
-      setTreatmentData(treatmentData);
+
+      // starttime이 null이 아닌 항목만 필터링하고 시간 기준 최신순으로 정렬
+      const sortedData = treatmentData.map((petTreatment) => ({
+        ...petTreatment,
+        treatments: petTreatment.treatments
+          .filter((item) => item.treatmentInfo.startTime == null) // starttime이 null인 것만 포함함
+          .sort((a, b) => {
+            // reservationTime을 기준으로 내림차순 정렬 (최신순)
+            return b.reservationTime - a.reservationTime;
+          }),
+      }));
+
+      setTreatmentData(sortedData);
     };
     getTreatmentList();
   }, []);
@@ -39,7 +51,7 @@ export default function OwnerTreatment() {
     show: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.3,  // 항목 간의 순차 애니메이션 딜레이
+        staggerChildren: 0.3, // 항목 간의 순차 애니메이션 딜레이
       },
     },
   };
@@ -65,10 +77,7 @@ export default function OwnerTreatment() {
             {treatmentData.map((treatment) =>
               treatment.treatments.map((item) => {
                 return (
-                  <motion.div
-                    key={item.reservationId}
-                    variants={itemVariants}
-                  >
+                  <motion.div key={item.reservationId} variants={itemVariants}>
                     <OwnerRemoteTreatmentCard
                       petName={treatment.petResponse.name}
                       petInfo={`진료 예정 시간 : ${timeMapping[item.reservationTime]}`}
@@ -79,7 +88,7 @@ export default function OwnerTreatment() {
                     />
                   </motion.div>
                 );
-              })
+              }),
             )}
           </motion.div>
         </AnimatePresence>
