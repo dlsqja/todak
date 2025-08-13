@@ -11,7 +11,6 @@ export default function OwnerSignup() {
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [birth, setBirth] = useState('');
-  const [authCode, setAuthCode] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
   // 각 필드별 에러 상태 관리
@@ -19,7 +18,6 @@ export default function OwnerSignup() {
     name: '',
     phone: '',
     birth: '',
-    authCode: '',
   });
 
   // 휴대폰 번호 11자리 제한
@@ -65,9 +63,9 @@ export default function OwnerSignup() {
             ? '이름을 입력해주세요.'
             : fieldName === 'phone'
             ? '휴대폰 번호를 입력해주세요.'
-            : fieldName === 'authCode'
-            ? '인증번호를 입력해주세요.'
-            : '생년월일을 입력해주세요.'
+            : fieldName === 'birth'
+            ? '생년월일을 입력해주세요.'
+            : ''
         }`,
       }));
     } else {
@@ -122,41 +120,55 @@ export default function OwnerSignup() {
   };
 
   const handleSubmit = async () => {
-    console.log('handleSubmit 호출됨');
-    console.log('name:', name, 'type:', typeof name);
-    console.log('phone:', phone, 'type:', typeof phone);
-    console.log('birth:', birth, 'type:', typeof birth);
+    // 직접 유효성 검사 수행
+    const nameError = !name.trim() ? '이름을 입력해주세요.' : '';
+    const phoneNumbers = phone.replace(/[^\d]/g, '');
+    const phoneError = !phone.trim()
+      ? '휴대폰 번호를 입력해주세요.'
+      : phoneNumbers.length !== 11
+      ? '휴대폰 번호를 올바르게 입력해주세요.'
+      : '';
 
-    // 최종 유효성 검사
-    validateField('name', name);
-    validateField('phone', phone);
-    validateField('birth', birth);
-    validateField('authCode', authCode);
+    const birthNumbers = birth.replace(/[^\d]/g, '');
+    const birthError = !birth.trim()
+      ? '생년월일을 입력해주세요.'
+      : birthNumbers.length !== 8
+      ? '생년월일을 올바르게 입력해주세요.'
+      : '';
 
-    // 에러가 있으면 제출 중단
-    if (
-      errors.name ||
-      errors.phone ||
-      errors.birth ||
-      errors.authCode ||
-      !name.trim() ||
-      !phone.trim() ||
-      !birth.trim() ||
-      !authCode.trim()
-    ) {
+    // 에러가 있으면 상태 업데이트 후 중단
+    if (nameError || phoneError || birthError) {
+      setErrors({
+        name: nameError,
+        phone: phoneError,
+        birth: birthError,
+      });
       console.log('유효성 검사 실패');
       return;
     }
 
+    // 유효성 검사 통과 시 진행
     console.log('유효성 검사 통과');
 
     setIsLoading(true);
 
-    const response = await authAPI.ownerSignup({
-      name: name.trim(),
-      phone: Number(phone.trim()),
-      birth: Number(birth.trim()),
-    });
+    // URL에서 authId 가져오기 (카카오 로그인 후 전달받은 값)
+    const urlParams = new URLSearchParams(window.location.search);
+    const authId = urlParams.get('authId');
+
+    if (!authId) {
+      alert('인증 정보가 없습니다. 다시 로그인해주세요.');
+      return;
+    }
+
+    const response = await authAPI.ownerSignup(
+      {
+        name: name.trim(),
+        phone: Number(phone.replace(/[^\d]/g, '')), // 숫자만 추출
+        birth: Number(birth.replace(/[^\d]/g, '')), // 숫자만 추출
+      },
+      authId,
+    );
 
     console.log('response', response);
 
