@@ -89,6 +89,7 @@ public class SignalRecordHandler extends TextWebSocketHandler {
     @Override
     public void afterConnectionClosed(WebSocketSession ws, CloseStatus status) throws Exception {
         // 브라우저 새로고침·뒤로가기 등으로 연결이 끊겼을 때도 정리
+        System.out.println("Websocket 연결 종료:" + ws.getId());
         SessionRecordWrapper wrap = sessions.get(ws.getId());
         String sessionId = findRoomIdBySession(ws.getId());
         if (wrap != null) {
@@ -178,7 +179,7 @@ public class SignalRecordHandler extends TextWebSocketHandler {
         // 같은 방에 참가하면 덮어씌워진다. -> 수의사만 구분해서 저장하도록 해야한다.
         // 방을 여는 사람 = 수의사. -> 처음 방이 만들어 질 때만 저장하도록 한다.
         if (roomParticipants.get(sessionId) == null) {
-            String recordPath = "file:///tmp/audio-" + sessionId + ".webm";
+            String recordPath = "file:///tmp/audio/audio-" + sessionId + ".webm";
             recorder = new RecorderEndpoint.Builder(pipeline, recordPath)
                     .withMediaProfile(MediaProfileSpecType.WEBM_AUDIO_ONLY)
                     .build();
@@ -220,6 +221,8 @@ public class SignalRecordHandler extends TextWebSocketHandler {
                 candNode.get("sdpMid").asText(),
                 candNode.get("sdpMLineIndex").asInt()
         );
-        sessions.get(ws.getId()).getWebRtc().addIceCandidate(cand);
+        SessionRecordWrapper session = sessions.get(ws.getId());
+        if (session == null) return;
+        session.getWebRtc().addIceCandidate(cand);
     }
 }

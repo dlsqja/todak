@@ -64,7 +64,7 @@ public class OwnerTreatmentController {
     }
 
     @Operation(summary = "반려인 비대면 진료 시작", description = "비대면 진료 버튼을 누르면, session을 확입합니다.")
-    @PostMapping("/start/{treatment_id}")
+    @PatchMapping("/start/{treatment_id}")
     public APIResponse<?> startTreatment(@PathVariable("treatment_id") Integer treatment_id) {
         String cacheKey = "treatment" + treatment_id;
         Integer cachedNum = (Integer) redisService.getByKey(cacheKey);

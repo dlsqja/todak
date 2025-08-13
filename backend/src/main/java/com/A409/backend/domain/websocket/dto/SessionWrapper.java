@@ -11,16 +11,13 @@ public class SessionWrapper {
     private final WebSocketSession wsSession;
     private final MediaPipeline pipeline;
     private final WebRtcEndpoint webRtc;
-    private final WebRtcEndpoint sttEp;
 
     public SessionWrapper(WebSocketSession wsSession,
                           MediaPipeline pipeline,
-                          WebRtcEndpoint webRtc,
-                          WebRtcEndpoint sttEp) {
+                          WebRtcEndpoint webRtc) {
         this.wsSession = wsSession;
         this.pipeline = pipeline;
         this.webRtc = webRtc;
-        this.sttEp = sttEp;
     }
 
     public void close() {
@@ -30,8 +27,5 @@ public class SessionWrapper {
 //        if (pipeline != null) {
 //            pipeline.release();
 //        }
-        if (sttEp != null) {
-            sttEp.release();
-        }
     }
 }

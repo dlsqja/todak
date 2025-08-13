@@ -8,6 +8,7 @@ import com.A409.backend.domain.treatment.service.TreatmentService;
 import com.A409.backend.domain.user.vet.dto.VetWorkingHourResponse;
 import com.A409.backend.global.ai.AIClient;
 import com.A409.backend.global.enums.ErrorCode;
+import com.A409.backend.global.exception.CustomException;
 import com.A409.backend.global.redis.RedisService;
 import com.A409.backend.global.response.APIResponse;
 import com.A409.backend.global.security.model.User;
@@ -18,9 +19,11 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -62,19 +65,35 @@ public class VetTreatmentController {
 
         return APIResponse.ofSuccess(null);
     }
+
+    @Transactional
     @Operation(summary = "수의사 비대면 진료 시작", description = "비대면 진료 버튼을 누르면, session을 생성합니다.")
     @PostMapping("/start/{treatment_id}")
-    public APIResponse<?> startTreatment(@PathVariable("treatment_id") Integer treatment_id) {
+    public APIResponse<?> startTreatment(@PathVariable("treatment_id") Long treatment_id) {
         String cacheKey = "treatment" + treatment_id;
+        redisService.setByKey(cacheKey, 0);
+        treatmentService.updateStartTime(treatment_id);
+        return APIResponse.ofSuccess(null);
+    }
+
+    @PatchMapping("/join/{treatment_id}")
+    public APIResponse<?> joinTreatment(@PathVariable("treatment_id") Long treatment_id) {
+        String cacheKey = "treatment" + treatment_id;
+        Integer cacheNum = (Integer)redisService.getByKey(cacheKey);
+        if (cacheNum == null) {
+            throw new CustomException(ErrorCode.SESSION_NOT_FOUND);
+        }
         redisService.setByKey(cacheKey, 1);
         return APIResponse.ofSuccess(null);
     }
 
     @Operation(summary = "수의사 비대면 진료 종료", description = "통화 종료 버튼을 누르면, session을 삭제합니다.")
     @DeleteMapping("/end/{treatment_id}")
-    public APIResponse<?> endTreatment(@PathVariable("treatment_id") Integer treatment_id) {
+    public APIResponse<?> endTreatment(@PathVariable("treatment_id") Long treatment_id) {
         String cacheKey = "treatment" + treatment_id;
         redisService.deleteByKey(cacheKey);
+        treatmentService.updateEndTime(treatment_id);
+        System.out.println("수의사 비대면 진료 종료");
         return APIResponse.ofSuccess(null);
     }
 
