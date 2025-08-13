@@ -202,7 +202,7 @@ public class ReservationService {
                         .build();
         treatmentRepository.save(treatment);
         reservationRepository.save(reservation);
-        if(!firstTreatmentRepository.existsByOwner_OwnerId(reservation.getOwner().getOwnerId())){
+        if(!firstTreatmentRepository.existsByOwner_OwnerIdAndPet_PetId(reservation.getOwner().getOwnerId(),reservation.getPet().getPetId())){
             FirstTreatment firstTreatment = FirstTreatment.builder()
                     .hospital(reservation.getHospital())
                     .pet(reservation.getPet())
