@@ -48,24 +48,27 @@ public class SignupController {
     @PostMapping("/owner")
     public void ownerSignup(@RequestParam Long authId, @RequestBody OwnerRequest ownerRequest, HttpServletResponse response) throws IOException {
         ownerService.insertOwnerInfo(authId, ownerRequest);
-        loginAfterSignup("owner", authId, response);
+        String redirectUrl = loginAfterSignup("owner", authId, response);
+        response.sendRedirect(redirectUrl);
     }
 
     @Operation(summary = "수의사 회원가입")
     @PostMapping("/vet")
     public void vetSignup(@RequestParam Long authId, @RequestBody VetRequest vetRequest, HttpServletResponse response) throws IOException  {
         vetService.insertVetInfo(authId, vetRequest);
-        loginAfterSignup("vet", authId, response);
+        String redirectUrl = loginAfterSignup("vet", authId, response);
+        response.sendRedirect(redirectUrl);
     }
 
     @Operation(summary = "병원관계자 회원가입")
     @PostMapping("/staff")
     public void signup(@RequestParam Long authId, @RequestBody StaffRequest staffRequest, HttpServletResponse response) throws IOException  {
         staffService.insertStaffInfo(authId, staffRequest);
-        loginAfterSignup("staff", authId, response);
+        String redirectUrl = loginAfterSignup("staff", authId, response);
+        response.sendRedirect(redirectUrl);
     }
 
-    private void loginAfterSignup(String role, Long authId, HttpServletResponse response) throws IOException {
+    private String loginAfterSignup(String role, Long authId, HttpServletResponse response) throws IOException {
         Role selectedRole = switch (role) {
             case "owner" -> Role.OWNER;
             case "vet"   -> Role.VET;
@@ -79,15 +82,15 @@ public class SignupController {
 
         if(selectedRole == Role.OWNER) {
             Owner owner = ownerRepository.findByAuthAuthId(authId).orElse(null);
-            if(owner == null) {response.sendRedirect(signRedirectURL+authId); return;};
+            if(owner == null) { return signRedirectURL+authId;};
             id = owner.getOwnerId();
         } else if(selectedRole == Role.VET) {
             Vet vet = vetRepository.findByAuthAuthId(authId).orElse(null);
-            if(vet == null) {response.sendRedirect(signRedirectURL+authId); return;};
+            if(vet == null) { return signRedirectURL+authId;};
             id = vet.getVetId();
         } else if(selectedRole == Role.STAFF) {
             Staff staff = staffRepository.findByAuthAuthId(authId).orElse(null);
-            if(staff == null) {response.sendRedirect(signRedirectURL+authId); return;};
+            if(staff == null) { return signRedirectURL+authId;};
             Hospital hospital = staff.getHospital();
             id = hospital.getHospitalId();
         }
@@ -118,6 +121,8 @@ public class SignupController {
         String successRedirectURL = String.format("https://i13a409.p.ssafy.io/%s/home", role);
         //String successRedirectURL = String.format("http://localhost:8080/%s", role);
 
-        response.sendRedirect(successRedirectURL);
+//        response.sendRedirect(successRedirectURL);
+        return successRedirectURL;
     }
+
 }
