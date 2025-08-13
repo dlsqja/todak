@@ -44,9 +44,9 @@ export default function OwnerMyPage() {
     }
   };
 
-  const handleLogout = () => {
-    authAPI.logout();
-    navigate('/auth/signup');
+  const handleLogout = async () => {
+    await authAPI.logout();
+    navigate(`/auth/`);
   };
 
   return (
