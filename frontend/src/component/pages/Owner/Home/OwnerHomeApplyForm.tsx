@@ -18,10 +18,10 @@ import { timeMapping } from '@/utils/timeMapping';
 
 export default function ApplyFormPage() {
   const location = useLocation();
-  const { pet, hospital, vet, time } = location.state || {};
+  const { pet, hospital, vet, time, startTime, endTime, usableTimes } = location.state || {};
 
-  const selectedTime = useTimeStore((state) => state.selectedTime);
-  const setSelectedTime = useTimeStore((state) => state.setSelectedTime);
+  const selectedTime = useTimeStore((s) => s.selectedTime)
+  const setSelectedTime = useTimeStore((s) => s.setSelectedTime)
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -70,10 +70,10 @@ export default function ApplyFormPage() {
   }, [symptomImage]);
 
   useEffect(() => {
-    if (time && !selectedTime) {
-      setSelectedTime(time);
-    }
-  }, [time, selectedTime, setSelectedTime]);
+  if (time && time !== selectedTime) {
+    setSelectedTime(time)
+  }
+}, [time, selectedTime, setSelectedTime])
 
   useEffect(() => {
     let alive = true;
@@ -158,10 +158,10 @@ navigate('/owner/home/payment', { state: { draft, photo: symptomFile } });
 
       <div className="flex-1 overflow-y-auto px-7 py-6 flex flex-col gap-6">
         <TimeSelectionDropdown
-          label="진료 희망 시간"
-          start_time={vet?.start_time || '09:00'}
-          end_time={vet?.end_time || '18:00'}
-        />
+            label="진료 희망 시간"
+            start_time={startTime || '09:00'}
+            end_time={endTime || '18:00'}
+          />
 
         {/* 반려동물 정보 */}
         <div>
