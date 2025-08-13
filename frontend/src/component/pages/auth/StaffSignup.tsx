@@ -82,11 +82,11 @@ export default function StaffSignup() {
       setIsLoading(false);
       return;
     }
-
+    console.log('hospitalCode', hospitalCode);
     try {
       const response = await authAPI.staffSignup(
         {
-          hospitalcode: hospitalCode.trim(),
+          hospitalCode: hospitalCode.trim(),
           name: name.trim(),
         },
         authId,
