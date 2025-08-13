@@ -176,9 +176,9 @@ export default function OwnerSignup() {
       authId,
     );
 
-    console.log('response', response);
+    console.log('response', response.message);
 
-    if (response.success) {
+    if (response.message === '성공') {
       alert('회원가입이 완료되었습니다!');
       navigate('/owner/home');
     } else {
