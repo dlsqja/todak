@@ -170,7 +170,7 @@ export default function OwnerSignup() {
     const response = await authAPI.ownerSignup(
       {
         name: name.trim(),
-        phone: phoneNumbers,
+        phone: phone,
         birth: formattedBirth,
       },
       authId,

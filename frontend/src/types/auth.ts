@@ -21,6 +21,7 @@ interface VetSignup {
   hospital_code: number;
   name: string;
   license_number: number;
+  photo: string; // "010-1234-5678" 형태의 문자열
 }
 
 // 병원 관계자 회원가입
