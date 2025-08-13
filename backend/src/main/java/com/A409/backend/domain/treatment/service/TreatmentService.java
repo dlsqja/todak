@@ -133,9 +133,10 @@ public class TreatmentService {
                     map.put("petInfo", PetResponse.toResponse(treatments.getPet()));
                     map.put("subject", treatments.getReservation().getSubject());
                     map.put("isCompleted", treatments.getIsCompleted());
-                    map.put("startTime", treatments.getReservation().getReservationTime());
+                    map.put("startTime", treatments.getStartTime());
+                    map.put("reservationTime", treatments.getReservation().getReservationTime());
                     map.put("reservationId", treatments.getReservation().getReservationId());
-                    map.put("endTime", treatments.getReservation().getReservationTime());
+                    map.put("endTime", treatments.getEndTime());
                     map.put("treatmentDate", treatments.getReservation().getReservationDay());
                     return map;
                 })
