@@ -5,10 +5,10 @@ import '@/styles/main.css'
 import OwnerTreatmentSimpleCard from '@/component/card/OwnerTreatmentSimpleCard'
 import TreatmentSlideList from '@/component/card/TreatmentSlideList'
 
-// ✅ 시간 범위 유틸(목록 페이지와 동일 로직)
-import { toTimeRange } from '@/utils/timeMapping'
+// ✅ 시간 유틸
+import { toTimeRange, toLocalHHmm } from '@/utils/timeMapping'
 
-// ✅ 매핑 유틸(목록 페이지와 동일)
+// ✅ 매핑 유틸
 import { speciesMapping } from '@/utils/speciesMapping'
 import { genderMapping } from '@/utils/genderMapping'
 import { subjectMapping } from '@/utils/subjectMapping'
@@ -16,13 +16,16 @@ import { subjectMapping } from '@/utils/subjectMapping'
 // ✅ API
 import { getVetMy } from '@/services/api/Vet/vetmypage'
 import { getVetTreatmentList } from '@/services/api/Vet/vettreatment'
-import type { VetMyResponse, VetTreatmentListResponse } from '@/types/Vet'
+import type { VetTreatmentListResponse } from '@/types/Vet/vettreatmentType'
+import type { VetMyResponse } from '@/types/Vet/vetmypageType'
 
 export default function VetHome() {
   const navigate = useNavigate()
 
   const [me, setMe] = useState<VetMyResponse | null>(null)
   const [loadingMe, setLoadingMe] = useState(true)
+
+  const CARD_WIDTH = 180;
 
   useEffect(() => {
     let alive = true
@@ -41,15 +44,51 @@ export default function VetHome() {
   }, [])
 
   type CardRow = {
-    id: number            // reservationId
-    time: string          // "HH:mm - HH:mm"
-    department: string    // 한글 과목
+    id: number
+    time: string
+    department: string
     petName: string
-    petInfo: string       // "종 / 성별 / 나이세"
+    petInfo: string
   }
 
   const [reservationCards, setReservationCards] = useState<CardRow[]>([])
   const [loadingList, setLoadingList] = useState(true)
+
+  // 🔸 HH:mm → 분
+  const hhmmToMinutes = (hhmm: string): number => {
+    const [h, m] = hhmm.split(':').map(Number)
+    return (Number.isFinite(h) && Number.isFinite(m)) ? h * 60 + m : Number.POSITIVE_INFINITY
+  }
+
+  // 🔸 다양한 형태의 startTime/slot을 “시각(분)”으로 환산 (날짜 무시, 시간만)
+  const getStartMinutes = (it: VetTreatmentListResponse): number => {
+    const s: any = (it as any).startTime ?? (it as any).start_time
+
+    // 1) 숫자면: 슬롯(0~47) 또는 타임스탬프
+    if (typeof s === 'number') {
+      if (s >= 0 && s <= 47) return s * 30
+      const d = new Date(s)
+      if (!isNaN(d.getTime())) return d.getHours() * 60 + d.getMinutes()
+    }
+
+    // 2) 문자열이면: toLocalHHmm으로 HH:mm 뽑아서 분
+    if (typeof s === 'string' && s.trim()) {
+      const hhmm = toLocalHHmm(s)
+      if (hhmm) return hhmmToMinutes(hhmm)
+    }
+
+    // 3) 대체: 예약 슬롯(0~47) 또는 HH:mm 문자열
+    const slot: any = (it as any).reservationTime ?? (it as any).reservation_time
+    if (typeof slot === 'number' && slot >= 0 && slot <= 47) return slot * 30
+    if (typeof slot === 'string' && /^\d+$/.test(slot)) return Number(slot) * 30
+    if (typeof slot === 'string') {
+      const m = slot.match(/^(\d{2}):(\d{2})$/)
+      if (m) return hhmmToMinutes(slot)
+    }
+
+    // 4) 마지막 안전망
+    return Number.POSITIVE_INFINITY
+  }
 
   useEffect(() => {
     let alive = true
@@ -59,7 +98,12 @@ export default function VetHome() {
         const list = await getVetTreatmentList() // type=0 목록
         if (!alive) return
 
-        const rows = (list as VetTreatmentListResponse[]).map((it) => {
+        // ✅ “시작 시각(분)” 기준 오름차순 정렬
+        const sorted = [...(list as VetTreatmentListResponse[])].sort(
+          (a, b) => getStartMinutes(a) - getStartMinutes(b)
+        )
+
+        const rows = sorted.map((it) => {
           const pet = it.petInfo
           const species = speciesMapping[pet.species as keyof typeof speciesMapping] ?? '반려동물'
           const gender  = genderMapping[pet.gender as keyof typeof genderMapping] ?? '성별미상'
@@ -107,23 +151,34 @@ export default function VetHome() {
         <div className="w-max flex gap-4 h-full p-3">
           {loadingList ? (
             <>
-              <div className="w-[260px] h-24 rounded-2xl bg-gray-100 animate-pulse" />
-              <div className="w-[260px] h-24 rounded-2xl bg-gray-100 animate-pulse" />
+              <div
+                className="h-24 rounded-2xl bg-gray-100 animate-pulse"
+                style={{ width: CARD_WIDTH }}
+              />
+              <div
+                className="h-24 rounded-2xl bg-gray-100 animate-pulse"
+                style={{ width: CARD_WIDTH }}
+              />
             </>
           ) : (
             reservationCards.map((r) => (
               <div
-                key={r.id}
-                className="cursor-pointer"
-                onClick={() => navigate(`/vet/treatment/detail/${r.id}`)} // ✅ 목록 페이지와 동일하게 상세로!
-              >
-                <OwnerTreatmentSimpleCard
-                  time={r.time}
-                  department={r.department}
-                  petName={r.petName}
-                  petInfo={r.petInfo}
-                />
-              </div>
+              key={r.id}
+              className="cursor-pointer"
+              style={{ minWidth: CARD_WIDTH }}
+              onClick={() =>
+                navigate(`/owner/reservation/detail/${r.id}`, {
+                  state: { petName: r.petName }, // ✅ 상세로 petName 전달
+                })
+              }
+            >
+              <OwnerTreatmentSimpleCard
+                time={r.time}
+                department={r.department}
+                petName={r.petName}
+                petInfo={r.petInfo}
+              />
+            </div>
             ))
           )}
         </div>

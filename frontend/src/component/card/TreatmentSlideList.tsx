@@ -1,5 +1,4 @@
 // src/component/card/TreatmentSlideList.tsx
-
 import React, { useRef, useEffect, useState } from 'react'
 import TreatmentSlideCard from '@/component/card/TreatmentSlideCard'
 import { getVetTreatments, getVetTreatmentDetail } from '@/services/api/Vet/vettreatment'
@@ -11,14 +10,14 @@ import { speciesMapping } from '@/utils/speciesMapping'
 const CARD_HEIGHT = 96
 const OVERLAP = 40
 const SNAP_GAP = CARD_HEIGHT - OVERLAP
-const MIN_CONTAINER_SCROLL_HEIGHT = 600 // 최소 스크롤 영역
+const MIN_CONTAINER_SCROLL_HEIGHT = 600
 
 type CardRow = {
   id: number
   department: string
   petName: string
-  petInfo: string   
-  time: string      // "HH:mm - HH:mm"
+  petInfo: string
+  time: string
   is_signed: boolean
 }
 
@@ -26,12 +25,31 @@ interface Props {
   onCardClick?: (id: number) => void
 }
 
+/** ✅ AI 요약 존재 여부 판별(여러 키 대응) */
+const hasAiSummary = (t: any): boolean => {
+  const cand =
+    t.aiSummary ??
+    t.ai_summary ??
+    t.summary?.ai ??
+    t.summary?.aiSummary ??
+    t.summaryText ??
+    t.summary_text ??
+    t.aiNote ??
+    t.ai_note
+
+  if (cand == null) return false
+  if (typeof cand === 'string') return cand.trim().length > 0
+  if (Array.isArray(cand)) return cand.some((x) => String(x ?? '').trim().length > 0)
+  if (typeof cand === 'object') return Object.values(cand).some((v) => String(v ?? '').trim().length > 0)
+  return false
+}
+
 const TreatmentSlideList = ({ onCardClick }: Props) => {
   const containerRef = useRef<HTMLDivElement>(null)
   const [focusedIndex, setFocusedIndex] = useState(0)
   const [cards, setCards] = useState<CardRow[]>([])
 
-  // 스크롤 포커스(애니메이션 로직) — 원본 그대로!!!!
+  // 스크롤 포커스(애니메이션)
   useEffect(() => {
     const container = containerRef.current
     if (!container) return
@@ -43,7 +61,7 @@ const TreatmentSlideList = ({ onCardClick }: Props) => {
     return () => container.removeEventListener('scroll', handleScroll)
   }, [])
 
-  // 데이터 로딩: ListFilter와 동일한 보정 로직(숫자 슬롯 → 상세로 덮어쓰기)
+  // 데이터 로딩(+ 숫자 슬롯 상세로 보정) →  AI 요약 있는 항목만 남김
   useEffect(() => {
     let alive = true
     ;(async () => {
@@ -51,7 +69,7 @@ const TreatmentSlideList = ({ onCardClick }: Props) => {
         // 1) 기본 목록(type=2)
         const raw = (await getVetTreatments(2)) as VetTreatment[]
 
-        // 2) 숫자 슬롯을 가진 항목 선별해서 상세로 start/end 보정
+        // 2) 숫자 슬롯 가진 항목 선별하여 상세로 보정
         const needFix = raw.filter(
           (it: any) => typeof it.startTime === 'number' || typeof it.endTime === 'number'
         )
@@ -74,12 +92,16 @@ const TreatmentSlideList = ({ onCardClick }: Props) => {
               petInfo:   it.petInfo ?? d.petInfo ?? d.pet,
               subject:   it.subject ?? d.subject,
               isCompleted: (it.isCompleted ?? it.is_completed) ?? (d.isCompleted ?? d.is_completed),
+              aiSummary: it.aiSummary ?? it.ai_summary ?? d?.aiSummary ?? d?.ai_summary ?? it.summaryText ?? d?.summaryText,
             }
           })
         }
 
-        // 3) ListFilter와 동일한 카드 매핑 규칙
-        const rows: CardRow[] = merged
+        // 3) AI 요약 있는 항목만 고정 필터
+        const summarized = merged.filter(hasAiSummary)
+
+        // 4) 카드 매핑
+        const rows: CardRow[] = summarized
           .map((t: any) => {
             const subjectKo =
               subjectMapping[t.subject as keyof typeof subjectMapping] ?? '진료'
@@ -94,7 +116,7 @@ const TreatmentSlideList = ({ onCardClick }: Props) => {
                 : t.petInfo?.age != null
                 ? `${t.petInfo.age}세`
                 : ''
-            const info = [speciesKo, agePart, subjectKo].filter(Boolean).join(' | ') // ✅ 동일!
+            const info = [speciesKo, agePart, subjectKo].filter(Boolean).join(' | ')
 
             const slot = t.reservationTime ?? t.reservation_time
             const time = toTimeRange(t.startTime ?? t.start_time, t.endTime ?? t.end_time, slot) || '시간 미정'
@@ -108,17 +130,17 @@ const TreatmentSlideList = ({ onCardClick }: Props) => {
               is_signed: !!(t.isCompleted ?? t.is_completed),
             }
           })
-          // 4) 최근 시작시간 기준으로 내림차순(동일 날짜/시간 처리도 ListFilter 방식과 호환)
+          // 5) 최근 시작시간 기준 내림차순
           .sort((a, b) => {
             const toTs = (x: any) => {
-              const s = merged.find((m: any) => m.treatmentId === x.id)?.startTime ?? ''
+              const s = summarized.find((m: any) => m.treatmentId === x.id)?.startTime ?? ''
               if (typeof s === 'string' && s) {
                 const norm = s.replace(' ', 'T').replace(/\.\d+$/, '')
                 const d = new Date(norm)
                 if (!isNaN(d.getTime())) return d.getTime()
               }
-              const slot = merged.find((m: any) => m.treatmentId === x.id)?.reservationTime
-                ?? merged.find((m: any) => m.treatmentId === x.id)?.reservation_time
+              const slot = summarized.find((m: any) => m.treatmentId === x.id)?.reservationTime
+                ?? summarized.find((m: any) => m.treatmentId === x.id)?.reservation_time
               return Number.isFinite(slot) ? Number(slot) * 30 * 60 * 1000 : 0
             }
             return toTs(b) - toTs(a)
@@ -143,10 +165,7 @@ const TreatmentSlideList = ({ onCardClick }: Props) => {
     <div
       ref={containerRef}
       className="overflow-y-scroll hide-scrollbar"
-      style={{
-        height: '400px',              
-        scrollSnapType: 'y mandatory',
-      }}
+      style={{ height: '400px', scrollSnapType: 'y mandatory' }}
     >
       <div className="relative" style={{ height: `${paddedHeight}px` }}>
         {cards.map((card, i) => {
@@ -162,7 +181,7 @@ const TreatmentSlideList = ({ onCardClick }: Props) => {
                 transform: isFocused ? 'scale(1)' : 'scale(0.96)', 
                 zIndex: isFocused ? 99 : cards.length - i,
               }}
-              onClick={() => onCardClick?.(card.id)} 
+              onClick={() => onCardClick?.(card.id)}
             >
               <TreatmentSlideCard
                 time={card.time}

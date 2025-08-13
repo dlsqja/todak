@@ -1,53 +1,55 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import '@/styles/main.css';
+import React, { useEffect, useMemo, useState } from 'react'
+import '@/styles/main.css'
 
-import BackHeader from '@/component/header/BackHeader';
-import Input from '@/component/input/Input';
-import SearchInput from '@/component/input/SearchInput';
-import Button from '@/component/button/Button';
+import BackHeader from '@/component/header/BackHeader'
+import Input from '@/component/input/Input'
+import SearchInput from '@/component/input/SearchInput'
+import Button from '@/component/button/Button'
 
-import { getStaffHospitalDetail, updateStaffHospital } from '@/services/api/Staff/staffhospital';
+import { getStaffHospitalDetail, updateStaffHospital } from '@/services/api/Staff/staffhospital'
 
 export default function StaffHospitalInfo() {
-  const [hospitalName, setHospitalName] = useState('');
-  const [description, setDescription] = useState('');
-  const [location, setLocation] = useState('');
-  const [phone, setPhone] = useState('');
+  const [hospitalName, setHospitalName] = useState('')
+  const [description, setDescription] = useState('')
+  const [location, setLocation] = useState('')
+  const [phone, setPhone] = useState('')
+
+  const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    let alive = true;
-    (async () => {
+    let alive = true
+    ;(async () => {
       try {
-        setLoading(true);
-        setError(null);
-        const data = await getStaffHospitalDetail();
-        if (!alive) return;
-        setHospitalName(data.name ?? '');
-        setDescription(data.profile ?? '');
-        setLocation(data.location ?? '');
-        setPhone(data.contact ?? '');
+        setLoading(true)
+        setError(null)
+        const data = await getStaffHospitalDetail()
+        if (!alive) return
+        setHospitalName(data.name ?? '')
+        setDescription(data.profile ?? '')
+        setLocation(data.location ?? '')
+        setPhone(data.contact ?? '')
       } catch (e: any) {
-        if (!alive) return;
-        setError(e?.message || '병원 정보를 불러오지 못했어요!');
+        if (!alive) return
+        setError(e?.message || '병원 정보를 불러오지 못했어요!')
       } finally {
-        if (alive) setLoading(false);
+        if (alive) setLoading(false)
       }
-    })();
-    return () => {
-      alive = false;
-    };
-  }, []);
+    })()
+    return () => { alive = false }
+  }, [])
 
-  const canSave = useMemo(() => !loading && !saving, [loading, saving]);
+  const canSave = useMemo(() => !loading && !saving, [loading, saving])
 
   const handleSave = async () => {
     try {
-      setSaving(true);
-      setError(null);
+      setSaving(true)
+      setError(null)
       await updateStaffHospital({
         name: hospitalName.trim(),
         profile: description.trim(),
@@ -115,12 +117,12 @@ export default function StaffHospitalInfo() {
                 color="green"
                 text={saving ? '수정 중...' : '수정하기'}
                 onClick={handleSave}
-                className={!canSave ? 'opacity-50 cursor-not-allowed' : ''}
+                disabled={!canSave}
               />
             </div>
           </>
         )}
       </div>
     </>
-  );
+  )
 }

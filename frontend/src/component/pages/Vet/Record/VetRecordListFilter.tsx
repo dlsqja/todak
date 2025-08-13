@@ -50,30 +50,47 @@ const makeInfo = (t: any) => {
   return [species, agePart, subject].filter(Boolean).join(' | ');
 };
 
+// ✅ AI 요약 존재 여부 판단(여러 키 대응)
+const hasAiSummary = (t: any): boolean => {
+  const cand =
+    t.aiSummary ??
+    t.ai_summary ??
+    t.summary?.ai ??
+    t.summary?.aiSummary ??
+    t.summaryText ??
+    t.summary_text ??
+    t.aiNote ??
+    t.ai_note;
+
+  if (cand == null) return false;
+  if (typeof cand === 'string') return cand.trim().length > 0;
+  if (Array.isArray(cand)) return cand.some((x) => String(x ?? '').trim().length > 0);
+  if (typeof cand === 'object') return Object.values(cand).some((v) => String(v ?? '').trim().length > 0);
+  return false;
+};
+
 interface Props {
   data?: VetTreatment[];
   onCardClick: (id: number) => void;
 }
 
 export default function VetRecordListFilter({ data = [], onCardClick }: Props) {
+  // ✅ 서명 상태만 남기고, AI 요약은 항상 “있음”으로 고정 필터
   const [selectedSigned, setSelectedSigned] =
     useState<'ALL' | 'true' | 'false'>('ALL');
 
-  // 🔧 리스트 데이터 보정본 (상세 호출로 start/end를 실제 시간으로 덮어쓰기)
+  // 상세 호출로 시간/필드 보강
   const [enriched, setEnriched] = useState<any[]>(data as any[]);
 
   useEffect(() => {
     let alive = true;
 
     (async () => {
-      // 처음엔 원본 그대로 반영
       setEnriched(data as any[]);
 
-      // 숫자 슬롯처럼 보이는 항목들만 선별
       const needFix = (data as any[]).filter(
         (it) => typeof (it as any).startTime === 'number' || typeof (it as any).endTime === 'number'
       );
-
       if (needFix.length === 0) return;
 
       try {
@@ -93,16 +110,22 @@ export default function VetRecordListFilter({ data = [], onCardClick }: Props) {
 
           return {
             ...it,
-            // 상세의 실제 시간을 우선 적용
             startTime: d.startTime ?? d.start_time ?? it.startTime,
             endTime: d.endTime ?? d.end_time ?? it.endTime,
-            // 동물/과목/완료 여부도 최대한 보강
             pet: it.pet ?? it.petInfo ?? d.pet ?? d.petInfo,
             petInfo: it.petInfo ?? d.petInfo ?? d.pet,
             subject: it.subject ?? d.subject,
             isCompleted:
               (it.isCompleted ?? it.is_completed) ??
               (d.isCompleted ?? d.is_completed),
+            // 요약도 상세에서 보강
+            aiSummary:
+              it.aiSummary ??
+              it.ai_summary ??
+              d.aiSummary ??
+              d.ai_summary ??
+              it.summaryText ??
+              d.summaryText,
           };
         });
 
@@ -118,7 +141,7 @@ export default function VetRecordListFilter({ data = [], onCardClick }: Props) {
     };
   }, [data]);
 
-  // 1) 서명상태 필터 → 2) 최신 시작시간(desc) 정렬
+  // 1) 서명상태 필터 → 2) ✅ AI 요약 있는 것만 남김 → 3) 최신 시작시간(desc)
   const filteredData = useMemo(() => {
     let list = [...enriched];
 
@@ -129,6 +152,9 @@ export default function VetRecordListFilter({ data = [], onCardClick }: Props) {
       );
     }
 
+    // ✅ 고정 필터: AI 요약 있는 항목만
+    list = list.filter(hasAiSummary);
+
     list.sort((a: any, b: any) => {
       const sa = a.startTime ?? a.start_time ?? '';
       const sb = b.startTime ?? b.start_time ?? '';
@@ -138,7 +164,7 @@ export default function VetRecordListFilter({ data = [], onCardClick }: Props) {
     return list as VetTreatment[];
   }, [enriched, selectedSigned]);
 
-  // 날짜별 그룹핑 + 각 날짜 내부는 시간 오름차순
+  // 날짜별 그룹핑 + 각 날짜 내부는 시간 내림차순(최근 먼저)
   const grouped = useMemo(() => {
     const map = new Map<string, VetTreatment[]>();
     for (const it of filteredData as any[]) {
@@ -150,23 +176,19 @@ export default function VetRecordListFilter({ data = [], onCardClick }: Props) {
 
     const entries = Array.from(map.entries()).sort((a, b) => b[0].localeCompare(a[0]));
     for (const [, arr] of entries as any) {
-  const getTs = (x: any) => {
-    // 1) 문자열 시간 → 타임스탬프
-    const s = x.startTime ?? x.start_time ?? '';
-    if (typeof s === 'string' && s) {
-      const norm = s.replace(' ', 'T').replace(/\.\d+$/, '');
-      const d = new Date(norm);
-      if (!isNaN(d.getTime())) return d.getTime();
+      const getTs = (x: any) => {
+        const s = x.startTime ?? x.start_time ?? '';
+        if (typeof s === 'string' && s) {
+          const norm = s.replace(' ', 'T').replace(/\.\d+$/, '');
+          const d = new Date(norm);
+          if (!isNaN(d.getTime())) return d.getTime();
+        }
+        const slot = x.reservationTime ?? x.reservation_time;
+        if (Number.isFinite(slot)) return Number(slot) * 30 * 60 * 1000;
+        return 0;
+      };
+      arr.sort((a: any, b: any) => getTs(b) - getTs(a));
     }
-    // 2) 슬롯 숫자(0~47)면 30분 단위로 환산(하루 기준 상대값)
-    const slot = x.reservationTime ?? x.reservation_time;
-    if (Number.isFinite(slot)) return Number(slot) * 30 * 60 * 1000;
-    return 0;
-  };
-
-  // ✅ 같은 날짜 내에서 최근(큰 시간) 먼저
-  arr.sort((a: any, b: any) => getTs(b) - getTs(a));
-}
     return entries as [string, VetTreatment[]][];
   }, [filteredData]);
 
@@ -181,12 +203,12 @@ export default function VetRecordListFilter({ data = [], onCardClick }: Props) {
             placeholder="서명상태 선택"
           />
         </div>
+        {/* ✅ AI 요약 드롭다운 제거됨 (항상 요약 있는 항목만 표시) */}
       </div>
 
       <div className="px-7">
         {grouped.map(([dateKey, items]) => (
           <div key={dateKey} className="mb-5">
-            {/* 날짜 헤더: 좌측=진료 일자, 우측=해당 날짜 건수 */}
             <div className="flex justify-between items-center mb-2">
               <h4 className="h4 text-black">{formatKoreanDate(dateKey)}</h4>
               <h4 className="h4 text-black">{items.length}건</h4>
@@ -206,10 +228,10 @@ export default function VetRecordListFilter({ data = [], onCardClick }: Props) {
                 return (
                   <TreatmentSlideCard
                     key={t.treatmentId}
-                    time={timeRange}               // "10:00 - 10:30"
-                    department={subject}           // 과목
-                    petName={petName}              // 반려동물 이름
-                    petInfo={info}                 // "종류 | 나이세 | 과목"
+                    time={timeRange}
+                    department={subject}
+                    petName={petName}
+                    petInfo={info}
                     isAuthorized={true}
                     is_signed={!!(t.isCompleted ?? t.is_completed)}
                     onClick={() => onCardClick(t.treatmentId)}
