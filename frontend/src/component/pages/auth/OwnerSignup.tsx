@@ -149,7 +149,6 @@ export default function OwnerSignup() {
 
     // 유효성 검사 통과 시 진행
     console.log('유효성 검사 통과');
-
     setIsLoading(true);
 
     // URL에서 authId 가져오기 (카카오 로그인 후 전달받은 값)
@@ -175,15 +174,14 @@ export default function OwnerSignup() {
       },
       authId,
     );
+    console.log('response', response);
 
-    // console.log('response', response.message);
-
-    // if (response.message === '성공') {
-    //   alert('회원가입이 완료되었습니다!');
-    //   navigate('/owner/home');
-    // } else {
-    //   alert('회원가입에 실패했습니다. 다시 시도해주세요.');
-    // }
+    if (response.message === '실패') {
+      alert('회원가입에 실패했습니다. 다시 시도해주세요.');
+    } else {
+      alert('회원가입이 완료되었습니다!');
+      navigate('/owner/home');
+    }
   };
 
   return (
