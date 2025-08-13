@@ -52,6 +52,7 @@ public class TreatmentService {
                 List<Map<String, Object>> treatmentsList  = treatmentList.stream()
                         .map(treatments -> {
                             Map<String, Object> map = new HashMap<>();
+                            map.put("treatementInfo", TreatementResponse.toResponse(treatments));
                             map.put("reservationId",treatments.getReservation().getReservationId());
                             map.put("vetName",treatments.getVet().getName());
                             map.put("reservationDay", treatments.getReservation().getReservationDay());
@@ -176,5 +177,24 @@ public class TreatmentService {
 
 
         return result;
+    }
+
+    public void updateTreatment(Long treatmentId,String aiSummary){
+
+        Treatment treatment = treatmentRepository.findById(treatmentId).orElseThrow(()->new CustomException(ErrorCode.RESOURCE_NOT_FOUND));
+
+        treatment.setAiSummary(aiSummary);
+
+        treatmentRepository.save(treatment);
+    }
+
+
+    public void completeTreatment(Long treatmentId){
+
+        Treatment treatment = treatmentRepository.findById(treatmentId).orElseThrow(()->new CustomException(ErrorCode.RESOURCE_NOT_FOUND));
+
+        treatment.setIsCompleted(true);
+
+        treatmentRepository.save(treatment);
     }
 }

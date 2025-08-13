@@ -22,12 +22,16 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
+
 @Slf4j
 @RestController
 @RequestMapping("/public/login")
@@ -94,11 +98,27 @@ public class LoginController {
         String accessToken = jwtService.generateAccessToken(id, auth.getEmail(), selectedRole);
         String refreshToken = jwtService.generateRefreshToken(id , auth.getEmail(), selectedRole);
 
-        Map<String, String> tokens = new HashMap<>();
-        tokens.put("accessToken", accessToken);
-        tokens.put("refreshToken", refreshToken);
+        ResponseCookie accessTokenCookie = ResponseCookie.from("ACCESSTOKEN", accessToken)
+                .httpOnly(true) //js 에서 document.cookie로 읽어오지 못하게함
+                .secure(true)   //https 에서만 가능
+                .sameSite("Lax")
+                .path("/")
+                .maxAge(Duration.ofDays(14))
+                .build();
 
-        String successRedirectURL = String.format("https://i13a409.p.ssafy.io/%s?accessToken=%s&refreshToken=%s", role,accessToken,refreshToken);
+        ResponseCookie refreshTokenCookie = ResponseCookie.from("REFRESHTOKEN", refreshToken)
+                .httpOnly(true) //js 에서 document.cookie로 읽어오지 못하게함
+                .secure(true)   //https 에서만 가능
+                .sameSite("Lax")
+                .path("/")
+                .maxAge(Duration.ofDays(14))
+                .build();
+
+
+        response.addHeader(HttpHeaders.SET_COOKIE, accessTokenCookie.toString());
+        response.addHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
+
+        String successRedirectURL = String.format("https://i13a409.p.ssafy.io/%s", role);
 
         response.sendRedirect(successRedirectURL);
     }

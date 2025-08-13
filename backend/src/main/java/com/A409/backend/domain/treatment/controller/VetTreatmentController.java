@@ -2,6 +2,7 @@ package com.A409.backend.domain.treatment.controller;
 
 import com.A409.backend.domain.hospital.dto.HospitalResponse;
 import com.A409.backend.domain.reservation.entity.Reservation;
+import com.A409.backend.domain.treatment.dto.TreatementReqeust;
 import com.A409.backend.domain.treatment.entity.Treatment;
 import com.A409.backend.domain.treatment.entity.TreatmentResponse;
 import com.A409.backend.domain.treatment.service.TreatmentService;
@@ -57,6 +58,25 @@ public class VetTreatmentController {
     public APIResponse<?> uploadAudio(@PathVariable("treatment_id") Long treatmentId) {
 
         //aiClient.uploadAudio(treatmentId);
+
+        return APIResponse.ofSuccess(null);
+    }
+
+    @Operation(summary = "진료 내용 수정")
+    @PostMapping("/{treatment_id}")
+    public APIResponse<?> updateTreatment(@PathVariable("treatment_id") Long treatmentId,
+                                          @RequestBody TreatementReqeust treatementReqeust) {
+
+        treatmentService.updateTreatment(treatmentId,treatementReqeust.getAiSummary());
+
+        return APIResponse.ofSuccess(null);
+    }
+
+    @Operation(summary = "AI요약 내용 확인")
+    @PatchMapping("/complete/{treatment_id}")
+    public APIResponse<?> completeTreatment(@PathVariable("treatment_id") Long treatmentId) {
+
+        treatmentService.completeTreatment(treatmentId);
 
         return APIResponse.ofSuccess(null);
     }
