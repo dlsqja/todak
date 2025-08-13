@@ -34,8 +34,12 @@ export const authAPI = {
   },
 
   // staff 회원가입
-  staffSignup: async (userData: StaffSignup) => {
-    const response = await apiClient.post('/public/signup/staff', userData);
+  staffSignup: async (userData: StaffSignup, authId: string) => {
+    const response = await apiClient.post('/public/signup/staff', userData, {
+      params: {
+        authId: Number(authId),
+      },
+    });
     return response.data;
   },
 

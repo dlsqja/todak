@@ -27,8 +27,8 @@ interface VetSignup {
 
 // 병원 관계자 회원가입
 interface StaffSignup {
-  hospital_code: number;
   name: string;
+  hospitalcode: string;
 }
 
 export type { KakaoLoginParams, LoginResponse, OwnerSignup, VetSignup, StaffSignup };
