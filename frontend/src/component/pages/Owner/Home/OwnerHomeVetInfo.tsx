@@ -84,12 +84,17 @@ export default function VetInfoPage() {
   }, [vet?.workingHours, closingHours]);
 
   const handleSubmit = () => {
-    if (!selectedTime) {
-      alert('시간을 선택해주세요!');
-      return;
-    }
-    navigate('/owner/home/form', { state: { pet, hospital, vet, time: selectedTime } });
-  };
+  if (!selectedTime) return alert('시간을 선택해주세요!')
+  navigate('/owner/home/form', {
+    state: {
+      pet, hospital, vet,
+      time: selectedTime,
+      startTime: todayRange?.startText,   
+      endTime: todayRange?.endText,       
+      usableTimes: todayRange?.usableTimes, // (선택) 필요하면 쓰게!!!!
+    },
+  })
+}
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
