@@ -173,12 +173,12 @@ export default function VetSignup() {
 
     console.log('response', response);
 
-    // if (response.message === '성공') {
-    //   alert('회원가입이 완료되었습니다!');
-    //   navigate('/vet/home');
-    // } else {
-    //   alert('회원가입에 실패했습니다. 다시 시도해주세요.');
-    // }
+    if (response.message === '성공') {
+      alert('수의사 가입이 완료되었습니다!');
+      navigate('/vet/home');
+    } else {
+      alert('수의사 가입에 실패했습니다. 다시 시도해주세요.');
+    }
   };
 
   return (
