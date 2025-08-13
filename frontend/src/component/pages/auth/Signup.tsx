@@ -28,6 +28,15 @@ function SignupPage() {
     const token = urlParams.get('token');
     const error = urlParams.get('error');
     const role = urlParams.get('role');
+    const authId = urlParams.get('authId');
+
+    console.log('=== 로그인 결과 디버깅 ===');
+    console.log('success:', success);
+    console.log('token:', token);
+    console.log('error:', error);
+    console.log('role:', role);
+    console.log('authId:', authId);
+    console.log('전체 URL:', window.location.href);
 
     if (success === 'true' && token) {
       // 토큰 저장
@@ -44,13 +53,21 @@ function SignupPage() {
     } else if (error) {
       // 에러에 따라 처리
       if (error === 'not_registered') {
-        // role에 따라 추가정보 입력창으로 이동
+        // authId 파라미터 가져오기
+        const authId = urlParams.get('authId');
+
+        if (!authId) {
+          alert('인증 정보가 없습니다.');
+          return;
+        }
+
+        // role에 따라 추가정보 입력창으로 이동 (authId 포함)
         if (role === 'owner') {
-          navigate('/auth/owner_signup');
+          navigate(`/auth/owner/${authId}`);
         } else if (role === 'vet') {
-          navigate('/auth/vet_signup');
+          navigate(`/auth/vet/${authId}`);
         } else if (role === 'staff') {
-          navigate('/auth/staff_signup');
+          navigate(`/auth/staff/${authId}`);
         }
       } else {
         alert('로그인에 실패했습니다.');
