@@ -33,7 +33,7 @@ export default function OwnerTreatment() {
       const sortedData = treatmentData.map((petTreatment) => ({
         ...petTreatment,
         treatments: petTreatment.treatments
-          .filter((item) => item.treatmentInfo.startTime == null) // starttime이 null인 것만 포함함
+          .filter((item) => !item.treatmentInfo || item.treatmentInfo.startTime == null) // treatmentInfo가 없거나 startTime이 null인 것만 포함
           .sort((a, b) => {
             // reservationTime을 기준으로 내림차순 정렬 (최신순)
             return b.reservationTime - a.reservationTime;
