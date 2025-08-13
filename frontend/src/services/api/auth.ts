@@ -12,8 +12,11 @@ export const authAPI = {
   },
 
   // owner 회원가입
-  ownerSignup: async (userData: OwnerSignup) => {
-    const response = await apiClient.post('/public/signup/owner', userData);
+  ownerSignup: async (userData: OwnerSignup, authid: string) => {
+    const response = await apiClient.post('/public/signup/owner', {
+      ...userData,
+      authId: authid,
+    });
     return response.data;
   },
 
