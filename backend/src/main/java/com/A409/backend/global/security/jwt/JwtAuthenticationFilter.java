@@ -41,36 +41,56 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
+        String token = null;
         String authHeader = request.getHeader("Authorization");
 
-        if(authHeader != null && authHeader.startsWith("Bearer ")) {
-            String token = authHeader.substring(7);
-            if(jwtService.validateToken(token)){
-                Long id = jwtService.getUserId(token);
-                String username = jwtService.getUsername(token);
-                String role = jwtService.getRole(token);
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            token = authHeader.substring(7);
+        }
 
+        if (token == null) {
+            jakarta.servlet.http.Cookie[] cookies = request.getCookies();
 
-                String cacheKey = "blacklist:" + id;
-                List<String> cachedTokens = (List<String>) redisService.getByKey(cacheKey);
+            if (cookies != null) {
+                for (jakarta.servlet.http.Cookie c : cookies) {
 
-                if(cachedTokens!=null&&cachedTokens.contains(token)){
-                    throw new CustomException(ErrorCode.ACCESS_DENIED);
+                    log.info("쿠키 이름: {}, 값: {}", c.getName(), c.getValue());
+
+                    if ("ACCESSTOKEN".equals(c.getName())) {
+                        String v = c.getValue();
+                        if (v != null && !v.isBlank()) {
+                            token = v;
+                            break;
+                        }
+                    }
                 }
-
-
-
-                User user = User.builder()
-                        .id(id)
-                        .username(username)
-                        .role(Role.valueOf(role))
-                        .password(null)
-                        .build();
-
-                UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
-                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
             }
         }
+        if(token != null && jwtService.validateToken(token)){
+            Long id = jwtService.getUserId(token);
+            String username = jwtService.getUsername(token);
+            String role = jwtService.getRole(token);
+
+            String cacheKey = "blacklist:" + id;
+            List<String> cachedTokens = (List<String>) redisService.getByKey(cacheKey);
+
+            if(cachedTokens!=null&&cachedTokens.contains(token)){
+                throw new CustomException(ErrorCode.ACCESS_DENIED);
+            }
+
+
+
+            User user = User.builder()
+                    .id(id)
+                    .username(username)
+                    .role(Role.valueOf(role))
+                    .password(null)
+                    .build();
+
+            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+            SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+        }
+
         filterChain.doFilter(request, response);
     }
 

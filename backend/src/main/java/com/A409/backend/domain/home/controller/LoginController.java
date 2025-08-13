@@ -119,6 +119,7 @@ public class LoginController {
         response.addHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
 
         String successRedirectURL = String.format("https://i13a409.p.ssafy.io/%s", role);
+        //String successRedirectURL = String.format("http://localhost:8080/%s", role);
 
         response.sendRedirect(successRedirectURL);
     }
