@@ -12,11 +12,8 @@ const apiClient: AxiosInstance = axios.create({
 
 apiClient.interceptors.request.use(
   (config) => {
-    const accessToken = localStorage.getItem('accessToken');
-    if (accessToken) {
-      config.headers['Authorization'] = `Bearer ${accessToken}`;
-      // console.log('토큰 헤더 추가:', config.headers['Authorization']);
-    }
+    // HTTP-only 쿠키는 브라우저가 자동으로 처리
+    console.log('Request with HTTP-only cookies');
     return config;
   },
   (error) => Promise.reject(error),

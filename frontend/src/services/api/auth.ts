@@ -34,22 +34,27 @@ export const authAPI = {
     return response.data;
   },
 
-  // 토큰 저장
-  saveTokens: (accessToken: string, refreshToken?: string) => {
-    localStorage.setItem('accessToken', accessToken);
-    if (refreshToken) {
-      localStorage.setItem('refreshToken', refreshToken);
-    }
+  // HTTP-only 쿠키는 서버에서 자동 설정되므로 클라이언트에서 저장할 필요 없음
+  saveTokens: (accessToken?: string, refreshToken?: string) => {
+    console.log('HTTP-only 쿠키로 토큰이 자동 저장됩니다.');
+    // 서버에서 Set-Cookie 헤더로 HTTP-only 쿠키 설정
+    // 클라이언트에서는 별도 저장 작업 불필요
   },
 
-  // 토큰 가져오기
+  // HTTP-only 쿠키는 JavaScript로 접근 불가
   getAccessToken: (): string | null => {
-    return localStorage.getItem('accessToken');
+    console.log('HTTP-only 쿠키는 JavaScript로 접근할 수 없습니다.');
+    return null; // HTTP-only 쿠키는 브라우저가 자동으로 처리
   },
 
-  // 토큰 삭제 (로그아웃)
-  clearTokens: () => {
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
+  // 로그아웃 시 서버에 요청해서 쿠키 삭제
+  clearTokens: async () => {
+    try {
+      // 서버에 로그아웃 요청을 보내서 쿠키 삭제
+      await apiClient.post('/auth/logout');
+      console.log('로그아웃 완료 - HTTP-only 쿠키 삭제됨');
+    } catch (error) {
+      console.error('로그아웃 중 오류:', error);
+    }
   },
 };
