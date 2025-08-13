@@ -114,23 +114,6 @@ export default function VetMypage() {
     <>
       <SimpleHeader text="마이페이지" />
       <div className="flex flex-col gap-6 px-7 mt-11">
-        {/* 병원코드 입력 제거 완료!!! */}
-        <Input id="name" label="이름" value={vetName} onChange={(e) => setVetName(e.target.value)} disabled={loading} />
-        <Input id="license" label="면허번호" value={license} disabled />
-        <div className="flex flex-col">
-          <label htmlFor="profile" className="mb-2 block h4 text-black">
-            수의사 소개글
-          </label>
-          <textarea
-            id="profile"
-            value={profile}
-            onChange={(e) => setProfile(e.target.value)}
-            placeholder={loading ? '불러오는 중…' : '소개글을 입력해주세요'}
-            className="w-full h-30 block border-1 rounded-[12px] border-gray-400 px-5 pt-3 pb-3 text-black placeholder:text-gray-500 resize-none align-top whitespace-pre-wrap break-words scrollbar-hide"
-            disabled={loading}
-          />
-          {error && <p className="caption text-red-500 mt-1">{error}</p>}
-        </div>
         <div>
           <label className="block h4 text-black mb-2">프로필 사진</label>
           <input type="file" ref={fileInputRef} onChange={handleFileChange} accept="image/*" className="hidden" />
@@ -162,6 +145,23 @@ export default function VetMypage() {
             </div>
           </div>
         </div>
+        <Input id="name" label="이름" value={vetName} onChange={(e) => setVetName(e.target.value)} disabled={loading} />
+        <Input id="license" label="면허번호" value={license} disabled />
+        <div className="flex flex-col">
+          <label htmlFor="profile" className="mb-2 block h4 text-black">
+            수의사 소개글
+          </label>
+          <textarea
+            id="profile"
+            value={profile}
+            onChange={(e) => setProfile(e.target.value)}
+            placeholder={loading ? '불러오는 중…' : '소개글을 입력해주세요'}
+            className="w-full h-30 block border-1 rounded-[12px] border-gray-400 px-5 pt-3 pb-3 text-black placeholder:text-gray-500 resize-none align-top whitespace-pre-wrap break-words scrollbar-hide"
+            disabled={loading}
+          />
+          {error && <p className="caption text-red-500 mt-1">{error}</p>}
+        </div>
+        
       </div>
       <br />
       <div className="px-7">

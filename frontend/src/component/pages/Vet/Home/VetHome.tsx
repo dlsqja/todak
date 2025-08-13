@@ -19,13 +19,24 @@ import { getVetTreatmentList } from '@/services/api/Vet/vettreatment'
 import type { VetTreatmentListResponse } from '@/types/Vet/vettreatmentType'
 import type { VetMyResponse } from '@/types/Vet/vetmypageType'
 
+// ✅ 상세 모달 관련 (비대면 진료 페이지와 동일)
+import VetReservationDetailModal from '@/component/pages/Vet/Treatment/VetReservationDetailModal'
+import { getVetReservationDetail } from '@/services/api/Vet/vetreservation'
+import { getStaffReservationDetail } from '@/services/api/Staff/staffreservation'
+import type { StaffReservationItem } from '@/types/Staff/staffreservationType'
+
 export default function VetHome() {
   const navigate = useNavigate()
 
   const [me, setMe] = useState<VetMyResponse | null>(null)
   const [loadingMe, setLoadingMe] = useState(true)
 
-  const CARD_WIDTH = 180;
+  // 모달 상태
+  const [modalOpen, setModalOpen] = useState(false)
+  const [modalLoading, setModalLoading] = useState(false)
+  const [modalDetail, setModalDetail] = useState<StaffReservationItem | null>(null)
+
+  const CARD_WIDTH = 180
 
   useEffect(() => {
     let alive = true
@@ -89,47 +100,85 @@ export default function VetHome() {
     // 4) 마지막 안전망
     return Number.POSITIVE_INFINITY
   }
+  // 슬롯 인덱스 안전 파서 (숫자/문자 모두)
+const toSlotIndex = (v: unknown): number | null => {
+  if (typeof v === 'number') return Number.isFinite(v) ? v : null
+  const s = String(v ?? '')
+  if (/^\d+$/.test(s)) return Number(s)
+  return null
+}
 
   useEffect(() => {
-    let alive = true
-    ;(async () => {
+  let alive = true
+  ;(async () => {
+    try {
+      setLoadingList(true)
+      const list = await getVetTreatmentList() // type=0 목록
+      if (!alive) return
+
+      const src = (list as VetTreatmentListResponse[]) || []
+
+      // ✅ startTime 없는 애들만(= 미시작) + 미완료만
+      const onlyPending = src.filter((it: any) => {
+        const slot = toSlotIndex(it.startTime)
+        const started = slot != null && slot > 0   // 0 또는 null/undefined → 미시작으로 간주
+        const completed = it.isCompleted === true
+        return !started && !completed
+      })
+
+      // 기존과 동일: “시작 시각(분)” 기준 오름차순 정렬
+      const sorted = [...onlyPending].sort(
+        (a, b) => getStartMinutes(a) - getStartMinutes(b)
+      )
+
+      const rows = sorted.map((it) => {
+        const pet = it.petInfo
+        const species = speciesMapping[pet.species as keyof typeof speciesMapping] ?? '반려동물'
+        const gender  = genderMapping[pet.gender as keyof typeof genderMapping] ?? '성별미상'
+        const agePart = Number.isFinite(pet.age as number) ? `${pet.age}세` : ''
+        const department = subjectMapping[it.subject as keyof typeof subjectMapping] ?? '진료'
+        const time = toTimeRange(it.startTime, it.endTime) || ''
+
+        return {
+          id: it.reservationId,
+          time,
+          department,
+          petName: pet.name,
+          petInfo: [species, gender, agePart].filter(Boolean).join(' / '),
+        } as CardRow
+      })
+
+      setReservationCards(rows)
+    } catch (e) {
+      console.warn('[VetHome] getVetTreatmentList failed:', e)
+      setReservationCards([])
+    } finally {
+      if (alive) setLoadingList(false)
+    }
+  })()
+  return () => { alive = false }
+}, [])
+
+
+  // ✅ 카드 클릭 → 상세 모달 (비대면 진료 페이지와 동일 로직)
+  const openDetailModal = async (reservationId: number) => {
+    setModalOpen(true)
+    setModalLoading(true)
+    setModalDetail(null)
+    try {
+      let res: StaffReservationItem | null = null
       try {
-        setLoadingList(true)
-        const list = await getVetTreatmentList() // type=0 목록
-        if (!alive) return
-
-        // ✅ “시작 시각(분)” 기준 오름차순 정렬
-        const sorted = [...(list as VetTreatmentListResponse[])].sort(
-          (a, b) => getStartMinutes(a) - getStartMinutes(b)
-        )
-
-        const rows = sorted.map((it) => {
-          const pet = it.petInfo
-          const species = speciesMapping[pet.species as keyof typeof speciesMapping] ?? '반려동물'
-          const gender  = genderMapping[pet.gender as keyof typeof genderMapping] ?? '성별미상'
-          const agePart = Number.isFinite(pet.age) ? `${pet.age}세` : ''
-          const department = subjectMapping[it.subject as keyof typeof subjectMapping] ?? '진료'
-          const time = toTimeRange(it.startTime, it.endTime) || ''
-
-          return {
-            id: it.reservationId,
-            time,
-            department,
-            petName: pet.name,
-            petInfo: [species, gender, agePart].filter(Boolean).join(' / '),
-          } as CardRow
-        })
-
-        setReservationCards(rows)
-      } catch (e) {
-        console.warn('[VetHome] getVetTreatmentList failed:', e)
-        setReservationCards([])
-      } finally {
-        if (alive) setLoadingList(false)
+        res = await getVetReservationDetail(reservationId)
+      } catch {
+        res = await getStaffReservationDetail(reservationId)
       }
-    })()
-    return () => { alive = false }
-  }, [])
+      setModalDetail(res ?? null)
+    } catch {
+      setModalDetail(null)
+    } finally {
+      setModalLoading(false)
+    }
+  }
 
   return (
     <div>
@@ -151,34 +200,24 @@ export default function VetHome() {
         <div className="w-max flex gap-4 h-full p-3">
           {loadingList ? (
             <>
-              <div
-                className="h-24 rounded-2xl bg-gray-100 animate-pulse"
-                style={{ width: CARD_WIDTH }}
-              />
-              <div
-                className="h-24 rounded-2xl bg-gray-100 animate-pulse"
-                style={{ width: CARD_WIDTH }}
-              />
+              <div className="h-24 rounded-2xl bg-gray-100 animate-pulse" style={{ width: CARD_WIDTH }} />
+              <div className="h-24 rounded-2xl bg-gray-100 animate-pulse" style={{ width: CARD_WIDTH }} />
             </>
           ) : (
             reservationCards.map((r) => (
               <div
-              key={r.id}
-              className="cursor-pointer"
-              style={{ minWidth: CARD_WIDTH }}
-              onClick={() =>
-                navigate(`/owner/reservation/detail/${r.id}`, {
-                  state: { petName: r.petName }, // ✅ 상세로 petName 전달
-                })
-              }
-            >
-              <OwnerTreatmentSimpleCard
-                time={r.time}
-                department={r.department}
-                petName={r.petName}
-                petInfo={r.petInfo}
-              />
-            </div>
+                key={r.id}
+                className="cursor-pointer"
+                style={{ minWidth: CARD_WIDTH }}
+                onClick={() => openDetailModal(r.id)} // ← ✅ 모달 오픈
+              >
+                <OwnerTreatmentSimpleCard
+                  time={r.time}
+                  department={r.department}
+                  petName={r.petName}
+                  petInfo={r.petInfo}
+                />
+              </div>
             ))
           )}
         </div>
@@ -188,6 +227,15 @@ export default function VetHome() {
       <div className="mx-7">
         <TreatmentSlideList onCardClick={(id) => navigate(`/vet/records/detail/${id}`)} />
       </div>
+
+      {/* ✅ 상세 모달 */}
+      {modalOpen && (
+        <VetReservationDetailModal
+          onClose={() => setModalOpen(false)}
+          detail={modalDetail}
+          loading={modalLoading}
+        />
+      )}
     </div>
   )
 }
