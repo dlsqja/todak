@@ -1,11 +1,11 @@
-import React, { useRef, useEffect, useState } from "react";
-import TreatmentSlideCard from "@/component/card/TreatmentSlideCard";
+import React, { useRef, useEffect, useState } from 'react';
+import TreatmentSlideCard from '@/component/card/TreatmentSlideCard';
 
 const cards = [
-  { department: "안과", petName: "뽀삐", petInfo: "강아지 / 3세 / 여(중성화)", time: "17:00", is_signed: true },
-  { department: "치과", petName: "쿠쿠", petInfo: "고양이 / 2세 / 남(중성화)", time: "18:00", is_signed: false },
-  { department: "내과", petName: "초코", petInfo: "강아지 / 1세 / 여", time: "19:00", is_signed: false },
-  { department: "외과", petName: "망고", petInfo: "고양이 / 4세 / 여", time: "20:00", is_signed: false },
+  { department: '안과', petName: '뽀삐', petInfo: '강아지 / 3세 / 여(중성화)', time: '17:00', is_signed: true },
+  { department: '치과', petName: '쿠쿠', petInfo: '고양이 / 2세 / 남(중성화)', time: '18:00', is_signed: false },
+  { department: '내과', petName: '초코', petInfo: '강아지 / 1세 / 여', time: '19:00', is_signed: false },
+  { department: '외과', petName: '망고', petInfo: '고양이 / 4세 / 여', time: '20:00', is_signed: false },
 ];
 
 const CARD_HEIGHT = 96;
@@ -28,8 +28,8 @@ const TreatmentSlideList = () => {
       setFocusedIndex(index);
     };
 
-    container.addEventListener("scroll", handleScroll);
-    return () => container.removeEventListener("scroll", handleScroll);
+    container.addEventListener('scroll', handleScroll);
+    return () => container.removeEventListener('scroll', handleScroll);
   }, []);
 
   // 카드 스택 높이 계산
@@ -41,8 +41,8 @@ const TreatmentSlideList = () => {
       ref={containerRef}
       className="overflow-y-scroll hide-scrollbar"
       style={{
-        height: "400px", // 고정된 화면 높이
-        scrollSnapType: "y mandatory",
+        height: '400px', // 고정된 화면 높이
+        scrollSnapType: 'y mandatory',
       }}
     >
       <div
@@ -61,11 +61,11 @@ const TreatmentSlideList = () => {
               className="absolute left-0 right-0 transition-transform duration-300 snap-start"
               style={{
                 top,
-                transform: isFocused ? "scale(1)" : "scale(0.96)",
+                transform: isFocused ? 'scale(1)' : 'scale(0.96)',
                 zIndex: isFocused ? 99 : cards.length - i,
               }}
             >
-              <TreatmentSlideCard {...card} />
+              <TreatmentSlideCard {...card} isAuthorized={true} />
             </div>
           );
         })}

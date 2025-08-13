@@ -12,19 +12,18 @@
 /* 1rem = 16pt */
 .h1 {
   font-weight: 400;
-  font-weight: 400;
   font-size: 2.5rem;
   line-height: 140%;
 }
-/* .h1.fw-black {
+
+.h1-black {
   font-weight: 700;
-} */
+  font-size: 2.5rem;
+  line-height: 140%;
+}
 
 .h2 {
-  font-weight: 400;
-  font-size: 2rem;
-  line-height: 150%;
-  font-weight: 400;
+  font-weight: 600;
   font-size: 2rem;
   line-height: 150%;
 }
@@ -33,23 +32,21 @@
   font-weight: 600;
   font-size: 1.5rem;
   line-height: 150%;
-  font-weight: 600;
+}
+
+.h3-black {
+  font-weight: 800;
   font-size: 1.5rem;
   line-height: 150%;
 }
 
 .h4 {
   font-weight: 600;
-  font-weight: 600;
   font-size: 1rem;
-  line-height: 150%;
   line-height: 150%;
 }
 
 .h5 {
-  font-weight: 400;
-  font-size: 0.75rem;
-  line-height: 120%;
   font-weight: 400;
   font-size: 0.75rem;
   line-height: 120%;
@@ -58,16 +55,12 @@
 .h6 {
   font-weight: 400;
   font-size: 0.625rem;
-  font-weight: 400;
-  font-size: 0.625rem;
   line-height: 160%;
 }
 
 .p {
   font-weight: 400;
-  font-weight: 400;
   font-size: 1rem;
-  line-height: 150%;
   line-height: 150%;
 }
 
@@ -75,15 +68,9 @@
   font-weight: 400;
   font-size: 0.75rem;
   line-height: 120%;
-  font-weight: 400;
-  font-size: 0.75rem;
-  line-height: 120%;
 }
 
 .caption-bold {
-  font-weight: 600;
-  font-size: 0.75rem;
-  line-height: 120%;
   font-weight: 600;
   font-size: 0.75rem;
   line-height: 120%;

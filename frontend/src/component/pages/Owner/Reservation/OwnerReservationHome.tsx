@@ -1,403 +1,104 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import '@/styles/main.css';
 import SimpleHeader from '@/component/header/SimpleHeader';
 import ImageInputBox from '@/component/input/ImageInputBox';
 import { useState } from 'react';
 import TabGroupWaiting from '@/component/navbar/TabGroupWaiting';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
+import { getReservations } from '@/services/api/Owner/ownerreservation';
+import { timeMapping } from '@/utils/timeMapping';
+import { subjectMapping } from '@/utils/subjectMapping';
+import { motion, AnimatePresence } from 'framer-motion'; // 애니메이션 추가
 
-// 더미데이터
-interface Owner {
-  name: string;
-  phone: string;
-  birth: string;
-}
+import type { ReservationsResponse, PetResponse, OwnerReservationList } from '@/types/Owner/ownerreservationType';
+import { statusMapping } from '@/utils/statusMapping';
+import ReservationListCard from '@/component/card/ReservationListCard';
 
-interface Pet {
-  petId: number;
-  name: string;
-  species: string;
-  photo: string;
-  gender: string;
-  age: number;
-}
-
-interface Reservation {
-  reservationId: number;
-  owner: Owner;
-  pet: Pet;
-  hospitalName: string;
-  vetName: string;
-  reservationDay: string;
-  reservationTime: string;
-  photo: string;
-  description: string;
-  subject: string;
-  status: string;
-}
-
-const reservations: { [petName: string]: Reservation[] } = {
-  미료: [
-    {
-      reservationId: 1,
-      owner: {
-        name: '홍길동',
-        phone: '010-1234-5678',
-        birth: '2020-01-01',
-      },
-      pet: {
-        petId: 1,
-        name: '미료',
-        species: 'DOG',
-        photo: '/images/미료_test.jpg',
-        gender: 'FEMALE',
-        age: 4,
-      },
-      hospitalName: '튼튼동물병원',
-      vetName: '김수의',
-      reservationDay: '2025-08-05',
-      reservationTime: '10:00',
-      photo: '/images/미료_test.jpg',
-      description: '피부에 뭐가 나서 병원에 방문했습니다.',
-      subject: '피부과',
-      status: '대기',
-    },
-    {
-      reservationId: 2,
-      owner: {
-        name: '홍길동',
-        phone: '010-1234-5678',
-        birth: '2020-01-01',
-      },
-      pet: {
-        petId: 1,
-        name: '미료',
-        species: 'DOG',
-        photo: '/images/미료_test.jpg',
-        gender: 'FEMALE',
-        age: 4,
-      },
-      hospitalName: '튼튼동물병원',
-      vetName: '이수의',
-      reservationDay: '2025-08-06',
-      reservationTime: '11:30',
-      photo: '/images/미료_test.jpg',
-      description: '정기 건강검진',
-      subject: '내과',
-      status: '승인',
-    },
-    {
-      reservationId: 3,
-      owner: {
-        name: '홍길동',
-        phone: '010-1234-5678',
-        birth: '2020-01-01',
-      },
-      pet: {
-        petId: 1,
-        name: '미료',
-        species: 'DOG',
-        photo: '/images/미료_test.jpg',
-        gender: 'FEMALE',
-        age: 4,
-      },
-      hospitalName: '튼튼동물병원',
-      vetName: '이수의',
-      reservationDay: '2025-08-07',
-      reservationTime: '11:30',
-      photo: '/images/미료_test.jpg',
-      description: '내과 문제',
-      subject: '내과',
-      status: '반려',
-    },
-    {
-      reservationId: 4,
-      owner: {
-        name: '홍길동',
-        phone: '010-1234-5678',
-        birth: '2020-01-01',
-      },
-      pet: {
-        petId: 1,
-        name: '미료',
-        species: 'DOG',
-        photo: '/images/미료_test.jpg',
-        gender: 'FEMALE',
-        age: 4,
-      },
-      hospitalName: '튼튼동물병원',
-      vetName: '이수의',
-      reservationDay: '2025-08-07',
-      reservationTime: '11:30',
-      photo: '/images/미료_test.jpg',
-      description: '내과 문제',
-      subject: '내과',
-      status: '반려',
-    },
-    {
-      reservationId: 3,
-      owner: {
-        name: '홍길동',
-        phone: '010-1234-5678',
-        birth: '2020-01-01',
-      },
-      pet: {
-        petId: 1,
-        name: '미료',
-        species: 'DOG',
-        photo: '/images/미료_test.jpg',
-        gender: 'FEMALE',
-        age: 4,
-      },
-      hospitalName: '튼튼동물병원',
-      vetName: '이수의',
-      reservationDay: '2025-08-07',
-      reservationTime: '11:30',
-      photo: '/images/미료_test.jpg',
-      description: '내과 문제',
-      subject: '내과',
-      status: '반려',
-    },
-    {
-      reservationId: 5,
-      owner: {
-        name: '홍길동',
-        phone: '010-1234-5678',
-        birth: '2020-01-01',
-      },
-      pet: {
-        petId: 1,
-        name: '미료',
-        species: 'DOG',
-        photo: '/images/미료_test.jpg',
-        gender: 'FEMALE',
-        age: 4,
-      },
-      hospitalName: '튼튼동물병원',
-      vetName: '이수의',
-      reservationDay: '2025-08-07',
-      reservationTime: '11:30',
-      photo: '/images/미료_test.jpg',
-      description: '내과 문제',
-      subject: '내과',
-      status: '반려',
-    },
-    {
-      reservationId: 6,
-      owner: {
-        name: '홍길동',
-        phone: '010-1234-5678',
-        birth: '2020-01-01',
-      },
-      pet: {
-        petId: 1,
-        name: '미료',
-        species: 'DOG',
-        photo: '/images/미료_test.jpg',
-        gender: 'FEMALE',
-        age: 4,
-      },
-      hospitalName: '튼튼동물병원',
-      vetName: '이수의',
-      reservationDay: '2025-08-07',
-      reservationTime: '11:30',
-      photo: '/images/미료_test.jpg',
-      description: '내과 문제',
-      subject: '내과',
-      status: '반려',
-    },
-    {
-      reservationId: 7,
-      owner: {
-        name: '홍길동',
-        phone: '010-1234-5678',
-        birth: '2020-01-01',
-      },
-      pet: {
-        petId: 1,
-        name: '미료',
-        species: 'DOG',
-        photo: '/images/미료_test.jpg',
-        gender: 'FEMALE',
-        age: 4,
-      },
-      hospitalName: '튼튼동물병원',
-      vetName: '이수의',
-      reservationDay: '2025-08-07',
-      reservationTime: '11:30',
-      photo: '/images/미료_test.jpg',
-      description: '내과 문제',
-      subject: '내과',
-      status: '반려',
-    },
-    {
-      reservationId: 8,
-      owner: {
-        name: '홍길동',
-        phone: '010-1234-5678',
-        birth: '2020-01-01',
-      },
-      pet: {
-        petId: 1,
-        name: '미료',
-        species: 'DOG',
-        photo: '/images/미료_test.jpg',
-        gender: 'FEMALE',
-        age: 4,
-      },
-      hospitalName: '튼튼동물병원',
-      vetName: '이수의',
-      reservationDay: '2025-08-07',
-      reservationTime: '11:30',
-      photo: '/images/미료_test.jpg',
-      description: '내과 문제',
-      subject: '내과',
-      status: '반려',
-    },
-    {
-      reservationId: 9,
-      owner: {
-        name: '홍길동',
-        phone: '010-1234-5678',
-        birth: '2020-01-01',
-      },
-      pet: {
-        petId: 1,
-        name: '미료',
-        species: 'DOG',
-        photo: '/images/미료_test.jpg',
-        gender: 'FEMALE',
-        age: 4,
-      },
-      hospitalName: '튼튼동물병원',
-      vetName: '이수의',
-      reservationDay: '2025-08-07',
-      reservationTime: '11:30',
-      photo: '/images/미료_test.jpg',
-      description: '내과 문제',
-      subject: '내과',
-      status: '반려',
-    },
-    {
-      reservationId: 10,
-      owner: {
-        name: '홍길동',
-        phone: '010-1234-5678',
-        birth: '2020-01-01',
-      },
-      pet: {
-        petId: 1,
-        name: '미료',
-        species: 'DOG',
-        photo: '/images/미료_test.jpg',
-        gender: 'FEMALE',
-        age: 4,
-      },
-      hospitalName: '튼튼동물병원',
-      vetName: '이수의',
-      reservationDay: '2025-08-07',
-      reservationTime: '11:30',
-      photo: '/images/미료_test.jpg',
-      description: '내과 문제',
-      subject: '내과',
-      status: '반려',
-    },
-  ],
-  초코: [
-    {
-      reservationId: 4,
-      owner: {
-        name: '이몽룡',
-        phone: '010-5678-1234',
-        birth: '2019-05-10',
-      },
-      pet: {
-        petId: 2,
-        name: '초코',
-        species: 'DOG',
-        photo: '/images/미료_test.jpg',
-        gender: 'MALE',
-        age: 5,
-      },
-      hospitalName: '희망동물병원',
-      vetName: '최수의',
-      reservationDay: '2025-08-07',
-      reservationTime: '14:00',
-      photo: '/images/미료_test.jpg',
-      description: '다리 통증으로 내원',
-      subject: '정형외과',
-      status: '대기',
-    },
-    {
-      reservationId: 5,
-      owner: {
-        name: '이몽룡',
-        phone: '010-5678-1234',
-        birth: '2019-05-10',
-      },
-      pet: {
-        petId: 2,
-        name: '초코',
-        species: 'DOG',
-        photo: '/images/미료_test.jpg',
-        gender: 'MALE',
-        age: 5,
-      },
-      hospitalName: '튼튼동물병원',
-      vetName: '김수의',
-      reservationDay: '2025-08-08',
-      reservationTime: '16:30',
-      photo: '/images/미료_test.jpg',
-      description: '피부 알러지 진료',
-      subject: '피부과',
-      status: '반려',
-    },
-  ],
-};
-
-export default function OwnerReservation() {
+export default function OwnerReservationHome() {
+  const VITE_PHOTO_URL = import.meta.env.VITE_PHOTO_URL;
   const navigate = useNavigate();
-  const [selectedIdx, setSelectedIdx] = useState(0); // 기본값 : 첫번째 항목
-  const [currentTab, setCurrentTab] = useState<string>('대기'); // 기본값 : '대기'
 
-  const selectedPetName = Object.keys(reservations)[selectedIdx];
-  const currentPetReservations = reservations[selectedPetName] || [];
-  const filteredReservations = currentPetReservations.filter((reservation) => reservation.status === currentTab);
+  const [currentTab, setCurrentTab] = useState<string>('대기');
+  const [reservations, setReservations] = useState<ReservationsResponse[]>([]);
+  const [petList, setPetList] = useState<PetResponse[]>([]);
+  const data = useRef<OwnerReservationList[]>([]);
+  const { selectedPetIndex } = useParams<{ selectedPetIndex: string }>();
+  const [selectedPet, setSelectedPet] = useState<number>(selectedPetIndex ? Number(selectedPetIndex) : 0);
+  const { isRejected } = useLocation().state || {};
 
-  // 백엔드 API에 요청을 보내는 함수
-  // const [reservations, setReservations] = useState<Reservation[]>([]);
-  // useEffect(() => {
-  //   // 백엔드 API에 요청을 보내는 함수 (axios나 fetch 사용)
-  //   const fetchReservations = async () => {
-  //     try {
-  //       const response = await fetch('/api/my-reservations'); // API 엔드포인트
-  //       const data = await response.json();
+  // 마운트 될 때 반려동물 목록 조회
+  useEffect(() => {
+    const getReservationList = async () => {
+      data.current = await getReservations();
+      console.log('data:', data);
+      const petList = data.current.map((reservation) => reservation.petResponse);
+      setPetList(petList);
+      const initialIndex = selectedPetIndex ? Number(selectedPetIndex) : 0;
+      setSelectedPet(initialIndex);
 
-  //       // API로부터 받은 실제 데이터를 reservations 상태에 저장
-  //       setReservations(data);
-  //     } catch (error) {
-  //       console.error("예약 목록을 불러오는 데 실패했습니다:", error);
-  //     }
-  //   };
+      // 데이터 로딩 후 즉시 필터링
+      if (data.current.length > 0) {
+        const allReservation = data.current[initialIndex];
+        if (allReservation?.reservations) {
+          const filteredReservations = allReservation.reservations.filter(
+            (res) => statusMapping[res.status] === currentTab,
+          );
+          setReservations(filteredReservations);
+        }
+      }
+    };
+    getReservationList();
+  }, []);
 
-  //   fetchReservations(); // 함수 호출
-  // }, []);
+  // 대기, 승인, 반려 탭 누를 때마다 필터링한 데이터 저장
+  useEffect(() => {
+    if (data.current.length > 0 && selectedPet >= 0) {
+      const allReservation = data.current[selectedPet];
+      if (allReservation?.reservations) {
+        const filteredReservations = allReservation.reservations.filter(
+          (res) => statusMapping[res.status] === currentTab,
+        );
+        setReservations(filteredReservations);
+      }
+    }
+  }, [currentTab]);
 
-  // 선택된 반려동물 이름
+  useEffect(() => {
+    setCurrentTab('대기');
+    if (data.current.length > 0 && selectedPet >= 0) {
+      const allReservation = data.current[selectedPet];
+      if (allReservation?.reservations) {
+        const filteredReservations = allReservation.reservations.filter(
+          (res) => statusMapping[res.status] === currentTab,
+        );
+        setReservations(filteredReservations);
+      }
+    }
+  }, [selectedPet]);
 
   return (
     <div>
-      <div className="sticky top-0 z-10 bg-green-100">
+      <div className="sticky top-0 z-10 bg-gray-50">
         <SimpleHeader text="나의 예약" />
         {/* 반려동물 선택 */}
-        <div className="flex gap-4 justify-center mt-3">
-          {Object.keys(reservations).map((pet, idx) => (
-            <div key={idx} className="flex flex-col items-center cursor-pointer" onClick={() => setSelectedIdx(idx)}>
+        <div className="flex gap-4 pt-6 px-7 overflow-x-scroll hide-scrollbar">
+          {petList.map((pet, idx) => (
+            <div key={idx} className="flex flex-col items-center cursor-pointer" onClick={() => setSelectedPet(idx)}>
               <ImageInputBox
-                src={reservations[pet][0].photo}
-                stroke={selectedIdx === idx ? 'border-5 border-pink-200' : 'border border-gray-300'}
+                src={`${VITE_PHOTO_URL}${pet.photo}`}
+                stroke={
+                  selectedPet === idx
+                    ? 'border-5 border-green-300'
+                    : pet.photo && pet.photo !== ''
+                    ? 'border-1 border-gray-300'
+                    : 'border-1 border-green-200'
+                }
               />
-              {selectedIdx === idx ? <div className="h4 mt-1">{pet}</div> : <div className="p mt-1">{pet}</div>}
+              {selectedPet === idx ? (
+                <div className="h4 mt-1">{pet.name}</div>
+              ) : (
+                <div className="p mt-1">{pet.name}</div>
+              )}
             </div>
           ))}
         </div>
@@ -414,30 +115,56 @@ export default function OwnerReservation() {
       </div>
 
       {/* 필터링 결과 조회 */}
-      <div className="w-full px-7 mt-5 overflow-y-auto h-full hide-scrollbar">
-        {filteredReservations.length > 0 ? (
-          filteredReservations.map((res) => (
-            <div
-              key={res.reservationId}
-              className="mb-5 cursor-pointer"
-              onClick={() => navigate(`/owner/reservation/${res.reservationId}`)}
-            >
-              <div className="flex justify-between">
-                <div className="flex flex-col">
-                  <div className="h4 text-black">{res.subject}</div>
-                  <div className="p text-black"> {res.vetName} 수의사</div>
-                  <div className="caption text-black">{res.hospitalName}</div>
-                </div>
-                <div className="flex flex-col items-center gap-2">
-                  <div className="h4 text-black">{res.reservationTime}</div>
-                  <button className="w-17 h-6 h5 rounded-[12px] bg-gray-300 text-black cursor-pointer">상세</button>
-                </div>
-              </div>
-            </div>
-          ))
-        ) : (
-          <div className="mt-8 h4 text-center text-gray-500"> {currentTab} 내역이 없습니다.</div>
-        )}
+      <div className="w-full flex flex-col items-center gap-2 px-7 mt-5 overflow-y-auto h-full hide-scrollbar">
+        <AnimatePresence>
+          {reservations.length > 0 ? (
+            reservations.map((res) => (
+              // (
+              //   console.log(res),
+              //   // <motion.div
+              <ReservationListCard
+                key={res.reservationId}
+                doctorName={res.vetName}
+                hospitalName={res.hospitalName}
+                treatmentDate={timeMapping[res.reservationTime]}
+                department={subjectMapping[res.subject] ?? res.subject}
+                onClickDetail={() => {
+                  if (res.status === 'REJECTED') {
+                    // 반려 상태면 반려 사유와 함께 전달
+                    navigate(`/owner/reservation/${res.reservationId}`, {
+                      state: {
+                        isRejected: true,
+                        selectedPetId: selectedPet,
+                        selectedTab: currentTab,
+                      },
+                    });
+                  } else {
+                    // 일반 상세 페이지로 이동
+                    navigate(`/owner/reservation/${res.reservationId}`, {
+                      state: {
+                        selectedPetId: selectedPet,
+                        selectedTab: currentTab,
+                      },
+                    });
+                  }
+                }}
+              />
+              //   <div className="flex justify-between">
+              //     <div className="flex flex-col">
+              //       <div className="h4 text-black">{subjectMapping[res.subject]}</div>
+              //       <div className="p text-black"> {res.vetName} 수의사</div>
+              //       <div className="caption text-black">{res.hospitalName}</div>
+              //     </div>
+              //     <div className="flex flex-col items-center gap-2">
+              //     <div className="h4 tex t-black">{timeMapping[res.reservationTime]}</div>
+              //   </div>
+              // </div>
+              // {/* </motion.div> */}
+            ))
+          ) : (
+            <div className="mt-8 h4 text-center text-gray-500"> {currentTab} 내역이 없습니다.</div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );
