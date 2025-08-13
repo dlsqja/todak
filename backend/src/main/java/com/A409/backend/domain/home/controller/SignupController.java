@@ -46,26 +46,26 @@ public class SignupController {
 
     @Operation(summary = "반려인 회원가입")
     @PostMapping("/owner")
-    public void ownerSignup(@RequestParam Long authId, @RequestBody OwnerRequest ownerRequest, HttpServletResponse response) throws IOException {
+    public APIResponse<?> ownerSignup(@RequestParam Long authId, @RequestBody OwnerRequest ownerRequest, HttpServletResponse response) throws IOException {
         ownerService.insertOwnerInfo(authId, ownerRequest);
         String redirectUrl = loginAfterSignup("owner", authId, response);
-        response.sendRedirect(redirectUrl);
+        return APIResponse.ofSuccess(redirectUrl);
     }
 
     @Operation(summary = "수의사 회원가입")
     @PostMapping("/vet")
-    public void vetSignup(@RequestParam Long authId, @RequestBody VetRequest vetRequest, HttpServletResponse response) throws IOException  {
+    public APIResponse<?> vetSignup(@RequestParam Long authId, @RequestBody VetRequest vetRequest, HttpServletResponse response) throws IOException  {
         vetService.insertVetInfo(authId, vetRequest);
         String redirectUrl = loginAfterSignup("vet", authId, response);
-        response.sendRedirect(redirectUrl);
+        return APIResponse.ofSuccess(redirectUrl);
     }
 
     @Operation(summary = "병원관계자 회원가입")
     @PostMapping("/staff")
-    public void signup(@RequestParam Long authId, @RequestBody StaffRequest staffRequest, HttpServletResponse response) throws IOException  {
+    public APIResponse<?> signup(@RequestParam Long authId, @RequestBody StaffRequest staffRequest, HttpServletResponse response) throws IOException  {
         staffService.insertStaffInfo(authId, staffRequest);
         String redirectUrl = loginAfterSignup("staff", authId, response);
-        response.sendRedirect(redirectUrl);
+        return APIResponse.ofSuccess(redirectUrl);
     }
 
     private String loginAfterSignup(String role, Long authId, HttpServletResponse response) throws IOException {
