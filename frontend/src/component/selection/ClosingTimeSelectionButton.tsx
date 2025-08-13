@@ -47,7 +47,7 @@ export default function ClosingTimeSelectionButton({
 
   return (
     <div className="space-y-4">
-      <h4 className="h4">예약 시간 설정</h4>
+      <h4 className="h4">예약 가능 시간 조정</h4>
 
       <div className="flex flex-wrap gap-3">
         {allTimes.map((time) => {
