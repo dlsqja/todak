@@ -178,7 +178,7 @@ export default function OwnerMyPage() {
       };
 
       const response = await updateOwnerInfo(payload);
-      alert('수정 완료!');
+      alert('수정이 완료되었습니다');
       navigate('/owner/mypage');
     } catch (error) {
       console.error('수정 실패', error);
