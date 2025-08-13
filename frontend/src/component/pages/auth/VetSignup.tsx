@@ -146,7 +146,7 @@ export default function VetSignup() {
 
     // authId 확인
     const urlParams = window.location.pathname.split('/');
-    const authId = urlParams[3];
+    const authId = urlParams[4];
     console.log('pathname', urlParams);
     console.log('authId', authId);
 
