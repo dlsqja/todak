@@ -4,6 +4,7 @@ import com.A409.backend.domain.hospital.dto.HospitalResponse;
 import com.A409.backend.domain.pet.dto.PetResponse;
 import com.A409.backend.domain.pet.entity.Pet;
 import com.A409.backend.domain.pet.service.PetService;
+import com.A409.backend.domain.reservation.repository.ReservationRepository;
 import com.A409.backend.domain.treatment.dto.TreatementResponse;
 import com.A409.backend.domain.treatment.entity.Treatment;
 import com.A409.backend.domain.treatment.entity.TreatmentResponse;
@@ -17,6 +18,7 @@ import com.A409.backend.global.exception.CustomException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -29,6 +31,7 @@ public class TreatmentService {
     private final TreatmentRepository treatmentRepository;
     private final PetService petService;
     private final WorkingHourService workingHourService;
+    private final ReservationRepository reservationRepository;
 
     public void saveAISummary(Long treatmentId,String summary){
 
@@ -53,6 +56,7 @@ public class TreatmentService {
                         .map(treatments -> {
                             Map<String, Object> map = new HashMap<>();
                             map.put("treatementInfo", TreatementResponse.toResponse(treatments));
+                            map.put("treatmentId", treatments.getTreatmentId());
                             map.put("reservationId",treatments.getReservation().getReservationId());
                             map.put("vetName",treatments.getVet().getName());
                             map.put("reservationDay", treatments.getReservation().getReservationDay());
@@ -195,6 +199,18 @@ public class TreatmentService {
 
         treatment.setIsCompleted(true);
 
+        treatmentRepository.save(treatment);
+    }
+
+    public void updateStartTime(Long treatmentId){
+        Treatment treatment = treatmentRepository.findByTreatmentId(treatmentId).orElseThrow(() -> new CustomException(ErrorCode.RESOURCE_NOT_FOUND));
+        treatment.setStartTime(LocalDateTime.now());
+        treatmentRepository.save(treatment);
+    }
+
+    public void updateEndTime(Long treatmentId){
+        Treatment treatment = treatmentRepository.findByTreatmentId(treatmentId).orElseThrow(() -> new CustomException(ErrorCode.RESOURCE_NOT_FOUND));
+        treatment.setEndTime(LocalDateTime.now());
         treatmentRepository.save(treatment);
     }
 }
