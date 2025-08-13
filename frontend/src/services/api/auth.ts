@@ -13,7 +13,7 @@ export const authAPI = {
 
   // owner 회원가입
   ownerSignup: async (userData: OwnerSignup, authId: string) => {
-    console.log('userData', userData);
+    console.log('OwneruserData', userData);
     const response = await apiClient.post('/public/signup/owner', userData, {
       params: {
         authId: Number(authId),
@@ -24,7 +24,7 @@ export const authAPI = {
 
   // vet 회원가입
   vetSignup: async (userData: VetSignup, authId: string) => {
-    console.log('userData', userData);
+    console.log('VetuserData', userData);
     const response = await apiClient.post('/public/signup/vet', userData, {
       params: {
         authId: Number(authId),

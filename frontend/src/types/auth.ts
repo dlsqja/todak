@@ -12,16 +12,17 @@ interface KakaoLoginParams {
 // 반려인 회원가입
 interface OwnerSignup {
   name: string;
-  phone: string; // "010-1234-5678" 형태의 문자열
-  birth: string; // "YYYY-MM-DD" 형태의 문자열
+  phone: string; // "010-1234-5678"
+  birth: string; // "YYYY-MM-DD"
 }
 
 // 수의사 회원가입
 interface VetSignup {
-  hospital_code: number;
   name: string;
-  license_number: number;
-  photo: string; // "010-1234-5678" 형태의 문자열
+  license: string;
+  hospitalCode: string;
+  profile: string;
+  photo: string;
 }
 
 // 병원 관계자 회원가입

@@ -40,7 +40,7 @@ function SignupPage() {
 
     if (success === 'true' && token) {
       // 토큰 저장
-      authAPI.saveTokens(token);
+      // authAPI.saveTokens(token);
 
       // role에 따라 홈으로 이동
       if (role === 'owner') {

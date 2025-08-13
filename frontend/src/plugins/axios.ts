@@ -12,24 +12,29 @@ const apiClient: AxiosInstance = axios.create({
 
 apiClient.interceptors.request.use(
   (config) => {
-    // HTTP-only 쿠키는 브라우저가 자동으로 처리
-    console.log('Request with HTTP-only cookies');
+    // localStorage에서 토큰 가져와서 헤더에 추가
+    const accessToken = localStorage.getItem('accessToken');
+    if (accessToken) {
+      config.headers['Authorization'] = `Bearer ${accessToken}`;
+      console.log('토큰 헤더 추가:', config.headers['Authorization']);
+    }
     return config;
   },
   (error) => Promise.reject(error),
 );
 
-// apiClient.interceptors.response.use(
-//   (response) => response,
-//   async (error) => {
-//     if (error.response?.status === 401) {
-//       // 토큰 만료 시 로그아웃 처리
-//       localStorage.removeItem('accessToken');
-//       localStorage.removeItem('refreshToken');
-//       window.location.href = '/login';
-//     }
-//     return Promise.reject(error);
-//   }
-// );
+apiClient.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    if (error.response?.status === 401) {
+      // 토큰 만료 시 로그아웃 처리
+      console.log('토큰 만료 - 로그아웃 처리');
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+      window.location.href = '/auth';
+    }
+    return Promise.reject(error);
+  },
+);
 
 export default apiClient;
