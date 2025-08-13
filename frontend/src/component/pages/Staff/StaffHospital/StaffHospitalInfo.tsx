@@ -18,9 +18,6 @@ export default function StaffHospitalInfo() {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     let alive = true
@@ -117,7 +114,6 @@ export default function StaffHospitalInfo() {
                 color="green"
                 text={saving ? '수정 중...' : '수정하기'}
                 onClick={handleSave}
-                disabled={!canSave}
               />
             </div>
           </>

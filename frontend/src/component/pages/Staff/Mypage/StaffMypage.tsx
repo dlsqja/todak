@@ -9,8 +9,6 @@ import { getStaffInfo, updateStaffInfo } from '@/services/api/Staff/staffmypage'
 import type { StaffResponse, StaffRequest } from '@/types/Staff/staffmypageType';
 import { motion } from 'framer-motion';
 
-import { getStaffInfo, updateStaffInfo } from '@/services/api/Staff/staffmypage';
-import type { StaffResponse, StaffRequest } from '@/types/Staff/staffmypageType';
 
 export default function StaffMypage() {
   const navigate = useNavigate(); // useNavigate 훅을 함수처럼 호출해야 합니다.
