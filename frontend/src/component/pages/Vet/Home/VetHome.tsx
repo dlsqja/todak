@@ -90,7 +90,7 @@ export default function VetHome() {
   return (
     <div>
       <h3 className="h3 mx-7 pt-13">
-        {loadingMe ? '수의사님 반갑습니다!' : `${me?.name ?? '수의사'} 수의사님 반갑습니다!`}
+        {loadingMe ? '수의사님 반갑습니다!' : `${me?.name ?? ''} 수의사님 반갑습니다!`}
       </h3>
 
       <h3 className="h3 mx-7 mb-2">어플 사용이 처음이신가요?</h3>
