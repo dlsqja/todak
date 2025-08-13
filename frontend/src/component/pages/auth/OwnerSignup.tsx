@@ -153,19 +153,25 @@ export default function OwnerSignup() {
     setIsLoading(true);
 
     // URL에서 authId 가져오기 (카카오 로그인 후 전달받은 값)
-    const urlParams = new URLSearchParams(window.location.search);
-    const authId = urlParams.get('authId');
+    const urlParams = window.location.pathname.split('/');
+    const authId = urlParams[3];
+    console.log('pathname', urlParams);
+    console.log('authId', authId);
 
     if (!authId) {
+      console.log('authId', authId);
       alert('인증 정보가 없습니다. 다시 로그인해주세요.');
       return;
     }
 
+    // 생년월일을 YYYY-MM-DD 형태로 변환
+    const formattedBirth = `${birthNumbers.slice(0, 4)}-${birthNumbers.slice(4, 6)}-${birthNumbers.slice(6, 8)}`; // "2025-04-09"
+
     const response = await authAPI.ownerSignup(
       {
         name: name.trim(),
-        phone: Number(phone.replace(/[^\d]/g, '')), // 숫자만 추출
-        birth: Number(birth.replace(/[^\d]/g, '')), // 숫자만 추출
+        phone: phoneNumbers,
+        birth: formattedBirth,
       },
       authId,
     );
