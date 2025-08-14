@@ -123,7 +123,12 @@ export default function StaffSignup() {
           />
           <div className="flex justify-between gap-1">
             {errors.hospitalCode && <p className="text-red-500 caption mt-1 ml-2">{errors.hospitalCode}</p>}
-            <p className="text-gray-500 caption mt-1 ml-2 cursor-pointer">병원코드가 없으신가요?</p>
+            <p
+              className="text-gray-500 caption mt-1 ml-2 cursor-pointer"
+              onClick={() => alert('병원 담당자에게 문의하세요')}
+            >
+              병원코드가 없으신가요?
+            </p>
           </div>
         </div>
         <div>

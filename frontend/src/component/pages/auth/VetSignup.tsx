@@ -196,7 +196,12 @@ export default function VetSignup() {
           />
           <div className="flex justify-between gap-1">
             {errors.hospitalCode && <p className="text-red-500 caption mt-1 ml-2">{errors.hospitalCode}</p>}
-            <p className="text-gray-500 caption mt-1 ml-2 cursor-pointer">병원코드가 없으신가요?</p>
+            <p
+              className="text-gray-500 caption mt-1 ml-2 cursor-pointer"
+              onClick={() => alert('병원 담당자에게 문의하세요')}
+            >
+              병원코드가 없으신가요?
+            </p>
           </div>
         </div>
         <div>
@@ -230,7 +235,7 @@ export default function VetSignup() {
             onChange={(e) => handleInputChange('profile', e.target.value)}
             disabled={false}
             rows={5}
-            className="w-full placeholder:text-gray-500 p-3 border whitespace-pre-wrap word-wrap break-words line-height-1.5 border-gray-400 rounded-lg resize-none focus:outline-none focus:border-green-300 focus:border-2"
+            className="w-full bg-white placeholder:text-gray-500 p-3 border whitespace-pre-wrap word-wrap break-words line-height-1.5 border-gray-400 rounded-lg resize-none focus:outline-none focus:border-green-300 focus:border-2"
           />
           {errors.profile && <p className="text-red-500 caption ml-2">{errors.profile}</p>}
         </div>
@@ -238,7 +243,7 @@ export default function VetSignup() {
           <label className="block h4 text-black mb-2">프로필 사진</label>
           <input type="file" ref={fileInputRef} onChange={handleFileChange} accept="image/*" className="hidden" />
           <div className="flex items-center gap-4">
-            <div className="w-22 h-22 bg-green-100 border-3 border-green-200 rounded-[12px] flex items-center justify-center overflow-hidden">
+            <div className="w-22 h-22 bg-green-100 border-3 border-gray-400 rounded-[12px] flex items-center justify-center overflow-hidden">
               <img
                 src={previewImage || '/images/person_default.png'}
                 alt="프로필 사진"
@@ -260,7 +265,7 @@ export default function VetSignup() {
               </button>
             </div>
           </div>
-          <div className="px-7 mt-6">
+          <div className="mt-6">
             <Button text={isLoading ? '등록 중...' : '등록하기'} onClick={handleSubmit} color="green" />
           </div>
         </div>
