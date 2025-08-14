@@ -1,6 +1,8 @@
 package com.A409.backend.domain.home.controller;
 
 import com.A409.backend.domain.hospital.dto.HospitalResponse;
+import com.A409.backend.domain.hospital.entity.Hospital;
+import com.A409.backend.domain.hospital.repository.HospitalRepository;
 import com.A409.backend.domain.hospital.service.HospitalService;
 import com.A409.backend.domain.user.vet.dto.VetResponse;
 import com.A409.backend.domain.user.vet.service.VetService;
@@ -39,6 +41,7 @@ public class HomeController {
     private final VetService vetService;
     private final ElasticService elasticService;
     private final RedisService redisService;
+    private final HospitalRepository hospitalRepository;
 
     private static final long CACHE_TTL_MINUTES = 5;
 
@@ -98,9 +101,10 @@ public class HomeController {
                     array = @ArraySchema(schema = @Schema(implementation = HospitalDocument.class))
             )
     )
-    @GetMapping("/autocomplete/{keyword}")
+    @GetMapping("/autocomplete")
     @LogExecutionTime
-    public APIResponse<?> autocomplete(@PathVariable String keyword) {
+    public APIResponse<?> autocomplete(@RequestParam String keyword) {
+        log.info(keyword);
         String cacheKey = "autocomplete:" + keyword;
 
         Object cached = redisService.getByKey(cacheKey);
@@ -115,6 +119,16 @@ public class HomeController {
         if (result != null) {
             redisService.setByKeyWithTTL(cacheKey, result,CACHE_TTL_MINUTES);
         }
+
+        return APIResponse.ofSuccess(result);
+    }
+
+    @GetMapping("/autocomplete/db")
+    @LogExecutionTime
+    public APIResponse<?> autoDBcomplete(@RequestParam String keyword) {
+
+        List<Hospital> result = hospitalRepository.findALLByNameContaining(keyword);
+
 
         return APIResponse.ofSuccess(result);
     }
