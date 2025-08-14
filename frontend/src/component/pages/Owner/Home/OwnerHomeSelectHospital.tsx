@@ -341,10 +341,8 @@ export default function SelectHospitalPage() {
 
         {/* 검색어가 없을 때 안내 메시지 */}
         {!search.trim() && (
-          <div className="mt-8">
-            <div className="bg-gray-50 rounded-xl p-8 text-center">
-              <p className="text-gray-400 p">병원명을 검색해주세요.</p>
-            </div>
+          <div className="bg-gray-50 rounded-xl p-4 text-center">
+            <p className="text-gray-400 p">병원명 혹은 병원 주소를 검색해주세요.</p>
           </div>
         )}
       </div>
