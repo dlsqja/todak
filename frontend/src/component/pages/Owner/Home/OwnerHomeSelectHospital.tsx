@@ -287,11 +287,10 @@ export default function SelectHospitalPage() {
             )}
           </div>
         </div>
-
+        <h4 className="p text-black mb-3 mt-6">검색 결과</h4>
         {/* 검색 결과 (검색어가 있을 때만 표시) */}
         {search.trim() && (
           <div className="mt-6">
-            <h4 className="p text-black mb-3">검색 결과</h4>
             <div className="bg-gray-50 rounded-xl overflow-hidden">
               {suggests.length === 0 && hospitals.length === 0 && (
                 <div className="p-4 text-gray-400 text-center">검색 결과가 없습니다.</div>
