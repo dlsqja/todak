@@ -44,7 +44,6 @@ public class KakaoAuthService {
                 request,
                 Map.class
         );
-        log.info("token response: {}", response.getBody());
 
         return (String) response.getBody().get("access_token");
 

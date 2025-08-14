@@ -117,7 +117,7 @@ public class VetTreatmentController {
         String cacheKey = "treatment" + treatmentId;
         redisService.deleteByKey(cacheKey);
         treatmentService.endTreatment(treatmentId);
-        File file = new File("/audio/audio-"+treatmentId+".webm");
+        File file = new File("/tmp/audio/audio-"+treatmentId+".webm");
 
         aiClient.uploadAudio(treatmentId, file);
 

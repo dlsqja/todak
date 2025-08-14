@@ -68,7 +68,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             Long id = jwtService.getUserId(token);
             String username = jwtService.getUsername(token);
             String role = jwtService.getRole(token);
-
+            log.info("sender id : {}, role : {}",id,role);
             String cacheKey = "blacklist:" + id;
             List<String> cachedTokens = (List<String>) redisService.getByKey(cacheKey);
 

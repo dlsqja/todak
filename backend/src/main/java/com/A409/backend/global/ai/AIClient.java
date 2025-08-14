@@ -1,6 +1,7 @@
 package com.A409.backend.global.ai;
 
 import com.A409.backend.domain.treatment.service.TreatmentService;
+import com.A409.backend.global.exception.CustomException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
