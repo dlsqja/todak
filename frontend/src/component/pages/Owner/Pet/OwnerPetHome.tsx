@@ -80,13 +80,14 @@ export default function OwnerPetHome() {
       {isLoading && <div className="h4 text-center mt-76 text-gray-400">불러오는 중...</div>}
       {error && <div className="h4 text-center mt-76 text-gray-400">데이터를 불러올 수 없습니다</div>}
       {pets.length === 0 && !isLoading && !error && (
-        <div className="p flex flex-col items-center justify-center h-[600px] gap-6 text-center">
+        <div className="flex flex-col justify-center items-center h-full gap-2">
+          <img src="/images/sad_dog.png" alt="nodata" className="w-20 h-20" />
           <p className="h4 text-gray-500">등록된 반려동물이 없습니다.</p>
           <button
-            className="text-white bg-green-300/60 hover:bg-green-400 px-6 py-2 rounded-xl p cursor-pointer"
-            onClick={handleRegister}
+            className="text-white bg-green-300/60 hover:bg-green-300 px-6 py-2 rounded-xl p cursor-pointer"
+            onClick={() => navigate('/owner/pet/register')}
           >
-            반려동물 등록하기
+            반려동물 등록하러 가기
           </button>
         </div>
       )}
