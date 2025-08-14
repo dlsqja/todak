@@ -16,7 +16,7 @@ apiClient.interceptors.request.use(
     const accessToken = localStorage.getItem('accessToken');
     if (accessToken) {
       config.headers['Authorization'] = `Bearer ${accessToken}`;
-      console.log('토큰 헤더 추가:', config.headers['Authorization']);
+      // console.log('토큰 헤더 추가:', config.headers['Authorization']);
     }
     return config;
   },

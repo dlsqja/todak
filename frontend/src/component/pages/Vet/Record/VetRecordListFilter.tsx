@@ -3,9 +3,9 @@ import React, { useEffect, useMemo, useState } from 'react';
 import '@/styles/main.css';
 import SelectionDropdown from '@/component/selection/SelectionDropdown';
 import TreatmentSlideCard from '@/component/card/TreatmentSlideCard';
-import type { VetTreatment } from '@/types/Vet/vettreatmentType';
+import type { VetTreatment, VetTreatmentDetail } from '@/types/Vet/vettreatmentType';
 import { toTimeRange } from '@/utils/timeMapping';
-import { getVetTreatmentDetail } from '@/services/api/Vet/vettreatment';
+import { getVetTreatments, getVetTreatmentDetail } from '@/services/api/Vet/vettreatment';
 
 const signedOptions = [
   { value: 'ALL', label: '전체 상태' },
@@ -50,98 +50,89 @@ const makeInfo = (t: any) => {
   return [species, agePart, subject].filter(Boolean).join(' | ');
 };
 
-// ✅ AI 요약 존재 여부 판단(여러 키 대응)
-const hasAiSummary = (t: any): boolean => {
-  const cand =
-    t.aiSummary ??
-    t.ai_summary ??
-    t.summary?.ai ??
-    t.summary?.aiSummary ??
-    t.summaryText ??
-    t.summary_text ??
-    t.aiNote ??
-    t.ai_note;
-
-  if (cand == null) return false;
-  if (typeof cand === 'string') return cand.trim().length > 0;
-  if (Array.isArray(cand)) return cand.some((x) => String(x ?? '').trim().length > 0);
-  if (typeof cand === 'object') return Object.values(cand).some((v) => String(v ?? '').trim().length > 0);
-  return false;
+// ✅ 실제 시작시간이 있는지(문자열이고 날짜로 파싱 가능) 체크
+const hasRealStartTime = (it: any): boolean => {
+  const s = it?.startTime ?? it?.start_time;
+  if (typeof s !== 'string' || !s.trim()) return false;
+  const norm = s.replace(' ', 'T').replace(/\.\d+$/, '');
+  const d = new Date(norm);
+  return !isNaN(d.getTime());
 };
 
 interface Props {
-  data?: VetTreatment[];
+  data?: VetTreatment[];           // 비어있으면 내부에서 type=2 호출
   onCardClick: (id: number) => void;
 }
 
 export default function VetRecordListFilter({ data = [], onCardClick }: Props) {
-  // ✅ 서명 상태만 남기고, AI 요약은 항상 “있음”으로 고정 필터
   const [selectedSigned, setSelectedSigned] =
     useState<'ALL' | 'true' | 'false'>('ALL');
 
-  // 상세 호출로 시간/필드 보강
-  const [enriched, setEnriched] = useState<any[]>(data as any[]);
+  // 원본/보강본
+  const [base, setBase] = useState<any[]>([]);
+  const [enriched, setEnriched] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
 
+  // ▶ 데이터 로드: props.data가 비어 있으면 type=2(전체 진료) 로드
   useEffect(() => {
     let alive = true;
-
     (async () => {
-      setEnriched(data as any[]);
-
-      const needFix = (data as any[]).filter(
-        (it) => typeof (it as any).startTime === 'number' || typeof (it as any).endTime === 'number'
-      );
-      if (needFix.length === 0) return;
-
       try {
-        const ids = needFix.map((it: any) => it.treatmentId);
-        const details = await Promise.all(
-          ids.map((id) => getVetTreatmentDetail(id).catch(() => null))
-        );
-        const map = new Map<number, any>();
-        ids.forEach((id, i) => {
-          const d = details[i];
-          if (d) map.set(id, d);
+        setLoading(true);
+
+        const initialList =
+          (data && data.length > 0) ? (data as any[]) : ((await getVetTreatments(2)) as any[]);
+
+        if (!alive) return;
+        setBase(initialList);
+
+        // 모든 treatmentId 상세 병렬 로딩 (DateFilter와 동일)
+        const ids = Array.from(new Set(initialList.map((x: any) => x.treatmentId))).filter(Boolean);
+        if (ids.length === 0) {
+          if (alive) setEnriched(initialList);
+          return;
+        }
+
+        const results = await Promise.allSettled(ids.map((id) => getVetTreatmentDetail(id)));
+        if (!alive) return;
+
+        const dmap = new Map<number, VetTreatmentDetail>();
+        results.forEach((r, i) => {
+          if (r.status === 'fulfilled' && r.value) dmap.set(ids[i], r.value as VetTreatmentDetail);
         });
 
-        const merged = (data as any[]).map((it) => {
-          const d = map.get(it.treatmentId);
+        // 상세로 보강 병합(시간/펫/과목/완료여부 우선)
+        const merged = initialList.map((it: any) => {
+          const d = dmap.get(it.treatmentId);
           if (!d) return it;
-
           return {
             ...it,
             startTime: d.startTime ?? d.start_time ?? it.startTime,
-            endTime: d.endTime ?? d.end_time ?? it.endTime,
-            pet: it.pet ?? it.petInfo ?? d.pet ?? d.petInfo,
-            petInfo: it.petInfo ?? d.petInfo ?? d.pet,
-            subject: it.subject ?? d.subject,
+            endTime:   d.endTime   ?? d.end_time   ?? it.endTime,
+            pet:       it.pet ?? it.petInfo ?? d.pet ?? d.petInfo,
+            petInfo:   it.petInfo ?? d.petInfo ?? d.pet,
+            subject:   it.subject ?? d.subject,
             isCompleted:
               (it.isCompleted ?? it.is_completed) ??
-              (d.isCompleted ?? d.is_completed),
-            // 요약도 상세에서 보강
-            aiSummary:
-              it.aiSummary ??
-              it.ai_summary ??
-              d.aiSummary ??
-              d.ai_summary ??
-              it.summaryText ??
-              d.summaryText,
+              (d.isCompleted  ?? d.is_completed),
           };
         });
 
-        if (alive) setEnriched(merged);
+        setEnriched(merged);
       } catch (e) {
-        console.warn('[VetRecordListFilter] enrich failed:', e);
-        if (alive) setEnriched(data as any[]);
+        console.warn('[VetRecordListFilter] load/enrich failed:', e);
+        if (alive) {
+          setBase(data as any[]);
+          setEnriched(data as any[]);
+        }
+      } finally {
+        if (alive) setLoading(false);
       }
     })();
-
-    return () => {
-      alive = false;
-    };
+    return () => { alive = false; };
   }, [data]);
 
-  // 1) 서명상태 필터 → 2) ✅ AI 요약 있는 것만 남김 → 3) 최신 시작시간(desc)
+  // 1) 서명상태 필터 → 2) ✅ 시작시간 없는 항목 제거 → 3) 최신 시작시간(desc)
   const filteredData = useMemo(() => {
     let list = [...enriched];
 
@@ -152,8 +143,8 @@ export default function VetRecordListFilter({ data = [], onCardClick }: Props) {
       );
     }
 
-    // ✅ 고정 필터: AI 요약 있는 항목만
-    list = list.filter(hasAiSummary);
+    // ✅ 시작시간 없는 항목 제외
+    list = list.filter(hasRealStartTime);
 
     list.sort((a: any, b: any) => {
       const sa = a.startTime ?? a.start_time ?? '';
@@ -200,16 +191,15 @@ export default function VetRecordListFilter({ data = [], onCardClick }: Props) {
             options={signedOptions as any}
             value={selectedSigned}
             onChange={(v) => setSelectedSigned(v as any)}
-            placeholder="서명상태 선택"
+            placeholder={loading ? '불러오는 중…' : '서명상태 선택'}
           />
         </div>
-        {/* ✅ AI 요약 드롭다운 제거됨 (항상 요약 있는 항목만 표시) */}
       </div>
 
       <div className="px-7">
         {grouped.map(([dateKey, items]) => (
-          <div key={dateKey} className="mb-5">
-            <div className="flex justify-between items-center mb-2">
+          <div key={dateKey} className="mb-5 mt-1">
+            <div className="flex justify-between items-center mb-3">
               <h4 className="h4 text-black">{formatKoreanDate(dateKey)}</h4>
               <h4 className="h4 text-black">{items.length}건</h4>
             </div>
