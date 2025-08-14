@@ -134,7 +134,6 @@ export default function VetRecordDetail() {
   const summary =
     (detail as any).aiSummary ??
     (detail as any).ai_summary ??
-    (detail as any).result ??
     '';
 
   const vetName =
