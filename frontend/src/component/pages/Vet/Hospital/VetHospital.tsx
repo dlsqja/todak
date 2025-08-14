@@ -84,7 +84,7 @@ export default function VetHospital() {
             value={profile}
             onChange={(e) => setProfile(e.target.value)}
             placeholder={loading ? '불러오는 중…' : '소개글을 입력해주세요'}
-            className="w-full h-30 block border-1 rounded-[12px] border-gray-400 px-5 pt-3 pb-3 text-black placeholder:text-gray-500 resize-none align-top whitespace-pre-wrap break-words scrollbar-hide"
+            className="w-full h-30 bg-white block border-1 rounded-[12px] border-gray-400 px-5 pt-3 pb-3 text-black placeholder:text-gray-500 resize-none align-top whitespace-pre-wrap break-words scrollbar-hide"
             disabled={loading}
           />
           {error && <p className="caption text-red-500 mt-1">{error}</p>}

@@ -23,6 +23,8 @@ interface Props {
   onClose: () => void;
   detail: StaffReservationItem | null;
   loading?: boolean;
+  fallbackPetPhoto?: string;
+  
 }
 
 const VetReservationDetailModal: React.FC<Props> = ({ onClose, detail, loading }) => {
@@ -33,24 +35,36 @@ const VetReservationDetailModal: React.FC<Props> = ({ onClose, detail, loading }
   const subject =
     detail ? (subjectMapping[detail.subject as keyof typeof subjectMapping] ?? detail.subject ?? '진료') : '';
 
-  // ⬇️ "실제 로드 가능한" 증상 사진인지 모달에서만 검사
+  const toUrl = (raw?: unknown): string => {
+    const s = String(raw ?? "").trim();
+    if (!s) return "";                                     // 빈 값은 그대로 반환 → ImageInputBox가 폴백!!!
+    if (/^https?:\/\//i.test(s) || /^data:image\//i.test(s)) return s; // 이미 절대/데이터 URL이면 통과!!!
+    const base = (import.meta as any).env?.VITE_PHOTO_URL ?? "";
+    if (!base) return s.startsWith("/") ? s : `/${s}`;     // base 없으면 루트 기준!!!
+    return `${String(base).replace(/\/+$/, "")}/${s.replace(/^\/+/, "")}`;
+  };
+
+  // ✅ (2) 리스트의 petInfo 사진도 상대경로일 수 있으니 절대 URL로 변환!!!
+  const petPhotoUrl = toUrl(detail?.pet?.photo);
+
+  // ⬇️ "실제 로드 가능한" 증상 사진인지 모달에서만 검사 (상대경로도 커버하도록 수정)!!!
   const [symptomPhotoOk, setSymptomPhotoOk] = useState(false);
   useEffect(() => {
-    const raw = String(detail?.photo ?? '').trim().toLowerCase();
-    // 명시적으로 비었거나 'null'/'undefined' 같은 값이면 바로 숨김
-    if (!raw || raw === 'null' || raw === 'undefined') {
+    const url = toUrl(detail?.photo); // ← 여기 포인트!!! 상대/절대 모두 toUrl로 정규화!!!
+    if (!url) {
       setSymptomPhotoOk(false);
       return;
     }
     const img = new Image();
     img.onload = () => setSymptomPhotoOk(true);
     img.onerror = () => setSymptomPhotoOk(false);
-    img.src = String(detail?.photo); // 상대/절대 모두 시도
+    img.src = url;
     return () => {
       img.onload = null;
       img.onerror = null;
     };
   }, [detail?.photo]);
+
 
   return (
     <ModalOnLayout onClose={onClose}>
@@ -64,9 +78,9 @@ const VetReservationDetailModal: React.FC<Props> = ({ onClose, detail, loading }
           <div className="p text-center text-gray-500">예약 정보를 불러오지 못했습니다.</div>
         ) : (
           <div className="space-y-6">
-            {/* 프로필(항상 표시) */}
+            {/* ✅ 프로필(항상 표시) — 리스트의 petInfo 사진을 절대 URL로 변환해 상자에 표시!!! */}
             <div className="flex items-center gap-4">
-              <ImageInputBox src={detail.pet?.photo} />
+              <ImageInputBox src={petPhotoUrl} />
               <div className="flex-1">
                 <h3 className="h3">{detail.pet?.name ?? '-'}</h3>
                 <p className="h4 text-gray-500 mt-1">
@@ -78,7 +92,7 @@ const VetReservationDetailModal: React.FC<Props> = ({ onClose, detail, loading }
             {/* 증상: 사진이 실제로 로드 가능할 때만 이미지 박스 렌더 */}
             <div>
               <h4 className="h4 mb-2">증상</h4>
-              {symptomPhotoOk && <ImageInputBox src={detail.photo} />}
+              {symptomPhotoOk && <ImageInputBox src={toUrl(detail.photo)} />} {/* ← 여기서도 toUrl!!! */}
               <p className={`p whitespace-pre-wrap ${symptomPhotoOk ? 'mt-3' : ''}`}>
                 {detail.description || '작성된 증상이 없습니다.'}
               </p>

@@ -142,19 +142,28 @@ export default function VetTreatment() {
     <div>
       <SimpleHeader text="비대면 진료" />
       <div className="px-7 py-1 space-y-4 max-h-full overflow-y-auto hide-scrollbar">
-        {rows.map(({ base, reservationTimeLabel }, index) => (
-          <VetRemoteTreatmentCard
-            key={index}
-            petName={base.petInfo.name}
-            petInfo={`${speciesMapping[base.petInfo.species]} / ${genderMapping[base.petInfo.gender]} / ${base.petInfo.age}세`}
-            department={subjectMapping[base.subject]}
-            time={reservationTimeLabel}
-            photo={base.petInfo.photo}
-            onDetailClick={() => handleDetailClick(base.reservationId)}
-            onTreatClick={() => handleRTCClick(base.treatmentId)}
-            buttonText="진료 하기"
-          />
-        ))}
+        {rows.map(({ base, reservationTimeLabel }, index) => {
+  // ✅ 유틸 없이 인라인 처리!!!
+  const raw = base.petInfo.photo || "";
+  const photoUrl =
+    /^https?:\/\//i.test(raw) || /^data:image\//i.test(raw)
+      ? raw
+      : `${(import.meta.env.VITE_PHOTO_URL ?? "").replace(/\/+$/, "")}/${String(raw).replace(/^\/+/, "")}`;
+
+  return (
+    <VetRemoteTreatmentCard
+      key={index}
+      petName={base.petInfo.name}
+      petInfo={`${speciesMapping[base.petInfo.species]} / ${genderMapping[base.petInfo.gender]} / ${base.petInfo.age}세`}
+      department={subjectMapping[base.subject]}
+      time={reservationTimeLabel}
+      photo={photoUrl}                 // ⬅️ 여기만 이렇게!!!
+      onDetailClick={() => handleDetailClick(base.reservationId)}
+      onTreatClick={() => handleRTCClick(base.treatmentId)}
+      buttonText="진료 하기"
+    />
+  );
+})}
       </div>
 
       {modalOpen && (
