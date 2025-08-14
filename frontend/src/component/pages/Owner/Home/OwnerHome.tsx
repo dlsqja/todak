@@ -8,6 +8,7 @@ import { getMyPets } from '@/services/api/Owner/ownerpet';
 import type { Pet as ApiPet, PetGender } from '@/types/Owner/ownerpetType';
 import { getOwnerInfo } from '@/services/api/Owner/ownermypage';
 import { FiChevronRight } from 'react-icons/fi';
+import ImageInputBox from '@/component/input/ImageInputBox';
 
 const buildPhotoUrl = (photo?: string | null) => {
   if (!photo) return '/images/pet_default.png';
@@ -154,7 +155,8 @@ export default function OwnerHome() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3, duration: 0.4 }}
         >
-          <div className="flex flex-col justify-center items-center h-full gap-6">
+          <div className="flex flex-col justify-center items-center h-full gap-2">
+            <img src="/images/sad_dog.png" alt="nodata" className="w-20 h-20" />
             <p className="h4 text-gray-500">등록된 반려동물이 없습니다.</p>
             <button
               className="text-white bg-green-300/60 hover:bg-green-300 px-6 py-2 rounded-xl p cursor-pointer"
