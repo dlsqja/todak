@@ -120,7 +120,7 @@ export default function VetMypage() {
           <div className="flex items-center gap-4">
             <div className="w-22 h-22 bg-green-100 border-3 border-green-200 rounded-[12px] flex items-center justify-center overflow-hidden">
               <img
-                src={previewImage || photo || '/images/pet_default.png'}
+                src={previewImage || photo || '/images/person_default.png'}
                 alt="프로필 사진"
                 className="w-full h-full object-cover"
               />
@@ -161,7 +161,6 @@ export default function VetMypage() {
           />
           {error && <p className="caption text-red-500 mt-1">{error}</p>}
         </div>
-        
       </div>
       <br />
       <div className="px-7">

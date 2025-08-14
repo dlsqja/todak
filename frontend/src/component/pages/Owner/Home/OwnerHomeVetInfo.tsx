@@ -11,11 +11,12 @@ import { getVetsByHospitalId, getVetClosingHours } from '@/services/api/Owner/ow
 import type { VetPublic, WorkingHourResponse } from '@/types/Owner/ownerhomeType';
 import { timeMapping } from '@/utils/timeMapping';
 
-const dayMap = ['SUN','MON','TUE','WED','THU','FRI','SAT'] as const;
+const dayMap = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'] as const;
 
 // 🔹 "HH:mm" -> 슬롯 인덱스 매핑
-const slotIndexByHHmm: Record<string, number> =
-  Object.fromEntries(Object.entries(timeMapping).map(([idx, hhmm]) => [hhmm, Number(idx)]));
+const slotIndexByHHmm: Record<string, number> = Object.fromEntries(
+  Object.entries(timeMapping).map(([idx, hhmm]) => [hhmm, Number(idx)]),
+);
 
 // 🔹 보조: 구간 인덱스 [start, end) 만들기 (end는 미포함)
 const buildIndices = (startIdx: number, endIdx: number) =>
@@ -26,8 +27,8 @@ const toSlotIdx = (v: number | string | undefined | null): number => {
   if (v == null) return NaN;
   if (typeof v === 'number') return v;
   const s = String(v);
-  if (/^\d+$/.test(s)) return Number(s);      // "18" 같은 문자열 숫자
-  const idx = slotIndexByHHmm[s];             // "09:00" 같은 HH:mm
+  if (/^\d+$/.test(s)) return Number(s); // "18" 같은 문자열 숫자
+  const idx = slotIndexByHHmm[s]; // "09:00" 같은 HH:mm
   return Number.isFinite(idx) ? idx : NaN;
 };
 
@@ -42,7 +43,7 @@ export default function VetInfoPage() {
     location?: string;
     profile?: string;
   };
-  const passedVet = location.state?.vet as (VetPublic | undefined);
+  const passedVet = location.state?.vet as VetPublic | undefined;
 
   const [vet, setVet] = useState<VetPublic | null>(passedVet ?? null);
   const [closingHours, setClosingHours] = useState<number[]>([]); // 0~47
@@ -88,7 +89,7 @@ export default function VetInfoPage() {
 
     // 시작/종료를 슬롯 인덱스로 표준화
     const startIdx = toSlotIdx(slot.startTime as any);
-    const endIdx   = toSlotIdx(slot.endTime as any);
+    const endIdx = toSlotIdx(slot.endTime as any);
     if (!Number.isFinite(startIdx) || !Number.isFinite(endIdx) || endIdx <= startIdx) {
       return null; // 범위가 이상하면 표시 안 함
     }
@@ -99,7 +100,7 @@ export default function VetInfoPage() {
     const usableIdx = allIdx.filter((i) => !blocked.has(i));
 
     const startText = timeMapping[startIdx] ?? '';
-    const endText   = timeMapping[endIdx] ?? '';
+    const endText = timeMapping[endIdx] ?? '';
     const usableTimes = usableIdx.map((i) => timeMapping[i]).filter(Boolean);
 
     return { startText, endText, usableTimes };
@@ -109,7 +110,9 @@ export default function VetInfoPage() {
     if (!selectedTime) return alert('시간을 선택해주세요!');
     navigate('/owner/home/form', {
       state: {
-        pet, hospital, vet,
+        pet,
+        hospital,
+        vet,
         time: selectedTime,
         startTime: todayRange?.startText,
         endTime: todayRange?.endText,
@@ -138,7 +141,10 @@ export default function VetInfoPage() {
           <h4 className="h4 text-gray-400">
             {hospital?.name}
             {todayRange?.startText && todayRange?.endText ? (
-              <> · 진료 가능 시간 {todayRange.startText}~{todayRange.endText}</>
+              <>
+                {' '}
+                · 진료 가능 시간 {todayRange.startText}~{todayRange.endText}
+              </>
             ) : null}
           </h4>
         </div>
@@ -155,11 +161,10 @@ export default function VetInfoPage() {
             // ✅ 근무시간 내부에서 closing 제외한 목록만 전달 → 비활성화가 자동 반영
             available_times={todayRange?.usableTimes ?? []}
           />
+          <div className="px-7 bg-gray-50">
+            <Button color="green" text="진료 신청서 작성하러 가기" onClick={handleSubmit} />
+          </div>
         </div>
-      </div>
-
-      <div className="px-7 bg-gray-50">
-        <Button color="green" text="진료 신청서 작성하러 가기" onClick={handleSubmit} />
       </div>
     </div>
   );
