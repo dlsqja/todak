@@ -8,6 +8,7 @@ import lombok.*;
 @Entity
 @Table(name = "vet")
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder(toBuilder = true)
