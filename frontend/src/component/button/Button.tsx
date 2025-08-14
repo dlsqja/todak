@@ -7,7 +7,7 @@ interface ButtonProps {
 
 export default function Button({ color, text, className = '', onClick }: ButtonProps) {
   const colorVariants = {
-    lightgreen: 'bg-green-200',
+    lightgreen: 'bg-green-200 hover:bg-green-300',
     green: 'bg-green-300 text-green-100',
     pink: 'bg-pink-100',
     gray: 'bg-gray-300',
@@ -15,7 +15,7 @@ export default function Button({ color, text, className = '', onClick }: ButtonP
   return (
     <button
       onClick={onClick}
-      className={`cursor-pointer w-full h-13 rounded-[12px] h4 ${
+      className={`cursor-pointer w-full h-13 rounded-[12px] h4 text-center ${
         colorVariants[color as keyof typeof colorVariants]
       } ${className}`}
     >

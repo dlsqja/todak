@@ -59,6 +59,7 @@ export default function OwnerHome() {
       }
     })();
   }, []);
+
   useEffect(() => {
     (async () => {
       try {
@@ -135,7 +136,7 @@ export default function OwnerHome() {
 
       <motion.button
         onClick={() => navigate('/owner/home/guide')}
-        className="h4 mx-7 px-6 py-2 rounded-full inline-block bg-green-300 text-green-100 cursor-pointer"
+        className="h4 mx-7 px-6 py-2 rounded-full inline-block bg-green-300 hover:bg-green-400 text-green-100 cursor-pointer"
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 0.3, duration: 0.3 }}
@@ -145,30 +146,31 @@ export default function OwnerHome() {
         </div>
       </motion.button>
 
-      <motion.h3 className="mx-7 h3 mt-11">비대면 진료 시작하기</motion.h3>
-      <motion.h3 className="mx-7 h4 text-gray-500 mt-1">진료 받고 싶은 반려동물을 선택해주세요</motion.h3>
-
       {/* 펫이 없을 때 안내 메시지 */}
       {petList.length === 0 && (
         <motion.div
-          className="flex flex-col justify-center h-[150px] gap-6 text-center mx-7"
+          className="w-full h-full px-7 mt-20"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3, duration: 0.4 }}
         >
-          <p className="h4 text-gray-500">등록된 반려동물이 없습니다.</p>
-          <button
-            className="text-white bg-green-300 hover:bg-green-400 px-6 py-2 rounded-xl p cursor-pointer"
-            onClick={() => navigate('/owner/pet/register')}
-          >
-            반려동물 등록하러 가기
-          </button>
+          <div className="flex flex-col justify-center items-center h-full gap-6">
+            <p className="h4 text-gray-500">등록된 반려동물이 없습니다.</p>
+            <button
+              className="text-white bg-green-300/60 hover:bg-green-300 px-6 py-2 rounded-xl p cursor-pointer"
+              onClick={() => navigate('/owner/pet/register')}
+            >
+              반려동물 등록하러 가기
+            </button>
+          </div>
         </motion.div>
       )}
 
       {/* 펫이 있을 때만 슬라이더 표시 */}
       {petList.length > 0 && (
         <div className="px-7">
+          <motion.h3 className="mx-7 h3 mt-11">비대면 진료 시작하기</motion.h3>
+          <motion.h3 className="mx-7 h4 text-gray-500 mt-1">진료 받고 싶은 반려동물을 선택해주세요</motion.h3>
           <motion.div
             ref={scrollRef}
             onScroll={handleScroll}

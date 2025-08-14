@@ -15,13 +15,12 @@ import { speciesMapping } from '@/utils/speciesMapping';
 import type { CreateOwnerReservationData } from '@/types/Owner/ownerreservationType';
 import { timeMapping } from '@/utils/timeMapping';
 
-
 export default function ApplyFormPage() {
   const location = useLocation();
   const { pet, hospital, vet, time, startTime, endTime, usableTimes } = location.state || {};
 
-  const selectedTime = useTimeStore((s) => s.selectedTime)
-  const setSelectedTime = useTimeStore((s) => s.setSelectedTime)
+  const selectedTime = useTimeStore((s) => s.selectedTime);
+  const setSelectedTime = useTimeStore((s) => s.setSelectedTime);
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -37,18 +36,18 @@ export default function ApplyFormPage() {
   const navigate = useNavigate();
 
   const buildPhotoUrl = (photo?: string | null) => {
-  if (!photo) return '/images/pet_default.png';
-  if (photo.startsWith('http')) return photo;
-  const base = import.meta.env.VITE_PHOTO_URL || '';
-  return `${base}${photo}`;
-};
+    if (!photo) return '/images/pet_default.png';
+    if (photo.startsWith('http')) return photo;
+    const base = import.meta.env.VITE_PHOTO_URL || '';
+    return `${base}${photo}`;
+  };
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       const preview = URL.createObjectURL(file);
-      setSymptomImage(preview);   // 프리뷰용!!!
-      setSymptomFile(file);       // 업로드용!!!
+      setSymptomImage(preview); // 프리뷰용!!!
+      setSymptomFile(file); // 업로드용!!!
     }
   };
 
@@ -70,10 +69,10 @@ export default function ApplyFormPage() {
   }, [symptomImage]);
 
   useEffect(() => {
-  if (time && time !== selectedTime) {
-    setSelectedTime(time)
-  }
-}, [time, selectedTime, setSelectedTime])
+    if (time && time !== selectedTime) {
+      setSelectedTime(time);
+    }
+  }, [time, selectedTime, setSelectedTime]);
 
   useEffect(() => {
     let alive = true;
@@ -107,7 +106,7 @@ export default function ApplyFormPage() {
   };
 
   const speciesLabel = mapEnumLabel(speciesMapping, pet?.species, '동물 종류');
-  const genderLabel  = mapEnumLabel(genderMapping,  pet?.gender,  '성별');
+  const genderLabel = mapEnumLabel(genderMapping, pet?.gender, '성별');
 
   // ✅ 추가: 'HH:mm' → 슬롯 인덱스(0~47)
   const timeToSlotIndex = (hhmm: string): number | undefined => {
@@ -118,38 +117,36 @@ export default function ApplyFormPage() {
   };
 
   const handleSubmit = () => {
-  const symptomText = symptomRef.current?.value?.trim();
-  if (!selectedTime) return alert('진료 희망 시간을 선택해주세요!');
-  if (!selectedDepartment) return alert('진료받을 과를 선택해주세요!');
-  if (!symptomText) return alert('증상 내용을 입력해주세요!');
+    const symptomText = symptomRef.current?.value?.trim();
+    if (!selectedTime) return alert('진료 희망 시간을 선택해주세요!');
+    if (!selectedDepartment) return alert('진료받을 과를 선택해주세요!');
+    if (!symptomText) return alert('증상 내용을 입력해주세요!');
 
-  const petIdRaw = (pet?.pet_id ?? pet?.petId ?? pet?.id) as string | undefined;
-const hospitalIdRaw = (hospital?.hospital_id ?? hospital?.hospitalId ?? hospital?.id) as string | undefined;
-const vetIdRaw = (vet?.vet_id ?? vet?.vetId ?? vet?.id) as string | undefined;
+    const petIdRaw = (pet?.pet_id ?? pet?.petId ?? pet?.id) as string | undefined;
+    const hospitalIdRaw = (hospital?.hospital_id ?? hospital?.hospitalId ?? hospital?.id) as string | undefined;
+    const vetIdRaw = (vet?.vet_id ?? vet?.vetId ?? vet?.id) as string | undefined;
 
-if (!petIdRaw || !hospitalIdRaw) {
-  return alert('필수 정보가 누락되었습니다! (반려동물/병원 식별자 확인)');
-}
+    if (!petIdRaw || !hospitalIdRaw) {
+      return alert('필수 정보가 누락되었습니다! (반려동물/병원 식별자 확인)');
+    }
 
-const slot = timeToSlotIndex(String(selectedTime));
-if (slot === undefined) return alert('선택한 시간이 올바르지 않습니다!');
+    const slot = timeToSlotIndex(String(selectedTime));
+    if (slot === undefined) return alert('선택한 시간이 올바르지 않습니다!');
 
-const reservationDay =
-  (location.state && location.state.reservationDay) ||
-  new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+    const reservationDay = (location.state && location.state.reservationDay) || new Date().toISOString().slice(0, 10); // YYYY-MM-DD
 
-const draft: CreateOwnerReservationData = {
-  petId: String(petIdRaw),             // ✔ 문자열로 고정
-  hospitalId: String(hospitalIdRaw),   // ✔ 문자열로 고정
-  vetId: vetIdRaw ? String(vetIdRaw) : undefined, // ✔ 문자열
-  subject: selectedDepartment,
-  description: symptomText,
-  reservationDay,
-  reservationTime: slot,
-  status: 'REQUESTED',
-};
+    const draft: CreateOwnerReservationData = {
+      petId: String(petIdRaw), // ✔ 문자열로 고정
+      hospitalId: String(hospitalIdRaw), // ✔ 문자열로 고정
+      vetId: vetIdRaw ? String(vetIdRaw) : undefined, // ✔ 문자열
+      subject: selectedDepartment,
+      description: symptomText,
+      reservationDay,
+      reservationTime: slot,
+      status: 'REQUESTED',
+    };
 
-navigate('/owner/home/payment', { state: { draft, photo: symptomFile } });
+    navigate('/owner/home/payment', { state: { draft, photo: symptomFile } });
   };
 
   return (
@@ -157,11 +154,7 @@ navigate('/owner/home/payment', { state: { draft, photo: symptomFile } });
       <BackHeader text="진료 신청서 작성" />
 
       <div className="flex-1 overflow-y-auto px-7 py-6 flex flex-col gap-6">
-        <TimeSelectionDropdown
-            label="진료 희망 시간"
-            start_time={startTime || '09:00'}
-            end_time={endTime || '18:00'}
-          />
+        <TimeSelectionDropdown label="진료 희망 시간" start_time={startTime || '09:00'} end_time={endTime || '18:00'} />
 
         {/* 반려동물 정보 */}
         <div>
@@ -170,9 +163,7 @@ navigate('/owner/home/payment', { state: { draft, photo: symptomFile } });
             <ImageInputBox src={buildPhotoUrl(pet?.photo ?? pet?.profileImage)} />
             <div className="flex flex-col gap-1">
               <p className="h4">{pet?.name || '반려동물 이름'}</p>
-              <p className="p text-gray-400">
-                {`${speciesLabel} | ${pet?.age ?? '나이'}세 | ${genderLabel}`}
-              </p>
+              <p className="p text-gray-400">{`${speciesLabel} | ${pet?.age ?? '나이'}세 | ${genderLabel}`}</p>
             </div>
           </div>
         </div>
@@ -181,7 +172,8 @@ navigate('/owner/home/payment', { state: { draft, photo: symptomFile } });
         <div>
           <h4 className="h4 mb-1">반려인 정보 확인</h4>
           <p className="p">
-            본인의 정보 혹은 다른 반려인의 기록에서 불러온 정보가 <strong className=' text-pink-200'>초진 당시 해당 병원에 등록한 반려인 정보</strong>임을 반드시 확인하세요.
+            본인의 정보 혹은 다른 반려인의 기록에서 불러온 정보가{' '}
+            <strong className=" text-pink-200">초진 당시 해당 병원에 등록한 반려인 정보</strong>임을 반드시 확인하세요.
           </p>
         </div>
 
@@ -228,13 +220,7 @@ navigate('/owner/home/payment', { state: { draft, photo: symptomFile } });
                 <span className="p text-gray-500">Add</span>
               </div>
             )}
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              onChange={handleImageSelect}
-              className="hidden"
-            />
+            <input ref={fileInputRef} type="file" accept="image/*" onChange={handleImageSelect} className="hidden" />
           </div>
 
           <Dropdown
@@ -264,11 +250,7 @@ navigate('/owner/home/payment', { state: { draft, photo: symptomFile } });
       </div>
 
       <div className="px-6">
-        <Button
-          color="green"
-          text="진료비 결제 수단 선택"
-          onClick={handleSubmit}
-        />
+        <Button color="green" text="진료비 결제 수단 선택" onClick={handleSubmit} />
       </div>
     </div>
   );

@@ -80,10 +80,10 @@ export default function OwnerPetHome() {
       {isLoading && <div className="p">불러오는 중...</div>}
       {error && <div className="p">에러 발생: {error.message}</div>}
       {pets.length === 0 && !isLoading && !error && (
-        <div className="p flex flex-col items-center justify-center h-[60vh] gap-6 text-center">
+        <div className="p flex flex-col items-center justify-center h-[600px] gap-6 text-center">
           <p className="h4 text-gray-500">등록된 반려동물이 없습니다.</p>
           <button
-            className="text-white bg-green-300 hover:bg-green-400 px-6 py-2 rounded-xl p cursor-pointer"
+            className="text-white bg-green-300/60 hover:bg-green-400 px-6 py-2 rounded-xl p cursor-pointer"
             onClick={handleRegister}
           >
             반려동물 등록하기
