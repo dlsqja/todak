@@ -150,7 +150,7 @@ export default function OwnerHome() {
       {/* 펫이 없을 때 안내 메시지 */}
       {petList.length === 0 && (
         <motion.div
-          className="w-full h-full px-7 mt-20"
+          className="w-full h-full px-7 mt-44"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3, duration: 0.4 }}
