@@ -1,3 +1,4 @@
+// src/component/pages/Vet/Treatment/VetTreatment.tsx
 import React, { useEffect, useState } from 'react';
 import '@/styles/main.css';
 import SimpleHeader from '@/component/header/SimpleHeader';
@@ -8,7 +9,7 @@ import type { VetTreatmentListResponse } from '@/types/Vet/vettreatmentType';
 import { speciesMapping } from '@/utils/speciesMapping';
 import { genderMapping } from '@/utils/genderMapping';
 import { subjectMapping } from '@/utils/subjectMapping';
-import { timeMapping } from '@/utils/timeMapping';
+import { timeMapping, toLocalHHmm } from '@/utils/timeMapping';
 import apiClient from '@/plugins/axios';
 
 // 상세
@@ -17,10 +18,17 @@ import { getStaffReservationDetail } from '@/services/api/Staff/staffreservation
 import type { StaffReservationItem } from '@/types/Staff/staffreservationType';
 import VetReservationDetailModal from '@/component/pages/Vet/Treatment/VetReservationDetailModal';
 
+type EnrichedRow = {
+  base: VetTreatmentListResponse;
+  reservationTimeLabel: string; // 카드에 표시용 "HH:mm"
+  reservationMinutes: number;   // 정렬용 (분). 없으면 Infinity
+};
+
 export default function VetTreatment() {
   const navigate = useNavigate();
 
-  const [treatmentData, setTreatmentData] = useState<VetTreatmentListResponse[]>([]);
+  // 목록은 가공된 행으로 보관(표시/정렬 편의)
+  const [rows, setRows] = useState<EnrichedRow[]>([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [modalLoading, setModalLoading] = useState(false);
   const [modalDetail, setModalDetail] = useState<StaffReservationItem | null>(null);
@@ -31,9 +39,37 @@ export default function VetTreatment() {
     const s = String(v ?? '');
     if (/^\d+$/.test(s)) return Number(s);
     return null;
-    // (※ 서버가 HH:mm을 주는 경우가 생기면 여기서 파싱해서 분/슬롯으로 바꿔도 됨)
   };
 
+  // ✅ "진료 시작 여부"를 모든 포맷에서 정확히 판별
+  // - number: >0이면 시작됨, 0이면 미시작
+  // - "숫자문자열": >0이면 시작됨, "0"은 미시작
+  // - 날짜/시간 문자열(ISO/DB): 유효 Date면 시작됨
+  // - 그 외/빈 값: 미시작
+  const hasStarted = (startVal: unknown): boolean => {
+    if (typeof startVal === 'number') return startVal > 0;
+    const s = String(startVal ?? '').trim();
+    if (!s) return false;
+    if (/^\d+$/.test(s)) return Number(s) > 0;
+    // 날짜/시간 문자열로 판단
+    const norm = s.replace(' ', 'T').replace(/\.\d+$/, '');
+    const d = new Date(norm);
+    if (!isNaN(d.getTime())) return true;
+    // 마지막 보조: "HH:mm" 파싱 성공 시도
+    return !!toLocalHHmm(s as any);
+  };
+
+  // RTC 시작 (⚠️ 수정 금지 요청)
+  const handleRTCClick = async (treatmentId: number) => {
+    await apiClient
+      .post(`/treatments/vets/start/${treatmentId}`)
+      .then(() => {
+        navigate('/vet/treatment/rtc', { state: { treatmentId } });
+      })
+      .catch((err) => console.log('err:', err));
+  };
+
+  // 상세 모달 열기
   const handleDetailClick = async (reservationId: number) => {
     setModalOpen(true);
     setModalLoading(true);
@@ -53,37 +89,75 @@ export default function VetTreatment() {
     }
   };
 
-  const handleRTCClick = async (treatmentId: number) => {
-    await apiClient
-      .post(`/treatments/vets/start/${treatmentId}`)
-      .then(() => {
-        navigate('/vet/treatment/rtc', { state: { treatmentId } });
-      })
-      .catch((err) => console.log('err:', err));
+  // "예약 시간"을 HH:mm 텍스트로
+  const reservationToHHmm = (val: unknown): string => {
+    const slot = toSlotIndex(val);
+    if (slot != null && slot >= 0 && slot <= 47 && timeMapping[slot]) {
+      return timeMapping[slot];
+    }
+    // 서버가 HH:mm/ISO 등을 줄 수 있으므로 util로 안전 파싱
+    return toLocalHHmm(val as any) || '';
+  };
+
+  // "예약 시간"을 분 단위로 (정렬용)
+  const reservationToMinutes = (val: unknown): number => {
+    const slot = toSlotIndex(val);
+    if (slot != null && slot >= 0 && slot <= 47) return slot * 30;
+
+    const hhmm = toLocalHHmm(val as any); // "HH:mm" 기대
+    if (hhmm) {
+      const m = hhmm.match(/^(\d{2}):(\d{2})$/);
+      if (m) {
+        const h = Number(m[1]);
+        const mm = Number(m[2]);
+        if (Number.isFinite(h) && Number.isFinite(mm)) return h * 60 + mm;
+      }
+    }
+    return Number.POSITIVE_INFINITY; // 시간 미정 → 맨 뒤로
   };
 
   useEffect(() => {
     (async () => {
+      // type=0 목록
       const list = await getVetTreatmentList();
 
-      // 1) 미시작 + 미완료만 남기기
-      const filtered = (list || []).filter((it: any) => {
-        const slot = toSlotIndex(it.startTime);
-        const started = slot != null && slot > 0;   // 0 또는 null/undefined → 미시작으로 간주
-        const completed = it.isCompleted === true;
-        return !started && !completed;
+      // 1) 치료 시작(startTime) "없는 것만" + 미완료만
+      const target = (list || []).filter((it: any) => {
+        const notStarted = !hasStarted(it.startTime);
+        const notCompleted = it.isCompleted !== true;
+        return notStarted && notCompleted;
       });
 
-      // 2) 시간 오름차순 정렬 (값이 없거나 0이면 맨 뒤)
-      const sorted = [...filtered].sort((a, b) => {
-        const sa = toSlotIndex((a as any).startTime);
-        const sb = toSlotIndex((b as any).startTime);
-        const va = sa == null || sa === 0 ? Infinity : sa;
-        const vb = sb == null || sb === 0 ? Infinity : sb;
-        return va - vb;
+      // 2) 각 항목의 "예약 상세"에서 reservationTime 확보(수의사 경로 우선)
+      const details = await Promise.all(
+        target.map(async (it) => {
+          try {
+            try {
+              return await getVetReservationDetail(it.reservationId);
+            } catch {
+              return await getStaffReservationDetail(it.reservationId);
+            }
+          } catch {
+            return null;
+          }
+        })
+      );
+
+      // 3) 표시에 필요한 데이터로 변환 + 예약 시간으로 정렬
+      const enriched: EnrichedRow[] = target.map((it, idx) => {
+        const det = details[idx];
+        const label = reservationToHHmm(det?.reservationTime);
+        const minutes = reservationToMinutes(det?.reservationTime);
+        return {
+          base: it,
+          reservationTimeLabel: label || '시간 미정',
+          reservationMinutes: minutes,
+        };
       });
 
-      setTreatmentData(sorted);
+      enriched.sort((a, b) => a.reservationMinutes - b.reservationMinutes);
+
+      setRows(enriched);
     })();
   }, []);
 
@@ -91,25 +165,19 @@ export default function VetTreatment() {
     <div>
       <SimpleHeader text="비대면 진료" />
       <div className="px-7 py-1 space-y-4 max-h-full overflow-y-auto hide-scrollbar">
-        {treatmentData.map((data, index) => {
-          const slot = toSlotIndex(data.startTime);
-          const timeLabel =
-            slot != null && slot >= 0 && timeMapping[slot] ? timeMapping[slot] : '시간 미정';
-
-          return (
-            <VetRemoteTreatmentCard
-              key={index}
-              petName={data.petInfo.name}
-              petInfo={`${speciesMapping[data.petInfo.species]} / ${genderMapping[data.petInfo.gender]} / ${data.petInfo.age}세`}
-              department={subjectMapping[data.subject]}
-              time={timeLabel}
-              photo={data.petInfo.photo}
-              onDetailClick={() => handleDetailClick(data.reservationId)}   // 모달 오픈
-              onTreatClick={() => handleRTCClick(data.treatmentId)}
-              buttonText="진료 하기"
-            />
-          );
-        })}
+        {rows.map(({ base, reservationTimeLabel }, index) => (
+          <VetRemoteTreatmentCard
+            key={index}
+            petName={base.petInfo.name}
+            petInfo={`${speciesMapping[base.petInfo.species]} / ${genderMapping[base.petInfo.gender]} / ${base.petInfo.age}세`}
+            department={subjectMapping[base.subject]}
+            time={reservationTimeLabel}                              
+            photo={base.petInfo.photo}
+            onDetailClick={() => handleDetailClick(base.reservationId)} 
+            onTreatClick={() => handleRTCClick(base.treatmentId)}         
+            buttonText="진료 하기"
+          />
+        ))}
       </div>
 
       {modalOpen && (
