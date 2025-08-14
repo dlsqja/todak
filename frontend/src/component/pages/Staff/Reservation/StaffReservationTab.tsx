@@ -223,7 +223,7 @@ export default function ReservationTab() {
         </>
       ) : (
         <div className="flex flex-grow items-center justify-center min-h-[200px]">
-          <p className="p">예약 내역이 없습니다</p>
+          <p className="h4 text-gray-500">현재 확인이 필요한 예약 신청이 없습니다</p>
         </div>
       )}
     </div>

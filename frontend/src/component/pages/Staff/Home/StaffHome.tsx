@@ -115,7 +115,7 @@ export default function StaffHome() {
 
   return (
     <div>
-      <h3 className="h3 mx-7 pt-13">OOO 관계자님 반갑습니다!</h3>
+      <h3 className="h3 mx-7 pt-13">병원 관계자님 반갑습니다!</h3>
       <h3 className="h3 mx-7 mb-2">어플 사용이 처음이신가요?</h3>
       <button
         onClick={() => navigate('/staff/home/guide')}
@@ -132,7 +132,7 @@ export default function StaffHome() {
           {loading ? (
             <div className="p text-gray-500">불러오는 중…</div>
           ) : cards.length === 0 ? (
-            <div className="p text-gray-500">대기 중인 예약이 없습니다</div>
+            <div className="h4 text-gray-500">대기 중인 예약이 없습니다</div>
           ) : (
             cards.map((reservation) => (
               <button

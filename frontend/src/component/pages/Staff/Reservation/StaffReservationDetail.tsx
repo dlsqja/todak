@@ -20,7 +20,6 @@ import {
 import { genderMapping } from '@/utils/genderMapping';
 import { speciesMapping } from '@/utils/speciesMapping';
 import { subjectMapping } from '@/utils/subjectMapping';
-import { statusMapping } from '@/utils/statusMapping';
 import { toTimeRange, timeMapping, toLocalHHmm } from '@/utils/timeMapping';
 
 import type {
@@ -28,13 +27,13 @@ import type {
   Gender,
   Species,
   Subject,
-  ReservationStatus,
 } from '@/types/Staff/staffreservationType';
+
+import StatusBadge from '@/component/state/StatusBadge';
 
 export default function StaffReservationDetail() {
   const navigate = useNavigate();
 
-  // state 또는 URL 파라미터로 식별자 수용
   const { state } = useLocation() as { state?: { reservationId?: number } };
   const params = useParams<{ reservationId?: string }>();
   const reservationId =
@@ -47,7 +46,9 @@ export default function StaffReservationDetail() {
   const [isApproveOpen, setApproveOpen] = useState(false);
   const [isRejectOpen, setRejectOpen] = useState(false);
 
-  // 식별자 없으면 즉시 가드
+  // 🔒 중복 클릭 방지
+  const [actioning, setActioning] = useState(false);
+
   if (!reservationId) {
     return (
       <div className="space-y-6">
@@ -83,7 +84,7 @@ export default function StaffReservationDetail() {
     };
   }, [reservationId]);
 
-  // 안전한 라벨 생성기
+  // 안전 라벨 유틸
   const mapEnum = <T extends string>(
     map: Record<string, string>,
     raw: T | undefined,
@@ -101,48 +102,60 @@ export default function StaffReservationDetail() {
   }, [detail?.reservationDay, detail?.reservationTime]);
 
   const subjectLabel = mapEnum<Subject>(subjectMapping, detail?.subject, '');
-  const statusLabel = mapEnum<ReservationStatus>(statusMapping, detail?.status, '');
   const petSpecies = mapEnum<Species>(speciesMapping, detail?.pet?.species as Species, '기타');
   const petGender = mapEnum<Gender>(genderMapping, detail?.pet?.gender as Gender, '미상');
-  const revisitLabel = detail?.isRevisit ? '재진' : '초진';
 
-  // 모달에 넘길 데이터
-  const modalData = {
-    time: timeLabel || '-',
-    doctor: detail?.vetName || '-',
-    department: subjectLabel || '-',
-    petName: detail?.pet?.name || '-',
-    petAge: detail?.pet?.age ? `${detail?.pet?.age}세` : '-',
-    petType: petSpecies || '-',
-    ownerName: detail?.owner?.name || '-',
-    ownerPhone: detail?.owner?.phone || '-',
-  };
+  // 배지 키(REQUESTED/APPROVED/REJECTED → 0/1/2)
+  const badgeKey = useMemo<number>(() => {
+    const s = String(detail?.status ?? '').toUpperCase();
+    if (s === 'APPROVED') return 1;
+    if (s === 'REJECTED') return 2;
+    return 0;
+  }, [detail?.status]);
 
+  // 사진 있으면만 노출
+  const hasPhoto = useMemo(
+    () => !!(detail?.photo && String(detail.photo).trim().length > 0),
+    [detail?.photo]
+  );
+
+  const isRequested = useMemo(
+    () => String(detail?.status ?? '').toUpperCase() === 'REQUESTED',
+    [detail?.status]
+  );
+
+  // 승인 처리 → 모달 닫고 → 목록으로 이동
   const handleApprove = async () => {
+    if (actioning) return;
     try {
+      setActioning(true);
       await approveStaffReservation(reservationId);
-      // 서버 최신값으로 싱크
-      const fresh = await getStaffReservationDetail(reservationId);
-      setDetail(fresh ?? (prev => prev && ({ ...prev, status: 'APPROVED' } as any)));
       setApproveOpen(false);
-      alert('승인 완료');
+      // alert('승인 완료');
+      navigate(-1); // 목록으로 복귀
     } catch {
       alert('승인 처리 실패. 잠시 후 다시 시도해주세요.');
+    } finally {
+      setActioning(false);
     }
   };
 
+  // 반려 처리 → 모달 닫고 → 목록으로 이동
   const handleReject = async (reason: string) => {
-  try {
-    await rejectStaffReservation(reservationId, reason);  // ✅ 문자열만 전달
-    const fresh = await getStaffReservationDetail(reservationId);  // 싱크 재조회 권장
-    setDetail(fresh ?? (prev => (prev ? { ...prev, status: 'REJECTED' } : prev)));
-    setRejectOpen(false);
-    alert('반려 처리 완료');
-  } catch (e) {
-    console.error(e);
-    alert('반려 처리 실패. 잠시 후 다시 시도해주세요.');
-  }
-};
+    if (actioning) return;
+    try {
+      setActioning(true);
+      await rejectStaffReservation(reservationId, reason);
+      setRejectOpen(false);
+      // alert('반려 처리 완료');
+      navigate(-1); // 목록으로 복귀
+    } catch (e) {
+      console.error(e);
+      alert('반려 처리 실패. 잠시 후 다시 시도해주세요.');
+    } finally {
+      setActioning(false);
+    }
+  };
 
   return (
     <div>
@@ -163,9 +176,15 @@ export default function StaffReservationDetail() {
           </>
         ) : (
           <>
-            {/* 반려동물 정보 */}
+            {/* "반려동물 정보" 제목 라인 + 상태 배지(오른쪽) */}
+            <div className="flex justify-between items-center mb-0">
+              <h4 className="h4">반려동물 정보</h4>
+              <StatusBadge type="reservation" statusKey={badgeKey} />
+            </div>
+
+            {/* 내용은 그대로(이름/나이/종/성별/체중) */}
             <MultiContent
-              title="반려동물 정보"
+              title=""
               contents={[
                 `이름 : ${detail.pet?.name ?? '-'}`,
                 `나이 : ${detail.pet?.age ?? '-'}세`,
@@ -185,11 +204,10 @@ export default function StaffReservationDetail() {
               ].filter(Boolean) as string[]}
             />
 
-            {/* 재진 여부 + 상태 */}
-            <SingleContent title="재진 여부" content={revisitLabel} />
-            <SingleContent title="현재 상태" content={statusLabel || '-'} />
+            {/* 재진 여부 */}
+            <SingleContent title="재진 여부" content={detail.isRevisit ? '재진' : '초진'} />
 
-            {/* 수의사 및 진료과목 */}
+            {/* 수의사 및 진료 과목 */}
             <SingleContent
               title="희망 수의사 및 진료 과목"
               content={`${detail.vetName ?? '-'} | ${subjectLabel || '-'}`}
@@ -199,52 +217,65 @@ export default function StaffReservationDetail() {
             <SingleContent title="예약 희망 시간" content={timeLabel || '-'} />
 
             {/* 증상 */}
-            <div className="space-y-4">
+            <div className="space-y-2">
               <h4 className="h4">증상</h4>
-              <div className="flex gap-4">
-                <ImageInputBox src={detail.photo} stroke="border border-gray-300" />
-              </div>
+              {hasPhoto && (
+                <div className="flex gap-2">
+                  <ImageInputBox src={detail.photo} stroke="border border-gray-300" />
+                </div>
+              )}
               <p className="p whitespace-pre-wrap">{detail.description || '-'}</p>
             </div>
 
-            {/* 버튼 */}
-            <div className="grid grid-cols-2 gap-4 pt-4">
-              <Button color="lightgreen" text="진료 반려" onClick={() => setRejectOpen(true)} />
-              <Button color="green" text="진료 승인" onClick={() => setApproveOpen(true)} />
-            </div>
+            {/* ✅ 요청 상태에서만 버튼 노출 (중복 승인/반려 방지) */}
+            {isRequested && (
+              <div className="grid grid-cols-2 gap-4 pt-4">
+                <Button
+                  color="lightgreen"
+                  text={actioning ? '처리 중…' : '진료 반려'}
+                  onClick={() => !actioning && setRejectOpen(true)}
+                />
+                <Button
+                  color="green"
+                  text={actioning ? '처리 중…' : '진료 승인'}
+                  onClick={() => !actioning && setApproveOpen(true)}
+                />
+              </div>
+            )}
           </>
         )}
       </div>
 
-      {/* 승인 모달 (요약만 보여주고 확인 시 승인 처리) */}
+      {/* 승인 모달 → 승인 확정시 목록으로 이동 */}
       {isApproveOpen && (
-      <ReservationApprovalModal
-        onClose={() => setApproveOpen(false)}
-        data={modalData}
-        onConfirm={async () => {
-          // 여기만 실제 승인 로직!
-          await approveStaffReservation(reservationId);
-          const fresh = await getStaffReservationDetail(reservationId);
-          setDetail(fresh);
-          setApproveOpen(false);
-          alert('승인 완료');
-        }}
-      />
-)}
-      {/* 반려 모달 */}
+        <ReservationApprovalModal
+          onClose={() => setApproveOpen(false)}
+          data={{
+            time: timeLabel || '-',
+            doctor: detail?.vetName || '-',
+            department: subjectLabel || '-',
+            petName: detail?.pet?.name || '-',
+            petAge: detail?.pet?.age ? `${detail?.pet?.age}세` : '-',
+            petType: petSpecies || '-',
+            ownerName: detail?.owner?.name || '-',
+            ownerPhone: detail?.owner?.phone || '-',
+          }}
+          onConfirm={handleApprove}
+        />
+      )}
+
+      {/* 반려 모달 → 반려 확정시 목록으로 이동 */}
       {isRejectOpen && detail && (
-  <StaffReservationRejectModal
-  onClose={() => setRejectOpen(false)}
-  onSubmit={(reason) => handleReject(reason)}
-  petName={detail.pet?.name ?? '-'}
-  petInfo={`${petSpecies || '-'} / ${detail.pet?.age ?? '-'}세`}          // ✅ '강아지' 등 한글 라벨 사용
-  time={timeLabel || '-'}
-  doctor={detail.vetName ?? '-'}
-  photo={detail.photo}
-/>
-
-)}
-
+        <StaffReservationRejectModal
+          onClose={() => setRejectOpen(false)}
+          onSubmit={(reason) => handleReject(reason)}
+          petName={detail.pet?.name ?? '-'}
+          petInfo={`${petSpecies || '-'} / ${detail.pet?.age ?? '-'}세`}
+          time={timeLabel || '-'}
+          doctor={detail.vetName ?? '-'}
+          photo={detail.photo}
+        />
+      )}
     </div>
   );
 }

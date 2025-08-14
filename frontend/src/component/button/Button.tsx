@@ -7,7 +7,7 @@ interface ButtonProps {
 
 export default function Button({ color, text, className = '', onClick }: ButtonProps) {
   const colorVariants = {
-    lightgreen: 'bg-green-200 hover:bg-green-300',
+    lightgreen: 'bg-green-200',
     green: 'bg-green-300 text-green-100',
     pink: 'bg-pink-100',
     gray: 'bg-gray-300',
