@@ -117,8 +117,13 @@ export default function OwnerMyPage() {
   }, []);
 
   if (isLoading) {
-    return <div className="text-center mt-20">불러오는 중...</div>;
-  }
+    
+    return (
+      <>
+    <SimpleHeader text="마이페이지" />
+    <div className="h4 text-center mt-76 text-gray-400">불러오는 중...</div>
+      </>
+  )}
 
   // 입력값 변경 핸들러
   const handleInputChange = (fieldName: string, value: string) => {
@@ -192,7 +197,7 @@ export default function OwnerMyPage() {
   };
 
   return (
-    <>
+    <div>
       <SimpleHeader text="마이페이지" />
       <div className="flex flex-col gap-6 px-7 mt-11">
         <div>
@@ -253,6 +258,7 @@ export default function OwnerMyPage() {
           로그 아웃
         </motion.button>
       </motion.div>
-    </>
+    </div>
   );
+  
 }

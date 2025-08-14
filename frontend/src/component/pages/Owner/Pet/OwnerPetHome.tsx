@@ -77,8 +77,8 @@ export default function OwnerPetHome() {
   return (
     <>
       <SimpleHeader text="반려동물 관리" />
-      {isLoading && <div className="p">불러오는 중...</div>}
-      {error && <div className="p">에러 발생: {error.message}</div>}
+      {isLoading && <div className="h4 text-center mt-76 text-gray-400">불러오는 중...</div>}
+      {error && <div className="h4 text-center mt-76 text-gray-400">데이터를 불러올 수 없습니다</div>}
       {pets.length === 0 && !isLoading && !error && (
         <div className="p flex flex-col items-center justify-center h-[600px] gap-6 text-center">
           <p className="h4 text-gray-500">등록된 반려동물이 없습니다.</p>
