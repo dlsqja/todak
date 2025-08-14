@@ -3,7 +3,7 @@ import React, { useEffect, useRef } from 'react';
 import DropdownArrow from '@/component/icon/Dropdown_Arrow';
 
 interface DropdownProps {
-  id?: string;                              // ✅ 각 드롭다운을 구분할 ID
+  id?: string; // ✅ 각 드롭다운을 구분할 ID
   options: Array<{ value: string; label: string }>;
   placeholder?: string;
   value: string;
@@ -46,7 +46,7 @@ export default function SelectionDropdown({
     <div
       ref={ref}
       className={`relative ${className}`}
-      onMouseDown={() => isControlled && id && setActiveId!(id)}   // 클릭 순간 활성 인식
+      onMouseDown={() => isControlled && id && setActiveId!(id)} // 클릭 순간 활성 인식
       onFocusCapture={() => isControlled && id && setActiveId!(id)} // 키보드 포커스 활성 인식
     >
       <select
@@ -56,14 +56,19 @@ export default function SelectionDropdown({
         className={`w-full border bg-white h-12 appearance-none rounded-2xl px-4 py-2
           focus:outline-none focus:ring-0
           ${isActive ? 'border-green-300 border-2' : 'border-gray-400'}
+          ${value === '' ? 'text-gray-500' : 'text-black'}
         `}
         aria-expanded={isActive ? true : undefined}
       >
         {placeholder !== '' && (
-          <option value="" disabled hidden>
+          <option value="" disabled hidden className="text-gray-500">
             {placeholder}
           </option>
         )}
+        {/* 선택 해제 옵션 */}
+        <option value="" className="text-black">
+          선택
+        </option>
         {options.map((opt) => (
           <option key={opt.value} value={opt.value} className="text-black bg-white">
             {opt.label}

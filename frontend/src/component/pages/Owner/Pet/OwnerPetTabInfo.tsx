@@ -20,8 +20,8 @@ export default function OwnerPetTabInfo({ selectedPet, setSelectedPet, pets, set
         console.log('API 응답:', response);
 
         // API 성공 시에만 상태 업데이트
-        if (response && (response.status === 200 || response.data)) {
-          console.log('삭제 성공, 상태 업데이트 시작');
+        if (response && response.message === '성공') {
+          console.log('삭제되었습니다');
 
           // 부모 컴포넌트의 onDelete 호출
           onDelete(selectedPet.petId);

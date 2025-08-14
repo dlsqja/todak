@@ -74,14 +74,11 @@ pipeline {
               docker stop "'${CONTAINER_NAME}'" || true
               docker rm "'${CONTAINER_NAME}'" || true
               docker pull "'${DOCKER_IMAGE}:${TAG}'"
-              docker run --name "'${CONTAINER_NAME}'" \
-                --env-file /home/ubuntu/frontend.env \
-                -d -p 3000:80 "'${DOCKER_IMAGE}:${TAG}'"
+              docker run --name "'${CONTAINER_NAME}'" -d -p 3000:80 "'${DOCKER_IMAGE}:${TAG}'"
             '
           '''
         }
       }
     }
-
   }
 }

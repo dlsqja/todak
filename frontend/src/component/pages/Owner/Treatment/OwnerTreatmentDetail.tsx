@@ -125,7 +125,7 @@ export default function OwnerTreatmentDetail() {
         )}
       </section>
       <div className="px-7 pt-5">
-        <Button className="px-7" text="진료 하기" color="green" onClick={() => handleRTCClick(treatmentId)} />
+        <Button className="px-7" text="진료 받기" color="green" onClick={() => handleRTCClick(treatmentId)} />
       </div>
     </div>
   );

@@ -12,39 +12,40 @@ export const authAPI = {
   },
 
   // owner 회원가입
-  ownerSignup: async (userData: OwnerSignup) => {
-    const response = await apiClient.post('/public/signup/owner', userData);
+  ownerSignup: async (userData: OwnerSignup, authId: string) => {
+    console.log('OwneruserData', userData);
+    const response = await apiClient.post('/public/signup/owner', userData, {
+      params: {
+        authId: Number(authId),
+      },
+    });
     return response.data;
   },
 
   // vet 회원가입
-  vetSignup: async (userData: VetSignup) => {
-    const response = await apiClient.post('/public/signup/vet', userData);
+  vetSignup: async (userData: VetSignup, authId: string) => {
+    console.log('VetuserData', userData);
+    const response = await apiClient.post('/public/signup/vet', userData, {
+      params: {
+        authId: Number(authId),
+      },
+    });
     return response.data;
   },
 
   // staff 회원가입
-  staffSignup: async (userData: StaffSignup) => {
-    const response = await apiClient.post('/public/signup/staff', userData);
+  staffSignup: async (userData: StaffSignup, authId: string) => {
+    const response = await apiClient.post('/public/signup/staff', userData, {
+      params: {
+        authId: Number(authId),
+      },
+    });
     return response.data;
   },
 
-  // 토큰 저장
-  saveTokens: (accessToken: string, refreshToken?: string) => {
-    localStorage.setItem('accessToken', accessToken);
-    if (refreshToken) {
-      localStorage.setItem('refreshToken', refreshToken);
-    }
-  },
-
-  // 토큰 가져오기
-  getAccessToken: (): string | null => {
-    return localStorage.getItem('accessToken');
-  },
-
-  // 토큰 삭제 (로그아웃)
-  clearTokens: () => {
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
+  // 로그아웃
+  logout: async () => {
+    const response = await apiClient.post('/kakao/logout');
+    return response.data;
   },
 };

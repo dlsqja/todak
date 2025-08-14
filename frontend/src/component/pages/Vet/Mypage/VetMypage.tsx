@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+// src/component/pages/Vet/VetMypage.tsx
+import React, { useEffect, useState, useRef } from 'react';
 import '@/styles/main.css';
 import SimpleHeader from '@/component/header/SimpleHeader';
 import Input from '@/component/input/Input';
@@ -7,6 +8,21 @@ import { useNavigate } from 'react-router-dom';
 
 import { getVetMy, updateVetMy } from '@/services/api/Vet/vetmypage';
 import type { VetMyResponse } from '@/types/Vet/vetmypageType';
+import { authAPI } from '@/services/api/auth';
+import { motion } from 'framer-motion';
+
+const DEFAULT_PHOTO = '/images/person_default.png';
+
+// 렌더용 src 계산기: 절대 URL/데이터URL/상대경로 모두 대응
+const resolvePhotoSrc = (val?: string | null): string => {
+  if (!val) return DEFAULT_PHOTO;
+  const s = String(val).trim();
+  if (!s) return DEFAULT_PHOTO;
+  if (/^(https?:)?\/\//i.test(s)) return s;            // http(s):// or //cdn...
+  if (/^(data:|blob:)/i.test(s)) return s;             // data URL / blob
+  if (s.startsWith('/')) return s;                     // 절대 경로
+  return `/${s}`;                                      // 상대경로 -> 절대로
+};
 
 export default function VetMypage() {
   const navigate = useNavigate();
@@ -19,19 +35,60 @@ export default function VetMypage() {
   const [vetName, setVetName] = useState('');
   const [profile, setProfile] = useState('');
 
-  // 최초 로드: 내 정보 불러오기!!!
+  // 서버 전송용(원본 문자열)과 화면 표시용(src) 분리
+  const [photoRaw, setPhotoRaw] = useState<string>('');      // 서버로 보낼 값
+  const [photoSrc, setPhotoSrc] = useState<string>(DEFAULT_PHOTO); // img src
+
+  // 업로드/미리보기
+  const [profileImage, setProfileImage] = useState<File | null>(null);
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleLogout = async () => {
+    await authAPI.logout();
+    navigate(`/auth/`);
+  };
+
+  // 이미지 업로드 핸들러
+  const handleImageUpload = () => fileInputRef.current?.click();
+
+  // 이미지 제거: DB엔 저장하지 않음, 화면만 기본이미지로
+  const handleRemoveImage = () => {
+    setProfileImage(null);
+    setPreviewImage(null);
+    setPhotoRaw('');                // 전송값 비움(기본이미지는 저장 안 함)
+    setPhotoSrc(DEFAULT_PHOTO);     // 화면은 기본 이미지
+  };
+
+  // 파일 선택 -> 미리보기 세팅
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => setPreviewImage((e.target?.result as string) || null);
+    reader.readAsDataURL(file);
+    setProfileImage(file);
+  };
+
+  // 최초 로드: 내 정보 불러오기
   useEffect(() => {
     (async () => {
       try {
         setLoading(true);
         setError(null);
         const me: VetMyResponse = await getVetMy();
+
         setVetName(me?.name ?? '');
         setLicense(me?.license ?? '');
         setProfile(me?.profile ?? '');
+
+        const raw = me?.photo ?? '';
+        setPhotoRaw(raw);
+        setPhotoSrc(resolvePhotoSrc(raw));
       } catch (e) {
         console.error(e);
         setError('수의사 정보를 불러오지 못했어요!');
+        setPhotoSrc(DEFAULT_PHOTO);
       } finally {
         setLoading(false);
       }
@@ -39,51 +96,98 @@ export default function VetMypage() {
   }, []);
 
   const handleSubmit = async () => {
-  try {
-    setSaving(true);
-    setError(null);
+    try {
+      setSaving(true);
+      setError(null);
 
-    // 방어 코드: 필수값 체크!!!
-    if (!vetName.trim()) {
-      alert('수의사 이름을 입력해주세요!');
-      return;
+      if (!vetName.trim()) {
+        alert('수의사 이름을 입력해주세요!');
+        return;
+      }
+      if (!license.trim()) {
+        alert('면허번호가 없습니다! 관리자에게 문의해주세요!');
+        return;
+      }
+
+      // 기본 이미지는 DB에 저장하지 않음. 새 파일 있으면 파일명만 보냄.
+      const photoToSend = profileImage ? profileImage.name : (photoRaw || undefined);
+
+      await updateVetMy({
+        name: vetName.trim(),
+        license: license.trim(),
+        profile: profile.trim(),
+        photo: photoToSend, // undefined면 필드 생략되어 기본 유지
+      });
+
+      alert('수정이 완료되었습니다.');
+      navigate('/vet/mypage');
+    } catch (e) {
+      console.error(e);
+      setError('수정에 실패했어요. 잠시 후 다시 시도해주세요!');
+    } finally {
+      setSaving(false);
     }
-    if (!license.trim()) {
-      alert('면허번호가 없습니다! 관리자에게 문의해주세요!');
-      return;
-    }
-
-    await updateVetMy({
-      name: vetName.trim(),
-      license: license.trim(),   // ← ★ 여기 반드시 포함 ★
-      profile: profile.trim(),
-    });
-
-    alert('수정 완료!');
-    navigate('/vet/mypage');
-  } catch (e) {
-    console.error(e);
-    setError('수정에 실패했어요. 잠시 후 다시 시도해주세요!');
-  } finally {
-    setSaving(false);
-  }
-};
+  };
 
   return (
     <>
       <SimpleHeader text="마이페이지" />
       <div className="flex flex-col gap-6 px-7 mt-11">
-        {/* 병원코드 입력 제거 완료!!! */}
-        <Input id="license" label="면허번호" value={license} disabled />
+        <div>
+          <label className="block h4 text-black mb-2">프로필 사진</label>
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={handleFileChange}
+            accept="image/*"
+            className="hidden"
+          />
+          <div className="flex items-center gap-4">
+            <div className="w-22 h-22 bg-green-100 border-3 border-green-200 rounded-[12px] flex items-center justify-center overflow-hidden">
+              <img
+                src={previewImage || photoSrc}
+                alt="프로필 사진"
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  // 네트워크/경로 에러 시 기본 이미지로 폴백
+                  (e.currentTarget as HTMLImageElement).src = DEFAULT_PHOTO;
+                }}
+              />
+            </div>
+            <div className="flex flex-col gap-2">
+              <button
+                type="button"
+                className="text-white bg-green-300 px-4 py-1 rounded-xl h5 cursor-pointer"
+                onClick={handleImageUpload}
+                disabled={loading}
+              >
+                사진 등록
+              </button>
+              <button
+                type="button"
+                className="text-gray-400 bg-gray-100 px-4 py-1 rounded-xl h5 cursor-pointer"
+                onClick={handleRemoveImage}
+                disabled={loading}
+              >
+                사진 제거
+              </button>
+            </div>
+          </div>
+        </div>
+
         <Input
           id="name"
-          label="수의사 이름"
+          label="이름"
           value={vetName}
           onChange={(e) => setVetName(e.target.value)}
           disabled={loading}
         />
+        <Input id="license" label="면허번호" value={license} disabled />
+
         <div className="flex flex-col">
-          <label htmlFor="profile" className="mb-2 block h4 text-black">수의사 소개글</label>
+          <label htmlFor="profile" className="mb-2 block h4 text-black">
+            수의사 소개글
+          </label>
           <textarea
             id="profile"
             value={profile}
@@ -95,14 +199,21 @@ export default function VetMypage() {
           {error && <p className="caption text-red-500 mt-1">{error}</p>}
         </div>
       </div>
+
       <br />
       <div className="px-7">
         <Button text={saving ? '수정 중…' : '수정하기'} onClick={handleSubmit} color="green" />
       </div>
-      <div className="flex justify-center gap-2 mt-2">
-        <button className="h4 text-center text-gray-500 cursor-pointer">로그 아웃</button>
-        <span className="text-gray-500"> | </span>
-        <button className="h4 text-center text-gray-500 cursor-pointer">회원 탈퇴</button>
+
+      <div className="flex justify-center gap-2 mt-2 px-7">
+        <motion.button
+          className="h4 text-center text-gray-500 cursor-pointer"
+          onClick={handleLogout}
+          whileHover={{ scale: 1.05 }}
+          transition={{ duration: 0.2 }}
+        >
+          로그 아웃
+        </motion.button>
       </div>
     </>
   );

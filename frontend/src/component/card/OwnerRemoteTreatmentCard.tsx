@@ -25,7 +25,7 @@ const OwnerRemoteTreatmentCard: React.FC<RemoteTreatmentCardProps> = ({
 }) => {
   return (
     <div
-      className="w-full h-full bg-white rounded-[12px] shadow-[0px_5px_15px_rgba(0,0,0,0.08)] px-6 py-4 flex flex-col justify-between"
+      className="w-full h-full bg-white rounded-[12px] shadow-[0px_5px_15px_rgba(0,0,0,0.08)] px-6 py-4 flex flex-col justify-between cursor-pointer"
       onClick={onClick}
     >
       {/* 상단: 이미지 + 이름/정보 + 시간/과 */}

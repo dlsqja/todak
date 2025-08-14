@@ -21,20 +21,18 @@ const staffRoutes = {
     { path: 'reservation', element: <StaffReservation /> },
     { path: 'payment', element: <StaffPayment /> },
     { path: 'mypage', element: <StaffMypage /> },
-    
   ],
 };
 
 const staffRoutesWithoutMenu = {
   path: '/staff',
-    element: <MobileLayout />,
-    children: [
-      { path: 'home/guide', element: <StaffHomeGuide /> },
-
-      { path: 'hospital/info', element: <StaffHospitalInfo /> },
-      { path: 'hospital/vet', element: <StaffHospitalVet /> },
-      { path: 'reservation/detail', element: <StaffReservationDetail /> },
-    ],
+  element: <MobileLayout />,
+  children: [
+    { path: 'home/guide', element: <StaffHomeGuide /> },
+    { path: 'hospital/info', element: <StaffHospitalInfo /> },
+    { path: 'hospital/vet', element: <StaffHospitalVet /> },
+    { path: 'reservation/detail', element: <StaffReservationDetail /> },
+  ],
 };
 
 export default { staffRoutes, staffRoutesWithoutMenu };

@@ -5,6 +5,7 @@ import BackHeader from '@/component/header/BackHeader';
 import ImageInputBox from '@/component/input/ImageInputBox';
 import Input from '@/component/input/Input';
 import Button from '@/component/button/Button';
+import SelectionDropdown from '@/component/selection/SelectionDropdown';
 
 import { registerPet } from '@/services/api/Owner/ownerpet'; // ✅ API import
 
@@ -17,6 +18,7 @@ export default function OwnerPetRegister() {
   const [weight, setWeight] = useState('');
   const [gender, setGender] = useState(''); // 성별 + 중성화 여부
   const [type, setType] = useState('');
+  const [activeDropdownId, setActiveDropdownId] = useState<string | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement | null>(null); // file input에 접근하기 위한 ref
 
@@ -30,6 +32,21 @@ export default function OwnerPetRegister() {
   };
 
   const typeMap = { 강아지: 'DOG', 고양이: 'CAT', 기타: 'OTHER' }; // `DOG`, `CAT`, `OTHER`
+
+  // SelectionDropdown용 옵션 배열
+  const genderOptions = [
+    { value: '남', label: '남' },
+    { value: '여', label: '여' },
+    { value: '남(중성화)', label: '남(중성화)' },
+    { value: '여(중성화)', label: '여(중성화)' },
+    { value: '성별 없음', label: '성별 없음' },
+  ];
+
+  const typeOptions = [
+    { value: '강아지', label: '강아지' },
+    { value: '고양이', label: '고양이' },
+    { value: '기타', label: '기타' },
+  ];
 
   const handleImageChange = (newImage: File | null) => {
     setImage(newImage); // 선택된 이미지 파일을 상태로 저장
@@ -47,12 +64,13 @@ export default function OwnerPetRegister() {
     try {
       // genderMap을 통해 결합된 성별 + 중성화 여부 처리
       const genderValue = genderMap[gender];
+      const typeValue = typeMap[type]; // type도 변환
       console.log('type', type);
       const petRequest = {
         name,
         age: parseInt(age),
         gender: genderValue, // 변환된 gender 값
-        species: type, // 변환된 type 값
+        species: typeValue, // 변환된 type 값
         weight: parseFloat(weight),
       };
 
@@ -112,7 +130,7 @@ export default function OwnerPetRegister() {
             <Input
               id="weight"
               label="체중(kg)"
-              placeholder="예 : 4.1"
+              placeholder="0.0"
               value={weight}
               onChange={(e) => setWeight(e.target.value)}
             />
@@ -123,19 +141,15 @@ export default function OwnerPetRegister() {
               <label htmlFor="gender" className="h4 mb-2 text-black">
                 성별
               </label>
-              <select
+              <SelectionDropdown
                 id="gender"
-                className="w-full h-12 rounded-[12px] border border-gray-400 px-4 p text-black"
+                options={genderOptions}
+                placeholder="성별을 선택해주세요"
                 value={gender}
-                onChange={(e) => setGender(e.target.value)}
-              >
-                <option value="">선택</option>
-                <option value="남">남</option>
-                <option value="여">여</option>
-                <option value="남(중성화)">남(중성화)</option>
-                <option value="여(중성화)">여(중성화)</option>
-                <option value="성별 없음">성별 없음</option>
-              </select>
+                onChange={setGender}
+                activeId={activeDropdownId}
+                setActiveId={setActiveDropdownId}
+              />
             </div>
           </div>
 
@@ -143,17 +157,15 @@ export default function OwnerPetRegister() {
             <label htmlFor="type" className="h4 mb-2 text-black">
               종
             </label>
-            <select
+            <SelectionDropdown
               id="type"
-              className="w-full h-12 rounded-[12px] border border-gray-400 px-4 p text-black"
+              options={typeOptions}
+              placeholder="반려동물 종을 선택해주세요"
               value={type}
-              onChange={(e) => setType(e.target.value)}
-            >
-              <option value="">반려동물 종을 선택해주세요</option>
-              <option value="DOG">강아지</option>
-              <option value="CAT">고양이</option>
-              <option value="OTHER">기타</option>
-            </select>
+              onChange={setType}
+              activeId={activeDropdownId}
+              setActiveId={setActiveDropdownId}
+            />
           </div>
         </div>
 

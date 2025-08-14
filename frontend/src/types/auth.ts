@@ -12,21 +12,23 @@ interface KakaoLoginParams {
 // 반려인 회원가입
 interface OwnerSignup {
   name: string;
-  phone: number;
-  birth: number;
+  phone: string; // "010-1234-5678"
+  birth: string; // "YYYY-MM-DD"
 }
 
 // 수의사 회원가입
 interface VetSignup {
-  hospital_code: number;
   name: string;
-  license_number: number;
+  license: string;
+  hospitalCode: string;
+  profile: string;
+  photo: string;
 }
 
 // 병원 관계자 회원가입
 interface StaffSignup {
-  hospital_code: number;
   name: string;
+  hospitalCode: string;
 }
 
 export type { KakaoLoginParams, LoginResponse, OwnerSignup, VetSignup, StaffSignup };

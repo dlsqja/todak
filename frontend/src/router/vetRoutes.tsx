@@ -6,7 +6,6 @@ import VetTreatment from '@/component/pages/Vet/Treatment/VetTreatment';
 import VetRecord from '@/component/pages/Vet/Record/VetRecordHome';
 import VetRecordDetail from '@/component/pages/Vet/Record/VetRecordDetail';
 import VetMyPage from '@/component/pages/Vet/Mypage/VetMypage';
-import VetTreatmentDetail from '@/component/pages/Vet/Treatment/VetTreatmentDetail';
 import VetHomeGuide from '@/component/pages/Vet/Home/VetHomeGuide';
 import VetRTC from '@/RTC/VetRTC';
 
@@ -27,7 +26,7 @@ const vetRoutesWithoutMenu = {
   children: [
     { path: 'home/guide', element: <VetHomeGuide /> },
 
-    { path: 'treatment/detail/:reservationId', element: <VetTreatmentDetail /> },
+    // { path: 'treatment/detail/:reservationId', element: <VetTreatmentDetail /> },
     { path: 'treatment/rtc/', element: <VetRTC /> },
     { path: 'records/detail/:treatmentId', element: <VetRecordDetail /> },
   ],

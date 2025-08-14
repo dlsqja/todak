@@ -58,12 +58,11 @@ export default function OwnerRTC() {
       const ok = await checkRoom(sessionIdRef.current);
       if (!ok || cancelled) return; // ← 실패하면 즉시 종료
 
-      // const wsProtocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
-      // const wsUrl =
-      //   wsProtocol === 'wss'
-      //     ? `${wsProtocol}://${window.location.host}/ws`
-      //     : `${wsProtocol}://localhost:8080/api/v1/ws`;
-      const wsUrl = 'wss://70.12.246.252/ws';
+      const wsProtocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+      const wsUrl =
+        wsProtocol === 'wss'
+          ? `${wsProtocol}://${window.location.host}/ws`
+          : `${wsProtocol}://localhost:8080/api/v1/ws`;
 
       const ws = new WebSocket(wsUrl);
       socket.current = ws;

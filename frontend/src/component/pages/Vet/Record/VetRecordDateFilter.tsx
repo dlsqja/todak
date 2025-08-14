@@ -152,7 +152,7 @@ export default function VetRecordDateFilter({ data = [], onCardClick }: Props) {
           <h3 className="text-gray-600 text-center">{loading ? '불러오는 중…' : '날짜를 선택해주세요.'}</h3>
         ) : (
           <>
-            <div className="flex justify-between items-center mb-2">
+            <div className="flex justify-between items-center">
               <h4 className="h4 text-black">{formatKoreanDate(selectedDate)}</h4>
               <h4 className="h4 text-black">{selectedList.length}건</h4>
             </div>

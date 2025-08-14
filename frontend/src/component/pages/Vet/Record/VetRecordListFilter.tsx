@@ -3,9 +3,9 @@ import React, { useEffect, useMemo, useState } from 'react';
 import '@/styles/main.css';
 import SelectionDropdown from '@/component/selection/SelectionDropdown';
 import TreatmentSlideCard from '@/component/card/TreatmentSlideCard';
-import type { VetTreatment } from '@/types/Vet/vettreatmentType';
+import type { VetTreatment, VetTreatmentDetail } from '@/types/Vet/vettreatmentType';
 import { toTimeRange } from '@/utils/timeMapping';
-import { getVetTreatmentDetail } from '@/services/api/Vet/vettreatment';
+import { getVetTreatments, getVetTreatmentDetail } from '@/services/api/Vet/vettreatment';
 
 const signedOptions = [
   { value: 'ALL', label: '전체 상태' },
@@ -50,8 +50,17 @@ const makeInfo = (t: any) => {
   return [species, agePart, subject].filter(Boolean).join(' | ');
 };
 
+// ✅ 실제 시작시간이 있는지(문자열이고 날짜로 파싱 가능) 체크
+const hasRealStartTime = (it: any): boolean => {
+  const s = it?.startTime ?? it?.start_time;
+  if (typeof s !== 'string' || !s.trim()) return false;
+  const norm = s.replace(' ', 'T').replace(/\.\d+$/, '');
+  const d = new Date(norm);
+  return !isNaN(d.getTime());
+};
+
 interface Props {
-  data?: VetTreatment[];
+  data?: VetTreatment[];           // 비어있으면 내부에서 type=2 호출
   onCardClick: (id: number) => void;
 }
 
@@ -59,66 +68,71 @@ export default function VetRecordListFilter({ data = [], onCardClick }: Props) {
   const [selectedSigned, setSelectedSigned] =
     useState<'ALL' | 'true' | 'false'>('ALL');
 
-  // 🔧 리스트 데이터 보정본 (상세 호출로 start/end를 실제 시간으로 덮어쓰기)
-  const [enriched, setEnriched] = useState<any[]>(data as any[]);
+  // 원본/보강본
+  const [base, setBase] = useState<any[]>([]);
+  const [enriched, setEnriched] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
 
+  // ▶ 데이터 로드: props.data가 비어 있으면 type=2(전체 진료) 로드
   useEffect(() => {
     let alive = true;
-
     (async () => {
-      // 처음엔 원본 그대로 반영
-      setEnriched(data as any[]);
-
-      // 숫자 슬롯처럼 보이는 항목들만 선별
-      const needFix = (data as any[]).filter(
-        (it) => typeof (it as any).startTime === 'number' || typeof (it as any).endTime === 'number'
-      );
-
-      if (needFix.length === 0) return;
-
       try {
-        const ids = needFix.map((it: any) => it.treatmentId);
-        const details = await Promise.all(
-          ids.map((id) => getVetTreatmentDetail(id).catch(() => null))
-        );
-        const map = new Map<number, any>();
-        ids.forEach((id, i) => {
-          const d = details[i];
-          if (d) map.set(id, d);
+        setLoading(true);
+
+        const initialList =
+          (data && data.length > 0) ? (data as any[]) : ((await getVetTreatments(2)) as any[]);
+
+        if (!alive) return;
+        setBase(initialList);
+
+        // 모든 treatmentId 상세 병렬 로딩 (DateFilter와 동일)
+        const ids = Array.from(new Set(initialList.map((x: any) => x.treatmentId))).filter(Boolean);
+        if (ids.length === 0) {
+          if (alive) setEnriched(initialList);
+          return;
+        }
+
+        const results = await Promise.allSettled(ids.map((id) => getVetTreatmentDetail(id)));
+        if (!alive) return;
+
+        const dmap = new Map<number, VetTreatmentDetail>();
+        results.forEach((r, i) => {
+          if (r.status === 'fulfilled' && r.value) dmap.set(ids[i], r.value as VetTreatmentDetail);
         });
 
-        const merged = (data as any[]).map((it) => {
-          const d = map.get(it.treatmentId);
+        // 상세로 보강 병합(시간/펫/과목/완료여부 우선)
+        const merged = initialList.map((it: any) => {
+          const d = dmap.get(it.treatmentId);
           if (!d) return it;
-
           return {
             ...it,
-            // 상세의 실제 시간을 우선 적용
             startTime: d.startTime ?? d.start_time ?? it.startTime,
-            endTime: d.endTime ?? d.end_time ?? it.endTime,
-            // 동물/과목/완료 여부도 최대한 보강
-            pet: it.pet ?? it.petInfo ?? d.pet ?? d.petInfo,
-            petInfo: it.petInfo ?? d.petInfo ?? d.pet,
-            subject: it.subject ?? d.subject,
+            endTime:   d.endTime   ?? d.end_time   ?? it.endTime,
+            pet:       it.pet ?? it.petInfo ?? d.pet ?? d.petInfo,
+            petInfo:   it.petInfo ?? d.petInfo ?? d.pet,
+            subject:   it.subject ?? d.subject,
             isCompleted:
               (it.isCompleted ?? it.is_completed) ??
-              (d.isCompleted ?? d.is_completed),
+              (d.isCompleted  ?? d.is_completed),
           };
         });
 
-        if (alive) setEnriched(merged);
+        setEnriched(merged);
       } catch (e) {
-        console.warn('[VetRecordListFilter] enrich failed:', e);
-        if (alive) setEnriched(data as any[]);
+        console.warn('[VetRecordListFilter] load/enrich failed:', e);
+        if (alive) {
+          setBase(data as any[]);
+          setEnriched(data as any[]);
+        }
+      } finally {
+        if (alive) setLoading(false);
       }
     })();
-
-    return () => {
-      alive = false;
-    };
+    return () => { alive = false; };
   }, [data]);
 
-  // 1) 서명상태 필터 → 2) 최신 시작시간(desc) 정렬
+  // 1) 서명상태 필터 → 2) ✅ 시작시간 없는 항목 제거 → 3) 최신 시작시간(desc)
   const filteredData = useMemo(() => {
     let list = [...enriched];
 
@@ -129,6 +143,9 @@ export default function VetRecordListFilter({ data = [], onCardClick }: Props) {
       );
     }
 
+    // ✅ 시작시간 없는 항목 제외
+    list = list.filter(hasRealStartTime);
+
     list.sort((a: any, b: any) => {
       const sa = a.startTime ?? a.start_time ?? '';
       const sb = b.startTime ?? b.start_time ?? '';
@@ -138,7 +155,7 @@ export default function VetRecordListFilter({ data = [], onCardClick }: Props) {
     return list as VetTreatment[];
   }, [enriched, selectedSigned]);
 
-  // 날짜별 그룹핑 + 각 날짜 내부는 시간 오름차순
+  // 날짜별 그룹핑 + 각 날짜 내부는 시간 내림차순(최근 먼저)
   const grouped = useMemo(() => {
     const map = new Map<string, VetTreatment[]>();
     for (const it of filteredData as any[]) {
@@ -150,23 +167,19 @@ export default function VetRecordListFilter({ data = [], onCardClick }: Props) {
 
     const entries = Array.from(map.entries()).sort((a, b) => b[0].localeCompare(a[0]));
     for (const [, arr] of entries as any) {
-  const getTs = (x: any) => {
-    // 1) 문자열 시간 → 타임스탬프
-    const s = x.startTime ?? x.start_time ?? '';
-    if (typeof s === 'string' && s) {
-      const norm = s.replace(' ', 'T').replace(/\.\d+$/, '');
-      const d = new Date(norm);
-      if (!isNaN(d.getTime())) return d.getTime();
+      const getTs = (x: any) => {
+        const s = x.startTime ?? x.start_time ?? '';
+        if (typeof s === 'string' && s) {
+          const norm = s.replace(' ', 'T').replace(/\.\d+$/, '');
+          const d = new Date(norm);
+          if (!isNaN(d.getTime())) return d.getTime();
+        }
+        const slot = x.reservationTime ?? x.reservation_time;
+        if (Number.isFinite(slot)) return Number(slot) * 30 * 60 * 1000;
+        return 0;
+      };
+      arr.sort((a: any, b: any) => getTs(b) - getTs(a));
     }
-    // 2) 슬롯 숫자(0~47)면 30분 단위로 환산(하루 기준 상대값)
-    const slot = x.reservationTime ?? x.reservation_time;
-    if (Number.isFinite(slot)) return Number(slot) * 30 * 60 * 1000;
-    return 0;
-  };
-
-  // ✅ 같은 날짜 내에서 최근(큰 시간) 먼저
-  arr.sort((a: any, b: any) => getTs(b) - getTs(a));
-}
     return entries as [string, VetTreatment[]][];
   }, [filteredData]);
 
@@ -178,16 +191,15 @@ export default function VetRecordListFilter({ data = [], onCardClick }: Props) {
             options={signedOptions as any}
             value={selectedSigned}
             onChange={(v) => setSelectedSigned(v as any)}
-            placeholder="서명상태 선택"
+            placeholder={loading ? '불러오는 중…' : '서명상태 선택'}
           />
         </div>
       </div>
 
       <div className="px-7">
         {grouped.map(([dateKey, items]) => (
-          <div key={dateKey} className="mb-5">
-            {/* 날짜 헤더: 좌측=진료 일자, 우측=해당 날짜 건수 */}
-            <div className="flex justify-between items-center mb-2">
+          <div key={dateKey} className="mb-5 mt-1">
+            <div className="flex justify-between items-center mb-3">
               <h4 className="h4 text-black">{formatKoreanDate(dateKey)}</h4>
               <h4 className="h4 text-black">{items.length}건</h4>
             </div>
@@ -206,10 +218,10 @@ export default function VetRecordListFilter({ data = [], onCardClick }: Props) {
                 return (
                   <TreatmentSlideCard
                     key={t.treatmentId}
-                    time={timeRange}               // "10:00 - 10:30"
-                    department={subject}           // 과목
-                    petName={petName}              // 반려동물 이름
-                    petInfo={info}                 // "종류 | 나이세 | 과목"
+                    time={timeRange}
+                    department={subject}
+                    petName={petName}
+                    petInfo={info}
                     isAuthorized={true}
                     is_signed={!!(t.isCompleted ?? t.is_completed)}
                     onClick={() => onCardClick(t.treatmentId)}

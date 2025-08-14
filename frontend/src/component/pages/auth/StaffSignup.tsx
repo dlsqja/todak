@@ -3,11 +3,12 @@ import '@/styles/main.css';
 import BackHeader from '@/component/header/BackHeader';
 import Input from '@/component/input/Input';
 import Button from '@/component/button/Button';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { authAPI } from '@/services/api/auth';
 
-export default function VetSignup() {
+export default function StaffSignup() {
   const navigate = useNavigate();
+  const { authId } = useParams();
   const [hospitalCode, setHospitalCode] = useState('');
   const [name, setName] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -23,7 +24,13 @@ export default function VetSignup() {
     if (!value.trim()) {
       setErrors((prev) => ({
         ...prev,
-        [fieldName]: `${fieldName === 'hospitalCode' ? '병원 코드를 입력해주세요.' : '이름을 입력해주세요.'}`,
+        [fieldName]: `${
+          fieldName === 'hospitalCode'
+            ? '병원 코드를 입력해주세요.'
+            : fieldName === 'name'
+            ? '이름을 입력해주세요.'
+            : ''
+        }`,
       }));
     } else {
       // 모든 검사를 통과하면 에러 제거
@@ -44,24 +51,55 @@ export default function VetSignup() {
   };
 
   const handleSubmit = async () => {
-    // 최종 유효성 검사
-    validateField('hospitalCode', hospitalCode);
-    validateField('name', name);
+    // 직접 유효성 검사 수행
+    const hospitalCodeError = !hospitalCode.trim() ? '병원 코드를 입력해주세요.' : '';
+    const nameError = !name.trim() ? '이름을 입력해주세요.' : '';
 
-    // 에러가 있으면 제출 중단
-    if (errors.hospitalCode || errors.name || !hospitalCode.trim() || !name.trim()) {
+    // 에러가 있으면 상태 업데이트 후 중단
+    if (hospitalCodeError || nameError) {
+      setErrors({
+        hospitalCode: hospitalCodeError,
+        name: nameError,
+      });
+      console.log('유효성 검사 실패');
       return;
     }
 
-    setIsLoading(true);
-    try {
-      await authAPI.staffSignup({
-        hospital_code: hospitalCode.trim(),
-        name: name.trim(),
-      });
+    // 유효성 검사 통과 시 진행
+    console.log('유효성 검사 통과');
 
-      alert('회원가입이 완료되었습니다!');
-      navigate('/vet/home');
+    setIsLoading(true);
+
+    // authId 확인
+    const urlParams = window.location.pathname.split('/');
+    const authId = urlParams[3];
+    console.log('pathname', urlParams);
+    console.log('authId', authId);
+
+    if (!authId) {
+      console.log('authId from useParams:', authId);
+      alert('인증 정보가 없습니다. 다시 로그인해주세요.');
+      setIsLoading(false);
+      return;
+    }
+    console.log('hospitalCode', hospitalCode);
+    try {
+      const response = await authAPI.staffSignup(
+        {
+          hospitalCode: hospitalCode.trim(),
+          name: name.trim(),
+        },
+        authId,
+      );
+
+      console.log('response', response);
+
+      if (response.message === '성공') {
+        alert('병원 관계자 가입이 완료되었습니다!');
+        navigate('/staff/home');
+      } else {
+        alert('병원 관계자 가입에 실패했습니다. 다시 시도해주세요.');
+      }
     } catch (error) {
       console.error('회원가입 실패:', error);
       alert('회원가입에 실패했습니다. 다시 시도해주세요.');
@@ -85,7 +123,12 @@ export default function VetSignup() {
           />
           <div className="flex justify-between gap-1">
             {errors.hospitalCode && <p className="text-red-500 caption mt-1 ml-2">{errors.hospitalCode}</p>}
-            <p className="text-gray-500 caption mt-1 ml-2 cursor-pointer">병원코드가 없으신가요?</p>
+            <p
+              className="text-gray-500 caption mt-1 ml-2 cursor-pointer"
+              onClick={() => alert('병원 담당자에게 문의하세요')}
+            >
+              병원코드가 없으신가요?
+            </p>
           </div>
         </div>
         <div>

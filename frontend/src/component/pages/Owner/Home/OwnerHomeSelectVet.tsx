@@ -10,10 +10,25 @@ import type { VetPublic, WorkingHourResponse } from '@/types/Owner/ownerhomeType
 import type { OwnerTreatmentsByPet, OwnerTreatmentItem } from '@/types/Owner/ownertreatmentType';
 import { timeMapping } from '@/utils/timeMapping';
 
-const dayIdxToCode: ('SUN'|'MON'|'TUE'|'WED'|'THU'|'FRI'|'SAT')[] =
-  ['SUN','MON','TUE','WED','THU','FRI','SAT'];
-const dayCodeToKo: Record<string,string> = {
-  SUN:'일', MON:'월', TUE:'화', WED:'수', THU:'목', FRI:'금', SAT:'토'
+const photoUrl = import.meta.env.VITE_PHOTO_URL;
+
+const dayIdxToCode: ('SUN' | 'MON' | 'TUE' | 'WED' | 'THU' | 'FRI' | 'SAT')[] = [
+  'SUN',
+  'MON',
+  'TUE',
+  'WED',
+  'THU',
+  'FRI',
+  'SAT',
+];
+const dayCodeToKo: Record<string, string> = {
+  SUN: '일',
+  MON: '월',
+  TUE: '화',
+  WED: '수',
+  THU: '목',
+  FRI: '금',
+  SAT: '토',
 };
 
 type RecentVet = VetPublic;
@@ -62,11 +77,11 @@ export default function SelectVetPage() {
     (async () => {
       try {
         const buckets: OwnerTreatmentsByPet[] = await getTreatments();
-        const bucket = buckets.find(b => b.petResponse?.petId === pet.petId);
+        const bucket = buckets.find((b) => b.petResponse?.petId === pet.petId);
         const items: OwnerTreatmentItem[] = bucket?.treatments ?? [];
 
         // 필터 전 행 구성
-        const rowsAll = items.map(t => {
+        const rowsAll = items.map((t) => {
           const info: any = (t as any).treatementInfo ?? (t as any).treatmentInfo ?? {};
           return {
             vetName: t.vetName ?? '',
@@ -79,19 +94,19 @@ export default function SelectVetPage() {
         // 병원명이 있으면 현재 병원과 일치해야 하고,
         // 병원명이 없으면 vetName만으로 일단 통과(후단에서 vets 목록으로 교차검증)
         const rows = rowsAll
-          .filter(x => x.vetName && x.ts > 0 && (x.eqHospital || !x.hospitalName))
+          .filter((x) => x.vetName && x.ts > 0 && (x.eqHospital || !x.hospitalName))
           .sort((a, b) => b.ts - a.ts);
 
         // 수의사명 기준 중복 제거
         const seen = new Set<string>();
         const uniqueNames = rows
-          .filter(r => (seen.has(norm(r.vetName)) ? false : (seen.add(norm(r.vetName)), true)))
-          .map(r => r.vetName)
+          .filter((r) => (seen.has(norm(r.vetName)) ? false : (seen.add(norm(r.vetName)), true)))
+          .map((r) => r.vetName)
           .slice(0, 5);
 
         // 현재 병원 수의사 목록과 교차검증 → 카드 표시용 데이터
         const recent = uniqueNames
-          .map(name => vets.find(v => norm(v.name) === norm(name)))
+          .map((name) => vets.find((v) => norm(v.name) === norm(name)))
           .filter(Boolean) as RecentVet[];
 
         setRecentVets(recent);
@@ -108,20 +123,16 @@ export default function SelectVetPage() {
   // 오늘 근무시간 표시
   const renderTodayWork = (wh?: WorkingHourResponse[]) => {
     if (!wh || wh.length === 0) return `(${todayKo}) 근무정보 없음`;
-    const today = wh.find(w => w.day === todayCode);
+    const today = wh.find((w) => w.day === todayCode);
     if (!today) return `(${todayKo}) 근무정보 없음`;
 
     const start = timeMapping[today.startTime] ?? '';
     const end = timeMapping[today.endTime] ?? '';
-    return (start && end)
-      ? `(${todayKo}) ${start}~${end}`
-      : `(${todayKo}) 근무정보 없음`;
+    return start && end ? `(${todayKo}) ${start}~${end}` : `(${todayKo}) 근무정보 없음`;
   };
 
   // 검색(수의사명)
-  const filtered = vets.filter(v =>
-    !search.trim() || v.name.toLowerCase().includes(search.trim().toLowerCase())
-  );
+  const filtered = vets.filter((v) => !search.trim() || v.name.toLowerCase().includes(search.trim().toLowerCase()));
 
   const handleClick = (vet: VetPublic) => {
     navigate('/owner/home/vet-info', { state: { hospital, pet, vet } });
@@ -131,9 +142,7 @@ export default function SelectVetPage() {
     <div className="min-h-screen pb-4">
       <BackHeader text="수의사 선택" />
       <div className="px-7 py-6">
-        <p className="p text-black mb-4 text-center">
-          {hospital?.name}의 수의사를 선택해주세요.
-        </p>
+        <p className="p text-black mb-4 text-center">{hospital?.name}의 수의사를 선택해주세요.</p>
 
         <SearchInput placeholder="수의사명" value={search} onChange={setSearch} />
 
@@ -141,15 +150,14 @@ export default function SelectVetPage() {
         <div className="mt-8">
           <h4 className="p text-black mb-3">최근 진료받은 수의사</h4>
           <div className="bg-gray-50 rounded-xl overflow-hidden">
-            {recentVets.length === 0 && (
-              <div className="p-4 text-gray-400">최근 진료 이력이 없습니다.</div>
-            )}
-            {recentVets.map(v => (
+            {recentVets.length === 0 && <div className="p-4 text-gray-400">최근 진료 이력이 없습니다.</div>}
+            {recentVets.map((v) => (
               <SearchListItem
                 key={`recent-${v.vetId}`}
                 name={v.name}
                 description={renderTodayWork(v.workingHours)}
                 onClick={() => handleClick(v)}
+                imageUrl={v.photo ? `${photoUrl}${v.photo}` : ''}
               />
             ))}
           </div>
@@ -160,15 +168,14 @@ export default function SelectVetPage() {
           <div className="mt-6">
             <h4 className="p text-black mb-3">검색 결과</h4>
             <div className="bg-gray-50 rounded-xl overflow-hidden">
-              {filtered.length === 0 && (
-                <div className="p-4 text-gray-400">검색 결과가 없습니다.</div>
-              )}
-              {filtered.map(v => (
+              {filtered.length === 0 && <div className="p-4 text-gray-400">검색 결과가 없습니다.</div>}
+              {filtered.map((v) => (
                 <SearchListItem
                   key={`search-${v.vetId}`}
                   name={v.name}
                   description={renderTodayWork(v.workingHours)}
                   onClick={() => handleClick(v)}
+                  imageUrl={v.photo ? `${photoUrl}${v.photo}` : ''}
                 />
               ))}
             </div>
@@ -180,15 +187,14 @@ export default function SelectVetPage() {
           <div className="mt-6">
             <h4 className="p text-black mb-3">수의사 목록</h4>
             <div className="bg-gray-50 rounded-xl overflow-hidden">
-              {vets.length === 0 && (
-                <div className="p-4 text-gray-400">등록된 수의사가 없습니다.</div>
-              )}
-              {vets.map(v => (
+              {vets.length === 0 && <div className="p-4 text-gray-400">등록된 수의사가 없습니다.</div>}
+              {vets.map((v) => (
                 <SearchListItem
                   key={`all-${v.vetId}`}
                   name={v.name}
                   description={renderTodayWork(v.workingHours)}
                   onClick={() => handleClick(v)}
+                  imageUrl={v.photo ? `${photoUrl}${v.photo}` : ''}
                 />
               ))}
             </div>
