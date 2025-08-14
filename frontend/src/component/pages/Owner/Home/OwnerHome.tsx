@@ -151,7 +151,7 @@ export default function OwnerHome() {
       {/* 펫이 없을 때 안내 메시지 */}
       {petList.length === 0 && (
         <motion.div
-          className="flex flex-col items-center justify-center h-[40vh] gap-6 text-center mx-7"
+          className="w-full h-[140px] rounded-[16px] bg-white shadow-[0px_5px_15px_rgba(0,0,0,0.08)]  flex items-center px-5 py-5 gap-6"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3, duration: 0.4 }}
