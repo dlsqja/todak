@@ -11,6 +11,8 @@ import { getVetsByHospitalId, getVetClosingHours } from '@/services/api/Owner/ow
 import type { VetPublic, WorkingHourResponse } from '@/types/Owner/ownerhomeType';
 import { timeMapping } from '@/utils/timeMapping';
 
+const photoUrl = import.meta.env.VITE_PHOTO_URL;
+
 const dayMap = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'] as const;
 
 // 🔹 "HH:mm" -> 슬롯 인덱스 매핑
@@ -42,7 +44,9 @@ export default function VetInfoPage() {
     name: string;
     location?: string;
     profile?: string;
+    photo?: string;
   };
+  console.log(hospital);
   const passedVet = location.state?.vet as VetPublic | undefined;
 
   const [vet, setVet] = useState<VetPublic | null>(passedVet ?? null);
@@ -125,13 +129,13 @@ export default function VetInfoPage() {
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <BackHeader text="수의사 정보" />
 
-      <div className="flex-1 overflow-y-auto px-7 py-6 flex flex-col gap-3">
+      <div className="flex-1 px-7 py-6 flex flex-col gap-3 overflow-y-auto h-full">
         {/* 프로필 */}
-        <div className="w-full h-[200px] bg-gray-100 rounded-[12px] flex items-center justify-center text-gray-400 overflow-hidden">
+        <div className="w-full h-[200px] bg-gray-100 rounded-[12px] overflow-hidden">
           {vet?.photo ? (
-            <img src={vet.photo} alt={vet.name} className="w-full h-full object-cover" />
+            <img src={`${photoUrl}${vet.photo}`} alt={vet.name} className="w-full h-full object-cover" />
           ) : (
-            '수의사 프로필 사진'
+            <img src="/images/person_default.png" alt="수의사 프로필 사진" className="w-full h-full object-contain" />
           )}
         </div>
 
@@ -153,7 +157,7 @@ export default function VetInfoPage() {
         <SingleContent title="병원 정보" content={hospital?.profile || '병원 소개글이 없습니다.'} />
         <SingleContent title="병원 위치" content={hospital?.location || '병원 주소가 없습니다.'} />
 
-        <div>
+        <div className="flex flex-col gap-3 mt-3">
           <h4 className="h4 mb-2">진료 가능 시간</h4>
           <TimeSelectionButton
             start_time={todayRange?.startText || '09:00'}
@@ -161,7 +165,7 @@ export default function VetInfoPage() {
             // ✅ 근무시간 내부에서 closing 제외한 목록만 전달 → 비활성화가 자동 반영
             available_times={todayRange?.usableTimes ?? []}
           />
-          <div className="px-7 bg-gray-50">
+          <div className="bg-gray-50">
             <Button color="green" text="진료 신청서 작성하러 가기" onClick={handleSubmit} />
           </div>
         </div>

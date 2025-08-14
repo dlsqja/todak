@@ -10,13 +10,14 @@ import { getStaffHospitalReservations } from '@/services/api/Staff/staffreservat
 import { timeMapping, toLocalHHmm } from '@/utils/timeMapping';
 import { speciesMapping } from '@/utils/speciesMapping';
 import { genderMapping } from '@/utils/genderMapping';
+import { FiChevronRight } from 'react-icons/fi';
 
 type HomeCardItem = {
   reservationId?: number;
   vet_name: string;
-  time: string;           // "HH:mm"
-  pet: string;            // 펫 이름
-  petinfo: string;        // "강아지 / 3세 / 여(중성화)"
+  time: string; // "HH:mm"
+  pet: string; // 펫 이름
+  petinfo: string; // "강아지 / 3세 / 여(중성화)"
 };
 
 const toHHmm = (val: unknown): string => {
@@ -70,15 +71,17 @@ export default function StaffHome() {
             const petName = r?.pet?.name ?? r?.petName ?? '반려동물';
             // 펫 상세 (종 / 나이 / 성별)
             const speciesRaw = r?.pet?.species ?? r?.petSpecies;
-            const speciesLabel =
-              speciesRaw ? (speciesMapping[String(speciesRaw) as keyof typeof speciesMapping] ?? String(speciesRaw)) : undefined;
+            const speciesLabel = speciesRaw
+              ? speciesMapping[String(speciesRaw) as keyof typeof speciesMapping] ?? String(speciesRaw)
+              : undefined;
 
             const ageRaw = r?.pet?.age ?? r?.petAge;
             const ageLabel = typeof ageRaw === 'number' ? `${ageRaw}세` : undefined;
 
             const genderRaw = r?.pet?.gender ?? r?.petGender;
-            const genderLabel =
-              genderRaw ? (genderMapping[String(genderRaw) as keyof typeof genderMapping] ?? String(genderRaw)) : undefined;
+            const genderLabel = genderRaw
+              ? genderMapping[String(genderRaw) as keyof typeof genderMapping] ?? String(genderRaw)
+              : undefined;
 
             const petinfo = [speciesLabel, ageLabel, genderLabel].filter(Boolean).join(' / ');
 
@@ -119,10 +122,11 @@ export default function StaffHome() {
       <h3 className="h3 mx-7 mb-2">어플 사용이 처음이신가요?</h3>
       <button
         onClick={() => navigate('/staff/home/guide')}
-        className="h5 mx-7 px-5 py-1 rounded-full inline-block 
-        bg-green-300 text-green-100 hover:bg-green-200 transition"
+        className="h4 mx-7 px-6 py-2 rounded-full inline-block bg-green-300 hover:bg-green-400 text-green-100 cursor-pointer"
       >
-        {guideText}
+        <div className="flex items-center gap-3">
+          {guideText} <FiChevronRight className="w-4 h-4" />
+        </div>
       </button>
 
       <h3 className="mx-7 h3 mt-11">{title}</h3>
