@@ -3,6 +3,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import BackHeader from '@/component/header/BackHeader';
 import SearchInput from '@/component/input/SearchInput';
+import DropdownArrow from '@/component/icon/Dropdown_Arrow';
 
 import { getPublicHospitals, autocompleteHospitals } from '@/services/api/Owner/ownerhome';
 import { getTreatments } from '@/services/api/Owner/ownertreatment';
@@ -24,10 +25,14 @@ export default function SelectHospitalPage() {
   const [visibleHospitalCount, setVisibleHospitalCount] = useState(6);
   const [visibleRecentCount, setVisibleRecentCount] = useState(6);
   const [visibleSuggestCount, setVisibleSuggestCount] = useState(6);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const pet = location.state?.pet; // { petId, ... }
   const abortRef = useRef<AbortController | null>(null);
+  const recentLoadMoreRef = useRef<HTMLDivElement>(null);
+  const suggestLoadMoreRef = useRef<HTMLDivElement>(null);
+  const hospitalLoadMoreRef = useRef<HTMLDivElement>(null);
 
   // 정렬용 timestamp (오타/누락 방어)
   const getSortTimestamp = (t: OwnerTreatmentItem) => {
@@ -120,6 +125,72 @@ export default function SelectHospitalPage() {
     })();
   }, [pet?.petId, hospitals]);
 
+  // 무한스크롤 - 최근 방문한 병원
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && !isLoadingMore && recents.length > visibleRecentCount) {
+          setIsLoadingMore(true);
+          setTimeout(() => {
+            setVisibleRecentCount((prev) => prev + 6);
+            setIsLoadingMore(false);
+          }, 300);
+        }
+      },
+      { threshold: 0.1 },
+    );
+
+    if (recentLoadMoreRef.current) {
+      observer.observe(recentLoadMoreRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, [visibleRecentCount, recents.length, isLoadingMore]);
+
+  // 무한스크롤 - 검색 결과
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && !isLoadingMore && suggests.length > visibleSuggestCount) {
+          setIsLoadingMore(true);
+          setTimeout(() => {
+            setVisibleSuggestCount((prev) => prev + 6);
+            setIsLoadingMore(false);
+          }, 300);
+        }
+      },
+      { threshold: 0.1 },
+    );
+
+    if (suggestLoadMoreRef.current) {
+      observer.observe(suggestLoadMoreRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, [visibleSuggestCount, suggests.length, isLoadingMore]);
+
+  // 무한스크롤 - 병원 전체 목록
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && !isLoadingMore && hospitals.length > visibleHospitalCount) {
+          setIsLoadingMore(true);
+          setTimeout(() => {
+            setVisibleHospitalCount((prev) => prev + 6);
+            setIsLoadingMore(false);
+          }, 300);
+        }
+      },
+      { threshold: 0.1 },
+    );
+
+    if (hospitalLoadMoreRef.current) {
+      observer.observe(hospitalLoadMoreRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, [visibleHospitalCount, hospitals.length, isLoadingMore]);
+
   // 자동완성 (검색창에 글자 있을 때만 결과 섹션 보이고, 없으면 전체 목록 섹션 보임)
   const debouncedSearch = useMemo(() => {
     let t: number | undefined;
@@ -191,13 +262,8 @@ export default function SelectHospitalPage() {
               </div>
             ))}
             {recents.length > visibleRecentCount && (
-              <div className="p-4 text-center">
-                <button
-                  className="text-green-400 p cursor-pointer hover:text-green-500"
-                  onClick={() => setVisibleRecentCount((prev) => prev + 6)}
-                >
-                  더보기
-                </button>
+              <div ref={recentLoadMoreRef} className="p-4 text-center">
+                <span className="text-gray-400 p">{isLoadingMore ? '로딩 중...' : '더보기'}</span>
               </div>
             )}
           </div>
@@ -223,13 +289,8 @@ export default function SelectHospitalPage() {
                 </div>
               ))}
               {suggests.length > visibleSuggestCount && (
-                <div className="p-4 text-center">
-                  <button
-                    className="text-green-400 p cursor-pointer hover:text-green-500"
-                    onClick={() => setVisibleSuggestCount((prev) => prev + 6)}
-                  >
-                    더보기
-                  </button>
+                <div ref={suggestLoadMoreRef} className="p-4 text-center">
+                  <span className="text-green-400 p">{isLoadingMore ? '로딩 중...' : '더보기'}</span>
                 </div>
               )}
             </div>
@@ -255,13 +316,8 @@ export default function SelectHospitalPage() {
                 </div>
               ))}
               {hospitals.length > visibleHospitalCount && (
-                <div className="p-4 text-center">
-                  <p
-                    className="text-gray-400 p cursor-pointer"
-                    onClick={() => setVisibleHospitalCount((prev) => prev + 6)}
-                  >
-                    더보기
-                  </p>
+                <div ref={hospitalLoadMoreRef} className="p-4 text-center">
+                  <span className="text-gray-400 p">{isLoadingMore ? '로딩 중...' : '더보기'}</span>
                 </div>
               )}
             </div>
