@@ -157,19 +157,19 @@ export default function VetSignup() {
       return;
     }
 
-    // 프로필 이미지 처리 - 선택하지 않으면 빈 문자열로 저장
-    const photoToSend = profileImage ? profileImage.name : '';
+    // FormData 구성
+    const formdata = new FormData();
+    formdata.append('name', name.trim());
+    formdata.append('license', licenseNumber.trim());
+    formdata.append('hospitalCode', hospitalCode.trim());
+    formdata.append('profile', profile.trim() || '안녕하세요. 수의사입니다.');
+    if (profileImage) {
+      formdata.append('photo', profileImage); // 파일 첨부
+    } else {
+      formdata.append('photo', new Blob([], { type: 'application/octet-stream' }));
+    }
 
-    const response = await authAPI.vetSignup(
-      {
-        name: name.trim(),
-        license: licenseNumber.trim(),
-        hospitalCode: hospitalCode.trim(),
-        profile: profile.trim() || '안녕하세요. 수의사입니다.',
-        photo: photoToSend,
-      },
-      authId,
-    );
+    const response = await authAPI.vetSignup(formdata, authId);
 
     console.log('response', response);
 

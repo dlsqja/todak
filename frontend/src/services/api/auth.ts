@@ -1,6 +1,6 @@
 // src/api/auth.ts
 import apiClient from '@/plugins/axios';
-import type { LoginResponse, KakaoLoginParams, OwnerSignup, VetSignup, StaffSignup } from '@/types/auth';
+import type { LoginResponse, KakaoLoginParams, OwnerSignup, StaffSignup } from '@/types/auth';
 
 export const authAPI = {
   // 카카오 로그인
@@ -22,13 +22,11 @@ export const authAPI = {
     return response.data;
   },
 
-  // vet 회원가입
-  vetSignup: async (userData: VetSignup, authId: string) => {
-    console.log('VetuserData', userData);
-    const response = await apiClient.post('/public/signup/vet', userData, {
-      params: {
-        authId: Number(authId),
-      },
+  // vet 회원가입 (multipart/form-data)
+  vetSignup: async (formData: FormData, authId: string) => {
+    const response = await apiClient.post('/public/signup/vet', formData, {
+      params: { authId: Number(authId) },
+      headers: { 'Content-Type': 'multipart/form-data' },
     });
     return response.data;
   },
