@@ -1,11 +1,11 @@
-package com.A409.backend.global.pay.kakao.controller;
+package com.A409.backend.domain.pay.kakao.controller;
 
 import com.A409.backend.global.enums.ErrorCode;
 import com.A409.backend.global.exception.CustomException;
-import com.A409.backend.global.pay.kakao.dto.KakaoPayRequest;
-import com.A409.backend.global.pay.kakao.dto.KakaoReadyRequest;
-import com.A409.backend.global.pay.kakao.dto.KakaoReadyResponse;
-import com.A409.backend.global.pay.kakao.service.KakaoPayService;
+import com.A409.backend.domain.pay.kakao.dto.KakaoPayRequest;
+import com.A409.backend.domain.pay.kakao.dto.KakaoReadyRequest;
+import com.A409.backend.domain.pay.kakao.dto.KakaoReadyResponse;
+import com.A409.backend.domain.pay.kakao.service.KakaoPayService;
 import com.A409.backend.global.redis.RedisService;
 import com.A409.backend.global.response.APIResponse;
 import lombok.RequiredArgsConstructor;

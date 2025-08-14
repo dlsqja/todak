@@ -113,10 +113,14 @@ public class VetTreatmentController {
 
     @Operation(summary = "수의사 비대면 진료 종료", description = "통화 종료 버튼을 누르면, session을 삭제합니다.")
     @DeleteMapping("/end/{treatment_id}")
-    public APIResponse<?> endTreatment(@PathVariable("treatment_id") Long treatment_id) {
-        String cacheKey = "treatment" + treatment_id;
+    public APIResponse<?> endTreatment(@PathVariable("treatment_id") Long treatmentId) {
+        String cacheKey = "treatment" + treatmentId;
         redisService.deleteByKey(cacheKey);
-        treatmentService.updateEndTime(treatment_id);
+        treatmentService.endTreatment(treatmentId);
+        File file = new File("/audio/audio-"+treatmentId+".webm");
+
+        aiClient.uploadAudio(treatmentId, file);
+
         return APIResponse.ofSuccess(null);
     }
 

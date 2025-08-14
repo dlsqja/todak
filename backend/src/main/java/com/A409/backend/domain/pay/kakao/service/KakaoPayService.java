@@ -1,10 +1,10 @@
-package com.A409.backend.global.pay.kakao.service;
+package com.A409.backend.domain.pay.kakao.service;
 
+import com.A409.backend.domain.pay.kakao.dto.*;
 import com.A409.backend.domain.user.owner.entity.Owner;
 import com.A409.backend.domain.user.owner.repository.OwnerRepository;
 import com.A409.backend.global.enums.ErrorCode;
 import com.A409.backend.global.exception.CustomException;
-import com.A409.backend.global.pay.kakao.dto.*;
 import com.A409.backend.global.redis.RedisService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
@@ -13,8 +13,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.LinkedHashMap;

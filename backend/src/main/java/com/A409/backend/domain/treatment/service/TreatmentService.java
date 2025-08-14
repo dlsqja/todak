@@ -1,8 +1,6 @@
 package com.A409.backend.domain.treatment.service;
 
-import com.A409.backend.domain.hospital.dto.HospitalResponse;
 import com.A409.backend.domain.pet.dto.PetResponse;
-import com.A409.backend.domain.pet.entity.Pet;
 import com.A409.backend.domain.pet.service.PetService;
 import com.A409.backend.domain.reservation.entity.Reservation;
 import com.A409.backend.domain.reservation.repository.ReservationRepository;
@@ -12,11 +10,12 @@ import com.A409.backend.domain.treatment.entity.TreatmentResponse;
 import com.A409.backend.domain.treatment.repository.TreatmentRepository;
 import com.A409.backend.domain.user.vet.dto.VetResponse;
 import com.A409.backend.domain.user.vet.dto.WorkingHourDto;
-import com.A409.backend.domain.user.vet.entity.WorkingHour;
 import com.A409.backend.domain.user.vet.service.WorkingHourService;
 import com.A409.backend.global.enums.ErrorCode;
 import com.A409.backend.global.enums.ReservationStatus;
 import com.A409.backend.global.exception.CustomException;
+import com.A409.backend.domain.pay.kakao.entity.Payment;
+import com.A409.backend.domain.pay.kakao.repository.PaymentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,6 +34,7 @@ public class TreatmentService {
     private final PetService petService;
     private final WorkingHourService workingHourService;
     private final ReservationRepository reservationRepository;
+    private final PaymentRepository paymentRepository;
 
     public void saveAISummary(Long treatmentId,String summary){
 
@@ -212,15 +212,22 @@ public class TreatmentService {
         treatmentRepository.save(treatment);
     }
 
-    // Endtime 업데이트 하면서 reservation을 진료 완료로 변환.
+    // Endtime 업데이트 하면서 reservation을 진료 완료로 변환 및 payment 테이블 생성.
     @Transactional
-    public void updateEndTime(Long treatmentId){
+    public void endTreatment(Long treatmentId){
         Treatment treatment = treatmentRepository.findByTreatmentId(treatmentId).orElseThrow(() -> new CustomException(ErrorCode.RESOURCE_NOT_FOUND));
         treatment.setEndTime(LocalDateTime.now());
         treatmentRepository.save(treatment);
         Reservation reservation = treatment.getReservation();
         reservation.setStatus(ReservationStatus.COMPLETED);
         reservationRepository.save(reservation);
+        Payment newPayment = Payment.builder()
+                .treatment(treatment)
+                .hospital(treatment.getHospital())
+                .owner(treatment.getOwner())
+                .build();
+
+        paymentRepository.save(newPayment);
     }
 
 }

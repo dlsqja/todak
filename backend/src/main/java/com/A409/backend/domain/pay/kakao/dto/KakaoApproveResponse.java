@@ -1,4 +1,4 @@
-package com.A409.backend.global.pay.kakao.dto;
+package com.A409.backend.domain.pay.kakao.dto;
 
 import lombok.Getter;
 import lombok.Setter;
