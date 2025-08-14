@@ -1,57 +1,58 @@
-// src/component/pages/Owner/Home/OwnerHomePaymentMethod.tsx
-
 import React, { useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import BackHeader from '@/component/header/BackHeader';
 import Button from '@/component/button/Button';
-import { createReservation } from '@/services/api/Owner/ownerreservation';
-import type { CreateOwnerReservationData } from '@/types/Owner/ownerreservationType';
+import apiClient from '@/plugins/axios';
 
 export default function PaymentMethodPage() {
   const navigate = useNavigate();
-  const { state } = useLocation() as {
-    state?: { draft?: CreateOwnerReservationData; photo?: File | null };
-  };
-
-  const draft = state?.draft;
-  const photo = state?.photo ?? null;
-
   const [loading, setLoading] = useState(false);
 
-  const handleClick = async () => {
-    if (!draft) {
-      alert('신청 데이터가 없습니다. 처음부터 다시 진행해주세요!');
-      return navigate(-1);
-    }
-
+  const startZeroAuth = async () => {
     try {
       setLoading(true);
-      await createReservation(draft, photo ?? undefined); // FormData: { data: Blob(JSON), photo?: File }
-      navigate('/owner/home/apply-complete');
-    } catch (e) {
-      console.error(e);
-      alert('신청에 실패했어요. 잠시 후 다시 시도해주세요!');
+      const origin = window.location.origin;
+
+      // 서버가 카카오페이 /v1/payment/ready를 "금액 0원"으로 호출해
+      // next_redirect_pc_url(or mobile_url)을 redirectUrl로 내려준다고 가정
+      const data = await apiClient.post('/public/pay/ready/1', {
+        successUrl: `${origin}/owner/home/payment/success`,
+        cancelUrl: `${origin}/owner/home/payment/cancel`,
+        failUrl: `${origin}/owner/home/payment/fail`,
+      });
+
+      console.log(data.data.data);
+      const redirectUrl: string | undefined = data.data.data;
+      if (!redirectUrl) throw new Error('redirectUrl 누락');
+
+      // 카카오 결제창으로 이동(0원 인증)
+      window.location.href = redirectUrl;
+    } catch (err) {
+      console.error(err);
+      alert('카카오페이 연결에 실패했습니다. 잠시 후 다시 시도해주세요.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      <BackHeader text="결제 수단 선택" />
-
-      <div className="px-7 py-6 flex-1 overflow-y-auto flex flex-col gap-6">
-        <p>결제 API 내용</p>
-        {/* 필요하면 디버깅용 드랩트 확인 */}
-        {/* <pre className="text-xs text-gray-500">{JSON.stringify(draft, null, 2)}</pre> */}
+    <div className="bg-gray-50 flex flex-col">
+      <BackHeader text="결제수단 등록" />
+      <div className="px-7 py-6 flex-1 overflow-y-auto flex flex-col gap-4">
+        <h2 className="text-xl font-semibold">자동결제용 결제수단 등록</h2>
+        <p className="text-gray-600 text-sm leading-6">
+          최초 1회 0원 인증만 진행하고, 정기결제 키(SID)만 발급받습니다.
+          <br />
+          이후 결제는 등록된 SID로 자동으로 청구됩니다.
+        </p>
       </div>
 
-      {/* 하단 버튼 */}
-      <div className="px-6">
+      <div className="px-6 pb-6">
         <Button
           color="green"
-          text={loading ? '신청 중…' : '진료 신청하기'}
-          onClick={handleClick}
+          text={loading ? '연결 중…' : '카카오페이로 인증'}
+          onClick={startZeroAuth}
+          disabled={loading}
         />
       </div>
     </div>

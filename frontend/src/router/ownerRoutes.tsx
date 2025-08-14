@@ -18,6 +18,9 @@ import ApplyCompletePage from '@/component/pages/Owner/Home/OwnerHomeApplyComple
 import OwnerHomeGuide from '@/component/pages/Owner/Home/OwnerHomeGuide';
 import TreatmentDetailPage from '@/component/pages/Owner/Pet/OwnerPetTabRecordDetail';
 import OwnerRTC from '@/RTC/OwnerRTC';
+import PaymentSuccessPage from '@/component/pages/Owner/Home/OwnerHomePaymentSuccess';
+import PaymentCancelPage from '@/component/pages/Owner/Home/OwnerHomePaymentCancel';
+import PaymentFailPage from '@/component/pages/Owner/Home/OwnerHomePaymentFail';
 
 const ownerRoutes = {
   path: '/owner',
@@ -40,6 +43,9 @@ const ownerRoutesWithoutMenu = {
     { path: 'home/vet-info', element: <VetInfoPage /> },
     { path: 'home/form', element: <ApplyFormPage /> },
     { path: 'home/payment', element: <PaymentMethodPage /> },
+    { path: 'home/payment/success', element: <PaymentSuccessPage /> },
+    { path: 'home/payment/cancel', element: <PaymentCancelPage /> },
+    { path: 'home/payment/fail', element: <PaymentFailPage /> },
     { path: 'home/apply-complete', element: <ApplyCompletePage /> },
     { path: 'home/guide', element: <OwnerHomeGuide /> },
 
