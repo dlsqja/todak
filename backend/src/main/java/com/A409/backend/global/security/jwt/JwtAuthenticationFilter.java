@@ -34,7 +34,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String path = request.getRequestURI();
-        log.info(path);
 
         if (isPermitAllPath(path)) {
             filterChain.doFilter(request, response);
@@ -68,7 +67,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             Long id = jwtService.getUserId(token);
             String username = jwtService.getUsername(token);
             String role = jwtService.getRole(token);
-            log.info("sender id : {}, role : {}",id,role);
+            log.info("sender id : {}, role : {} url : {}",id,role,path);
             String cacheKey = "blacklist:" + id;
             List<String> cachedTokens = (List<String>) redisService.getByKey(cacheKey);
 

@@ -66,8 +66,6 @@ public class KakaoAuthService {
                 Map.class
         );
 
-        log.info("user info response: {}", response.getBody());
-
         return response.getBody();
     }
 

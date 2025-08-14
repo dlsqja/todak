@@ -28,7 +28,6 @@ public class OwnerController {
     @GetMapping
     public APIResponse<?> getOwnerInfo(@AuthenticationPrincipal User user){
 
-        log.info(String.valueOf(user.getId()));
         OwnerResponse ownerResponse = ownerService.getOwnerInfo(user.getId());
 
         return APIResponse.ofSuccess(ownerResponse);

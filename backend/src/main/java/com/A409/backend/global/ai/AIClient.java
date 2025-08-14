@@ -53,9 +53,14 @@ public class AIClient {
         body.put("max_tokens", 1000);
 
         List<Map<String, String>> messages = new ArrayList<>();
-        messages.add(Map.of("role", "system", "content",
-                "당신은 전문 수의사이자 작문 전문가입니다. 진료 과정에서 일어난 의사의 대사를 환자가 이해하기 쉬운 말로 친절하게 요약해 주세요. " +
-                        "전문 용어는 풀어서 설명하고, 중요한 정보는 꼭 넣되 필요하지 않은 정보는 빼고 환자가 이해하기 쉽게 해주세요. 한국어로 답변하세요."));
+        messages.add(Map.of(
+                "role", "system",
+                "content",
+                "당신은 전문 수의사이자 작문 전문가입니다. " +
+                        "진료 과정에서 일어난 의사의 대사를 환자가 이해하기 쉬운 말로 친절하게 요약해 주세요. " +
+                        "전문 용어는 풀어서 설명하고, 중요한 정보는 꼭 넣되 필요하지 않은 정보는 빼고 환자가 이해하기 쉽게 해주세요. " +
+                        "출력 시 서두 문구 없이, 요약된 내용만 바로 작성하세요. 한국어로 답변하세요."
+        ));
         messages.add(Map.of("role", "user", "content", content));
         body.put("messages", messages);
 
