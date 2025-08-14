@@ -1,5 +1,5 @@
 // src/component/pages/Owner/Home/OwnerHomeSelectHospital.tsx
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import BackHeader from '@/component/header/BackHeader';
 import SearchInput from '@/component/input/SearchInput';
@@ -24,6 +24,7 @@ export default function SelectHospitalPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const pet = location.state?.pet; // { petId, ... }
+  const abortRef = useRef<AbortController | null>(null);
 
   // 정렬용 timestamp (오타/누락 방어)
   const getSortTimestamp = (t: OwnerTreatmentItem) => {
@@ -121,25 +122,32 @@ useEffect(() => {
 
   // 자동완성 (검색창에 글자 있을 때만 결과 섹션 보이고, 없으면 전체 목록 섹션 보임)
   const debouncedSearch = useMemo(() => {
-    let t: any;
+    let t: number | undefined;
     return (q: string) => {
-      clearTimeout(t);
-      t = setTimeout(async () => {
+      if (t) window.clearTimeout(t);
+      t = window.setTimeout(async () => {
         try {
-          if (!q.trim()) {
+          const keyword = q.trim();
+          // 직전 요청 취소
+          abortRef.current?.abort();
+          abortRef.current = new AbortController();
+
+          if (!keyword) {
             setSuggests([]);
             return;
           }
-          const s = await autocompleteHospitals(q.trim());
+          
+          const s = await autocompleteHospitals(keyword, { signal: abortRef.current.signal });
           setSuggests(s);
-        } catch (e) {
+        } catch (e: any) {
+          if (e?.name === 'CanceledError' || e?.name === 'AbortError') return;
           console.warn('자동완성 실패:', e);
           setSuggests([]);
         }
       }, 250);
     };
   }, []);
-
+  
   useEffect(() => { debouncedSearch(search); }, [search, debouncedSearch]);
 
   const handleHospitalClick = (h: { hospitalId?: number; name: string; location?: string }) => {
