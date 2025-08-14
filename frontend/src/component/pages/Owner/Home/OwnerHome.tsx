@@ -120,7 +120,7 @@ export default function OwnerHome() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1, duration: 0.4 }}
       >
-        <span className="h3-black text-green-300">{ownerName ? `${ownerName}님  ` : '사용자 님 '}</span>
+        <span className="h3-black text-green-400">{ownerName ? `${ownerName}님  ` : '사용자 님 '}</span>
         <span className="h3-black text-black">반가워요!</span>
       </motion.h3>
 
