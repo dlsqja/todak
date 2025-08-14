@@ -89,7 +89,22 @@ pipeline {
             credentialsId: 'gms_cred',
             usernameVariable: 'GMS',
             passwordVariable: 'GMS_KEY'
-          )
+          ),
+          usernamePassword(
+            credentialsId: 'kakaopay_host',
+            usernameVariable: 'KAKAOPAY',
+            passwordVariable: 'KAKAOPAY_HOST'
+          ),
+          usernamePassword(
+            credentialsId: 'kakaopay_dev_key',
+            usernameVariable: 'KAKAOPAY_KEY',
+            passwordVariable: 'KAKAOPAY_DEV_KEY'
+          ),
+          usernamePassword(
+            credentialsId: 'kakaopay_cid_dev',
+            usernameVariable: 'KAKAOPAY_CID',
+            passwordVariable: 'KAKAOPAY_DEV_CID'
+          ),
         ]) {
           sh '''
             chmod 600 "$KEYFILE"
@@ -111,6 +126,10 @@ pipeline {
             echo "KAKAO_SECRET=$KAKAO_SECRET" >> ${COMPOSE_DIR}/.env
 
             echo "GMS_KEY=$GMS_KEY" >> ${COMPOSE_DIR}/.env
+
+            echo "KAKAOPAY_HOST=$KAKAOPAY_HOST" >> ${COMPOSE_DIR}/.env
+            echo "KAKAOPAY_DEV_KEY=$KAKAOPAY_DEV_KEY" >> ${COMPOSE_DIR}/.env
+            echo "KAKAOPAY_DEV_CID=$KAKAOPAY_DEV_CID" >> ${COMPOSE_DIR}/.env
 
             scp -i "$KEYFILE" -o StrictHostKeyChecking=no ${COMPOSE_DIR}/.env $EC2_USERNAME@$EC2_HOST:/home/$EC2_USERNAME/
 
