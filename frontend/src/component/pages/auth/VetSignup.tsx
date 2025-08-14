@@ -259,13 +259,13 @@ export default function VetSignup() {
                 사진 제거
               </button>
             </div>
+            <div className="px-7 mt-6">
+              <Button text={isLoading ? '등록 중...' : '등록하기'} onClick={handleSubmit} color="green" />
+            </div>
           </div>
         </div>
       </div>
       <br />
-      <div className="px-7 mt-6">
-        <Button text={isLoading ? '등록 중...' : '등록하기'} onClick={handleSubmit} color="green" />
-      </div>
     </>
   );
 }
