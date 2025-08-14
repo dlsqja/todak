@@ -44,26 +44,26 @@ export default function VetHospital() {
   }, []);
 
   const handleSubmit = async () => {
-  try {
-    setSaving(true);
-    setError(null);
+    try {
+      setSaving(true);
+      setError(null);
 
-    await updateHospitalMine({
-      name,                 // 기존 값
-      location: address,    // 백엔드 키는 location (UI 라벨은 "위치")
-      contact,              // 기존 값
-      profile,              // 수정한 값
-    });
+      await updateHospitalMine({
+        name, // 기존 값
+        location: address, // 백엔드 키는 location (UI 라벨은 "위치")
+        contact, // 기존 값
+        profile, // 수정한 값
+      });
 
-    alert('수정 완료!');
-    navigate('/vet/hospital');
-  } catch (e) {
-    console.error(e);
-    setError('수정에 실패했어요. 잠시 후 다시 시도해주세요.');
-  } finally {
-    setSaving(false);
-  }
-};
+      alert('수정 완료!');
+      navigate('/vet/hospital');
+    } catch (e) {
+      console.error(e);
+      setError('수정에 실패했어요. 잠시 후 다시 시도해주세요.');
+    } finally {
+      setSaving(false);
+    }
+  };
 
   return (
     <>
@@ -71,7 +71,8 @@ export default function VetHospital() {
       <div className="flex flex-col gap-6 px-7 mt-11">
         {/* 병원코드: API에 없으므로 고정 ‘—’로 표기 */}
 
-        <Input id="name" label="병원 이름" value={name} disabled />        <Input id="address" label="위치" value={address} disabled />
+        <Input id="name" label="병원 이름" value={name} disabled />
+        <Input id="address" label="위치" value={address} disabled />
         <Input id="contact" label="전화번호" value={contact} disabled />
 
         <div className="flex flex-col">

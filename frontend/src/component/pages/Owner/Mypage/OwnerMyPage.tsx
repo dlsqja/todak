@@ -3,6 +3,7 @@ import '@/styles/main.css';
 import SimpleHeader from '@/component/header/SimpleHeader';
 import Input from '@/component/input/Input';
 import Button from '@/component/button/Button';
+import SelectionDropdown from '@/component/selection/SelectionDropdown';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getOwnerInfo, updateOwnerInfo } from '@/services/api/Owner/ownermypage';
@@ -14,6 +15,10 @@ export default function OwnerMyPage() {
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [birth, setBirth] = useState('');
+  const [birthYear, setBirthYear] = useState('');
+  const [birthMonth, setBirthMonth] = useState('');
+  const [birthDay, setBirthDay] = useState('');
+  const [activeDropdownId, setActiveDropdownId] = useState<string | null>(null);
 
   const [isLoading, setIsLoading] = useState(true);
 
@@ -40,21 +45,38 @@ export default function OwnerMyPage() {
     }
   };
 
-  // 생년월일 8자리 제한
-  const formatBirthDate = (value: string) => {
-    // 숫자만 추출
-    const numbers = value.replace(/[^\d]/g, '');
-    // 8자리로 제한
-    const limitedNumbers = numbers.slice(0, 8);
+  // 오늘 날짜 및 옵션 생성
+  const today = new Date();
+  const currentYear = today.getFullYear();
+  const currentMonth = today.getMonth() + 1;
+  const currentDay = today.getDate();
 
-    // 길이에 따라 점 추가
-    if (limitedNumbers.length <= 4) {
-      return limitedNumbers;
-    } else if (limitedNumbers.length <= 6) {
-      return `${limitedNumbers.slice(0, 4)}.${limitedNumbers.slice(4)}`;
-    } else {
-      return `${limitedNumbers.slice(0, 4)}.${limitedNumbers.slice(4, 6)}.${limitedNumbers.slice(6)}`;
+  // 년도 옵션 (2025 ~ 1900)
+  const yearOptions = [] as { value: string; label: string }[];
+  for (let year = 2025; year >= 1900; year--) {
+    yearOptions.push({ value: year.toString(), label: `${year}년` });
+  }
+
+  // 월 옵션 (1 ~ 12)
+  const getMonthOptions = () => {
+    const months = [] as { value: string; label: string }[];
+    for (let month = 1; month <= 12; month++) {
+      months.push({ value: month.toString(), label: `${month}월` });
     }
+    return months;
+  };
+
+  // 일 옵션 (선택된 연/월의 마지막 날까지)
+  const getDayOptions = () => {
+    if (!birthYear || !birthMonth) return [] as { value: string; label: string }[];
+    const year = parseInt(birthYear);
+    const month = parseInt(birthMonth);
+    const daysInMonth = new Date(year, month, 0).getDate();
+    const days = [] as { value: string; label: string }[];
+    for (let day = 1; day <= daysInMonth; day++) {
+      days.push({ value: day.toString(), label: `${day}일` });
+    }
+    return days;
   };
 
   // 실시간 유효성 검사 (길이 검사 추가)
@@ -83,14 +105,14 @@ export default function OwnerMyPage() {
           }));
           return;
         }
-      }
 
-      if (fieldName === 'birth') {
-        const numbers = value.replace(/[^\d]/g, '');
-        if (numbers.length !== 8) {
+        // 휴대폰 번호 앞 세자리 유효성 검사 (Signup과 동일)
+        const validPrefixes = ['010', '011', '016', '017', '018', '019'];
+        const prefix = numbers.substring(0, 3);
+        if (!validPrefixes.includes(prefix)) {
           setErrors((prev) => ({
             ...prev,
-            [fieldName]: '생년월일을 올바르게 입력해주세요.',
+            [fieldName]: '올바른 휴대폰 번호를 입력해주세요.',
           }));
           return;
         }
@@ -110,20 +132,30 @@ export default function OwnerMyPage() {
       setName(data.name);
       // 백엔드에서 받은 데이터를 포맷팅해서 화면에 표시
       setPhone(formatPhoneNumber(data.phone));
-      setBirth(formatBirthDate(data.birth));
+      // 생년월일 파싱(가정: YYYY-MM-DD 형태)
+      if (data.birth) {
+        const parts = String(data.birth).split(/[-./]/);
+        const y = parts[0] || '';
+        const m = parts[1] || '';
+        const d = parts[2] || '';
+        setBirthYear(y);
+        setBirthMonth(m.replace(/^0/, ''));
+        setBirthDay(d.replace(/^0/, ''));
+        setBirth(`${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`);
+      }
       setIsLoading(false);
     };
     fetchOwner();
   }, []);
 
   if (isLoading) {
-    
     return (
       <>
-    <SimpleHeader text="마이페이지" />
-    <div className="h4 text-center mt-76 text-gray-400">불러오는 중...</div>
+        <SimpleHeader text="마이페이지" />
+        <div className="h4 text-center mt-76 text-gray-400">불러오는 중...</div>
       </>
-  )}
+    );
+  }
 
   // 입력값 변경 핸들러
   const handleInputChange = (fieldName: string, value: string) => {
@@ -132,34 +164,108 @@ export default function OwnerMyPage() {
       const formattedValue = formatPhoneNumber(value);
       setPhone(formattedValue);
     }
-    if (fieldName === 'birth') {
-      const formattedValue = formatBirthDate(value);
-      setBirth(formattedValue);
-    }
 
     // 실시간 유효성 검사
-    validateField(
-      fieldName,
-      fieldName === 'phone' ? formatPhoneNumber(value) : fieldName === 'birth' ? formatBirthDate(value) : value,
-    );
+    validateField(fieldName, fieldName === 'phone' ? formatPhoneNumber(value) : value);
+  };
+
+  // 생년월일 Select 변경 핸들러 (Signup과 동일 동작)
+  const handleBirthChange = (type: 'year' | 'month' | 'day', value: string) => {
+    let updatedYear = birthYear;
+    let updatedMonth = birthMonth;
+    let updatedDay = birthDay;
+
+    if (type === 'year') {
+      setBirthYear(value);
+      updatedYear = value;
+      // 년도 변경 시 월, 일 초기화
+      setBirthMonth('');
+      setBirthDay('');
+      updatedMonth = '';
+      updatedDay = '';
+    } else if (type === 'month') {
+      setBirthMonth(value);
+      updatedMonth = value;
+      // 월 변경 시 일 초기화
+      setBirthDay('');
+      updatedDay = '';
+    } else if (type === 'day') {
+      setBirthDay(value);
+      updatedDay = value;
+    }
+
+    // birth 상태 업데이트
+    if (updatedYear && updatedMonth && updatedDay) {
+      const newBirth = `${updatedYear}-${updatedMonth.padStart(2, '0')}-${updatedDay.padStart(2, '0')}`;
+      setBirth(newBirth);
+      // 생년월일 유효성 검사
+      validateBirthDate(updatedYear, updatedMonth, updatedDay);
+    } else {
+      // 부분적으로라도 선택되었을 때 미래 날짜 체크
+      if (updatedYear && updatedMonth && type === 'month') {
+        const selectedYear = parseInt(updatedYear);
+        const selectedMonth = parseInt(updatedMonth);
+        const todayNow = new Date();
+        const curYear = todayNow.getFullYear();
+        const curMonth = todayNow.getMonth() + 1;
+        if (selectedYear === curYear && selectedMonth > curMonth) {
+          setErrors((prev) => ({ ...prev, birth: '날짜가 올바르지 않습니다.' }));
+        } else {
+          setErrors((prev) => ({ ...prev, birth: '' }));
+        }
+      } else if (updatedYear && updatedMonth && updatedDay && type === 'day') {
+        validateBirthDate(updatedYear, updatedMonth, updatedDay);
+      } else {
+        // 에러 초기화 (년도만 선택되었거나 빈 값으로 초기화된 경우)
+        setErrors((prev) => ({ ...prev, birth: '' }));
+      }
+    }
+  };
+
+  // 생년월일 유효성 검사 (Signup 동일)
+  const validateBirthDate = (year: string, month: string, day: string) => {
+    if (!year || !month || !day) {
+      setErrors((prev) => ({ ...prev, birth: '생년월일을 모두 선택해주세요.' }));
+      return;
+    }
+    const selectedDate = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+    const todayZero = new Date();
+    todayZero.setHours(0, 0, 0, 0);
+    if (selectedDate > todayZero) {
+      setErrors((prev) => ({ ...prev, birth: '날짜가 올바르지 않습니다.' }));
+      return;
+    }
+    setErrors((prev) => ({ ...prev, birth: '' }));
   };
 
   const handleSubmit = async () => {
     // 직접 유효성 검사 수행
     const nameError = !name.trim() ? '이름을 입력해주세요.' : '';
     const phoneNumbers = phone.replace(/[^\d]/g, '');
-    const phoneError = !phone.trim()
-      ? '휴대폰 번호를 입력해주세요.'
-      : phoneNumbers.length !== 11
-      ? '휴대폰 번호를 올바르게 입력해주세요.'
-      : '';
+    let phoneError = '';
+    if (!phone.trim()) {
+      phoneError = '휴대폰 번호를 입력해주세요.';
+    } else if (phoneNumbers.length !== 11) {
+      phoneError = '휴대폰 번호를 올바르게 입력해주세요.';
+    } else {
+      const validPrefixes = ['010', '011', '012', '013', '017', '019'];
+      const prefix = phoneNumbers.substring(0, 3);
+      if (!validPrefixes.includes(prefix)) {
+        phoneError = '올바른 휴대폰 번호를 입력해주세요.';
+      }
+    }
 
-    const birthNumbers = birth.replace(/[^\d]/g, '');
-    const birthError = !birth.trim()
-      ? '생년월일을 입력해주세요.'
-      : birthNumbers.length !== 8
-      ? '생년월일을 올바르게 입력해주세요.'
-      : '';
+    let birthError = '';
+    if (!birthYear || !birthMonth || !birthDay) {
+      birthError = '생년월일을 모두 선택해주세요.';
+    } else {
+      const selectedDate = new Date(parseInt(birthYear), parseInt(birthMonth) - 1, parseInt(birthDay));
+      const todayZero = new Date();
+      todayZero.setHours(0, 0, 0, 0);
+      if (selectedDate > todayZero) {
+        birthError = '날짜가 올바르지 않습니다';
+      }
+    }
 
     // 에러가 있으면 상태 업데이트 후 중단
     if (nameError || phoneError || birthError) {
@@ -173,8 +279,8 @@ export default function OwnerMyPage() {
     }
 
     try {
-      // 백엔드로 전송할 때는 둘 다 하이픈 포함 문자열로 전송
-      const formattedBirth = `${birthNumbers.slice(0, 4)}-${birthNumbers.slice(4, 6)}-${birthNumbers.slice(6, 8)}`; // YYYY-MM-DD
+      // 백엔드로 전송할 때는 YYYY-MM-DD로 전송 (드롭다운 선택 기준)
+      const formattedBirth = `${birthYear}-${birthMonth.padStart(2, '0')}-${birthDay.padStart(2, '0')}`; // YYYY-MM-DD
 
       const payload = {
         name: name.trim(),
@@ -212,14 +318,39 @@ export default function OwnerMyPage() {
           {errors.name && <p className="text-red-500 caption mt-1 ml-2">{errors.name}</p>}
         </div>
         <div>
-          <Input
-            id="birth"
-            label="생년월일"
-            placeholder="생년월일 8자리를 입력해주세요"
-            value={birth}
-            onChange={(e) => handleInputChange('birth', e.target.value)}
-            disabled={false}
-          />
+          <label className="block h4 text-black mb-2">생년월일</label>
+          <div className="flex gap-2">
+            <SelectionDropdown
+              id="birth-year"
+              options={yearOptions}
+              placeholder="년도"
+              value={birthYear}
+              onChange={(value) => handleBirthChange('year', value)}
+              activeId={activeDropdownId}
+              setActiveId={setActiveDropdownId}
+              className="flex-1"
+            />
+            <SelectionDropdown
+              id="birth-month"
+              options={getMonthOptions()}
+              placeholder="월"
+              value={birthMonth}
+              onChange={(value) => handleBirthChange('month', value)}
+              activeId={activeDropdownId}
+              setActiveId={setActiveDropdownId}
+              className="flex-1"
+            />
+            <SelectionDropdown
+              id="birth-day"
+              options={getDayOptions()}
+              placeholder="일"
+              value={birthDay}
+              onChange={(value) => handleBirthChange('day', value)}
+              activeId={activeDropdownId}
+              setActiveId={setActiveDropdownId}
+              className="flex-1"
+            />
+          </div>
           {errors.birth && <p className="text-red-500 caption mt-1 ml-2">{errors.birth}</p>}
         </div>
         <div>
@@ -260,5 +391,4 @@ export default function OwnerMyPage() {
       </motion.div>
     </div>
   );
-  
 }
