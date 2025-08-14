@@ -30,10 +30,9 @@ export const autocompleteHospitals = async (
   keyword: string,
   opts?: { signal?: AbortSignal }
 ): Promise<HospitalSuggest[]> => {
-  const res = await apiClient.get('/public/autocomplete', {
-    params: { keyword },
-    signal: opts?.signal,
-  });
+  const url = `/public/autocomplete?keyword=${encodeURIComponent(keyword)}`;
+  if (import.meta.env.DEV) console.debug('[autocomplete:req]', url);
+  const res = await apiClient.get(url, { signal: opts?.signal });
   return unwrap<HospitalSuggest[]>(res, []);
 };
 
