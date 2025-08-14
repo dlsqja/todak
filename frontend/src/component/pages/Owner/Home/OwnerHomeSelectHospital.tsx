@@ -46,19 +46,19 @@ export default function SelectHospitalPage() {
   };
 
   // 전체 병원
-  useEffect(() => {
-    (async () => {
-      try {
-        const list = await getPublicHospitals();
-        // 병원 이름 기준 가나다순 정렬
-        const sortedList = list.sort((a, b) => a.name.localeCompare(b.name));
-        setHospitals(sortedList);
-      } catch (e) {
-        console.warn('병원 리스트 불러오기 실패:', e);
-        setHospitals([]);
-      }
-    })();
-  }, []);
+  // useEffect(() => {
+  //   (async () => {
+  //     try {
+  //       const list = await getPublicHospitals();
+  //       // 병원 이름 기준 가나다순 정렬
+  //       const sortedList = list.sort((a, b) => a.name.localeCompare(b.name));
+  //       setHospitals(sortedList);
+  //     } catch (e) {
+  //       console.warn('병원 리스트 불러오기 실패:', e);
+  //       setHospitals([]);
+  //     }
+  //   })();
+  // }, []);
 
   // 최근 방문 병원(항상 위에 표시)
   useEffect(() => {
@@ -191,7 +191,7 @@ export default function SelectHospitalPage() {
     return () => observer.disconnect();
   }, [visibleHospitalCount, hospitals.length, isLoadingMore]);
 
-  // 자동완성 (검색창에 글자 있을 때만 결과 섹션 보이고, 없으면 전체 목록 섹션 보임)
+  // 검색 시 자동완성과 병원 목록을 함께 가져옴
   const debouncedSearch = useMemo(() => {
     let t: number | undefined;
     return (q: string) => {
@@ -205,19 +205,38 @@ export default function SelectHospitalPage() {
 
           if (!keyword) {
             setSuggests([]);
-            setVisibleSuggestCount(6); // 검색 초기화 시 카운터도 초기화
+            setHospitals([]); // 검색어 없으면 병원 목록도 초기화
+            setVisibleSuggestCount(6);
+            setVisibleHospitalCount(6);
             return;
           }
 
-          const s = await autocompleteHospitals(keyword, { signal: abortRef.current.signal });
-          // 검색 결과도 가나다순 정렬
-          const sortedSuggests = s.sort((a, b) => a.name.localeCompare(b.name));
+          // 자동완성과 전체 병원 목록을 병렬로 가져옴
+          const [suggestResults, hospitalList] = await Promise.all([
+            autocompleteHospitals(keyword, { signal: abortRef.current.signal }),
+            getPublicHospitals(),
+          ]);
+
+          // 검색 결과 정렬
+          const sortedSuggests = suggestResults.sort((a, b) => a.name.localeCompare(b.name));
           setSuggests(sortedSuggests);
-          setVisibleSuggestCount(6); // 새 검색 결과 시 카운터 초기화
+          setVisibleSuggestCount(6);
+
+          // 병원 목록도 검색어로 필터링하여 정렬
+          const filteredHospitals = hospitalList
+            .filter(
+              (h) =>
+                h.name.toLowerCase().includes(keyword.toLowerCase()) ||
+                h.location.toLowerCase().includes(keyword.toLowerCase()),
+            )
+            .sort((a, b) => a.name.localeCompare(b.name));
+          setHospitals(filteredHospitals);
+          setVisibleHospitalCount(6);
         } catch (e: any) {
           if (e?.name === 'CanceledError' || e?.name === 'AbortError') return;
-          console.warn('자동완성 실패:', e);
+          console.warn('검색 실패:', e);
           setSuggests([]);
+          setHospitals([]);
         }
       }, 250);
     };
@@ -263,7 +282,7 @@ export default function SelectHospitalPage() {
             ))}
             {recents.length > visibleRecentCount && (
               <div ref={recentLoadMoreRef} className="p-4 text-center">
-                <span className="text-gray-400 p">{isLoadingMore ? '로딩 중...' : '더보기'}</span>
+                <span className="text-gray-400 p">{isLoadingMore ? '' : '더보기'}</span>
               </div>
             )}
           </div>
@@ -274,52 +293,58 @@ export default function SelectHospitalPage() {
           <div className="mt-6">
             <h4 className="p text-black mb-3">검색 결과</h4>
             <div className="bg-gray-50 rounded-xl overflow-hidden">
-              {suggests.length === 0 && <div className="p-4 text-gray-400">검색 결과가 없습니다.</div>}
+              {suggests.length === 0 && hospitals.length === 0 && (
+                <div className="p-4 text-gray-400 text-center">검색 결과가 없습니다.</div>
+              )}
+
+              {/* 자동완성 결과 */}
               {suggests.slice(0, visibleSuggestCount).map((s) => (
                 <div
-                  key={s.hospitalId}
+                  key={`suggest-${s.hospitalId}`}
                   className="flex items-center px-0 py-3 bg-gray-50 w-full cursor-pointer"
                   onClick={() => handleHospitalClick(s)}
                 >
-                  {/* 텍스트 영역 */}
                   <div className="ml-3 flex flex-col justify-center">
                     <span className="h4 text-black">{s.name}</span>
                     <span className="caption text-gray-400">{s.location}</span>
                   </div>
                 </div>
               ))}
-              {suggests.length > visibleSuggestCount && (
-                <div ref={suggestLoadMoreRef} className="p-4 text-center">
-                  <span className="text-green-400 p">{isLoadingMore ? '로딩 중...' : '더보기'}</span>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
 
-        {/* 병원 전체 목록 (검색어가 없을 때만 표시) */}
-        {!search.trim() && (
-          <div className="mt-8">
-            <h4 className="p text-black mb-3">병원 목록</h4>
-            <div className="bg-gray-50 rounded-xl overflow-hidden">
+              {/* 필터링된 병원 목록 */}
               {hospitals.slice(0, visibleHospitalCount).map((h) => (
                 <div
-                  key={h.hospitalId}
+                  key={`hospital-${h.hospitalId}`}
                   className="flex items-center px-0 py-3 bg-gray-50 w-full cursor-pointer"
                   onClick={() => handleHospitalClick(h)}
                 >
-                  {/* 텍스트 영역 */}
                   <div className="ml-3 flex flex-col justify-center">
                     <span className="h4 text-black">{h.name}</span>
                     <span className="caption text-gray-400">{h.location}</span>
                   </div>
                 </div>
               ))}
-              {hospitals.length > visibleHospitalCount && (
-                <div ref={hospitalLoadMoreRef} className="p-4 text-center">
-                  <span className="text-gray-400 p">{isLoadingMore ? '로딩 중...' : '더보기'}</span>
+
+              {/* 더보기 버튼들 */}
+              {suggests.length > visibleSuggestCount && (
+                <div ref={suggestLoadMoreRef} className="p-4 text-center">
+                  <span className="text-gray-400 p">{isLoadingMore ? '' : '더보기'}</span>
                 </div>
               )}
+              {hospitals.length > visibleHospitalCount && (
+                <div ref={hospitalLoadMoreRef} className="p-4 text-center">
+                  <span className="text-gray-400 p">{isLoadingMore ? '' : '더보기'}</span>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* 검색어가 없을 때 안내 메시지 */}
+        {!search.trim() && (
+          <div className="mt-8">
+            <div className="bg-gray-50 rounded-xl p-8 text-center">
+              <p className="text-gray-400 p">병원명을 검색해주세요.</p>
             </div>
           </div>
         )}
