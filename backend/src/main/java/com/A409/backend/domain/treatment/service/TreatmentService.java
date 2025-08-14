@@ -4,6 +4,7 @@ import com.A409.backend.domain.hospital.dto.HospitalResponse;
 import com.A409.backend.domain.pet.dto.PetResponse;
 import com.A409.backend.domain.pet.entity.Pet;
 import com.A409.backend.domain.pet.service.PetService;
+import com.A409.backend.domain.reservation.entity.Reservation;
 import com.A409.backend.domain.reservation.repository.ReservationRepository;
 import com.A409.backend.domain.treatment.dto.TreatementResponse;
 import com.A409.backend.domain.treatment.entity.Treatment;
@@ -14,9 +15,11 @@ import com.A409.backend.domain.user.vet.dto.WorkingHourDto;
 import com.A409.backend.domain.user.vet.entity.WorkingHour;
 import com.A409.backend.domain.user.vet.service.WorkingHourService;
 import com.A409.backend.global.enums.ErrorCode;
+import com.A409.backend.global.enums.ReservationStatus;
 import com.A409.backend.global.exception.CustomException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -209,9 +212,15 @@ public class TreatmentService {
         treatmentRepository.save(treatment);
     }
 
+    // Endtime 업데이트 하면서 reservation을 진료 완료로 변환.
+    @Transactional
     public void updateEndTime(Long treatmentId){
         Treatment treatment = treatmentRepository.findByTreatmentId(treatmentId).orElseThrow(() -> new CustomException(ErrorCode.RESOURCE_NOT_FOUND));
         treatment.setEndTime(LocalDateTime.now());
         treatmentRepository.save(treatment);
+        Reservation reservation = treatment.getReservation();
+        reservation.setStatus(ReservationStatus.COMPLETED);
+        reservationRepository.save(reservation);
     }
+
 }

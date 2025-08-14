@@ -117,7 +117,6 @@ public class VetTreatmentController {
         String cacheKey = "treatment" + treatment_id;
         redisService.deleteByKey(cacheKey);
         treatmentService.updateEndTime(treatment_id);
-        System.out.println("수의사 비대면 진료 종료");
         return APIResponse.ofSuccess(null);
     }
 
