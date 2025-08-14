@@ -21,6 +21,9 @@ export default function SelectHospitalPage() {
   const [hospitals, setHospitals] = useState<HospitalPublic[]>([]);
   const [suggests, setSuggests] = useState<HospitalSuggest[]>([]);
   const [recents, setRecents] = useState<RecentHospital[]>([]);
+  const [visibleHospitalCount, setVisibleHospitalCount] = useState(6);
+  const [visibleRecentCount, setVisibleRecentCount] = useState(6);
+  const [visibleSuggestCount, setVisibleSuggestCount] = useState(6);
   const navigate = useNavigate();
   const location = useLocation();
   const pet = location.state?.pet; // { petId, ... }
@@ -42,7 +45,9 @@ export default function SelectHospitalPage() {
     (async () => {
       try {
         const list = await getPublicHospitals();
-        setHospitals(list);
+        // 병원 이름 기준 가나다순 정렬
+        const sortedList = list.sort((a, b) => a.name.localeCompare(b.name));
+        setHospitals(sortedList);
       } catch (e) {
         console.warn('병원 리스트 불러오기 실패:', e);
         setHospitals([]);
@@ -129,11 +134,15 @@ export default function SelectHospitalPage() {
 
           if (!keyword) {
             setSuggests([]);
+            setVisibleSuggestCount(6); // 검색 초기화 시 카운터도 초기화
             return;
           }
 
           const s = await autocompleteHospitals(keyword, { signal: abortRef.current.signal });
-          setSuggests(s);
+          // 검색 결과도 가나다순 정렬
+          const sortedSuggests = s.sort((a, b) => a.name.localeCompare(b.name));
+          setSuggests(sortedSuggests);
+          setVisibleSuggestCount(6); // 새 검색 결과 시 카운터 초기화
         } catch (e: any) {
           if (e?.name === 'CanceledError' || e?.name === 'AbortError') return;
           console.warn('자동완성 실패:', e);
@@ -167,11 +176,11 @@ export default function SelectHospitalPage() {
         <div className="mt-8">
           <h4 className="p text-black mb-3">최근 방문한 병원</h4>
           <div className="bg-gray-50 rounded-xl overflow-hidden">
-            {recents.length === 0 && <div className="p-4 text-gray-400">최근 방문한 병원이 없습니다.</div>}
-            {recents.map((h, i) => (
+            {recents.length === 0 && <div className="p-4 text-gray-400 text-center">최근 방문한 병원이 없습니다.</div>}
+            {recents.slice(0, visibleRecentCount).map((h, i) => (
               <div
                 key={`${h.name}-${i}`}
-                className="flex items-center px-0 py-3 bg-gray-50 w-full cursor-pointer"
+                className="flex px-0 py-3 bg-gray-50 w-full cursor-pointer"
                 onClick={() => handleHospitalClick(h)}
               >
                 {/* 텍스트 영역 */}
@@ -181,6 +190,16 @@ export default function SelectHospitalPage() {
                 </div>
               </div>
             ))}
+            {recents.length > visibleRecentCount && (
+              <div className="p-4 text-center">
+                <button
+                  className="text-green-400 p cursor-pointer hover:text-green-500"
+                  onClick={() => setVisibleRecentCount((prev) => prev + 6)}
+                >
+                  더보기
+                </button>
+              </div>
+            )}
           </div>
         </div>
 
@@ -190,7 +209,7 @@ export default function SelectHospitalPage() {
             <h4 className="p text-black mb-3">검색 결과</h4>
             <div className="bg-gray-50 rounded-xl overflow-hidden">
               {suggests.length === 0 && <div className="p-4 text-gray-400">검색 결과가 없습니다.</div>}
-              {suggests.map((s) => (
+              {suggests.slice(0, visibleSuggestCount).map((s) => (
                 <div
                   key={s.hospitalId}
                   className="flex items-center px-0 py-3 bg-gray-50 w-full cursor-pointer"
@@ -203,6 +222,16 @@ export default function SelectHospitalPage() {
                   </div>
                 </div>
               ))}
+              {suggests.length > visibleSuggestCount && (
+                <div className="p-4 text-center">
+                  <button
+                    className="text-green-400 p cursor-pointer hover:text-green-500"
+                    onClick={() => setVisibleSuggestCount((prev) => prev + 6)}
+                  >
+                    더보기
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -212,7 +241,7 @@ export default function SelectHospitalPage() {
           <div className="mt-8">
             <h4 className="p text-black mb-3">병원 목록</h4>
             <div className="bg-gray-50 rounded-xl overflow-hidden">
-              {hospitals.map((h) => (
+              {hospitals.slice(0, visibleHospitalCount).map((h) => (
                 <div
                   key={h.hospitalId}
                   className="flex items-center px-0 py-3 bg-gray-50 w-full cursor-pointer"
@@ -225,6 +254,16 @@ export default function SelectHospitalPage() {
                   </div>
                 </div>
               ))}
+              {hospitals.length > visibleHospitalCount && (
+                <div className="p-4 text-center">
+                  <p
+                    className="text-gray-400 p cursor-pointer"
+                    onClick={() => setVisibleHospitalCount((prev) => prev + 6)}
+                  >
+                    더보기
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         )}
