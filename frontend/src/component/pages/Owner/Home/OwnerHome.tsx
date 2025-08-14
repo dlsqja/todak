@@ -169,8 +169,8 @@ export default function OwnerHome() {
       {/* 펫이 있을 때만 슬라이더 표시 */}
       {petList.length > 0 && (
         <div className="px-7">
-          <motion.h3 className="mx-7 h3 mt-11">비대면 진료 시작하기</motion.h3>
-          <motion.h3 className="mx-7 h4 text-gray-500 mt-1">진료 받고 싶은 반려동물을 선택해주세요</motion.h3>
+          <motion.h3 className="h3 mt-11">비대면 진료 시작하기</motion.h3>
+          <motion.h3 className="h4 text-gray-500 mt-1">진료 받고 싶은 반려동물을 선택해주세요</motion.h3>
           <motion.div
             ref={scrollRef}
             onScroll={handleScroll}
