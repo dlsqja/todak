@@ -74,24 +74,22 @@ export default function OwnerPetHome() {
     fetchPets();
   }, [setPets, setSelectedPet]);
 
-  if (isLoading) return <div className="p">불러오는 중...</div>;
-  if (error) return <div className="p">에러 발생: {error.message}</div>;
-  if (pets.length === 0)
-    return (
-      <div className="p flex flex-col items-center justify-center h-[60vh] gap-6 text-center">
-        <p className="h4 gray-300">등록된 반려동물이 없습니다.</p>
-        <button
-          className="text-white bg-green-300 hover:bg-green-400 px-6 py-2 rounded-xl p cursor-pointer"
-          onClick={handleRegister}
-        >
-          반려동물 등록하기
-        </button>
-      </div>
-    );
-
   return (
     <>
       <SimpleHeader text="반려동물 관리" />
+      {isLoading && <div className="p">불러오는 중...</div>}
+      {error && <div className="p">에러 발생: {error.message}</div>}
+      {pets.length === 0 && (
+        <div className="p flex flex-col items-center justify-center h-[60vh] gap-6 text-center">
+          <p className="h3 text-gray-500">등록된 반려동물이 없습니다.</p>
+          <button
+            className="text-white bg-green-300 hover:bg-green-400 px-6 py-2 rounded-xl p cursor-pointer"
+            onClick={handleRegister}
+          >
+            반려동물 등록하기
+          </button>
+        </div>
+      )}
       <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
         <div className="px-7 space-y-6 pt-6">
           {/* 1. 반려동물 이미지 리스트 (좌→우 순차 등장으로 수정) */}
