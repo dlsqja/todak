@@ -157,8 +157,8 @@ export default function VetSignup() {
       return;
     }
 
-    // 프로필 이미지 처리 - 선택하지 않으면 기본 이미지 사용
-    const photoToSend = profileImage ? profileImage.name : '/images/pet_default.png';
+    // 프로필 이미지 처리 - 선택하지 않으면 빈 문자열로 저장
+    const photoToSend = profileImage ? profileImage.name : '';
 
     const response = await authAPI.vetSignup(
       {
@@ -259,9 +259,9 @@ export default function VetSignup() {
                 사진 제거
               </button>
             </div>
-            <div className="px-7 mt-6">
-              <Button text={isLoading ? '등록 중...' : '등록하기'} onClick={handleSubmit} color="green" />
-            </div>
+          </div>
+          <div className="px-7 mt-6">
+            <Button text={isLoading ? '등록 중...' : '등록하기'} onClick={handleSubmit} color="green" />
           </div>
         </div>
       </div>
