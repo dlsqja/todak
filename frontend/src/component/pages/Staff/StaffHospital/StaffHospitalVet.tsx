@@ -70,32 +70,33 @@ useEffect(() => {
 }, [])
 
 
-  // ✅ 서버 hours → byDay: workingId까지 보존, 시간은 슬롯 인덱스 문자열로
-  const applyWorkingHoursToState = (hours?: StaffWorkingHourDto[]) => {
-    const toSlotStr = (v: number | string | undefined): string => {
-      if (v === undefined || v === null) return ''
-      if (typeof v === 'number') return String(v)                     // 이미 슬롯 인덱스(0~47)
-      const idx = slotIndexByHHmm[String(v)]                          // "HH:mm" → 슬롯
-      return Number.isFinite(idx) ? String(idx) : ''
-    }
-
-    const next: DayState = {
-      MON:{workingId:null,start:'',end:''}, TUE:{workingId:null,start:'',end:''}, WED:{workingId:null,start:'',end:''},
-      THU:{workingId:null,start:'',end:''}, FRI:{workingId:null,start:'',end:''}, SAT:{workingId:null,start:'',end:''}, SUN:{workingId:null,start:'',end:''},
-    }
-
-    ;(hours || []).forEach(h => {
-      if (!h?.day) return
-      next[h.day] = {
-        workingId: h.workingId ?? null,                               // ✅ 핵심
-        start: toSlotStr(h.startTime as any),
-        end:   toSlotStr(h.endTime   as any),
-      }
-    })
-
-    setByDay(next)
+  // 서버 hours → byDay: workingId까지 보존, 시간은 슬롯 인덱스 문자열로
+  function applyWorkingHoursToState(hours?: StaffWorkingHourDto[]) {
+  const toSlotStr = (v: number | string | undefined): string => {
+    if (v === undefined || v === null) return ''
+    if (typeof v === 'number') return String(v)       // 이미 0~47
+    const sv = String(v)
+    if (/^\d+$/.test(sv)) return sv                   // ✅ "18" 같은 문자열 숫자도 그대로 슬롯으로 처리
+    const idx = slotIndexByHHmm[sv]                   // "HH:mm" → 슬롯
+    return Number.isFinite(idx) ? String(idx) : ''
   }
 
+  const next: DayState = {
+    MON:{workingId:null,start:'',end:''}, TUE:{workingId:null,start:'',end:''}, WED:{workingId:null,start:'',end:''},
+    THU:{workingId:null,start:'',end:''}, FRI:{workingId:null,start:'',end:''}, SAT:{workingId:null,start:'',end:''}, SUN:{workingId:null,start:'',end:''},
+  }
+
+  ;(hours || []).forEach(h => {
+    if (!h?.day) return
+    next[h.day] = {
+      workingId: h.workingId ?? null,
+      start: toSlotStr(h.startTime as any),
+      end:   toSlotStr(h.endTime   as any),
+    }
+  })
+
+  setByDay(next)
+}
   const handleVetChange = (vetIdStr: string) => {
     const vid = Number(vetIdStr)
     setSelectedVetId(vid)
