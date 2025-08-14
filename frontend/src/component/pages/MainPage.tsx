@@ -9,29 +9,25 @@ export default function MainPage() {
 
   return (
     <div
-      className="flex flex-col items-center justify-center px-7 pt-30 min-h-screen"
+      className="flex flex-col items-center justify-center px-7 min-h-screen"
       style={{
-        backgroundImage: 'linear-gradient(60deg, #64b3f4, #c2e59c, #64b3f4, #c2e59c)',
+        background: 'linear-gradient(-45deg, #afcf7e, #c8e6a0, #e9f1d7, #fdfcfb)',
+        backgroundRepeat: 'no-repeat',
         backgroundSize: '400% 400%',
-        animation: 'gradientFlow 15s ease-in-out infinite',
+        position: 'relative',
+        animation: 'backgroundChange 4s ease-in-out infinite',
       }}
     >
       <style>{`
-        @keyframes gradientFlow {
+        @keyframes backgroundChange {
           0% {
-            background-position: 0% 0%;
-          }
-          25% {
-            background-position: 100% 0%;
+            background-position: 0% 50%;
           }
           50% {
-            background-position: 100% 100%;
-          }
-          75% {
-            background-position: 0% 100%;
+            background-position: 100% 50%;
           }
           100% {
-            background-position: 0% 0%;
+            background-position: 0% 50%;
           }
         }
       `}</style>
@@ -43,7 +39,12 @@ export default function MainPage() {
       <h3 className="h3 text-brown-300 text-center mb-5">반려동물 비대면 의료 서비스</h3>
 
       <div className="w-full px-10">
-        <Button text="시작하기" color="green" onClick={handleStart} className="w-full" />
+        <button
+          className="w-full h-13 rounded-[12px] bg-green-300 text-green-100 h4 cursor-pointer shadow-lg hover:bg-green-400 transition-shadow duration-200"
+          onClick={handleStart}
+        >
+          시작하기
+        </button>
       </div>
     </div>
   );
