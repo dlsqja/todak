@@ -15,11 +15,14 @@ import com.A409.backend.domain.user.vet.repository.WorkingHourRepository;
 import com.A409.backend.global.enums.Day;
 import com.A409.backend.global.enums.ErrorCode;
 import com.A409.backend.global.exception.CustomException;
+import com.A409.backend.global.util.uploader.S3Uploader;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.IntStream;
 
@@ -31,6 +34,7 @@ public class VetService {
     private final AuthRepository authRepository;
     private final HospitalRepository hospitalRepository;
     private final WorkingHourRepository workingHourRepository;
+    private final S3Uploader s3Uploader;
 
     public List<VetResponse> getVetsByHospitalId(Long hospitalId){
 
@@ -58,27 +62,32 @@ public class VetService {
     }
 
     @Transactional
-    public void insertVetInfo(Long authId, VetRequest vetRequest) {
+    public void insertVetInfo(Long authId, VetRequest vetRequest,  MultipartFile photo) {
         Auth auth = Auth.builder().authId(authId).build();
         Hospital hospital = hospitalRepository.findByHospitalCode(vetRequest.getHospitalCode())
-                .orElseThrow(() -> new CustomException(ErrorCode.HOSPITAL_NOT_FOUND));;
+                .orElseThrow(() -> new CustomException(ErrorCode.HOSPITAL_NOT_FOUND));
 
-        Vet vet = Vet.builder()
-                .auth(auth)
-                .hospital(hospital)
-                .name(vetRequest.getName())
-                .license(vetRequest.getLicense())
-                .profile(vetRequest.getProfile())
-                .photo(vetRequest.getPhoto())
-                .build();
-        vetRepository.save(vet);
+        Vet resisterVet = vetRequest.toEntity();
+        resisterVet.setHospital(hospital);
+        resisterVet.setAuth(auth);
+
+        if(photo != null){
+            try{
+                String url = s3Uploader.upload(photo, "vet");
+                resisterVet.setPhoto(url);
+            } catch(IOException e){
+                throw new RuntimeException(e);
+            }
+        }
+
+        vetRepository.save(resisterVet);
 
         List<WorkingHour> workingHours = IntStream.rangeClosed(0, 6)
                 .mapToObj(day -> WorkingHour.builder()
                         .day(Day.values()[day])
                         .startTime((byte) 0)
                         .endTime((byte) 0)
-                        .vet(vet)
+                        .vet(resisterVet)
                         .build()
                 ).toList();
 
@@ -86,20 +95,23 @@ public class VetService {
     }
 
     @Transactional
-    public void updateVet(Long vetId, @NotNull VetUpdateRequest vetUpdateRequest) {
+    public void updateVet(Long vetId, @NotNull VetUpdateRequest vetUpdateRequest, MultipartFile photo) {
         // 기존 Vet 조회 (영속 상태로 만듦)
-        Vet existingVet = vetRepository.findById(vetId)
+        Vet findVet = vetRepository.findById(vetId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        // 기존 엔티티 기반으로 builder 사용 (id 유지)
-        Vet updateVet = existingVet.toBuilder()
-                .name(vetUpdateRequest.getName())
-                .license(vetUpdateRequest.getLicense())
-                .profile(vetUpdateRequest.getProfile())
-                .photo(vetUpdateRequest.getPhoto())
-                .build();
+        findVet.setName(vetUpdateRequest.getName());
+        findVet.setProfile(vetUpdateRequest.getProfile());
 
-        // 저장
-        vetRepository.save(updateVet);
+        if(photo != null){
+            try{
+                String url = s3Uploader.upload(photo, "vet");
+                findVet.setPhoto(url);
+            } catch(IOException e){
+                throw new RuntimeException(e);
+            }
+        }
+
+        vetRepository.save(findVet);
     }
 }

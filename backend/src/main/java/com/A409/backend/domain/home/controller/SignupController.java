@@ -24,8 +24,10 @@ import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseCookie;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -53,9 +55,12 @@ public class SignupController {
     }
 
     @Operation(summary = "수의사 회원가입")
-    @PostMapping("/vet")
-    public APIResponse<?> vetSignup(@RequestParam Long authId, @RequestBody VetRequest vetRequest, HttpServletResponse response) throws IOException  {
-        vetService.insertVetInfo(authId, vetRequest);
+    @PostMapping(path = "/vet", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public APIResponse<?> vetSignup(@RequestParam Long authId,
+                                    @RequestPart("vetRequest") VetRequest vetRequest,
+                                    HttpServletResponse response,
+                                    @RequestPart(value = "photo", required = false) MultipartFile photo) throws IOException  {
+        vetService.insertVetInfo(authId, vetRequest, photo);
         String redirectUrl = loginAfterSignup("vet", authId, response);
         return APIResponse.ofSuccess(redirectUrl);
     }

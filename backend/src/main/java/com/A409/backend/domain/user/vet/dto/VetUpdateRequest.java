@@ -5,7 +5,5 @@ import lombok.Data;
 @Data
 public class VetUpdateRequest {
     private String name;
-    private String license;
     private String profile;
-    private String photo;
 }
