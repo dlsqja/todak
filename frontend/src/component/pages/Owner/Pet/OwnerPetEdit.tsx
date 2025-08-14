@@ -71,6 +71,14 @@ export default function OwnerPetEdit() {
   const handleImageSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
+      const MAX_FILE_SIZE = 30 * 1024 * 1024; // 30MB
+
+      if (file.size > MAX_FILE_SIZE) {
+        alert('파일 크기가 너무 큽니다. 30MB 이하의 이미지를 선택해주세요.');
+        event.target.value = ''; // Reset file input
+        return;
+      }
+
       const imageUrl = URL.createObjectURL(file);
       setSelectedImage(imageUrl);
       setSelectedFile(file);

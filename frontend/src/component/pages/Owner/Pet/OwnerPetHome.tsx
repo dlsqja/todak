@@ -79,8 +79,11 @@ export default function OwnerPetHome() {
   if (pets.length === 0)
     return (
       <div className="p flex flex-col items-center justify-center h-[60vh] gap-6 text-center">
-        <p className="p">등록된 반려동물이 없습니다.</p>
-        <button className="text-white bg-green-300 px-6 py-2 rounded-xl h5" onClick={handleRegister}>
+        <p className="h4 gray-300">등록된 반려동물이 없습니다.</p>
+        <button
+          className="text-white bg-green-300 hover:bg-green-400 px-6 py-2 rounded-xl p cursor-pointer"
+          onClick={handleRegister}
+        >
           반려동물 등록하기
         </button>
       </div>
