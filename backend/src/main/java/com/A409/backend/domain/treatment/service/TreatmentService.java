@@ -4,6 +4,7 @@ import com.A409.backend.domain.hospital.dto.HospitalResponse;
 import com.A409.backend.domain.pet.dto.PetResponse;
 import com.A409.backend.domain.pet.entity.Pet;
 import com.A409.backend.domain.pet.service.PetService;
+import com.A409.backend.domain.reservation.entity.Reservation;
 import com.A409.backend.domain.reservation.repository.ReservationRepository;
 import com.A409.backend.domain.treatment.dto.TreatementResponse;
 import com.A409.backend.domain.treatment.entity.Treatment;
@@ -14,9 +15,11 @@ import com.A409.backend.domain.user.vet.dto.WorkingHourDto;
 import com.A409.backend.domain.user.vet.entity.WorkingHour;
 import com.A409.backend.domain.user.vet.service.WorkingHourService;
 import com.A409.backend.global.enums.ErrorCode;
+import com.A409.backend.global.enums.ReservationStatus;
 import com.A409.backend.global.exception.CustomException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -55,6 +58,7 @@ public class TreatmentService {
                 List<Map<String, Object>> treatmentsList  = treatmentList.stream()
                         .map(treatments -> {
                             Map<String, Object> map = new HashMap<>();
+                            map.put("treatementInfo", TreatementResponse.toResponse(treatments));
                             map.put("treatmentId", treatments.getTreatmentId());
                             map.put("reservationId",treatments.getReservation().getReservationId());
                             map.put("vetName",treatments.getVet().getName());
@@ -132,9 +136,10 @@ public class TreatmentService {
                     map.put("petInfo", PetResponse.toResponse(treatments.getPet()));
                     map.put("subject", treatments.getReservation().getSubject());
                     map.put("isCompleted", treatments.getIsCompleted());
-                    map.put("startTime", treatments.getReservation().getReservationTime());
+                    map.put("startTime", treatments.getStartTime());
+                    map.put("reservationTime", treatments.getReservation().getReservationTime());
                     map.put("reservationId", treatments.getReservation().getReservationId());
-                    map.put("endTime", treatments.getReservation().getReservationTime());
+                    map.put("endTime", treatments.getEndTime());
                     map.put("treatmentDate", treatments.getReservation().getReservationDay());
                     return map;
                 })
@@ -182,15 +187,40 @@ public class TreatmentService {
         return result;
     }
 
+    public void updateTreatment(Long treatmentId,String aiSummary){
+
+        Treatment treatment = treatmentRepository.findById(treatmentId).orElseThrow(()->new CustomException(ErrorCode.RESOURCE_NOT_FOUND));
+
+        treatment.setAiSummary(aiSummary);
+
+        treatmentRepository.save(treatment);
+    }
+
+
+    public void completeTreatment(Long treatmentId){
+
+        Treatment treatment = treatmentRepository.findById(treatmentId).orElseThrow(()->new CustomException(ErrorCode.RESOURCE_NOT_FOUND));
+
+        treatment.setIsCompleted(true);
+
+        treatmentRepository.save(treatment);
+    }
+
     public void updateStartTime(Long treatmentId){
         Treatment treatment = treatmentRepository.findByTreatmentId(treatmentId).orElseThrow(() -> new CustomException(ErrorCode.RESOURCE_NOT_FOUND));
         treatment.setStartTime(LocalDateTime.now());
         treatmentRepository.save(treatment);
     }
 
+    // Endtime 업데이트 하면서 reservation을 진료 완료로 변환.
+    @Transactional
     public void updateEndTime(Long treatmentId){
         Treatment treatment = treatmentRepository.findByTreatmentId(treatmentId).orElseThrow(() -> new CustomException(ErrorCode.RESOURCE_NOT_FOUND));
         treatment.setEndTime(LocalDateTime.now());
         treatmentRepository.save(treatment);
+        Reservation reservation = treatment.getReservation();
+        reservation.setStatus(ReservationStatus.COMPLETED);
+        reservationRepository.save(reservation);
     }
+
 }

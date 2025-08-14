@@ -2,6 +2,7 @@ package com.A409.backend.domain.treatment.controller;
 
 import com.A409.backend.domain.hospital.dto.HospitalResponse;
 import com.A409.backend.domain.reservation.entity.Reservation;
+import com.A409.backend.domain.treatment.dto.TreatementReqeust;
 import com.A409.backend.domain.treatment.entity.Treatment;
 import com.A409.backend.domain.treatment.entity.TreatmentResponse;
 import com.A409.backend.domain.treatment.service.TreatmentService;
@@ -70,6 +71,25 @@ public class VetTreatmentController {
         return APIResponse.ofSuccess(null);
     }
 
+    @Operation(summary = "진료 내용 수정")
+    @PostMapping("/{treatment_id}")
+    public APIResponse<?> updateTreatment(@PathVariable("treatment_id") Long treatmentId,
+                                          @RequestBody TreatementReqeust treatementReqeust) {
+
+        treatmentService.updateTreatment(treatmentId,treatementReqeust.getAiSummary());
+
+        return APIResponse.ofSuccess(null);
+    }
+
+    @Operation(summary = "AI요약 내용 확인")
+    @PatchMapping("/complete/{treatment_id}")
+    public APIResponse<?> completeTreatment(@PathVariable("treatment_id") Long treatmentId) {
+
+        treatmentService.completeTreatment(treatmentId);
+
+        return APIResponse.ofSuccess(null);
+    }
+
     @Transactional
     @Operation(summary = "수의사 비대면 진료 시작", description = "비대면 진료 버튼을 누르면, session을 생성합니다.")
     @PostMapping("/start/{treatment_id}")
@@ -97,7 +117,6 @@ public class VetTreatmentController {
         String cacheKey = "treatment" + treatment_id;
         redisService.deleteByKey(cacheKey);
         treatmentService.updateEndTime(treatment_id);
-        System.out.println("수의사 비대면 진료 종료");
         return APIResponse.ofSuccess(null);
     }
 

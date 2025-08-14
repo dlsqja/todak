@@ -7,4 +7,6 @@ public interface FirstTreatmentRepository extends JpaRepository<FirstTreatment,L
     boolean existsByOwner_OwnerId(Long ownerId);
 
     boolean existsByHospital_HospitalIdAndPet_PetId(Long hospitalHospitalId, Long petPetId);
+
+    boolean existsByOwner_OwnerIdAndPet_PetId(Long ownerOwnerId, Long petPetId);
 }

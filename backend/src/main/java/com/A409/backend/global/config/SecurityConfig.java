@@ -1,5 +1,6 @@
 package com.A409.backend.global.config;
 
+import com.A409.backend.global.security.jwt.ExceptionHandlerFilter;
 import com.A409.backend.global.security.jwt.JwtAuthenticationFilter;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -83,12 +84,16 @@ public class SecurityConfig {
                         .requestMatchers("/treatments/vets/**").hasRole("VET")
 
                         .requestMatchers("/staffs/**").hasRole("STAFF")
-                        .requestMatchers("/hospitals/**").hasRole("STAFF")
+                        .requestMatchers("/hospitals/**").hasAnyRole("STAFF", "VET")
                         .requestMatchers("/reservations/hospitals/**").hasRole("STAFF")
+
+                        .requestMatchers("/kakao/logout").hasAnyRole("STAFF", "VET", "OWNER")
                         .anyRequest().authenticated())
                 .sessionManagement((session) -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .addFilterBefore(new ExceptionHandlerFilter(), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+
 
         return http.build();
     }
