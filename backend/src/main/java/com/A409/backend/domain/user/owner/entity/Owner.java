@@ -31,5 +31,8 @@ public class Owner {
 
     @Column(nullable = false)
     private LocalDate birth;
+
+    @Column(nullable = true)
+    private String SID;
 }
 
