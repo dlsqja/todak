@@ -148,61 +148,81 @@ export default function OwnerHome() {
       <motion.h3 className="mx-7 h3 mt-11">비대면 진료 시작하기</motion.h3>
       <motion.h3 className="mx-7 h4 text-gray-500 mt-1">진료 받고 싶은 반려동물을 선택해주세요</motion.h3>
 
-      {/* 슬라이더: 바깥에서만 좌우 padding, 슬라이드는 전체 폭 = 컨테이너 폭 */}
-      <div className="px-7">
+      {/* 펫이 없을 때 안내 메시지 */}
+      {petList.length === 0 && (
         <motion.div
-          ref={scrollRef}
-          onScroll={handleScroll}
-          className="overflow-x-auto snap-x snap-mandatory scroll-smooth hide-scrollbar pt-3 pb-4 px-0"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.2, duration: 0.3 }}
+          className="flex flex-col justify-center h-[150px] gap-6 text-center mx-7"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3, duration: 0.4 }}
         >
-          <div className="flex w-full h-full">
-            {petList.map((pet, index) => (
-              <motion.div
-                key={pet.id}
-                className="w-full flex-shrink-0 snap-start" // ← 내부 padding 제거
-                onClick={() => handlePetClick(pet)}
-                initial={{ opacity: 0, scale: 0.98 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.3 + index * 0.05, duration: 0.25 }}
-                whileTap={{ scale: 0.97 }}
-              >
-                {/* 카드 자체에 마진만 살짝 */}
-                <div className="px-4">
-                  <PetProfileCard
-                    name={pet.name}
-                    genderAge={pet.genderText}
-                    breedAge={pet.breedAge}
-                    weight={pet.weight ?? '-'}
-                    imageUrl={pet.photoUrl}
-                  />
-                </div>
-              </motion.div>
-            ))}
-          </div>
+          <p className="h4 text-gray-500">등록된 반려동물이 없습니다.</p>
+          <button
+            className="text-white bg-green-300 hover:bg-green-400 px-6 py-2 rounded-xl p cursor-pointer"
+            onClick={() => navigate('/owner/pet/register')}
+          >
+            반려동물 등록하러 가기
+          </button>
         </motion.div>
+      )}
 
-        {/* 인디케이터: 슬라이드 개수와 정확히 동일 + 범위 클램프 */}
-        <motion.div
-          className="flex justify-center gap-4 mb-8"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.3, duration: 0.2 }}
-        >
-          {Array.from({ length: totalSlides }).map((_, idx) => (
-            <button
-              key={idx}
-              onClick={() => scrollToIndex(idx)}
-              aria-label={`slide ${idx + 1}`}
-              className={`w-2 h-2 rounded-full cursor-pointer transition-all ${
-                idx === currentIndex ? 'bg-green-300 scale-125' : 'bg-green-200'
-              }`}
-            />
-          ))}
-        </motion.div>
-      </div>
+      {/* 펫이 있을 때만 슬라이더 표시 */}
+      {petList.length > 0 && (
+        <div className="px-7">
+          <motion.div
+            ref={scrollRef}
+            onScroll={handleScroll}
+            className="overflow-x-auto snap-x snap-mandatory scroll-smooth hide-scrollbar pt-3 pb-4 px-0"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.2, duration: 0.3 }}
+          >
+            <div className="flex w-full h-full">
+              {petList.map((pet, index) => (
+                <motion.div
+                  key={pet.id}
+                  className="w-full flex-shrink-0 snap-start" // ← 내부 padding 제거
+                  onClick={() => handlePetClick(pet)}
+                  initial={{ opacity: 0, scale: 0.98 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.3 + index * 0.05, duration: 0.25 }}
+                  whileTap={{ scale: 0.97 }}
+                >
+                  {/* 카드 자체에 마진만 살짝 */}
+                  <div className="px-4">
+                    <PetProfileCard
+                      name={pet.name}
+                      genderAge={pet.genderText}
+                      breedAge={pet.breedAge}
+                      weight={pet.weight ?? '-'}
+                      imageUrl={pet.photoUrl}
+                    />
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+
+          {/* 인디케이터: 슬라이드 개수와 정확히 동일 + 범위 클램프 */}
+          <motion.div
+            className="flex justify-center gap-4 mb-8"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.3, duration: 0.2 }}
+          >
+            {Array.from({ length: totalSlides }).map((_, idx) => (
+              <button
+                key={idx}
+                onClick={() => scrollToIndex(idx)}
+                aria-label={`slide ${idx + 1}`}
+                className={`w-2 h-2 rounded-full cursor-pointer transition-all ${
+                  idx === currentIndex ? 'bg-green-300 scale-125' : 'bg-green-200'
+                }`}
+              />
+            ))}
+          </motion.div>
+        </div>
+      )}
     </motion.div>
   );
 }
