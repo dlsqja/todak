@@ -15,7 +15,7 @@ const SearchListItem: React.FC<SearchListItemProps> = ({ name, description, imag
         {imageUrl && imageUrl.trim() !== '' ? (
           <img src={imageUrl} alt={name} className="w-full h-full object-cover" />
         ) : (
-          <span className="text-green-400 font-medium text-lg">{name?.charAt(0)?.toUpperCase() || '?'}</span>
+          <img src="/images/person_default.png" alt={name} className="w-full h-full object-cover" />
         )}
       </div>
 

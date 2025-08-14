@@ -3,7 +3,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import BackHeader from '@/component/header/BackHeader';
 import SearchInput from '@/component/input/SearchInput';
-import SearchListItem from '@/component/card/SearchListItem';
+
 import { getPublicHospitals, autocompleteHospitals } from '@/services/api/Owner/ownerhome';
 import { getTreatments } from '@/services/api/Owner/ownertreatment';
 import type { HospitalPublic, HospitalSuggest } from '@/types/Owner/ownerhomeType';
@@ -51,74 +51,69 @@ export default function SelectHospitalPage() {
   }, []);
 
   // 최근 방문 병원(항상 위에 표시)
-useEffect(() => {
-  if (!pet?.petId) return;
+  useEffect(() => {
+    if (!pet?.petId) return;
 
-  (async () => {
-    try {
-      const buckets: OwnerTreatmentsByPet[] = await getTreatments();
-      const bucket = buckets.find(b => b.petResponse?.petId === pet.petId);
-      const items: OwnerTreatmentItem[] = bucket?.treatments ?? [];
+    (async () => {
+      try {
+        const buckets: OwnerTreatmentsByPet[] = await getTreatments();
+        const bucket = buckets.find((b) => b.petResponse?.petId === pet.petId);
+        const items: OwnerTreatmentItem[] = bucket?.treatments ?? [];
 
-      // 최신 10개만 후보로(상세 N+1 방지)
-      const candidates = items
-        .map(t => ({ t, ts: getSortTimestamp(t) }))
-        .filter(x => x.ts > 0)
-        .sort((a,b) => b.ts - a.ts)
-        .slice(0, 10)
-        .map(x => x.t);
+        // 최신 10개만 후보로(상세 N+1 방지)
+        const candidates = items
+          .map((t) => ({ t, ts: getSortTimestamp(t) }))
+          .filter((x) => x.ts > 0)
+          .sort((a, b) => b.ts - a.ts)
+          .slice(0, 10)
+          .map((x) => x.t);
 
-      // hospitalName 없으면 예약 상세로 보강
-      const enriched = await Promise.all(
-        candidates.map(async (t) => {
-          let hospitalName = (t as any).hospitalName ?? '';
+        // hospitalName 없으면 예약 상세로 보강
+        const enriched = await Promise.all(
+          candidates.map(async (t) => {
+            let hospitalName = (t as any).hospitalName ?? '';
 
-          if (!hospitalName) {
-            try {
-              const detail = await getReservationDetail(t.reservationId);
-              // 상세에서 병원명 확보
-              hospitalName = (detail as any)?.hospitalName ?? '';
-            } catch {
-              // 상세 실패는 스킵
+            if (!hospitalName) {
+              try {
+                const detail = await getReservationDetail(t.reservationId);
+                // 상세에서 병원명 확보
+                hospitalName = (detail as any)?.hospitalName ?? '';
+              } catch {
+                // 상세 실패는 스킵
+              }
             }
-          }
 
-          // 이름만 확보해도 표시 가능. id/location은 public 목록 매칭으로 보강
-          const match = hospitalName
-            ? hospitals.find(h => h.name === hospitalName)
-            : undefined;
+            // 이름만 확보해도 표시 가능. id/location은 public 목록 매칭으로 보강
+            const match = hospitalName ? hospitals.find((h) => h.name === hospitalName) : undefined;
 
-          return {
-            hospitalName,
-            hospitalId: match?.hospitalId,
-            location: match?.location ?? '',
-          };
-        })
-      );
+            return {
+              hospitalName,
+              hospitalId: match?.hospitalId,
+              location: match?.location ?? '',
+            };
+          }),
+        );
 
-      // 병원명 있는 것만 최신순 유니크
-      const seen = new Set<string>();
-      const uniq = enriched
-        .filter(e => e.hospitalName)
-        .filter(e => (seen.has(e.hospitalName) ? false : (seen.add(e.hospitalName), true)))
-        .slice(0, 5);
+        // 병원명 있는 것만 최신순 유니크
+        const seen = new Set<string>();
+        const uniq = enriched
+          .filter((e) => e.hospitalName)
+          .filter((e) => (seen.has(e.hospitalName) ? false : (seen.add(e.hospitalName), true)))
+          .slice(0, 5);
 
-      const recentHospitals: RecentHospital[] = uniq.map(e => ({
-        hospitalId: e.hospitalId,
-        name: e.hospitalName,
-        location: e.location,
-      }));
+        const recentHospitals: RecentHospital[] = uniq.map((e) => ({
+          hospitalId: e.hospitalId,
+          name: e.hospitalName,
+          location: e.location,
+        }));
 
-      setRecents(recentHospitals);
-    } catch (e) {
-      console.warn('최근 방문 병원 구성 실패:', e);
-      setRecents([]);
-    }
-  })();
-}, [pet?.petId, hospitals]);
-
-
-
+        setRecents(recentHospitals);
+      } catch (e) {
+        console.warn('최근 방문 병원 구성 실패:', e);
+        setRecents([]);
+      }
+    })();
+  }, [pet?.petId, hospitals]);
 
   // 자동완성 (검색창에 글자 있을 때만 결과 섹션 보이고, 없으면 전체 목록 섹션 보임)
   const debouncedSearch = useMemo(() => {
@@ -136,7 +131,7 @@ useEffect(() => {
             setSuggests([]);
             return;
           }
-          
+
           const s = await autocompleteHospitals(keyword, { signal: abortRef.current.signal });
           setSuggests(s);
         } catch (e: any) {
@@ -147,8 +142,10 @@ useEffect(() => {
       }, 250);
     };
   }, []);
-  
-  useEffect(() => { debouncedSearch(search); }, [search, debouncedSearch]);
+
+  useEffect(() => {
+    debouncedSearch(search);
+  }, [search, debouncedSearch]);
 
   const handleHospitalClick = (h: { hospitalId?: number; name: string; location?: string }) => {
     if (!h.hospitalId) {
@@ -164,26 +161,25 @@ useEffect(() => {
       <div className="px-7 py-6">
         <p className="p text-black mb-4 text-center">진료 받을 병원을 선택해주세요.</p>
 
-        <SearchInput
-          placeholder="병원명 혹은 병원 주소"
-          value={search}
-          onChange={setSearch}
-        />
+        <SearchInput placeholder="병원명 혹은 병원 주소" value={search} onChange={setSearch} />
 
         {/* 최근 방문한 병원 (항상 표시) */}
         <div className="mt-8">
           <h4 className="p text-black mb-3">최근 방문한 병원</h4>
           <div className="bg-gray-50 rounded-xl overflow-hidden">
-            {recents.length === 0 && (
-              <div className="p-4 text-gray-400">최근 방문한 병원이 없습니다.</div>
-            )}
+            {recents.length === 0 && <div className="p-4 text-gray-400">최근 방문한 병원이 없습니다.</div>}
             {recents.map((h, i) => (
-              <SearchListItem
+              <div
                 key={`${h.name}-${i}`}
-                name={h.name}
-                description={h.location ?? ''}
+                className="flex items-center px-0 py-3 bg-gray-50 w-full cursor-pointer"
                 onClick={() => handleHospitalClick(h)}
-              />
+              >
+                {/* 텍스트 영역 */}
+                <div className="ml-3 flex flex-col justify-center">
+                  <span className="h4 text-black">{h.name}</span>
+                  <span className="caption text-gray-400">{h.location ?? ''}</span>
+                </div>
+              </div>
             ))}
           </div>
         </div>
@@ -193,16 +189,19 @@ useEffect(() => {
           <div className="mt-6">
             <h4 className="p text-black mb-3">검색 결과</h4>
             <div className="bg-gray-50 rounded-xl overflow-hidden">
-              {suggests.length === 0 && (
-                <div className="p-4 text-gray-400">검색 결과가 없습니다.</div>
-              )}
-              {suggests.map(s => (
-                <SearchListItem
+              {suggests.length === 0 && <div className="p-4 text-gray-400">검색 결과가 없습니다.</div>}
+              {suggests.map((s) => (
+                <div
                   key={s.hospitalId}
-                  name={s.name}
-                  description={s.location}
+                  className="flex items-center px-0 py-3 bg-gray-50 w-full cursor-pointer"
                   onClick={() => handleHospitalClick(s)}
-                />
+                >
+                  {/* 텍스트 영역 */}
+                  <div className="ml-3 flex flex-col justify-center">
+                    <span className="h4 text-black">{s.name}</span>
+                    <span className="caption text-gray-400">{s.location}</span>
+                  </div>
+                </div>
               ))}
             </div>
           </div>
@@ -213,13 +212,18 @@ useEffect(() => {
           <div className="mt-8">
             <h4 className="p text-black mb-3">병원 목록</h4>
             <div className="bg-gray-50 rounded-xl overflow-hidden">
-              {hospitals.map(h => (
-                <SearchListItem
+              {hospitals.map((h) => (
+                <div
                   key={h.hospitalId}
-                  name={h.name}
-                  description={h.location}
+                  className="flex items-center px-0 py-3 bg-gray-50 w-full cursor-pointer"
                   onClick={() => handleHospitalClick(h)}
-                />
+                >
+                  {/* 텍스트 영역 */}
+                  <div className="ml-3 flex flex-col justify-center">
+                    <span className="h4 text-black">{h.name}</span>
+                    <span className="caption text-gray-400">{h.location}</span>
+                  </div>
+                </div>
               ))}
             </div>
           </div>
