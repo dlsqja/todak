@@ -44,6 +44,7 @@ export interface VetTreatmentListResponse {
   endTime: string;
   isCompleted: boolean;
   reservationId: number;
+  reservationTime: number;
   startTime: string;
   subject: string;
   treatementDate: string;

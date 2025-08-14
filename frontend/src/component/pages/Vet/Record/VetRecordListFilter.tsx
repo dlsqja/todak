@@ -3,28 +3,17 @@ import React, { useEffect, useMemo, useState } from 'react';
 import '@/styles/main.css';
 import SelectionDropdown from '@/component/selection/SelectionDropdown';
 import TreatmentSlideCard from '@/component/card/TreatmentSlideCard';
-import type { VetTreatment, VetTreatmentDetail } from '@/types/Vet/vettreatmentType';
+import type { VetTreatment } from '@/types/Vet/vettreatmentType';
 import { toTimeRange } from '@/utils/timeMapping';
-import { getVetTreatments, getVetTreatmentDetail } from '@/services/api/Vet/vettreatment';
+import { getVetTreatments } from '@/services/api/Vet/vettreatment';
+import { speciesMapping } from '@/utils/speciesMapping';
+import { subjectMapping } from '@/utils/subjectMapping';
 
 const signedOptions = [
   { value: 'ALL', label: '전체 상태' },
   { value: 'false', label: '검토 대기' },
   { value: 'true', label: '서명 완료' },
 ] as const;
-
-const subjectKo: Record<string, string> = {
-  DENTAL: '치과',
-  DERMATOLOGY: '피부과',
-  ORTHOPEDICS: '정형외과',
-  OPHTHALMOLOGY: '안과',
-};
-
-const koSpecies: Record<string, string> = {
-  DOG: '강아지',
-  CAT: '고양이',
-  OTHER: '기타',
-};
 
 // YYYY-MM-DD → "YYYY년 M월 D일"
 const formatKoreanDate = (ymd: string) => {
@@ -41,16 +30,16 @@ const getDateKey = (t: any): string => {
   return s.includes('T') ? s.split('T')[0] : s.split(' ')[0] || '';
 };
 
-// "종류 | 나이세 | 과목"
+// "종류 | 나이세 | 과목" (utils 매핑 사용)
 const makeInfo = (t: any) => {
   const p = t.pet ?? t.petInfo ?? {};
-  const species = koSpecies[p.species] ?? p.species ?? '반려동물';
+  const speciesKo = speciesMapping[p.species as keyof typeof speciesMapping] ?? p.species ?? '반려동물';
   const agePart = p.age != null ? `${p.age}세` : '';
-  const subject = subjectKo[t.subject] ?? '진료';
-  return [species, agePart, subject].filter(Boolean).join(' | ');
+  const subjectKo = subjectMapping[t.subject as keyof typeof subjectMapping] ?? '진료';
+  return [speciesKo, agePart, subjectKo].filter(Boolean).join(' | ');
 };
 
-// ✅ 실제 시작시간이 있는지(문자열이고 날짜로 파싱 가능) 체크
+// ✅ 실제 시작시간 있는지(리스트의 startTime 문자열 기준) 체크
 const hasRealStartTime = (it: any): boolean => {
   const s = it?.startTime ?? it?.start_time;
   if (typeof s !== 'string' || !s.trim()) return false;
@@ -80,47 +69,15 @@ export default function VetRecordListFilter({ data = [], onCardClick }: Props) {
       try {
         setLoading(true);
 
+        // ✅ 상세 호출 없이, 리스트(type=2)의 필드 그대로 사용
         const initialList =
           (data && data.length > 0) ? (data as any[]) : ((await getVetTreatments(2)) as any[]);
 
         if (!alive) return;
         setBase(initialList);
-
-        // 모든 treatmentId 상세 병렬 로딩 (DateFilter와 동일)
-        const ids = Array.from(new Set(initialList.map((x: any) => x.treatmentId))).filter(Boolean);
-        if (ids.length === 0) {
-          if (alive) setEnriched(initialList);
-          return;
-        }
-
-        const results = await Promise.allSettled(ids.map((id) => getVetTreatmentDetail(id)));
-        if (!alive) return;
-
-        const dmap = new Map<number, VetTreatmentDetail>();
-        results.forEach((r, i) => {
-          if (r.status === 'fulfilled' && r.value) dmap.set(ids[i], r.value as VetTreatmentDetail);
-        });
-
-        // 상세로 보강 병합(시간/펫/과목/완료여부 우선)
-        const merged = initialList.map((it: any) => {
-          const d = dmap.get(it.treatmentId);
-          if (!d) return it;
-          return {
-            ...it,
-            startTime: d.startTime ?? d.start_time ?? it.startTime,
-            endTime:   d.endTime   ?? d.end_time   ?? it.endTime,
-            pet:       it.pet ?? it.petInfo ?? d.pet ?? d.petInfo,
-            petInfo:   it.petInfo ?? d.petInfo ?? d.pet,
-            subject:   it.subject ?? d.subject,
-            isCompleted:
-              (it.isCompleted ?? it.is_completed) ??
-              (d.isCompleted  ?? d.is_completed),
-          };
-        });
-
-        setEnriched(merged);
+        setEnriched(initialList); // ← 바로 사용 (startTime/endTime 포함)
       } catch (e) {
-        console.warn('[VetRecordListFilter] load/enrich failed:', e);
+        console.warn('[VetRecordListFilter] load failed:', e);
         if (alive) {
           setBase(data as any[]);
           setEnriched(data as any[]);
@@ -143,7 +100,7 @@ export default function VetRecordListFilter({ data = [], onCardClick }: Props) {
       );
     }
 
-    // ✅ 시작시간 없는 항목 제외
+    // ✅ 시작시간 없는 항목 제외 (리스트의 startTime 기준)
     list = list.filter(hasRealStartTime);
 
     list.sort((a: any, b: any) => {
@@ -212,14 +169,14 @@ export default function VetRecordListFilter({ data = [], onCardClick }: Props) {
                 const timeRange = toTimeRange(start, end, slot);
 
                 const petName = t.pet?.name ?? t.petInfo?.name ?? '반려동물';
-                const subject = subjectKo[t.subject] ?? '진료';
+                const subjectKo = subjectMapping[t.subject as keyof typeof subjectMapping] ?? '진료';
                 const info    = makeInfo(t);
 
                 return (
                   <TreatmentSlideCard
                     key={t.treatmentId}
                     time={timeRange}
-                    department={subject}
+                    department={subjectKo}
                     petName={petName}
                     petInfo={info}
                     isAuthorized={true}

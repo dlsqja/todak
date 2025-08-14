@@ -2,9 +2,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import SelectionDropdown from '@/component/selection/SelectionDropdown';
 import TreatmentSlideCard from '@/component/card/TreatmentSlideCard';
-import type { VetTreatment, VetTreatmentDetail } from '@/types/Vet/vettreatmentType';
+import type { VetTreatment } from '@/types/Vet/vettreatmentType';
 import { toTimeRange } from '@/utils/timeMapping';
-import { getVetTreatmentDetail } from '@/services/api/Vet/vettreatment';
 
 const subjectKo: Record<string, string> = {
   DENTAL: '치과',
@@ -23,7 +22,6 @@ const koGender: Record<string, string> = {
 
 const formatDateKey = (val: unknown) => {
   if (val == null) return '';
-  // 어떤 타입이 와도 일단 문자열로 만든 뒤 YYYY-MM-DD를 안전 추출
   const s =
     typeof val === 'string'
       ? val
@@ -31,15 +29,10 @@ const formatDateKey = (val: unknown) => {
       ? val.toISOString()
       : String(val);
 
-  // 1) 맨 앞에 YYYY-MM-DD가 있으면 그걸 사용
   const m = s.match(/^\d{4}-\d{2}-\d{2}/);
   if (m) return m[0];
-
-  // 2) "YYYY-MM-DDTHH:mm..." or "YYYY-MM-DD HH:mm..." 형태 지원
   if (s.includes('T')) return s.split('T')[0] || '';
   if (s.includes(' ')) return s.split(' ')[0] || '';
-
-  // 그 외(숫자 슬롯 등)는 날짜로 쓸 수 없으니 공백
   return '';
 };
 const formatKoreanDate = (ymd: string) => {
@@ -62,51 +55,20 @@ interface Props {
 }
 
 export default function VetRecordDateFilter({ data = [], onCardClick }: Props) {
-  // 상세 캐시: treatmentId -> detail
-  const [details, setDetails] = useState<Record<number, VetTreatmentDetail>>({});
-  const [loading, setLoading] = useState(false);
+  // ✅ 상세 호출 제거: 로딩 플래그만 형태 유지
+  const [loading] = useState(false);
 
-  // 목록이 바뀌면 id들에 대해 상세 한번씩만 병렬로 로딩
-  useEffect(() => {
-    let alive = true;
-    (async () => {
-      const ids = Array.from(new Set((data ?? []).map((x) => x.treatmentId))).filter(Boolean);
-      if (!ids.length) {
-        setDetails({});
-        return;
-      }
-      setLoading(true);
-      try {
-        const results = await Promise.allSettled(ids.map((id) => getVetTreatmentDetail(id)));
-        const map: Record<number, VetTreatmentDetail> = {};
-        results.forEach((r, i) => {
-          if (r.status === 'fulfilled' && r.value) {
-            map[ids[i]] = r.value as VetTreatmentDetail;
-          }
-        });
-        if (alive) setDetails(map);
-      } finally {
-        if (alive) setLoading(false);
-      }
-    })();
-    return () => {
-      alive = false;
-    };
-  }, [data]);
-
-  // 드롭다운 날짜 목록(상세.startTime 우선, 없으면 목록의 startTime)
+  // 드롭다운 날짜 목록(리스트의 startTime만 사용)
   const dates = useMemo(() => {
     const s = new Set<string>();
     for (const it of data as any[]) {
-      const det = details[it.treatmentId];
       const key =
-        formatDateKey(det?.startTime) ||
         formatDateKey((it as any).startTime) ||
         formatDateKey((it as any).start_time);
       if (key) s.add(key);
     }
     return Array.from(s).sort((a, b) => b.localeCompare(a)); // 최신 날짜 먼저
-  }, [data, details]);
+  }, [data]);
 
   const [selectedDate, setSelectedDate] = useState('');
   useEffect(() => {
@@ -119,24 +81,20 @@ export default function VetRecordDateFilter({ data = [], onCardClick }: Props) {
   // 선택 날짜의 카드 목록(같은 날짜 안에서는 최신 시작시간이 위쪽)
   const selectedList = useMemo(() => {
     const list = (data as any[]).filter((it) => {
-      const det = details[it.treatmentId];
       const key =
-        formatDateKey(det?.startTime) ||
         formatDateKey(it.startTime) ||
         formatDateKey(it.start_time);
       return key === selectedDate;
     });
 
     list.sort((a, b) => {
-      const da = details[a.treatmentId];
-      const db = details[b.treatmentId];
-      const sa = String(da?.startTime ?? a.startTime ?? a.start_time ?? '');
-      const sb = String(db?.startTime ?? b.startTime ?? b.start_time ?? '');
+      const sa = String(a.startTime ?? a.start_time ?? '');
+      const sb = String(b.startTime ?? b.start_time ?? '');
       return sb.localeCompare(sa); // 최신이 위
     });
 
     return list;
-  }, [data, details, selectedDate]);
+  }, [data, selectedDate]);
 
   return (
     <div className="px-7">
@@ -158,17 +116,15 @@ export default function VetRecordDateFilter({ data = [], onCardClick }: Props) {
             </div>
 
             {selectedList.map((t: any) => {
-              const det = details[t.treatmentId];
               const timeRange = toTimeRange(
-                det?.startTime ?? t.startTime ?? t.start_time,
-                det?.endTime ?? t.endTime ?? t.end_time,
-                // 목록 값이 슬롯 숫자라면 보조로 사용
+                t.startTime ?? t.start_time,
+                t.endTime ?? t.end_time,
                 t.reservationTime ?? t.reservation_time
               );
 
-              const petName = t.pet?.name ?? t.petInfo?.name ?? det?.pet?.name ?? '반려동물';
-              const subject = subjectKo[(t.subject as string) ?? (det?.subject as string)] ?? '진료';
-              const info = makeInfo(det ?? t);
+              const petName = t.pet?.name ?? t.petInfo?.name ?? '반려동물';
+              const subject = subjectKo[(t.subject as string)] ?? '진료';
+              const info = makeInfo(t);
 
               return (
                 <TreatmentSlideCard
@@ -178,7 +134,7 @@ export default function VetRecordDateFilter({ data = [], onCardClick }: Props) {
                   petName={petName}
                   petInfo={info}
                   isAuthorized={true}
-                  is_signed={!!(t.isCompleted ?? t.is_completed ?? det?.isCompleted)}
+                  is_signed={!!(t.isCompleted ?? t.is_completed)}
                   onClick={() => onCardClick(t.treatmentId)}
                 />
               );

@@ -120,7 +120,7 @@ export default function VetHome() {
   };
   // ───────────────────────────────────────────
 
-  // ✅ 비대면 진료 예정 목록
+  // ✅ 비대면 진료 예정 목록 (예약 상세 호출 제거: 목록의 reservationTime 사용)
   useEffect(() => {
     let alive = true;
     (async () => {
@@ -144,30 +144,16 @@ export default function VetHome() {
           return true;
         });
 
-        const details = await Promise.all(
-          target.map(async (it) => {
-            try {
-              try {
-                return await getVetReservationDetail(it.reservationId);
-              } catch {
-                return await getStaffReservationDetail(it.reservationId);
-              }
-            } catch {
-              return null;
-            }
-          }),
-        );
-
-        const rows = target.map((it, idx) => {
-          const det = details[idx];
+        // 🔁 목록의 reservationTime으로 바로 라벨/정렬 생성
+        const rows = target.map((it) => {
           const pet = it.petInfo;
           const species = speciesMapping[pet.species as keyof typeof speciesMapping] ?? '반려동물';
           const gender = genderMapping[pet.gender as keyof typeof genderMapping] ?? '성별미상';
           const agePart = Number.isFinite(pet.age as number) ? `${pet.age}세` : '';
           const department = subjectMapping[it.subject as keyof typeof subjectMapping] ?? '진료';
 
-          const timeLabel = reservationToHHmm(det?.reservationTime) || '시간 미정';
-          const sortMin = reservationToMinutes(det?.reservationTime);
+          const timeLabel = reservationToHHmm(it.reservationTime) || '시간 미정';
+          const sortMin = reservationToMinutes(it.reservationTime);
 
           return {
             id: it.reservationId,
@@ -233,58 +219,40 @@ export default function VetHome() {
   };
 
   useEffect(() => {
-    let alive = true;
-    (async () => {
-      try {
-        setReviewLoading(true);
+  let alive = true;
+  (async () => {
+    try {
+      setReviewLoading(true);
 
-        const initialList = (await getVetTreatments(2)) as any[];
+      // type=2 리스트만 사용
+      const raw = (await getVetTreatments(2)) as any[];
 
-        const ids = Array.from(new Set(initialList.map((x: any) => x.treatmentId))).filter(Boolean);
-        const results = await Promise.allSettled(ids.map((id) => getVetTreatmentDetail(id)));
+      // treatmentId 중복 제거
+      const seenTid = new Set<number>();
+      const unique = raw.filter((x: any) => {
+        const tid = Number(x?.treatmentId);
+        if (!tid || seenTid.has(tid)) return false;
+        seenTid.add(tid);
+        return true;
+      });
 
-        const dmap = new Map<number, VetTreatmentDetail>();
-        results.forEach((r, i) => {
-          if (r.status === 'fulfilled' && r.value) dmap.set(ids[i], r.value as VetTreatmentDetail);
-        });
+      // startTime 없는(무효) 항목 제외 + 시작 시간순 정렬
+      const finalList = unique
+        .filter(hasRealStartTime)
+        .sort((a: any, b: any) => getStartTs(a) - getStartTs(b));
 
-        const merged = initialList.map((it: any) => {
-          const d = dmap.get(it.treatmentId);
-          if (!d) return it;
-          return {
-            ...it,
-            startTime: d.startTime ?? d.start_time ?? it.startTime,
-            endTime: d.endTime ?? d.end_time ?? it.endTime,
-            pet: it.pet ?? it.petInfo ?? d.pet ?? d.petInfo,
-            petInfo: it.petInfo ?? d.petInfo ?? d.pet,
-            subject: it.subject ?? d.subject,
-            isCompleted: it.isCompleted ?? it.is_completed ?? d.isCompleted ?? d.is_completed,
-          };
-        });
-
-        // treatmentId 중복 제거
-        const seenTid = new Set<number>();
-        const uniqueByTid = merged.filter((x: any) => {
-          const tid = x.treatmentId;
-          if (seenTid.has(tid)) return false;
-          seenTid.add(tid);
-          return true;
-        });
-
-        const finalList = uniqueByTid.filter(hasRealStartTime).sort((a: any, b: any) => getStartTs(a) - getStartTs(b));
-
-        if (alive) setReviewData(finalList as VetTreatment[]);
-      } catch (e) {
-        console.warn('[VetHome] reviewData load failed:', e);
-        if (alive) setReviewData([]);
-      } finally {
-        if (alive) setReviewLoading(false);
-      }
-    })();
-    return () => {
-      alive = false;
-    };
-  }, []);
+      if (alive) setReviewData(finalList as VetTreatment[]);
+    } catch (e) {
+      console.warn('[VetHome] reviewData load failed:', e);
+      if (alive) setReviewData([]);
+    } finally {
+      if (alive) setReviewLoading(false);
+    }
+  })();
+  return () => {
+    alive = false;
+  };
+}, []);
 
   // ── 가로 드래그 스크롤(예정 목록) ─────────────────────────
   const hScrollRef = useRef<HTMLDivElement>(null);
