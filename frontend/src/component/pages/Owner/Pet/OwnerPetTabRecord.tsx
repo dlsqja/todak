@@ -95,7 +95,7 @@ export default function OwnerPetTabRecord({ selectedPet }: OwnerPetTabRecordProp
             value={selectedSubject}
             onChange={setSelectedSubject}
             options={[
-              { value: '', label: '전체 과목' },
+              // { value: '', label: '전체 과목' },
               { value: 'DENTAL', label: '치과' },
               { value: 'DERMATOLOGY', label: '피부과' },
               { value: 'ORTHOPEDICS', label: '정형외과' },
@@ -108,7 +108,10 @@ export default function OwnerPetTabRecord({ selectedPet }: OwnerPetTabRecordProp
           <SelectionDropdown
             value={selectedDate}
             onChange={setSelectedDate}
-            options={[{ value: '', label: '전체 날짜' }, ...uniqueDates.map((d) => ({ value: d, label: d }))]}
+            options={[
+              // { value: '', label: '전체 날짜' },
+              ...uniqueDates.map((d) => ({ value: d, label: d })),
+            ]}
             placeholder="날짜 필터"
           />
         </div>
