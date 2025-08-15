@@ -6,7 +6,7 @@ import TabGroupPet from '@/component/navbar/TabGroupPet';
 import OwnerPetTabInfo from './OwnerPetTabInfo';
 import OwnerPetTabRecord from './OwnerPetTabRecord';
 
-import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion, type Variants } from 'framer-motion';
 import PlusIcon from '@/component/icon/PlusIcon';
 
 import { getMyPets } from '@/services/api/Owner/ownerpet'; // ✅ API 함수 import
@@ -23,7 +23,7 @@ const stripVariants = {
     },
   },
 };
-const itemVariants = {
+const itemVariants: Variants = {
   hidden: { opacity: 0, x: -24 },
   show: { opacity: 1, x: 0, transition: { duration: 0.26, ease: [0.22, 1, 0.36, 1] } },
 };
@@ -85,7 +85,7 @@ export default function OwnerPetHome() {
             <img src="/images/sad_dog.png" alt="nodata" className="w-20 h-20" />
             <p className="h4 text-gray-500">등록된 반려동물이 없습니다.</p>
             <button
-              className="text-white bg-green-300/60 hover:bg-green-300 px-6 py-2 rounded-xl p cursor-pointer"
+              className="text-white bg-green-300/60 hover:bg-green-400 px-6 py-2 rounded-xl p cursor-pointer"
               onClick={() => navigate('/owner/pet/register')}
             >
               반려동물 등록하러 가기
