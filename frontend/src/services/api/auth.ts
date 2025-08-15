@@ -26,6 +26,9 @@ export const authAPI = {
   vetSignup: async (vetRequest: FormData, authId: string) => {
     const response = await apiClient.post('/public/signup/vet', vetRequest, {
       params: { authId: Number(authId) },
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
     });
     console.log('vetSignup response', response.data);
     return response.data;
