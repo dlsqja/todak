@@ -5,7 +5,7 @@ import axios from 'axios';
 // 1. 반려동물 목록 조회
 export const getMyPets = async () => {
   const res = await apiClient.get('/pets');
-  console.log('🐶 API 응답:', res.data);
+  // console.log('API 응답:', res.data);
   return res.data.data;
 };
 
@@ -19,7 +19,7 @@ export const getPetDetail = async (petId) => {
 export const registerPet = async ({ petRequest, photo }) => {
   const formData = new FormData();
 
-  console.log('petRequest:', petRequest);
+  // console.log('petRequest:', petRequest);
 
   formData.append('petRequest', new Blob([JSON.stringify(petRequest)], { type: 'application/json' }));
 
@@ -29,10 +29,10 @@ export const registerPet = async ({ petRequest, photo }) => {
 
   // 확인용 로그
   for (const [key, value] of formData.entries()) {
-    console.log(`${key}:`, value);
+    // console.log(`${key}:`, value);
   }
-  console.log('formData', formData);
-  console.log('✅ baseURL 확인:', apiClient.defaults.baseURL);
+  // console.log('formData', formData);
+  // console.log('baseURL 확인:', apiClient.defaults.baseURL);
 
   // 요청 경로 수정: /owner/pets로 변경
   const res = await apiClient.post('/pets', formData, {
@@ -85,6 +85,6 @@ export const getPets = async () => {
 // 반려동물 삭제 함수
 export const deletePet = async (petId: number) => {
   const response = await apiClient.delete(`/pets/${petId}`);
-  console.log(response.data);
+  // console.log(response.data);
   return response.data;
 };

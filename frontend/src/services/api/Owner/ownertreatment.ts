@@ -12,7 +12,7 @@ export const getTreatmentWaitingList = async (): Promise<OwnerTreatmentsByPet[]>
 // 비대면 진료 완료 목록
 export const getTreatments = async () => {
   const res = await apiClient.get('/treatments/owner?type=1');
-  console.log('rescomplete:', res.data.data);
+  // console.log('rescomplete:', res.data.data);
   return res.data?.data ?? [];
 };
 

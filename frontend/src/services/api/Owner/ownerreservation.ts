@@ -9,7 +9,6 @@ import type {
 //  예약 목록 조회
 export const getReservations = async (): Promise<OwnerReservationList[]> => {
   const response = await apiClient.get('/reservations/owner');
-  console.log('allresponse:', response.data.data);
   return response.data?.data ?? response.data;
 };
 
@@ -23,7 +22,6 @@ export const getReservationDetail = async (reservationId: number): Promise<Reser
 // 예약 반려 상세 조회
 export const getReservationRejectDetail = async (reservationId: number): Promise<{ reason: string }> => {
   const res = await apiClient.get(`/reservations/owner/rejection/${reservationId}`);
-  console.log('resreject:', res.data.data);
   return res.data?.data ?? res.data;
 };
 
@@ -43,7 +41,7 @@ export const createReservation = async (
   return res.data?.data ?? res.data;
 };
 
-// 🔴 예약 취소 (필요 시 해제)
+// 예약 취소 (필요 시 해제)
 // export const deleteReservation = async (reservationId: number): Promise<void> => {
 //   await apiClient.delete(`/reservations/owner/${reservationId}`);
 // }
