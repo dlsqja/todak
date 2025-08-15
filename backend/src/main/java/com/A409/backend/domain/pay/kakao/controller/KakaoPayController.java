@@ -8,22 +8,25 @@ import com.A409.backend.domain.pay.kakao.dto.KakaoReadyResponse;
 import com.A409.backend.domain.pay.kakao.service.KakaoPayService;
 import com.A409.backend.global.redis.RedisService;
 import com.A409.backend.global.response.APIResponse;
+import com.A409.backend.global.security.model.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/public/pay")
+@RequestMapping("/owner/pay")
 @RequiredArgsConstructor
 public class KakaoPayController {
 
     private final KakaoPayService kakaoPayService;
     private final RedisService redisService;
 
-    @PostMapping("/ready/{user_id}")
-    public APIResponse<?> readyKakaoPay(@PathVariable("user_id") Long userId, @RequestBody Map<String, String> body) {
+    @PostMapping("/ready")
+    public APIResponse<?> readyKakaoPay(@AuthenticationPrincipal User user, @RequestBody Map<String, String> body) {
+        Long userId = user.getId();
         KakaoReadyRequest req = KakaoReadyRequest.builder()
                 .successUrl(body.get("successUrl"))
                 .cancelUrl(body.get("cancelUrl"))
@@ -41,15 +44,17 @@ public class KakaoPayController {
         return APIResponse.ofSuccess(redirectUrl);
     }
 
-    @PostMapping("/regist/{user_id}")
-    public APIResponse<?> regist(@PathVariable("user_id") Long userId, @RequestBody Map<String, String> body) {
+    @PostMapping("/regist")
+    public APIResponse<?> regist(@AuthenticationPrincipal User user, @RequestBody Map<String, String> body) {
+        Long userId = user.getId();
         String pgToken = body.get("pgToken");
         kakaoPayService.registPay(userId, pgToken);
         return APIResponse.ofSuccess(null);
     }
 
-    @PostMapping("/{user_id}")
-    public APIResponse<?> pay(@PathVariable("user_id") Long userId, @RequestBody Map<String, String> body) {
+    @PostMapping("/")
+    public APIResponse<?> pay(@AuthenticationPrincipal User user, @RequestBody Map<String, String> body) {
+        Long userId = user.getId();
         KakaoPayRequest req = KakaoPayRequest.builder()
                 .item_name(body.get("item_name"))
                 .partner_order_id("sub-" + userId)
