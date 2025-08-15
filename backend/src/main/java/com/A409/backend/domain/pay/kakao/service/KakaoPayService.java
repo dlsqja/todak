@@ -1,6 +1,10 @@
 package com.A409.backend.domain.pay.kakao.service;
 
+import com.A409.backend.domain.hospital.entity.Hospital;
+import com.A409.backend.domain.hospital.repository.HospitalRepository;
 import com.A409.backend.domain.pay.kakao.dto.*;
+import com.A409.backend.domain.pay.kakao.entity.Payment;
+import com.A409.backend.domain.pay.kakao.repository.PaymentRepository;
 import com.A409.backend.domain.user.owner.entity.Owner;
 import com.A409.backend.domain.user.owner.repository.OwnerRepository;
 import com.A409.backend.global.enums.ErrorCode;
@@ -28,6 +32,8 @@ public class KakaoPayService {
     private final RestTemplate rest = new RestTemplate();
     private final OwnerRepository ownerRepository;
     private final RedisService redisService;
+    private final PaymentRepository paymentRepository;
+    private final HospitalRepository hospitalRepository;
 
     public KakaoReadyResponse readyZero(KakaoReadyRequest req) {
         String url = props.getHost() + "/v1/payment/ready";
@@ -64,6 +70,7 @@ public class KakaoPayService {
         if (tid == null) {
             throw new CustomException(ErrorCode.INVALID_ERROR);
         }
+        Owner owner = ownerRepository.findById(ownerId).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "SECRET_KEY " + props.getAdminKey());
@@ -78,25 +85,28 @@ public class KakaoPayService {
 
         HttpEntity<Map<String, Object>> entity = new HttpEntity<>(body, headers);
         ResponseEntity<KakaoApproveResponse> res = rest.postForEntity(url, entity, KakaoApproveResponse.class);
-        
+
         // sid를 저장하기
         if (res.getBody() == null) {
             throw new CustomException(ErrorCode.INVALID_ERROR);
         }
         String sid = res.getBody().getSid();
-        Owner owner = ownerRepository.findById(ownerId).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
         owner.setSID(sid);
         ownerRepository.save(owner);
+        redisService.deleteByKey(redisKey);
     }
 
     @Transactional
     public void pay(KakaoPayRequest req) {
         String url = props.getHost() + "/v1/payment/subscription";
-        Long ownerId = Long.parseLong(req.getPartner_user_id());
-        Owner owner = ownerRepository.findById(ownerId).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        Payment payment = paymentRepository.findByPaymentId(req.getPayment_id())
+                .orElseThrow(() -> new CustomException(ErrorCode.PAYMENT_NOT_FOUND));
+
+        Hospital hospital = payment.getHospital();
+        Owner owner = payment.getOwner();
         String sid = owner.getSID();
         if (sid == null) {
-            throw new CustomException(ErrorCode.INVALID_ERROR);
+            throw new CustomException(ErrorCode.PAYMENT_FAIL);
         }
 
         HttpHeaders headers = new HttpHeaders();
@@ -106,22 +116,30 @@ public class KakaoPayService {
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("cid", props.getCid());
         body.put("sid", sid);
-        body.put("partner_order_id", req.getPartner_order_id());
-        body.put("partner_user_id",  req.getPartner_user_id());
-        body.put("item_name", req.getItem_name());
-        body.put("quantity", req.getQuantity());
+        body.put("partner_order_id", "sub-" + owner.getOwnerId());
+        body.put("partner_user_id",  owner.getOwnerId());
+        body.put("item_name", hospital.getName() + "진료비");
+        body.put("quantity", 1L);
         body.put("total_amount", req.getTotal_amount());
-//        body.put("vat_amount", req.getVat_amount());
-        body.put("tax_free_amount", req.getTax_free_amount());
+        body.put("tax_free_amount", 0);
 
-        System.out.println(body.toString());
         HttpEntity<Map<String, Object>> entity = new HttpEntity<>(body, headers);
-        // try - catch로 해야하나?
         ResponseEntity<KakaoApproveResponse> res = rest.postForEntity(url, entity, KakaoApproveResponse.class);
         if (res.getBody() == null) {
-            throw new CustomException(ErrorCode.INVALID_ERROR);
+            throw new CustomException(ErrorCode.PAYMENT_FAIL);
         }
-        System.out.println(res.getBody());
+        payment.setIsCompleted(true);
+        payment.setTid(res.getBody().getTid());
+        paymentRepository.save(payment);
+    }
+
+    @Transactional
+    public List<Payment> getPaymentList(Long hospitalId) {
+        Hospital hospital = hospitalRepository.findById(hospitalId)
+                .orElseThrow(() -> new CustomException(ErrorCode.HOSPITAL_NOT_FOUND));
+        List<Payment> list = paymentRepository.findByHospital(hospital);
+
+        return list;
     }
 }
 
