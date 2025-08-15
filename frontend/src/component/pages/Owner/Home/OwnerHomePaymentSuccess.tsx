@@ -32,28 +32,25 @@ export default function PaymentSuccessPage() {
   }, [sp]);
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
+    <div className="w-full h-full bg-gray-50 flex flex-col gap-4">
       <BackHeader text="결제수단 등록" />
-      <div className="px-7 py-6 flex-1">
+      <div className="px-7 py-6">
         {status === 'loading' && <p className="text-gray-600">{msg}</p>}
 
         {status === 'success' && (
           <>
-            <p className="text-green-700 font-medium">{msg}</p>
+            <p className="text-green-400 h4">{msg}</p>
             <p className="text-sm text-gray-600 mt-2">마이페이지 &gt; 결제수단에서 등록 정보를 확인할 수 있어요.</p>
           </>
         )}
 
         {status === 'error' && (
           <>
-            <p className="text-red-600 font-medium">{msg}</p>
-            <p className="text-sm text-gray-600 mt-2">결제수단을 다시 등록하거나 다른 방법을 선택해주세요.</p>
+            <p className="text-red-600 h4">{msg}</p>
+            <p className="text-p text-gray-600 mt-2">결제수단을 다시 등록하거나 다른 방법을 선택해주세요.</p>
           </>
         )}
-      </div>
-
-      <div className="px-6 pb-6">
-        <Button color="green" text="확인" onClick={() => navigate('/owner/home/apply-complete')} />
+        <Button color="green" text="확인" className="mt-10" onClick={() => navigate('/owner/home/apply-complete')} />
       </div>
     </div>
   );

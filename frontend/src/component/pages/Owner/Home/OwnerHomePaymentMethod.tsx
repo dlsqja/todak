@@ -36,24 +36,25 @@ export default function PaymentMethodPage() {
   };
 
   return (
-    <div className="bg-gray-50 flex flex-col">
+    <div className="w-full h-full bg-gray-50 flex flex-col">
       <BackHeader text="결제수단 등록" />
       <div className="px-7 py-6 flex-1 overflow-y-auto flex flex-col gap-4">
-        <h2 className="text-xl font-semibold">자동결제용 결제수단 등록</h2>
-        <p className="text-gray-600 text-sm leading-6">
-          최초 1회 0원 인증만 진행하고, 정기결제 키(SID)만 발급받습니다.
+        <h2 className="h3">자동결제용 결제수단 등록</h2>
+        <p className="text-gray-600  leading-6">
+          최초 1회 0원 인증만 진행하고,
+          <br />
+          정기결제 키(SID)만 발급받습니다.
           <br />
           이후 결제는 등록된 SID로 자동으로 청구됩니다.
         </p>
-      </div>
-
-      <div className="px-6 pb-6">
-        <Button
-          color="green"
-          text={loading ? '연결 중…' : '카카오페이로 인증'}
-          onClick={startZeroAuth}
-          disabled={loading}
-        />
+        <div className="pt-3">
+          <Button
+            color="green"
+            text={loading ? '연결 중…' : '카카오페이로 인증'}
+            onClick={startZeroAuth}
+            disabled={loading}
+          />
+        </div>
       </div>
     </div>
   );
