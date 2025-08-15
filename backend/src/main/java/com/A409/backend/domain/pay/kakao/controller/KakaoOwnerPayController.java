@@ -2,13 +2,13 @@ package com.A409.backend.domain.pay.kakao.controller;
 
 import com.A409.backend.global.enums.ErrorCode;
 import com.A409.backend.global.exception.CustomException;
-import com.A409.backend.domain.pay.kakao.dto.KakaoPayRequest;
 import com.A409.backend.domain.pay.kakao.dto.KakaoReadyRequest;
 import com.A409.backend.domain.pay.kakao.dto.KakaoReadyResponse;
 import com.A409.backend.domain.pay.kakao.service.KakaoPayService;
 import com.A409.backend.global.redis.RedisService;
 import com.A409.backend.global.response.APIResponse;
 import com.A409.backend.global.security.model.User;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -19,11 +19,12 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/owner/pay")
 @RequiredArgsConstructor
-public class KakaoPayController {
+public class KakaoOwnerPayController {
 
     private final KakaoPayService kakaoPayService;
     private final RedisService redisService;
 
+    @Operation(summary = "자동결제 토큰 생성", description = "카카오페이 인증을 위한 토큰을 생성합니다.")
     @PostMapping("/ready")
     public APIResponse<?> readyKakaoPay(@AuthenticationPrincipal User user, @RequestBody Map<String, String> body) {
         Long userId = user.getId();
@@ -44,6 +45,7 @@ public class KakaoPayController {
         return APIResponse.ofSuccess(redirectUrl);
     }
 
+    @Operation(summary = "자동결제 등록", description = "자동결제를 위한 코드를 저장합니다.")
     @PostMapping("/regist")
     public APIResponse<?> regist(@AuthenticationPrincipal User user, @RequestBody Map<String, String> body) {
         Long userId = user.getId();
@@ -51,23 +53,4 @@ public class KakaoPayController {
         kakaoPayService.registPay(userId, pgToken);
         return APIResponse.ofSuccess(null);
     }
-
-    @PostMapping("/")
-    public APIResponse<?> pay(@AuthenticationPrincipal User user, @RequestBody Map<String, String> body) {
-        Long userId = user.getId();
-        KakaoPayRequest req = KakaoPayRequest.builder()
-                .item_name(body.get("item_name"))
-                .partner_order_id("sub-" + userId)
-                .partner_user_id(String.valueOf(userId))
-                .quantity(1L)
-                .total_amount(Long.parseLong(body.get("total_amount")))
-                .vat_amount(Long.parseLong(body.get("vat_amount")))
-                .tax_free_amount(Long.parseLong(body.get("tax_free_amount")))
-                .build();
-
-        kakaoPayService.pay(req);
-        return APIResponse.ofSuccess(null);
-    }
-
-
 }

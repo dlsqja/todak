@@ -39,6 +39,9 @@ public enum ErrorCode {
     INVALID_STATUS(HttpStatus.BAD_REQUEST, "유효하지 않은 예약 상태(status) 값입니다."),
 
     USER_PET_DUPLICATED(HttpStatus.CONFLICT, "이미 등록한 Pet 입니다."),
+
+    PAYMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 결제 건을 찾을 수 없습니다."),
+    PAYMENT_FAIL(HttpStatus.UNPROCESSABLE_ENTITY, "결제 요청이 실패했습니다."),
     SESSION_NOT_FOUND(HttpStatus.NOT_FOUND, "세션이 존재하지 않습니다.");
 
 

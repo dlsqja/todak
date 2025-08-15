@@ -6,11 +6,12 @@ import lombok.Getter;
 @Getter
 @Builder
 public class KakaoPayRequest {
-    private String item_name;
-    private String partner_order_id;
-    private String partner_user_id;
-    private Long quantity;
+//    private String item_name;
+//    private String partner_order_id;
+//    private String partner_user_id;
+//    private Long quantity;
+    private Long payment_id;
     private Long total_amount;
-    private Long vat_amount;
-    private Long tax_free_amount;
+//    private Long vat_amount;
+//    private Long tax_free_amount;
 }
