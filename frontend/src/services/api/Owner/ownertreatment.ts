@@ -22,6 +22,7 @@ export const getTreatmentDetail = async (treatmentId: number) => {
 
   for (const bucket of buckets) {
     const t = bucket.treatments.find((x) => x.reservationId === treatmentId);
+    // console.log('t:', t);
     if (!t) continue;
 
     // ✅ 오타/누락 모두 대비 (treatementInfo | treatmentInfo | 개별 필드)
@@ -32,6 +33,7 @@ export const getTreatmentDetail = async (treatmentId: number) => {
 
     return {
       treatmentId: t.reservationId,
+      hospitalId: t.hospitalId,
       reservation: { photo: undefined, description: undefined }, // 목록엔 없음
       vetName: t.vetName ?? '',
       pet: bucket.petResponse,

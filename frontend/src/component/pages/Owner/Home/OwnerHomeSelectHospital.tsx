@@ -50,6 +50,7 @@ export default function SelectHospitalPage() {
   //   (async () => {
   //     try {
   //       const list = await getPublicHospitals();
+  //       console.log('list:', list);
   //       // 병원 이름 기준 가나다순 정렬
   //       const sortedList = list.sort((a, b) => a.name.localeCompare(b.name));
   //       setHospitals(sortedList);
@@ -66,9 +67,13 @@ export default function SelectHospitalPage() {
 
     (async () => {
       try {
+        // 진료 완료된 목록을 조회
         const buckets: OwnerTreatmentsByPet[] = await getTreatments();
+        // 현재 선택한 동물의 진료 완료된 목록만 필터링
         const bucket = buckets.find((b) => b.petResponse?.petId === pet.petId);
+        // 거기서 reservation 목록만 조회
         const items: OwnerTreatmentItem[] = bucket?.treatments ?? [];
+        // console.log('items:', items);
 
         // 최신 10개만 후보로(상세 N+1 방지)
         const candidates = items
@@ -81,13 +86,15 @@ export default function SelectHospitalPage() {
         // hospitalName 없으면 예약 상세로 보강
         const enriched = await Promise.all(
           candidates.map(async (t) => {
+            // console.log('t:', t);
             let hospitalName = (t as any).hospitalName ?? '';
-
+            // console.log('hospitalName:', hospitalName);
             if (!hospitalName) {
               try {
                 const detail = await getReservationDetail(t.reservationId);
                 // 상세에서 병원명 확보
                 hospitalName = (detail as any)?.hospitalName ?? '';
+                // console.log('hospitalName:', hospitalName);
               } catch {
                 // 상세 실패는 스킵
               }
@@ -95,6 +102,7 @@ export default function SelectHospitalPage() {
 
             // 이름만 확보해도 표시 가능. id/location은 public 목록 매칭으로 보강
             const match = hospitalName ? hospitals.find((h) => h.name === hospitalName) : undefined;
+            // console.log('match:', match);
 
             return {
               hospitalName,
@@ -268,6 +276,7 @@ export default function SelectHospitalPage() {
           <div className="bg-gray-50 rounded-xl overflow-hidden">
             {recents.length === 0 && <div className="p-4 text-gray-400 text-center">최근 방문한 병원이 없습니다.</div>}
             {recents.slice(0, visibleRecentCount).map((h, i) => (
+              // console.log('h:', h),
               <div
                 key={`${h.name}-${i}`}
                 className="flex px-0 py-3 bg-gray-50 w-full cursor-pointer"
