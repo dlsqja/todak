@@ -6,12 +6,14 @@ interface MobileLayoutProps {
 }
 
 const MobileLayout: React.FC<MobileLayoutProps> = ({ menuBar }) => (
-  <div id="app-shell" className="max-h-screen w-full mx-auto max-w-md bg-gray-50 flex flex-col pt-7">
-    <main className="h-screen overflow-y-auto pb-2">
-      {/* hidden scrollbar  설정가능*/}
-      <Outlet />
-    </main>
-    {menuBar}
+  <div className="max-h-screen bg-gray-100 flex justify-center items-start">
+    <div id="app-shell" className="max-h-screen w-full mx-auto max-w-md bg-gray-50 flex flex-col pt-7 shadow-lg">
+      <main className="h-screen overflow-y-auto pb-2">
+        {/* hidden scrollbar  설정가능*/}
+        <Outlet />
+      </main>
+      {menuBar}
+    </div>
   </div>
 );
 export default MobileLayout;
