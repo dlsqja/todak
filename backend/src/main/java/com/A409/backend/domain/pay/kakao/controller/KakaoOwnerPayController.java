@@ -17,7 +17,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/owner/pay")
+@RequestMapping("/owners/pay")
 @RequiredArgsConstructor
 public class KakaoOwnerPayController {
 
