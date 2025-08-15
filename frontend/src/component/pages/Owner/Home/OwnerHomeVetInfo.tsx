@@ -152,9 +152,9 @@ export default function VetInfoPage() {
 
       <div className="flex-1 px-7 py-6 flex flex-col gap-3 overflow-y-auto h-full">
         {/* 프로필 */}
-        <div className="w-full h-[200px] bg-gray-100 rounded-[12px] overflow-hidden">
+        <div className="w-full h-[200px] bg-gray-50 rounded-[12px] overflow-hidden">
           {vet?.photo ? (
-            <img src={`${photoUrl}${vet.photo}`} alt={vet.name} className="w-full h-full object-cover" />
+            <img src={`${photoUrl}${vet.photo}`} alt={vet.name} className="w-full h-full object-scale-down" />
           ) : (
             <img src="/images/person_default.png" alt="수의사 프로필 사진" className="w-full h-full object-contain" />
           )}

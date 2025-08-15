@@ -343,7 +343,7 @@ export default function SelectHospitalPage() {
         {!search.trim() && (
           <div className="mt-6">
             <div className="bg-gray-50 rounded-xl p-4 text-center">
-              <p className="text-gray-400 p">병원명 혹은 병원 주소를 검색해주세요.</p>
+              <p className="text-gray-400 p">예약하고자 하는 병원을 검색해주세요.</p>
             </div>
           </div>
         )}
