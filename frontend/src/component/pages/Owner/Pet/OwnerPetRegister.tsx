@@ -102,13 +102,13 @@ export default function OwnerPetRegister() {
             className="hidden" // input은 숨겨놓고 버튼을 통해 클릭
           />
           <button
-            className="text-white bg-green-300 px-4 py-1 rounded-xl h5"
+            className="text-white bg-green-300 px-4 py-1 rounded-xl h5 cursor-pointer"
             onClick={handleImageUpload} // 사진 등록 버튼 클릭 시 파일 선택 창 열기
           >
             사진 등록
           </button>
           <button
-            className="text-gray-400 bg-gray-100 px-4 py-1 rounded-xl h5"
+            className="text-gray-400 bg-gray-100 px-4 py-1 rounded-xl h5 cursor-pointer"
             onClick={handleRemoveImage} // 사진 제거 버튼 클릭 시 이미지 제거
           >
             사진 제거
