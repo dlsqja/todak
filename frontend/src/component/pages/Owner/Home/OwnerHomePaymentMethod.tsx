@@ -15,7 +15,7 @@ export default function PaymentMethodPage() {
 
       // 서버가 카카오페이 /v1/payment/ready를 "금액 0원"으로 호출해
       // next_redirect_pc_url(or mobile_url)을 redirectUrl로 내려준다고 가정
-      const data = await apiClient.post('/public/pay/ready/1', {
+      const data = await apiClient.post('/owner/pay/ready', {
         successUrl: `${origin}/owner/home/payment/success`,
         cancelUrl: `${origin}/owner/home/payment/cancel`,
         failUrl: `${origin}/owner/home/payment/fail`,

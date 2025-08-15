@@ -14,6 +14,8 @@ import { genderMapping } from '@/utils/genderMapping';
 import { speciesMapping } from '@/utils/speciesMapping';
 import type { CreateOwnerReservationData } from '@/types/Owner/ownerreservationType';
 import { timeMapping } from '@/utils/timeMapping';
+import apiClient from '@/plugins/axios';
+import { createReservation } from '@/services/api/Owner/ownerreservation';
 
 export default function ApplyFormPage() {
   const location = useLocation();
@@ -116,7 +118,7 @@ export default function ApplyFormPage() {
     return undefined;
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const symptomText = symptomRef.current?.value?.trim();
     if (!selectedTime) return alert('진료 희망 시간을 선택해주세요!');
     if (!selectedDepartment) return alert('진료받을 과를 선택해주세요!');
@@ -146,7 +148,9 @@ export default function ApplyFormPage() {
       status: 'REQUESTED',
     };
 
-    navigate('/owner/home/payment', { state: { draft, photo: symptomFile } });
+    const res = await createReservation(draft, symptomFile);
+
+    navigate('/owner/home/payment');
   };
 
   return (

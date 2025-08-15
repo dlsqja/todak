@@ -115,7 +115,7 @@ export default function VetRTC() {
       .then((res) => console.log(res))
       .catch((err) => console.log(err));
     alert('진료가 종료되었습니다.');
-    navigator('/vet/treatment');
+    navigator('/vet/home');
   };
 
   const stopLocalVideo = () => {

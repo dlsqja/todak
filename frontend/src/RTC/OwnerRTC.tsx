@@ -107,7 +107,7 @@ export default function OwnerRTC() {
     stopLocalVideo();
     stopRemoteVideo();
     alert('진료가 종료되었습니다.');
-    navigator(-1);
+    navigator('/owner/home');
   };
 
   const stopLocalVideo = () => {

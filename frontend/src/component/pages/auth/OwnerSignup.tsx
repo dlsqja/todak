@@ -104,7 +104,7 @@ export default function OwnerSignup() {
 
     // birth 상태 업데이트
     if (updatedYear && updatedMonth && updatedDay) {
-      const newBirth = `${updatedYear}.${updatedMonth.padStart(2, '0')}.${updatedDay.padStart(2, '0')}`;
+      const newBirth = `${updatedYear}-${updatedMonth.padStart(2, '0')}-${updatedDay.padStart(2, '0')}`;
       setBirth(newBirth);
       // 생년월일이 완성되면 유효성 검사
       validateBirthDate(updatedYear, updatedMonth, updatedDay);
