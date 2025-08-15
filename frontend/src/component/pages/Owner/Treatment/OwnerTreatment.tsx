@@ -61,7 +61,7 @@ export default function OwnerTreatment() {
           ...petTreatment,
           treatments: petTreatment.treatments
             .filter((item) => hasNoRealStartTime(item)) // 시작 안 한 것만
-            .sort((a, b) => toMinutes(a.reservationTime) - toMinutes(b.reservationTime)), // ⬅️ 시간 오름차순
+            .sort((a, b) => toMinutes(b.reservationTime) - toMinutes(a.reservationTime)), // ⬅️ 시간 오름차순
         }))
         .filter((pt) => (pt.treatments?.length ?? 0) > 0); // 비어있으면 그룹 제거
       setTreatmentData(sortedData);

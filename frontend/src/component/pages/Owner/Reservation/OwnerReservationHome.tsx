@@ -30,7 +30,7 @@ export default function OwnerReservationHome() {
   useEffect(() => {
     const getReservationList = async () => {
       data.current = await getReservations();
-      console.log('data:', data);
+      // console.log('data:', data);
       const petList = data.current.map((reservation) => reservation.petResponse);
       setPetList(petList);
       const initialIndex = selectedPetIndex ? Number(selectedPetIndex) : 0;

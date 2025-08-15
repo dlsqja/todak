@@ -21,7 +21,7 @@ import VetReservationDetailModal from '@/component/pages/Vet/Treatment/VetReserv
 type EnrichedRow = {
   base: VetTreatmentListResponse;
   reservationTimeLabel: string; // 카드에 표시용 "HH:mm"
-  reservationMinutes: number;   // 정렬용 (분). 없으면 Infinity
+  reservationMinutes: number; // 정렬용 (분). 없으면 Infinity
 };
 
 export default function VetTreatment() {
@@ -41,7 +41,7 @@ export default function VetTreatment() {
   };
 
   // ✅ "진료 시작 여부"를 모든 포맷에서 정확히 판별
-  const hasStarted = (startVal: unknown): boolean => {
+  const hasEnded = (startVal: unknown): boolean => {
     if (typeof startVal === 'number') return startVal > 0;
     const s = String(startVal ?? '').trim();
     if (!s) return false;
@@ -113,11 +113,11 @@ export default function VetTreatment() {
       // type=0 목록
       const list = await getVetTreatmentList();
 
-      // 1) 치료 시작(startTime) "없는 것만" + 미완료만
+      // 1) 치료 종료 시간 (endtime) "없는 것만" + 미완료만
       const target = (list || []).filter((it: any) => {
-        const notStarted = !hasStarted(it.startTime);
+        const notEnded = !hasEnded(it.endTime);
         const notCompleted = it.isCompleted !== true;
-        return notStarted && notCompleted;
+        return notEnded && notCompleted;
       });
 
       // 2) 🔁 더 깊게 가지 않고, 목록의 reservationTime으로 직접 라벨/정렬 생성
@@ -131,8 +131,8 @@ export default function VetTreatment() {
         };
       });
 
-      // 3) 예약 시간 오름차순 정렬
-      enriched.sort((a, b) => a.reservationMinutes - b.reservationMinutes);
+      // 3) 예약 시간 최신순 정렬
+      enriched.sort((a, b) => b.reservationMinutes - a.reservationMinutes);
 
       setRows(enriched);
     })();
@@ -143,35 +143,33 @@ export default function VetTreatment() {
       <SimpleHeader text="비대면 진료" />
       <div className="px-7 py-1 space-y-4 max-h-full overflow-y-auto hide-scrollbar">
         {rows.map(({ base, reservationTimeLabel }, index) => {
-  // ✅ 유틸 없이 인라인 처리!!!
-  const raw = base.petInfo.photo || "";
-  const photoUrl =
-    /^https?:\/\//i.test(raw) || /^data:image\//i.test(raw)
-      ? raw
-      : `${(import.meta.env.VITE_PHOTO_URL ?? "").replace(/\/+$/, "")}/${String(raw).replace(/^\/+/, "")}`;
+          // ✅ 유틸 없이 인라인 처리!!!
+          const raw = base.petInfo.photo || '';
+          const photoUrl =
+            /^https?:\/\//i.test(raw) || /^data:image\//i.test(raw)
+              ? raw
+              : `${(import.meta.env.VITE_PHOTO_URL ?? '').replace(/\/+$/, '')}/${String(raw).replace(/^\/+/, '')}`;
 
-  return (
-    <VetRemoteTreatmentCard
-      key={index}
-      petName={base.petInfo.name}
-      petInfo={`${speciesMapping[base.petInfo.species]} / ${genderMapping[base.petInfo.gender]} / ${base.petInfo.age}세`}
-      department={subjectMapping[base.subject]}
-      time={reservationTimeLabel}
-      photo={photoUrl}                 // ⬅️ 여기만 이렇게!!!
-      onDetailClick={() => handleDetailClick(base.reservationId)}
-      onTreatClick={() => handleRTCClick(base.treatmentId)}
-      buttonText="진료 하기"
-    />
-  );
-})}
+          return (
+            <VetRemoteTreatmentCard
+              key={index}
+              petName={base.petInfo.name}
+              petInfo={`${speciesMapping[base.petInfo.species]} / ${genderMapping[base.petInfo.gender]} / ${
+                base.petInfo.age
+              }세`}
+              department={subjectMapping[base.subject]}
+              time={reservationTimeLabel}
+              photo={photoUrl} // ⬅️ 여기만 이렇게!!!
+              onDetailClick={() => handleDetailClick(base.reservationId)}
+              onTreatClick={() => handleRTCClick(base.treatmentId)}
+              buttonText="진료 하기"
+            />
+          );
+        })}
       </div>
 
       {modalOpen && (
-        <VetReservationDetailModal
-          onClose={() => setModalOpen(false)}
-          detail={modalDetail}
-          loading={modalLoading}
-        />
+        <VetReservationDetailModal onClose={() => setModalOpen(false)} detail={modalDetail} loading={modalLoading} />
       )}
     </div>
   );

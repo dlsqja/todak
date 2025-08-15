@@ -51,8 +51,8 @@ export default function OwnerPetTabInfo({ selectedPet, setSelectedPet, pets, set
     });
   };
 
-  console.log(selectedPet);
-  console.log(Object.keys(selectedPet));
+  // console.log(selectedPet);
+  // console.log(Object.keys(selectedPet));
 
   return (
     <>

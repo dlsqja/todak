@@ -13,6 +13,7 @@ import CallingIcon from '@/component/icon/CallingIcon';
 
 export default function OwnerTreatmentDetail() {
   const navigate = useNavigate();
+  const photoUrl = import.meta.env.VITE_PHOTO_URL;
   const [detail, setDetail] = useState<ReservationDetail>();
   const { reservationId } = useParams<{ reservationId: string }>();
   const { isRejected } = useLocation().state || {};
@@ -113,7 +114,9 @@ export default function OwnerTreatmentDetail() {
         <div className="flex flex-col border-b-1 border-gray-100 pb-4 gap-2 ">
           <div className="h4">증상</div>
           {detail.photo && (
-            <div>{!detail.photo && <ImageInputBox src={detail.photo} stroke="border-5 border-green-200" />}</div>
+            <div>
+              {!detail.photo && <ImageInputBox src={`${photoUrl}${detail.photo}`} stroke="border-5 border-green-200" />}
+            </div>
           )}
           <div className="p">{detail.description}</div>
         </div>

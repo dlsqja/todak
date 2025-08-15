@@ -1,5 +1,5 @@
-import React from "react";
-import { FiX } from "react-icons/fi";
+import React from 'react';
+import { FiX } from 'react-icons/fi';
 
 interface ModalTemplateProps {
   title?: string;
@@ -17,7 +17,7 @@ const ModalTemplate: React.FC<ModalTemplateProps> = ({ title, onClose, children 
           {onClose && (
             <button
               onClick={onClose}
-              className="p-1 text-xl text-gray-500 hover:text-black transition-colors"
+              className="p-1 text-xl text-gray-500 hover:text-black transition-colors cursor-pointer"
             >
               <FiX size={20} />
             </button>
