@@ -158,20 +158,24 @@ export default function VetSignup() {
     }
 
     // FormData 구성
-    const formdata = new FormData();
-    formdata.append('name', name.trim());
-    formdata.append('license', licenseNumber.trim());
-    formdata.append('hospitalCode', hospitalCode.trim());
-    formdata.append('profile', profile.trim() || '안녕하세요. 수의사입니다.');
+    const formData = new FormData();
+    const vetRequestData = {
+      name: name.trim(),
+      license: licenseNumber.trim(),
+      hospitalCode: hospitalCode.trim(),
+      profile: profile.trim() || '',
+    };
+    formData.append('vetRequest', new Blob([JSON.stringify(vetRequestData)], { type: 'application/json' }));
     if (profileImage) {
-      formdata.append('photo', profileImage); // 파일 첨부
-    } else {
-      formdata.append('photo', new Blob([], { type: 'application/octet-stream' }));
+      formData.append('photo', profileImage);
     }
 
-    const response = await authAPI.vetSignup(formdata, authId);
+    for (const [key, value] of formData.entries()) {
+      console.log(`${key}:`, value);
+    }
+    console.log('formdata', formData);
 
-    console.log('response', response);
+    const response = await authAPI.vetSignup(formData, authId);
 
     if (response.message === '성공') {
       alert('수의사 가입이 완료되었습니다!');
