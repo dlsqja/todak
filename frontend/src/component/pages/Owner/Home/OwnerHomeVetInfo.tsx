@@ -7,7 +7,7 @@ import TimeSelectionButton from '@/component/selection/TimeSelectionButton';
 import Button from '@/component/button/Button';
 import { useTimeStore } from '@/store/timeStore';
 
-import { getVetsByHospitalId, getVetClosingHours } from '@/services/api/Owner/ownerhome';
+import { getVetsByHospitalId, getVetClosingHours, getPublicHospitals } from '@/services/api/Owner/ownerhome';
 import type { VetPublic, WorkingHourResponse } from '@/types/Owner/ownerhomeType';
 import { timeMapping } from '@/utils/timeMapping';
 
@@ -47,6 +47,7 @@ export default function VetInfoPage() {
     photo?: string;
   };
   console.log(hospital);
+  const [hospitalInfo, setHospitalInfo] = useState<typeof hospital | undefined>(hospital);
   const passedVet = location.state?.vet as VetPublic | undefined;
 
   const [vet, setVet] = useState<VetPublic | null>(passedVet ?? null);
@@ -67,6 +68,26 @@ export default function VetInfoPage() {
       }
     })();
   }, [hospital?.hospitalId, vet?.vetId]);
+
+  // ✅ 병원 상세 보강 (profile 누락 시 /public/hospitals에서 매칭)
+  useEffect(() => {
+    if (!hospital?.hospitalId) return;
+    if (hospital?.profile) {
+      setHospitalInfo(hospital);
+      return;
+    }
+    (async () => {
+      try {
+        const pubs = await getPublicHospitals();
+        const found = pubs.find((h) => h.hospitalId === hospital.hospitalId);
+        if (found) {
+          setHospitalInfo((prev) => ({ ...(prev ?? ({} as any)), ...found }));
+        }
+      } catch {
+        // ignore
+      }
+    })();
+  }, [hospital?.hospitalId, hospital?.profile]);
 
   // ✅ 선택된 수의사의 closing-hours(0~47) 로드
   useEffect(() => {
@@ -115,7 +136,7 @@ export default function VetInfoPage() {
     navigate('/owner/home/form', {
       state: {
         pet,
-        hospital,
+        hospital: hospitalInfo ?? hospital,
         vet,
         time: selectedTime,
         startTime: todayRange?.startText,
@@ -131,9 +152,9 @@ export default function VetInfoPage() {
 
       <div className="flex-1 px-7 py-6 flex flex-col gap-3 overflow-y-auto h-full">
         {/* 프로필 */}
-        <div className="w-full h-[200px] bg-gray-100 rounded-[12px] overflow-hidden">
+        <div className="w-full h-[200px] bg-gray-50 rounded-[12px] overflow-hidden">
           {vet?.photo ? (
-            <img src={`${photoUrl}${vet.photo}`} alt={vet.name} className="w-full h-full object-cover" />
+            <img src={`${photoUrl}${vet.photo}`} alt={vet.name} className="w-full h-full object-scale-down" />
           ) : (
             <img src="/images/person_default.png" alt="수의사 프로필 사진" className="w-full h-full object-contain" />
           )}
@@ -143,7 +164,7 @@ export default function VetInfoPage() {
         <div>
           <h3 className="h3 mt-1">{vet?.name || '수의사 이름'}</h3>
           <h4 className="h4 text-gray-400">
-            {hospital?.name}
+            {hospitalInfo?.name}
             {todayRange?.startText && todayRange?.endText ? (
               <>
                 {' '}
@@ -154,11 +175,11 @@ export default function VetInfoPage() {
         </div>
 
         <SingleContent title="의사 소개" content={vet?.profile || '의사 소개 정보가 없습니다.'} />
-        <SingleContent title="병원 정보" content={hospital?.profile || '병원 소개글이 없습니다.'} />
-        <SingleContent title="병원 위치" content={hospital?.location || '병원 주소가 없습니다.'} />
+        <SingleContent title="병원 정보" content={hospitalInfo?.profile || '병원 소개글이 없습니다.'} />
+        <SingleContent title="병원 위치" content={hospitalInfo?.location || '병원 주소가 없습니다.'} />
 
-        <div className="flex flex-col gap-3 mt-3">
-          <h4 className="h4 mb-2">진료 가능 시간</h4>
+        <div className="flex flex-col gap-1">
+          <h4 className="h4">진료 가능 시간</h4>
           <TimeSelectionButton
             start_time={todayRange?.startText || '09:00'}
             end_time={todayRange?.endText || '18:00'}

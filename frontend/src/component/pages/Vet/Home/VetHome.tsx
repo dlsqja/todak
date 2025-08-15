@@ -32,6 +32,7 @@ type CardRow = {
   department: string;
   petName: string;
   petInfo: string;
+  petPhotoUrl: string; 
   _sortMinutes: number;
 };
 
@@ -120,7 +121,7 @@ export default function VetHome() {
   };
   // ───────────────────────────────────────────
 
-  // ✅ 비대면 진료 예정 목록
+  // ✅ 비대면 진료 예정 목록 (예약 상세 호출 제거: 목록의 reservationTime 사용)
   useEffect(() => {
     let alive = true;
     (async () => {
@@ -144,41 +145,33 @@ export default function VetHome() {
           return true;
         });
 
-        const details = await Promise.all(
-          target.map(async (it) => {
-            try {
-              try {
-                return await getVetReservationDetail(it.reservationId);
-              } catch {
-                return await getStaffReservationDetail(it.reservationId);
-              }
-            } catch {
-              return null;
-            }
-          }),
-        );
-
-        const rows = target.map((it, idx) => {
-          const det = details[idx];
+        // 🔁 목록의 reservationTime으로 바로 라벨/정렬 생성
+        const rows = target.map((it) => {
           const pet = it.petInfo;
           const species = speciesMapping[pet.species as keyof typeof speciesMapping] ?? '반려동물';
           const gender = genderMapping[pet.gender as keyof typeof genderMapping] ?? '성별미상';
           const agePart = Number.isFinite(pet.age as number) ? `${pet.age}세` : '';
           const department = subjectMapping[it.subject as keyof typeof subjectMapping] ?? '진료';
 
-          const timeLabel = reservationToHHmm(det?.reservationTime) || '시간 미정';
-          const sortMin = reservationToMinutes(det?.reservationTime);
+          const timeLabel = reservationToHHmm(it.reservationTime) || '시간 미정';
+          const sortMin = reservationToMinutes(it.reservationTime);
 
-          return {
-            id: it.reservationId,
-            time: timeLabel,
-            department,
-            petName: pet.name,
-            petInfo: [species, gender, agePart].filter(Boolean).join(' / '),
-            _sortMinutes: sortMin,
-          } as CardRow;
-        });
+          const raw = pet.photo || "";
+  const petPhotoUrl =
+    /^https?:\/\//i.test(raw) || /^data:image\//i.test(raw)
+      ? raw
+      : `${(import.meta.env.VITE_PHOTO_URL ?? "").replace(/\/+$/, "")}/${String(raw).replace(/^\/+/, "")}`;
 
+  return {
+    id: it.reservationId,
+    time: timeLabel,
+    department,
+    petName: pet.name,
+    petInfo: [species, gender, agePart].filter(Boolean).join(' / '),
+    petPhotoUrl,                 
+    _sortMinutes: sortMin,
+  } as CardRow;
+});
         rows.sort((a, b) => a._sortMinutes - b._sortMinutes);
         setReservationCards(rows);
       } catch (e) {
@@ -193,9 +186,11 @@ export default function VetHome() {
     };
   }, []);
 
-  // ✅ 진료 기록 검토 (리스트필터와 동일 파이프라인)
+  // 진료 기록 검토 (리스트필터와 동일 파이프라인)
   const [reviewData, setReviewData] = useState<VetTreatment[]>([]);
   const [reviewLoading, setReviewLoading] = useState(false);
+  const [modalPetPhotoUrl, setModalPetPhotoUrl] = useState<string | undefined>(undefined);
+
 
   // ⬇︎ 여기 두 함수만 더 “유연하게” 수정 (number/Date/문자열 모두 허용)
   const hasRealStartTime = (it: any): boolean => {
@@ -233,58 +228,40 @@ export default function VetHome() {
   };
 
   useEffect(() => {
-    let alive = true;
-    (async () => {
-      try {
-        setReviewLoading(true);
+  let alive = true;
+  (async () => {
+    try {
+      setReviewLoading(true);
 
-        const initialList = (await getVetTreatments(2)) as any[];
+      // type=2 리스트만 사용
+      const raw = (await getVetTreatments(2)) as any[];
 
-        const ids = Array.from(new Set(initialList.map((x: any) => x.treatmentId))).filter(Boolean);
-        const results = await Promise.allSettled(ids.map((id) => getVetTreatmentDetail(id)));
+      // treatmentId 중복 제거
+      const seenTid = new Set<number>();
+      const unique = raw.filter((x: any) => {
+        const tid = Number(x?.treatmentId);
+        if (!tid || seenTid.has(tid)) return false;
+        seenTid.add(tid);
+        return true;
+      });
 
-        const dmap = new Map<number, VetTreatmentDetail>();
-        results.forEach((r, i) => {
-          if (r.status === 'fulfilled' && r.value) dmap.set(ids[i], r.value as VetTreatmentDetail);
-        });
+      // startTime 없는(무효) 항목 제외 + 시작 시간순 정렬
+      const finalList = unique
+        .filter(hasRealStartTime)
+        .sort((a: any, b: any) => getStartTs(a) - getStartTs(b));
 
-        const merged = initialList.map((it: any) => {
-          const d = dmap.get(it.treatmentId);
-          if (!d) return it;
-          return {
-            ...it,
-            startTime: d.startTime ?? d.start_time ?? it.startTime,
-            endTime: d.endTime ?? d.end_time ?? it.endTime,
-            pet: it.pet ?? it.petInfo ?? d.pet ?? d.petInfo,
-            petInfo: it.petInfo ?? d.petInfo ?? d.pet,
-            subject: it.subject ?? d.subject,
-            isCompleted: it.isCompleted ?? it.is_completed ?? d.isCompleted ?? d.is_completed,
-          };
-        });
-
-        // treatmentId 중복 제거
-        const seenTid = new Set<number>();
-        const uniqueByTid = merged.filter((x: any) => {
-          const tid = x.treatmentId;
-          if (seenTid.has(tid)) return false;
-          seenTid.add(tid);
-          return true;
-        });
-
-        const finalList = uniqueByTid.filter(hasRealStartTime).sort((a: any, b: any) => getStartTs(a) - getStartTs(b));
-
-        if (alive) setReviewData(finalList as VetTreatment[]);
-      } catch (e) {
-        console.warn('[VetHome] reviewData load failed:', e);
-        if (alive) setReviewData([]);
-      } finally {
-        if (alive) setReviewLoading(false);
-      }
-    })();
-    return () => {
-      alive = false;
-    };
-  }, []);
+      if (alive) setReviewData(finalList as VetTreatment[]);
+    } catch (e) {
+      console.warn('[VetHome] reviewData load failed:', e);
+      if (alive) setReviewData([]);
+    } finally {
+      if (alive) setReviewLoading(false);
+    }
+  })();
+  return () => {
+    alive = false;
+  };
+}, []);
 
   // ── 가로 드래그 스크롤(예정 목록) ─────────────────────────
   const hScrollRef = useRef<HTMLDivElement>(null);
@@ -296,68 +273,82 @@ export default function VetHome() {
   const DRAG_CLICK_THRESHOLD_X = 5;
 
   useEffect(() => {
-    const el = hScrollRef.current;
-    if (!el) return;
+  const el = hScrollRef.current;
+  if (!el) return;
 
-    const onPointerDown = (e: PointerEvent) => {
-      isDownXRef.current = true;
-      movedXRef.current = false;
-      startXRef.current = e.clientX;
-      startScrollLeftRef.current = el.scrollLeft;
-      setDraggingX(true);
-      el.setPointerCapture?.(e.pointerId);
-    };
+  let pointerId: number | null = null;
 
-    const onPointerMove = (e: PointerEvent) => {
-      if (!isDownXRef.current) return;
-      const dx = e.clientX - startXRef.current;
-      if (Math.abs(dx) > DRAG_CLICK_THRESHOLD_X) movedXRef.current = true;
+  const onPointerDown = (e: PointerEvent) => {
+    isDownXRef.current = true;
+    movedXRef.current = false;                // 클릭 판단을 위해 초기화
+    startXRef.current = e.clientX;
+    startScrollLeftRef.current = el.scrollLeft;
+    setDraggingX(true);
+    pointerId = e.pointerId;
+    // ❌ 여기서 setPointerCapture 걸지 마세요!!! (클릭 막힘 원인)
+  };
+
+  const onPointerMove = (e: PointerEvent) => {
+    if (!isDownXRef.current) return;
+    const dx = e.clientX - startXRef.current;
+
+    // ✅ 드래그로 전환되는 순간에만 캡처!
+    if (!movedXRef.current && Math.abs(dx) > DRAG_CLICK_THRESHOLD_X) {
+      movedXRef.current = true;
+      if (pointerId != null) el.setPointerCapture?.(pointerId);
+    }
+
+    // 드래그 중에만 스크롤/방지 처리
+    if (movedXRef.current) {
       el.scrollLeft = startScrollLeftRef.current - dx;
       e.preventDefault(); // 텍스트 선택 방지
-    };
+    }
+  };
 
-    const endDrag = (e: PointerEvent) => {
-      if (!isDownXRef.current) return;
-      isDownXRef.current = false;
-      setDraggingX(false);
-      el.releasePointerCapture?.(e.pointerId);
-    };
+  const endDrag = (e: PointerEvent) => {
+    if (!isDownXRef.current) return;
+    isDownXRef.current = false;
+    setDraggingX(false);
+    if (pointerId != null) el.releasePointerCapture?.(pointerId);
+    pointerId = null;
+  };
 
-    el.addEventListener('pointerdown', onPointerDown, { passive: true });
-    el.addEventListener('pointermove', onPointerMove);
-    el.addEventListener('pointerup', endDrag);
-    el.addEventListener('pointerleave', endDrag);
-    el.addEventListener('pointercancel', endDrag);
+  el.addEventListener('pointerdown', onPointerDown, { passive: true });
+  el.addEventListener('pointermove', onPointerMove); // passive: false (preventDefault 필요)
+  el.addEventListener('pointerup', endDrag);
+  el.addEventListener('pointerleave', endDrag);
+  el.addEventListener('pointercancel', endDrag);
 
-    return () => {
-      el.removeEventListener('pointerdown', onPointerDown);
-      el.removeEventListener('pointermove', onPointerMove);
-      el.removeEventListener('pointerup', endDrag);
-      el.removeEventListener('pointerleave', endDrag);
-      el.removeEventListener('pointercancel', endDrag);
-    };
-  }, []);
+  return () => {
+    el.removeEventListener('pointerdown', onPointerDown);
+    el.removeEventListener('pointermove', onPointerMove);
+    el.removeEventListener('pointerup', endDrag);
+    el.removeEventListener('pointerleave', endDrag);
+    el.removeEventListener('pointercancel', endDrag);
+  };
+}, []);
   // ─────────────────────────────────────────────────────────
 
   // 모달
-  const openDetailModal = async (reservationId: number) => {
-    setModalOpen(true);
-    setModalLoading(true);
-    setModalDetail(null);
+  const openDetailModal = async (reservationId: number, fallbackPhoto?: string) => {
+  setModalOpen(true);
+  setModalLoading(true);
+  setModalDetail(null);
+  setModalPetPhotoUrl(fallbackPhoto); // ⬅️ 추가!!!
+  try {
+    let res: StaffReservationItem | null = null;
     try {
-      let res: StaffReservationItem | null = null;
-      try {
-        res = await getVetReservationDetail(reservationId);
-      } catch {
-        res = await getStaffReservationDetail(reservationId);
-      }
-      setModalDetail(res ?? null);
+      res = await getVetReservationDetail(reservationId);
     } catch {
-      setModalDetail(null);
-    } finally {
-      setModalLoading(false);
+      res = await getStaffReservationDetail(reservationId);
     }
-  };
+    setModalDetail(res ?? null);
+  } catch {
+    setModalDetail(null);
+  } finally {
+    setModalLoading(false);
+  }
+};
 
   return (
     <div>
@@ -402,9 +393,9 @@ export default function VetHome() {
                 className="cursor-pointer"
                 style={{ minWidth: CARD_WIDTH }}
                 onClick={() => {
-                  if (movedXRef.current) return;
-                  openDetailModal(r.id);
-                }}
+  if (movedXRef.current) return;
+  openDetailModal(r.id, r.petPhotoUrl); 
+}}
               >
                 <OwnerTreatmentSimpleCard
                   time={r.time}
@@ -428,8 +419,13 @@ export default function VetHome() {
       </div>
 
       {modalOpen && (
-        <VetReservationDetailModal onClose={() => setModalOpen(false)} detail={modalDetail} loading={modalLoading} />
-      )}
+  <VetReservationDetailModal
+    onClose={() => setModalOpen(false)}
+    detail={modalDetail}
+    loading={modalLoading}
+    fallbackPetPhoto={modalPetPhotoUrl}   // ⬅️ 여기!!!
+  />
+)}
     </div>
   );
 }

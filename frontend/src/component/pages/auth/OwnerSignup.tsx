@@ -24,9 +24,10 @@ export default function OwnerSignup() {
   const currentMonth = today.getMonth() + 1;
   const currentDay = today.getDate();
 
-  // 년도 옵션 생성 (1900년 ~ 현재 년도)
+  // 년도 옵션 생성 (2025년 ~ 1900년) 내림차순
   const yearOptions = [];
-  for (let year = 1900; year <= currentYear; year++) {
+  const startYear = 2025;
+  for (let year = startYear; year >= 1900; year--) {
     yearOptions.push({ value: year.toString(), label: `${year}년` });
   }
 

@@ -1,3 +1,4 @@
+// src/component/card/TreatmentSlideList.tsx
 import React, { useRef, useEffect, useState, useMemo } from 'react';
 import TreatmentSlideCard from '@/component/card/TreatmentSlideCard';
 import { getVetTreatments, getVetTreatmentDetail } from '@/services/api/Vet/vettreatment';
@@ -10,6 +11,7 @@ const CARD_HEIGHT = 96;
 const OVERLAP = 40;
 const SNAP_GAP = CARD_HEIGHT - OVERLAP;
 const MIN_CONTAINER_SCROLL_HEIGHT = 600;
+const CONTAINER_HEIGHT_PX = 400; // ✅ 컨테이너 실제 높이(style과 동일하게 유지)
 
 type CardRow = {
   id: number;
@@ -163,8 +165,12 @@ const TreatmentSlideList = ({ data, loading, onCardClick }: Props) => {
   }, [controlled]);
 
   const isLoading = controlled ? !!loading : internalLoading;
-  const totalHeight = cards.length * SNAP_GAP + OVERLAP;
-  const paddedHeight = Math.max(totalHeight, MIN_CONTAINER_SCROLL_HEIGHT);
+
+  // ✅ 마지막 카드도 snap-start 지점까지 도달하도록 콘텐츠 높이 보정
+  // 마지막 카드의 top = (N-1)*SNAP_GAP 이므로, scrollTop이 이 값에 도달하려면
+  // 내부 높이 >= (N-1)*SNAP_GAP + 컨테이너 높이 여야 함.
+  const innerHeight = cards.length > 0 ? (cards.length - 1) * SNAP_GAP + CONTAINER_HEIGHT_PX : CONTAINER_HEIGHT_PX;
+  const paddedHeight = Math.max(innerHeight, MIN_CONTAINER_SCROLL_HEIGHT);
 
   return (
     <div

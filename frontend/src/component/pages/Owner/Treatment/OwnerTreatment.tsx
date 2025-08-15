@@ -28,7 +28,7 @@ export default function OwnerTreatment() {
     if (v == null) return true;
     if (v instanceof Date) return isNaN(v.getTime());
     if (typeof v === 'number') {
-      if (v >= 0 && v <= 47) return true;        // 슬롯 숫자는 '시작 아님'
+      if (v >= 0 && v <= 47) return true; // 슬롯 숫자는 '시작 아님'
       const d = new Date(v);
       return isNaN(d.getTime());
     }
@@ -46,7 +46,8 @@ export default function OwnerTreatment() {
     if (/^\d+$/.test(s)) return Number(s) * 30; // '23' 같은 숫자 문자열 슬롯
     const m = s.match(/\b(\d{1,2}):(\d{2})\b/);
     if (m) {
-      const hh = Number(m[1]); const mm = Number(m[2]);
+      const hh = Number(m[1]);
+      const mm = Number(m[2]);
       if (Number.isFinite(hh) && Number.isFinite(mm)) return hh * 60 + mm;
     }
     return Number.POSITIVE_INFINITY;
@@ -84,41 +85,34 @@ export default function OwnerTreatment() {
     <div>
       <SimpleHeader text="비대면 진료" />
       <div className="px-7 pb-1 h-max space-y-4 overflow-y-scroll hide-scrollbar">
-  {isEmpty ? (
-    <div
-      className="grid place-items-center"
-      style={{ minHeight: 'calc(100vh - 180px)' }}
-    >
-      <p className="h4 text-gray-400">현재 비대면 진료 예정 항목이 없습니다</p>
-    </div>
-  ) : (
-    <AnimatePresence>
-      <motion.div
-        variants={listVariants}
-        initial="hidden"
-        animate="show"
-        exit="hidden"
-        className="space-y-4"
-      >
-        {treatmentData.map((treatment) =>
-          treatment.treatments.map((item) => (
-            <motion.div key={item.reservationId} variants={itemVariants}>
-              <OwnerRemoteTreatmentCard
-                petName={treatment.petResponse.name}
-                petInfo={`진료 예정 시간 : ${timeMapping[item.reservationTime]}`}
-                department={subjectMapping[item.subject]}
-                photo={`${VITE_PHOTO_URL}${treatment.petResponse.photo}`}
-                buttonText="상세 정보"
-                onClick={() => handleDetailClick(item.reservationId, item.treatmentId)}
-              />
+        {isEmpty ? (
+          <div className="flex-1 flex items-center justify-center px-7 mt-60">
+            <div className="flex flex-col items-center gap-2">
+              <img src="/images/sad_dog.png" alt="nodata" className="w-20 h-20" />
+              <p className="h4 text-gray-500">현재 비대면 진료 예정 항목이 없습니다.</p>
+            </div>
+          </div>
+        ) : (
+          <AnimatePresence>
+            <motion.div variants={listVariants} initial="hidden" animate="show" exit="hidden" className="space-y-4">
+              {treatmentData.map((treatment) =>
+                treatment.treatments.map((item) => (
+                  <motion.div key={item.reservationId} variants={itemVariants}>
+                    <OwnerRemoteTreatmentCard
+                      petName={treatment.petResponse.name}
+                      petInfo={`진료 예정 시간 : ${timeMapping[item.reservationTime]}`}
+                      department={subjectMapping[item.subject]}
+                      photo={`${VITE_PHOTO_URL}${treatment.petResponse.photo}`}
+                      buttonText="상세 정보"
+                      onClick={() => handleDetailClick(item.reservationId, item.treatmentId)}
+                    />
+                  </motion.div>
+                )),
+              )}
             </motion.div>
-          ))
+          </AnimatePresence>
         )}
-      </motion.div>
-    </AnimatePresence>
-  )}
-</div>
-
+      </div>
     </div>
   );
 }

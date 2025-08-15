@@ -11,18 +11,18 @@ import type { VetMyResponse } from '@/types/Vet/vetmypageType';
 import { authAPI } from '@/services/api/auth';
 import { motion } from 'framer-motion';
 
-const DEFAULT_PHOTO = '/images/person_default.png';
-
 // 렌더용 src 계산기: 절대 URL/데이터URL/상대경로 모두 대응
-const resolvePhotoSrc = (val?: string | null): string => {
-  if (!val) return DEFAULT_PHOTO;
-  const s = String(val).trim();
-  if (!s) return DEFAULT_PHOTO;
-  if (/^(https?:)?\/\//i.test(s)) return s;            // http(s):// or //cdn...
-  if (/^(data:|blob:)/i.test(s)) return s;             // data URL / blob
-  if (s.startsWith('/')) return s;                     // 절대 경로
-  return `/${s}`;                                      // 상대경로 -> 절대로
-};
+// const resolvePhotoSrc = (val?: string | null): string => {
+//   if (!val) return DEFAULT_PHOTO;
+//   const s = String(val).trim();
+//   if (!s) return DEFAULT_PHOTO;
+//   if (/^(https?:)?\/\//i.test(s)) return s; // http(s):// or //cdn...
+//   if (/^(data:|blob:)/i.test(s)) return s; // data URL / blob
+//   if (s.startsWith('/')) return s; // 절대 경로
+//   return `/${s}`; // 상대경로 -> 절대로
+// };
+const photoUrl = import.meta.env.VITE_PHOTO_URL;
+const DEFAULT_PHOTO = '/images/person_default.png';
 
 export default function VetMypage() {
   const navigate = useNavigate();
@@ -36,7 +36,7 @@ export default function VetMypage() {
   const [profile, setProfile] = useState('');
 
   // 서버 전송용(원본 문자열)과 화면 표시용(src) 분리
-  const [photoRaw, setPhotoRaw] = useState<string>('');      // 서버로 보낼 값
+  // const [photoRaw, setPhotoRaw] = useState<string>(''); // 서버로 보낼 값
   const [photoSrc, setPhotoSrc] = useState<string>(DEFAULT_PHOTO); // img src
 
   // 업로드/미리보기
@@ -56,8 +56,8 @@ export default function VetMypage() {
   const handleRemoveImage = () => {
     setProfileImage(null);
     setPreviewImage(null);
-    setPhotoRaw('');                // 전송값 비움(기본이미지는 저장 안 함)
-    setPhotoSrc(DEFAULT_PHOTO);     // 화면은 기본 이미지
+    // setPhotoRaw(''); // 전송값 비움(기본이미지는 저장 안 함)
+    setPhotoSrc(DEFAULT_PHOTO); // 화면은 기본 이미지
   };
 
   // 파일 선택 -> 미리보기 세팅
@@ -78,13 +78,16 @@ export default function VetMypage() {
         setError(null);
         const me: VetMyResponse = await getVetMy();
 
-        setVetName(me?.name ?? '');
-        setLicense(me?.license ?? '');
-        setProfile(me?.profile ?? '');
+        setVetName(me.name ?? '');
+        setLicense(me.license ?? '');
+        setProfile(me.profile ?? '');
 
-        const raw = me?.photo ?? '';
-        setPhotoRaw(raw);
-        setPhotoSrc(resolvePhotoSrc(raw));
+        // 프로필 이미지 설정: null이면 기본 이미지, 있으면 IMAGE_URL + 경로
+        if (me.photo && photoUrl) {
+          setPhotoSrc(`${photoUrl}${me.photo}`);
+        } else {
+          setPhotoSrc(DEFAULT_PHOTO);
+        }
       } catch (e) {
         console.error(e);
         setError('수의사 정보를 불러오지 못했어요!');
@@ -109,16 +112,26 @@ export default function VetMypage() {
         return;
       }
 
-      // 기본 이미지는 DB에 저장하지 않음. 새 파일 있으면 파일명만 보냄.
-      const photoToSend = profileImage ? profileImage.name : (photoRaw || undefined);
-
-      await updateVetMy({
+      // FormData로 전송 (파일 포함)
+      const formData = new FormData();
+      const vetRequestData = {
         name: vetName.trim(),
         license: license.trim(),
-        profile: profile.trim(),
-        photo: photoToSend, // undefined면 필드 생략되어 기본 유지
-      });
+        profile: profile.trim() || '',
+      };
+      formData.append('vetUpdateRequest', new Blob([JSON.stringify(vetRequestData)], { type: 'application/json' }));
 
+      if (profileImage) {
+        formData.append('photo', profileImage);
+      }
+
+      for (const [key, value] of formData.entries()) {
+        console.log(`${key}:`, value);
+      }
+      console.log('formdata', formData);
+
+      // formdata로 api 호출
+      const response = await updateVetMy(formData);
       alert('수정이 완료되었습니다.');
       navigate('/vet/mypage');
     } catch (e) {
@@ -135,13 +148,7 @@ export default function VetMypage() {
       <div className="flex flex-col gap-6 px-7 mt-11">
         <div>
           <label className="block h4 text-black mb-2">프로필 사진</label>
-          <input
-            type="file"
-            ref={fileInputRef}
-            onChange={handleFileChange}
-            accept="image/*"
-            className="hidden"
-          />
+          <input type="file" ref={fileInputRef} onChange={handleFileChange} accept="image/*" className="hidden" />
           <div className="flex items-center gap-4">
             <div className="w-22 h-22 bg-green-100 border-3 border-green-200 rounded-[12px] flex items-center justify-center overflow-hidden">
               <img
@@ -150,7 +157,7 @@ export default function VetMypage() {
                 className="w-full h-full object-cover"
                 onError={(e) => {
                   // 네트워크/경로 에러 시 기본 이미지로 폴백
-                  (e.currentTarget as HTMLImageElement).src = DEFAULT_PHOTO;
+                  (e.currentTarget as HTMLImageElement).src = '';
                 }}
               />
             </div>
@@ -175,13 +182,7 @@ export default function VetMypage() {
           </div>
         </div>
 
-        <Input
-          id="name"
-          label="이름"
-          value={vetName}
-          onChange={(e) => setVetName(e.target.value)}
-          disabled={loading}
-        />
+        <Input id="name" label="이름" value={vetName} onChange={(e) => setVetName(e.target.value)} disabled={loading} />
         <Input id="license" label="면허번호" value={license} disabled />
 
         <div className="flex flex-col">
