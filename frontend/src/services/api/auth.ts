@@ -30,7 +30,6 @@ export const authAPI = {
         'Content-Type': 'multipart/form-data',
       },
     });
-    console.log('vetSignup response', response.data);
     return response.data;
   },
 

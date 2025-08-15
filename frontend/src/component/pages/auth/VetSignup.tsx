@@ -170,11 +170,7 @@ export default function VetSignup() {
       formData.append('photo', profileImage);
     }
 
-    for (const [key, value] of formData.entries()) {
-      console.log(`${key}:`, value);
-    }
-    console.log('formdata', formData);
-
+    // formdata로 api 호출
     const response = await authAPI.vetSignup(formData, authId);
 
     if (response.message === '성공') {

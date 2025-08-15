@@ -110,19 +110,25 @@ export default function VetMypage() {
       }
 
       // FormData로 전송 (파일 포함)
-      const fd = new FormData();
-      fd.append('name', vetName.trim());
-      fd.append('license', license.trim());
-      fd.append('profile', profile.trim());
+      const formData = new FormData();
+      const vetRequestData = {
+        name: vetName.trim(),
+        license: license.trim(),
+        profile: profile.trim() || '',
+      };
+      formData.append('vetRequest', new Blob([JSON.stringify(vetRequestData)], { type: 'application/json' }));
+
       if (profileImage) {
-        fd.append('photo', profileImage);
-      } else if (photoRaw) {
-        // 기존 저장된 파일명을 그대로 유지해야 한다면 서버 스펙에 맞춰 전달
-        fd.append('photo', new Blob([photoRaw], { type: 'text/plain' }), 'filename.txt');
+        formData.append('photo', profileImage);
       }
 
-      await updateVetMy(fd);
+      for (const [key, value] of formData.entries()) {
+        console.log(`${key}:`, value);
+      }
+      console.log('formdata', formData);
 
+      // formdata로 api 호출
+      const response = await updateVetMy(formData);
       alert('수정이 완료되었습니다.');
       navigate('/vet/mypage');
     } catch (e) {
