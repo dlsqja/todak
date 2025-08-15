@@ -7,7 +7,7 @@ import { speciesMapping } from '@/utils/speciesMapping'; // ✅ 종 라벨 매�
 
 interface Props {
   onClose: () => void;
-  onSubmit: (reason: string) => void;   // ✅ 입력 텍스트만 보냄
+  onSubmit: (reason: string) => void; // ✅ 입력 텍스트만 보냄
   petName: string;
   /** 기존 문자열 그대로도 OK */
   petInfo: string;
@@ -32,10 +32,10 @@ const StaffReservationRejectModal: React.FC<Props> = ({
   photo = '',
 }) => {
   const [detailReason, setDetailReason] = useState('');
+  const [date, timeRange] = time.split(' ');
 
   // ✅ petInfo가 이미 오면 그대로 사용 / 없으면 species+age로 안전하게 조합
-  const speciesLabel =
-    species ? (speciesMapping[species as keyof typeof speciesMapping] ?? String(species)) : '';
+  const speciesLabel = species ? speciesMapping[species as keyof typeof speciesMapping] ?? String(species) : '';
   const ageLabel = typeof age === 'number' ? `${age}세` : '';
   const petInfoText =
     petInfo && petInfo.trim().length > 0 ? petInfo : [speciesLabel, ageLabel].filter(Boolean).join(' / ');
@@ -43,7 +43,6 @@ const StaffReservationRejectModal: React.FC<Props> = ({
   const handleSubmit = () => {
     onSubmit(detailReason.trim());
   };
-
   return (
     <ModalOnLayout onClose={onClose}>
       <div className="mx-auto w-full">
@@ -51,11 +50,7 @@ const StaffReservationRejectModal: React.FC<Props> = ({
           {/* 헤더 */}
           <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
             <h3 className="h4">반려 사유 작성</h3>
-            <button
-              aria-label="닫기"
-              onClick={onClose}
-              className="p-2 -mr-2 rounded-full hover:bg-gray-100 transition"
-            >
+            <button aria-label="닫기" onClick={onClose} className="p-2 -mr-2 rounded-full hover:bg-gray-100 transition">
               <span className="text-2xl leading-none">×</span>
             </button>
           </div>
@@ -72,8 +67,9 @@ const StaffReservationRejectModal: React.FC<Props> = ({
                 </div>
               </div>
               <div className="text-right">
-                <h4 className="h4">{time}</h4>
-                <p className="p text-gray-500">{doctor}</p>
+                <h4 className="h4">{date}</h4>
+                <h4 className="h4">{timeRange}</h4>
+                <p className="p text-gray-500">{doctor} 수의사</p>
               </div>
             </div>
 
