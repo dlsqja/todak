@@ -23,22 +23,22 @@ export default function StaffMypage() {
     navigate(`/auth/`);
   };
 
-  useEffect(() => {
-    (async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const me: StaffResponse = await getStaffInfo(); // API 호출
-        setStaffName(me?.name ?? '');
-        setStaffHospitalId(me?.hospitalId ?? 0); //
-      } catch (e) {
-        console.error(e);
-        setError('관계자 정보를 불러오지 못했습니다!');
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, []);
+  // useEffect(() => {
+  //   (async () => {
+  //     try {
+  //       setLoading(true);
+  //       setError(null);
+  //       const me: StaffResponse = await getStaffInfo(); // API 호출
+  //       setStaffName(me?.name ?? '');
+  //       setStaffHospitalId(me?.hospitalId ?? 0); //
+  //     } catch (e) {
+  //       console.error(e);
+  //       setError('관계자 정보를 불러오지 못했습니다!');
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   })();
+  // }, []);
 
   // 수정 기능 제거 - 조회만 가능
 
