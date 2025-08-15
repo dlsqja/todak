@@ -164,10 +164,10 @@ export default function ApplyFormPage() {
         <div>
           <h4 className="h4 mb-2">반려동물 정보</h4>
           <div className="flex gap-4 items-center">
-            <ImageInputBox src={buildPhotoUrl(pet?.photo ?? pet?.profileImage)} />
+            <ImageInputBox src={buildPhotoUrl(pet?.photo ?? pet?.profileImage)} stroke="border-5 border-gray-400" />
             <div className="flex flex-col gap-1">
               <p className="h4">{pet?.name || '반려동물 이름'}</p>
-              <p className="p text-gray-400">{`${speciesLabel} | ${pet?.age ?? '나이'}세 | ${genderLabel}`}</p>
+              <p className="p text-gray-500">{`${speciesLabel} | ${pet?.age ?? '나이'}세 | ${genderLabel}`}</p>
             </div>
           </div>
         </div>

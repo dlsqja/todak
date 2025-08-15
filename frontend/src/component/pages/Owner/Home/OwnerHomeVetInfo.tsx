@@ -38,6 +38,16 @@ export default function VetInfoPage() {
   const location = useLocation();
   const navigate = useNavigate();
 
+  const daymapping = {
+    SUN: '일',
+    MON: '월',
+    TUE: '화',
+    WED: '수',
+    THU: '목',
+    FRI: '금',
+    SAT: '토',
+  };
+
   const pet = location.state?.pet;
   const hospital = location.state?.hospital as {
     hospitalId: number;
@@ -110,6 +120,7 @@ export default function VetInfoPage() {
 
     const today = dayMap[new Date().getDay()];
     const slot = wh.find((w) => w.day === today);
+
     if (!slot) return null;
 
     // 시작/종료를 슬롯 인덱스로 표준화
@@ -127,7 +138,6 @@ export default function VetInfoPage() {
     const startText = timeMapping[startIdx] ?? '';
     const endText = timeMapping[endIdx] ?? '';
     const usableTimes = usableIdx.map((i) => timeMapping[i]).filter(Boolean);
-
     return { startText, endText, usableTimes };
   }, [vet?.workingHours, closingHours]);
 
@@ -162,18 +172,17 @@ export default function VetInfoPage() {
 
         {/* 헤더 정보 */}
         <div>
-          <h3 className="h3 mt-1">{vet?.name || '수의사 이름'}</h3>
-          <h4 className="h4 text-gray-400">
-            {hospitalInfo?.name}
+          <h4 className="p text-gray-500">{hospitalInfo?.name}</h4>
+          <h3 className="h3">{vet?.name || '수의사 이름'}</h3>
+          <h4 className="p text-black">
             {todayRange?.startText && todayRange?.endText ? (
               <>
-                {' '}
-                · 진료 가능 시간 {todayRange.startText}~{todayRange.endText}
+                진료 가능 시간 : ({daymapping[dayMap[new Date().getDay()]]}) {todayRange.startText} ~{' '}
+                {todayRange.endText}
               </>
             ) : null}
           </h4>
         </div>
-
         <SingleContent title="의사 소개" content={vet?.profile || '의사 소개 정보가 없습니다.'} />
         <SingleContent title="병원 정보" content={hospitalInfo?.profile || '병원 소개글이 없습니다.'} />
         <SingleContent title="병원 위치" content={hospitalInfo?.location || '병원 주소가 없습니다.'} />
@@ -186,7 +195,7 @@ export default function VetInfoPage() {
             // ✅ 근무시간 내부에서 closing 제외한 목록만 전달 → 비활성화가 자동 반영
             available_times={todayRange?.usableTimes ?? []}
           />
-          <div className="bg-gray-50">
+          <div className="bg-gray-50 pt-3">
             <Button color="green" text="진료 신청서 작성하러 가기" onClick={handleSubmit} />
           </div>
         </div>
