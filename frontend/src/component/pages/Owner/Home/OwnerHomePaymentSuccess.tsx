@@ -20,7 +20,7 @@ export default function PaymentSuccessPage() {
       }
       try {
         // 서버: 저장해둔 tid로 /v1/payment/approve 호출 → SID 발급/DB 저장
-        await apiClient.post('/owner/pay/regist', { pgToken });
+        await apiClient.post('/owners/pay/regist', { pgToken });
         setStatus('success');
         setMsg('결제수단(정기결제 키) 등록이 완료되었습니다.');
       } catch (e: any) {
