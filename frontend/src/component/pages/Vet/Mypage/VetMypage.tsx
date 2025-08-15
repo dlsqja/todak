@@ -11,18 +11,18 @@ import type { VetMyResponse } from '@/types/Vet/vetmypageType';
 import { authAPI } from '@/services/api/auth';
 import { motion } from 'framer-motion';
 
-const DEFAULT_PHOTO = '/images/person_default.png';
-
 // 렌더용 src 계산기: 절대 URL/데이터URL/상대경로 모두 대응
-const resolvePhotoSrc = (val?: string | null): string => {
-  if (!val) return DEFAULT_PHOTO;
-  const s = String(val).trim();
-  if (!s) return DEFAULT_PHOTO;
-  if (/^(https?:)?\/\//i.test(s)) return s; // http(s):// or //cdn...
-  if (/^(data:|blob:)/i.test(s)) return s; // data URL / blob
-  if (s.startsWith('/')) return s; // 절대 경로
-  return `/${s}`; // 상대경로 -> 절대로
-};
+// const resolvePhotoSrc = (val?: string | null): string => {
+//   if (!val) return DEFAULT_PHOTO;
+//   const s = String(val).trim();
+//   if (!s) return DEFAULT_PHOTO;
+//   if (/^(https?:)?\/\//i.test(s)) return s; // http(s):// or //cdn...
+//   if (/^(data:|blob:)/i.test(s)) return s; // data URL / blob
+//   if (s.startsWith('/')) return s; // 절대 경로
+//   return `/${s}`; // 상대경로 -> 절대로
+// };
+const photoUrl = import.meta.env.VITE_PHOTO_URL;
+const DEFAULT_PHOTO = '/images/person_default.png';
 
 export default function VetMypage() {
   const navigate = useNavigate();
@@ -36,7 +36,7 @@ export default function VetMypage() {
   const [profile, setProfile] = useState('');
 
   // 서버 전송용(원본 문자열)과 화면 표시용(src) 분리
-  const [photoRaw, setPhotoRaw] = useState<string>(''); // 서버로 보낼 값
+  // const [photoRaw, setPhotoRaw] = useState<string>(''); // 서버로 보낼 값
   const [photoSrc, setPhotoSrc] = useState<string>(DEFAULT_PHOTO); // img src
 
   // 업로드/미리보기
@@ -56,7 +56,7 @@ export default function VetMypage() {
   const handleRemoveImage = () => {
     setProfileImage(null);
     setPreviewImage(null);
-    setPhotoRaw(''); // 전송값 비움(기본이미지는 저장 안 함)
+    // setPhotoRaw(''); // 전송값 비움(기본이미지는 저장 안 함)
     setPhotoSrc(DEFAULT_PHOTO); // 화면은 기본 이미지
   };
 
@@ -78,13 +78,16 @@ export default function VetMypage() {
         setError(null);
         const me: VetMyResponse = await getVetMy();
 
-        setVetName(me?.name ?? '');
-        setLicense(me?.license ?? '');
-        setProfile(me?.profile ?? '');
+        setVetName(me.name ?? '');
+        setLicense(me.license ?? '');
+        setProfile(me.profile ?? '');
 
-        const raw = me?.photo ?? '';
-        setPhotoRaw(raw);
-        setPhotoSrc(resolvePhotoSrc(raw));
+        // 프로필 이미지 설정: null이면 기본 이미지, 있으면 IMAGE_URL + 경로
+        if (me.photo && photoUrl) {
+          setPhotoSrc(`${photoUrl}${me.photo}`);
+        } else {
+          setPhotoSrc(DEFAULT_PHOTO);
+        }
       } catch (e) {
         console.error(e);
         setError('수의사 정보를 불러오지 못했어요!');
@@ -116,7 +119,7 @@ export default function VetMypage() {
         license: license.trim(),
         profile: profile.trim() || '',
       };
-      formData.append('vetRequest', new Blob([JSON.stringify(vetRequestData)], { type: 'application/json' }));
+      formData.append('vetUpdateRequest', new Blob([JSON.stringify(vetRequestData)], { type: 'application/json' }));
 
       if (profileImage) {
         formData.append('photo', profileImage);
@@ -154,7 +157,7 @@ export default function VetMypage() {
                 className="w-full h-full object-cover"
                 onError={(e) => {
                   // 네트워크/경로 에러 시 기본 이미지로 폴백
-                  (e.currentTarget as HTMLImageElement).src = DEFAULT_PHOTO;
+                  (e.currentTarget as HTMLImageElement).src = '';
                 }}
               />
             </div>
