@@ -11,6 +11,7 @@ import { speciesMapping } from '@/utils/speciesMapping';
 import { statusMapping } from '@/utils/statusMapping';
 
 export default function OwnerReservationDetail() {
+  const imageUrl = import.meta.env.VITE_PHOTO_URL;
   const navigate = useNavigate();
   const [detail, setDetail] = useState<ReservationDetail>();
   const { reservationId } = useParams<{ reservationId: string }>();
@@ -96,7 +97,9 @@ export default function OwnerReservationDetail() {
         <div className="flex flex-col border-b-1 border-gray-100 pb-4 gap-2 ">
           <div className="h4">증상</div>
           {detail.photo && (
-            <div>{!detail.photo && <ImageInputBox src={detail.photo} stroke="border-5 border-green-200" />}</div>
+            <div>
+              <ImageInputBox src={`${imageUrl}${detail.photo}`} stroke="border-5 border-green-400" />
+            </div>
           )}
           <div className="p">{detail.description}</div>
         </div>
