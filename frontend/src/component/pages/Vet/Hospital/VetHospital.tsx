@@ -24,24 +24,35 @@ export default function VetHospital() {
   const [profile, setProfile] = useState('');
 
   useEffect(() => {
-    (async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const h: HospitalDetail = await getHospitalMine();
-        setName(h?.name ?? '');
-        setAddress(h?.location ?? '');
-        setContact(h?.contact ?? '');
-        setProfile(h?.profile ?? '');
-      } catch (e) {
-        console.error(e);
-        // 403 포함 모든 실패를 사용자 친화적으로 처리
-        setError('병원 정보를 불러오지 못했어요. 잠시 후 다시 시도해주세요.');
-      } finally {
-        setLoading(false);
+  (async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const h = await getHospitalMine();
+
+      if (!h) {
+        // 404 등으로 병원 정보가 없을 때
+        setName('');
+        setAddress('');
+        setContact('');
+        setProfile('');
+        setError('현재 계정에 연결된 병원 정보를 찾을 수 없어요. 병원 연결 후 다시 시도해주세요.');
+        return;
       }
-    })();
-  }, []);
+
+      setName(h.name ?? '');
+      setAddress(h.location ?? '');
+      setContact(h.contact ?? '');
+      setProfile(h.profile ?? '');
+    } catch (e) {
+      console.error(e);
+      setError('병원 정보를 불러오지 못했어요. 잠시 후 다시 시도해주세요.');
+    } finally {
+      setLoading(false);
+    }
+  })();
+}, []);
+
 
   const handleSubmit = async () => {
     try {
