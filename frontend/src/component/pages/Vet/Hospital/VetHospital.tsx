@@ -1,9 +1,11 @@
+// src/component/pages/Vet/VetHospital.tsx
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '@/styles/main.css';
 import Input from '@/component/input/Input';
 import Button from '@/component/button/Button';
 import SimpleHeader from '@/component/header/SimpleHeader';
+import { motion } from 'framer-motion'; // ✅ 추가
 
 import { getHospitalMine, updateHospitalMine } from '@/services/api/Vet/vethospital';
 import type { HospitalDetail } from '@/types/Vet/vethospitalType';
@@ -101,10 +103,22 @@ export default function VetHospital() {
           {error && <p className="caption text-red-500 mt-1">{error}</p>}
         </div>
       </div>
+
       <br />
-      <div className="px-7">
-        <Button text={saving ? '수정 중…' : '수정하기'} onClick={handleSubmit} color="green" />
-      </div>
+
+      {/* ✅ 1번코드와 동일한 motion 적용 구간 */}
+      <motion.div
+        className="px-7"
+        initial={{ opacity: 0, y: 10 }}   // 초기 상태
+        animate={{ opacity: 1, y: 0 }}    // 등장 상태
+        transition={{ duration: 0.3 }}    // 지속 시간
+      >
+        <Button
+          text={saving ? '수정 중…' : '수정하기'}
+          onClick={handleSubmit}
+          color="green"
+        />
+      </motion.div>
     </>
   );
 }
