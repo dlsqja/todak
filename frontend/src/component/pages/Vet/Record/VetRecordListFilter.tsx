@@ -1,20 +1,45 @@
-// src/component/pages/Vet/Record/VetRecordListFilter.tsx
+// src/component/pages/Staff/Payment/StaffPayment.tsx
 import React, { useEffect, useMemo, useState } from 'react';
 import '@/styles/main.css';
+import SimpleHeader from '@/component/header/SimpleHeader';
 import SelectionDropdown from '@/component/selection/SelectionDropdown';
-import TreatmentSlideCard from '@/component/card/TreatmentSlideCard';
-import type { VetTreatment } from '@/types/Vet/vettreatmentType';
-import { toTimeRange } from '@/utils/timeMapping';
-import { getVetTreatments } from '@/services/api/Vet/vettreatment';
-import { speciesMapping } from '@/utils/speciesMapping';
+import StaffPaymentCard from '@/component/card/StaffPaymentCard';
 import { subjectMapping } from '@/utils/subjectMapping';
+import { speciesMapping } from '@/utils/speciesMapping';
+import { toTimeRange } from '@/utils/timeMapping';
 
-const signedOptions = [
-  { value: 'ALL', label: '전체 상태' },
-  { value: 'false', label: '검토 대기' },
-  { value: 'true', label: '서명 완료' },
-] as const;
+import { getStaffPayments, postStaffPay } from '@/services/api/Staff/staffpayment';
+import type { StaffPayment } from '@/types/Staff/staffpaymentType';
 
+import ModalOnLayout from '@/layouts/ModalLayout';
+import ModalTemplate from '@/component/template/ModalTemplate';
+import Button from '@/component/button/Button';
+
+// ---------- helpers ----------
+const pad2 = (n: number) => String(n).padStart(2, '0');
+const hasTZ = (s: string) => /[zZ]|[+\-]\d{2}:?\d{2}$/.test(s);
+const normalizeISOish = (s: string) => {
+  let out = s.trim().replace(' ', 'T');
+  out = out.replace(/(\.\d{3})\d+$/, '$1'); // 소수점 3자리까지만
+  return out;
+};
+const parseServerDate = (s?: string | null): Date | null => {
+  if (!s || typeof s !== 'string') return null;
+  const isoish = normalizeISOish(s);
+  const withTZ = hasTZ(isoish) ? isoish : `${isoish}Z`; // tz 없으면 UTC로
+  const d = new Date(withTZ);
+  return isNaN(d.getTime()) ? null : d;
+};
+const hhmmLocalFromServer = (s?: string | null) => {
+  const d = parseServerDate(s);
+  if (!d) return '';
+  return `${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
+};
+const ymdLocalFromServer = (s?: string | null) => {
+  const d = parseServerDate(s);
+  if (!d) return '';
+  return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
+};
 // YYYY-MM-DD → "YYYY년 M월 D일"
 const formatKoreanDate = (ymd: string) => {
   if (!ymd) return '날짜 미정';
@@ -22,173 +47,458 @@ const formatKoreanDate = (ymd: string) => {
   if (!y || !m || !d) return ymd;
   return `${y}년 ${m}월 ${d}일`;
 };
-
-// startTime에서 날짜키 추출
-const getDateKey = (t: any): string => {
-  const s = t.startTime ?? t.start_time ?? '';
-  if (typeof s !== 'string' || !s) return '';
-  return s.includes('T') ? s.split('T')[0] : s.split(' ')[0] || '';
+// 진료 날짜키: startTime(로컬 변환) 우선, 없으면 reservationDay
+const getDateKey = (p: StaffPayment): string => {
+  const ymd = ymdLocalFromServer(p.startTime || '');
+  return ymd || (p.reservationDay ?? '');
+};
+// 정렬용 ts
+const getTs = (p: StaffPayment): number => {
+  const d = parseServerDate(p.startTime || '');
+  if (d) return d.getTime();
+  if (p.reservationDay) {
+    const [y, m, d2] = p.reservationDay.split('-').map((v) => parseInt(v, 10));
+    const base = new Date(y, (m || 1) - 1, d2 || 1, 0, 0, 0, 0).getTime();
+    const slotMs = (p.reservationTime ?? 0) * 30 * 60 * 1000;
+    return base + slotMs;
+  }
+  return 0;
+};
+// 표시용 시간(HH:mm ~ HH:mm)
+const getTimeText = (p: StaffPayment) => {
+  const a = p.startTime ? hhmmLocalFromServer(p.startTime) : '';
+  const b = p.endTime ? hhmmLocalFromServer(p.endTime) : '';
+  if (a && b) return `${a} - ${b}`;
+  if (a || b) return a || b;
+  return toTimeRange(undefined as any, undefined as any, p.reservationTime as any) || '';
+};
+// 통화 포맷
+const formatKRW = (v: number) => v.toLocaleString('ko-KR') + '원';
+// 지금 시간(로컬) 간단 포맷
+const nowYmdHm = () => {
+  const d = new Date();
+  return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())} ${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
 };
 
-// "종류 | 나이세 | 과목" (utils 매핑 사용)
-const makeInfo = (t: any) => {
-  const p = t.pet ?? t.petInfo ?? {};
-  const speciesKo = speciesMapping[p.species as keyof typeof speciesMapping] ?? p.species ?? '반려동물';
-  const agePart = p.age != null ? `${p.age}세` : '';
-  const subjectKo = subjectMapping[t.subject as keyof typeof subjectMapping] ?? '진료';
-  return [speciesKo, agePart, subjectKo].filter(Boolean).join(' | ');
-};
+// 드롭다운 필터 옵션 수정: 결제 상태(전체, 결제 대기, 결제 완료)
+const paidOptions = [
+  { value: 'ALL', label: '결제 상태(전체)' },
+  { value: 'false', label: '결제 대기' },
+  { value: 'true', label: '결제 완료' },
+] as const;
 
-// ✅ 실제 시작시간 있는지(리스트의 startTime 문자열 기준) 체크
-const hasRealStartTime = (it: any): boolean => {
-  const s = it?.startTime ?? it?.start_time;
-  if (typeof s !== 'string' || !s.trim()) return false;
-  const norm = s.replace(' ', 'T').replace(/\.\d+$/, '');
-  const d = new Date(norm);
-  return !isNaN(d.getTime());
-};
+export default function StaffPayment() {
+  // 목록/필터
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [rows, setRows] = useState<StaffPayment[]>([]);
+  const [selectedPaid, setSelectedPaid] = useState<'ALL' | 'true' | 'false'>('ALL');
+  const [selectedVet, setSelectedVet] = useState<string>('ALL');
 
-interface Props {
-  data?: VetTreatment[];           // 비어있으면 내부에서 type=2 호출
-  onCardClick: (id: number) => void;
-}
+  // 입력 모달
+  const [modalOpen, setModalOpen] = useState(false);
+  const [current, setCurrent] = useState<StaffPayment | null>(null);
+  const [amountInput, setAmountInput] = useState<string>('');
+  const [saving, setSaving] = useState(false);
 
-export default function VetRecordListFilter({ data = [], onCardClick }: Props) {
-  const [selectedSigned, setSelectedSigned] =
-    useState<'ALL' | 'true' | 'false'>('ALL');
+  // 확인 모달
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [confirmPayload, setConfirmPayload] = useState<{
+    dateText: string;
+    timeText: string;
+    vet: string;
+    petText: string;
+    amount: number | null;
+    paidAt: string;
+  } | null>(null);
 
-  // 원본/보강본
-  const [base, setBase] = useState<any[]>([]);
-  const [enriched, setEnriched] = useState<any[]>([]);
-  const [loading, setLoading] = useState(false);
-
-  // ▶ 데이터 로드: props.data가 비어 있으면 type=2(전체 진료) 로드
   useEffect(() => {
     let alive = true;
     (async () => {
       try {
         setLoading(true);
-
-        // ✅ 상세 호출 없이, 리스트(type=2)의 필드 그대로 사용
-        const initialList =
-          (data && data.length > 0) ? (data as any[]) : ((await getVetTreatments(2)) as any[]);
-
+        setError(null);
+        const list = await getStaffPayments();
         if (!alive) return;
-        setBase(initialList);
-        setEnriched(initialList); // ← 바로 사용 (startTime/endTime 포함)
-      } catch (e) {
-        console.warn('[VetRecordListFilter] load failed:', e);
-        if (alive) {
-          setBase(data as any[]);
-          setEnriched(data as any[]);
+
+        const safeList = Array.isArray(list) ? list : [];
+        setRows(safeList);
+
+        if (DEBUG) {
+          console.groupCollapsed('[StaffPayment] fetched');
+          console.log('raw length:', safeList.length);
+          const table = safeList.map((p) => {
+            const rawDatePart = String(p.startTime ?? '').split(/[ T]/)[0] || '';
+            const localYMD = getDateKey(p);
+            return {
+              paymentId: p.paymentId,
+              startTime: p.startTime ?? '',
+              endTime: p.endTime ?? '',
+              completeTime: p.completeTime ?? '', // ✅ 추가
+              reservationDay: p.reservationDay ?? '',
+              reservationTime: p.reservationTime ?? '',
+              rawDatePart,
+              localYMD,
+              timeText: getTimeText(p),
+              ts: getTs(p),
+              isCompleted: !!p.isCompleted,
+              amount: p.amount ?? null,
+              vet: p.vet?.name ?? '',
+              pet: p.pet?.name ?? '',
+              subject: p.subject ?? '',
+            };
+          });
+          console.table(table);
+          (window as any)._staffPayments = safeList;
+          console.groupEnd();
         }
+      } catch (e: any) {
+        console.error('[StaffPayment] fetch error:', e);
+        if (!alive) return;
+        setError(e?.response?.data?.message || e?.message || '결제 목록을 불러오지 못했어요.');
+        setRows([]);
       } finally {
         if (alive) setLoading(false);
       }
     })();
     return () => { alive = false; };
-  }, [data]);
+  }, []);
 
-  // 1) 서명상태 필터 → 2) ✅ 시작시간 없는 항목 제거 → 3) 최신 시작시간(desc)
-  const filteredData = useMemo(() => {
-    let list = [...enriched];
-
-    if (selectedSigned !== 'ALL') {
-      const want = selectedSigned === 'true';
-      list = list.filter(
-        (it: any) => !!(it.isCompleted ?? it.is_completed) === want
-      );
-    }
-
-    // ✅ 시작시간 없는 항목 제외 (리스트의 startTime 기준)
-    list = list.filter(hasRealStartTime);
-
-    list.sort((a: any, b: any) => {
-      const sa = a.startTime ?? a.start_time ?? '';
-      const sb = b.startTime ?? b.start_time ?? '';
-      return sa < sb ? 1 : -1;
+  // 수의사 드롭다운 옵션 (ALL + 유니크)
+  const vetOptions = useMemo(() => {
+    const uniq = new Map<string, string>();
+    rows.forEach((r) => {
+      const value = String(r.vet?.vetId ?? r.vet?.name ?? '');
+      const label = r.vet?.name ?? '이름 미정';
+      if (value) uniq.set(value, label);
     });
+    return [{ value: 'ALL', label: '전체 수의사' }].concat(
+      Array.from(uniq.entries()).map(([value, label]) => ({ value, label })),
+    );
+  }, [rows]);
 
-    return list as VetTreatment[];
-  }, [enriched, selectedSigned]);
+  // "종류 | 나이세 | 과"
+  const makeInfo = (p: StaffPayment) => {
+    const rawSpecies = p.pet?.species ?? '';
+    const speciesCand =
+      (speciesMapping as any)[String(rawSpecies).toUpperCase()] ??
+      (speciesMapping as any)[rawSpecies] ??
+      rawSpecies;
+    const speciesKo = speciesCand || '반려동물';
+    const agePart = p.pet?.age != null ? `${p.pet?.age}세` : '';
+    const rawSubject = p.subject ?? '진료';
+    const subjectKo =
+      (subjectMapping as any)[rawSubject as keyof typeof subjectMapping] || rawSubject;
+    return [speciesKo, agePart, subjectKo].filter(Boolean).join(' | ');
+  };
 
-  // 날짜별 그룹핑 + 각 날짜 내부는 시간 내림차순(최근 먼저)
+  // 필터 → 최신순 → 날짜별 그룹(로컬 날짜 기준)
   const grouped = useMemo(() => {
-    const map = new Map<string, VetTreatment[]>();
-    for (const it of filteredData as any[]) {
+    let list = [...rows];
+    if (selectedVet !== 'ALL') {
+      list = list.filter((r) => String(r.vet?.vetId ?? r.vet?.name ?? '') === selectedVet);
+    }
+    if (selectedPaid !== 'ALL') {
+      const want = selectedPaid === 'true';
+      list = list.filter((r) => !!r.isCompleted === want);
+    }
+    list.sort((a, b) => getTs(b) - getTs(a));
+
+    const map = new Map<string, StaffPayment[]>();
+    for (const it of list) {
       const key = getDateKey(it) || '날짜 미정';
       const arr = map.get(key) ?? [];
-      arr.push(it as any);
+      arr.push(it);
       map.set(key, arr);
     }
 
-    const entries = Array.from(map.entries()).sort((a, b) => b[0].localeCompare(a[0]));
-    for (const [, arr] of entries as any) {
-      const getTs = (x: any) => {
-        const s = x.startTime ?? x.start_time ?? '';
-        if (typeof s === 'string' && s) {
-          const norm = s.replace(' ', 'T').replace(/\.\d+$/, '');
-          const d = new Date(norm);
-          if (!isNaN(d.getTime())) return d.getTime();
-        }
-        const slot = x.reservationTime ?? x.reservation_time;
-        if (Number.isFinite(slot)) return Number(slot) * 30 * 60 * 1000;
-        return 0;
-      };
-      arr.sort((a: any, b: any) => getTs(b) - getTs(a));
+    const entries = Array.from(map.entries()).sort((a, b) => {
+      const ka = a[0], kb = b[0];
+      if (ka === '날짜 미정') return 1;
+      if (kb === '날짜 미정') return -1;
+      return kb.localeCompare(ka);
+    });
+    for (const [, arr] of entries) arr.sort((x, y) => getTs(y) - getTs(x));
+
+    if (DEBUG) {
+      console.groupCollapsed('[StaffPayment] grouped (by local date)');
+      console.log('groups count:', entries.length);
+      entries.forEach(([key, arr]) => {
+        console.groupCollapsed(`dateKey=${key} (${arr.length}건)`);
+        console.table(
+          arr.map((p) => ({
+            paymentId: p.paymentId,
+            rawDatePart: String(p.startTime ?? '').split(/[ T]/)[0] || '',
+            localYMD: getDateKey(p),
+            timeText: getTimeText(p),
+            ts: getTs(p),
+            isCompleted: !!p.isCompleted,
+            amount: p.amount ?? null,
+            completeTime: p.completeTime ?? '',
+          }))
+        );
+        console.groupEnd();
+      });
+      console.groupEnd();
     }
-    return entries as [string, VetTreatment[]][];
-  }, [filteredData]);
+
+    return entries as [string, StaffPayment[]][];
+  }, [rows, selectedPaid, selectedVet]);
+
+  // 카드 클릭 시: 완료 모달 또는 입력 모달
+  const openConfirmModalFromItem = (p: StaffPayment) => {
+    const dateText = formatKoreanDate(getDateKey(p));
+    const timeText = getTimeText(p);
+    const vet = p.vet?.name || '-';
+    const petText = (p.pet?.name || '반려동물') + (makeInfo(p) ? ` (${makeInfo(p)})` : '');
+
+    const paidAt = p.completeTime
+      ? `${ymdLocalFromServer(p.completeTime)} ${hhmmLocalFromServer(p.completeTime)}`
+      : '-';
+
+    const amount = typeof p.amount === 'number' ? p.amount : null;
+
+    const payload = { dateText, timeText, vet, petText, amount, paidAt };
+    if (DEBUG) console.log('[StaffPayment] openConfirmModalFromItem payload:', payload);
+
+    setConfirmPayload(payload);
+    setConfirmOpen(true);
+  };
+
+  const onCardClick = (p: StaffPayment) => {
+    if (p.isCompleted) {
+      openConfirmModalFromItem(p);
+    } else {
+      setCurrent(p);
+      setAmountInput(p.amount != null ? String(p.amount) : '');
+      setModalOpen(true);
+    }
+  };
+
+  // 금액 저장 → 확인 모달
+  const saveAmount = async () => {
+    const n = Number(String(amountInput).replace(/[^\d]/g, ''));
+    if (!Number.isFinite(n) || n <= 0) {
+      alert('올바른 금액(원)을 입력해주세요.');
+      return;
+    }
+    if (!current) return;
+
+    try {
+      setSaving(true);
+      await postStaffPay({ paymentId: current.paymentId, totalAmount: n } as any);
+
+      const nowIso = new Date().toISOString();
+      setRows((prev) =>
+        prev.map((it) =>
+          it.paymentId === current.paymentId
+            ? { ...it, amount: n, isCompleted: true, completeTime: nowIso }
+            : it
+        )
+      );
+
+      const dateText = formatKoreanDate(getDateKey(current));
+      const timeText = getTimeText(current);
+      const vet = current.vet?.name || '-';
+      const petText =
+        (current.pet?.name || '반려동물') + (makeInfo(current) ? ` (${makeInfo(current)})` : '');
+      const paidAt = `${ymdLocalFromServer(nowIso)} ${hhmmLocalFromServer(nowIso)}`;
+
+      const payload = { dateText, timeText, vet, petText, amount: n, paidAt };
+      if (DEBUG) console.log('[StaffPayment] confirmPayload:', payload);
+
+      setConfirmPayload(payload);
+      setModalOpen(false);
+      setConfirmOpen(true);
+    } catch (e) {
+      console.warn('[StaffPayment] postStaffPay failed. Local-only update…', e);
+
+      const nowIso = new Date().toISOString();
+      setRows((prev) =>
+        prev.map((it) =>
+          it.paymentId === current.paymentId
+            ? { ...it, amount: n, isCompleted: true, completeTime: nowIso }
+            : it
+        )
+      );
+
+      const dateText = formatKoreanDate(getDateKey(current));
+      const timeText = getTimeText(current);
+      const vet = current.vet?.name || '-';
+      const petText =
+        (current.pet?.name || '반려동물') + (makeInfo(current) ? ` (${makeInfo(current)})` : '');
+      const paidAt = `${ymdLocalFromServer(nowIso)} ${hhmmLocalFromServer(nowIso)}`;
+
+      const payload = { dateText, timeText, vet, petText, amount: n, paidAt };
+      if (DEBUG) console.log('[StaffPayment] confirmPayload(LOCAL):', payload);
+
+      setConfirmPayload(payload);
+      setModalOpen(false);
+      setConfirmOpen(true);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  // 모달 표시용(입력용)
+  const modalDateText = current ? formatKoreanDate(getDateKey(current)) : '';
+  const modalTime = current ? getTimeText(current) : '';
+  const modalVet = current?.vet?.name || '-';
+  const modalPetName = current?.pet?.name || '반려동물';
+  const modalPetInfo = current ? makeInfo(current) : '';
 
   return (
     <>
-      <div className="px-7 flex gap-3">
+      <SimpleHeader text="결제 관리" />
+
+      {/* 필터 */}
+      <div className="px-7 mt-4 flex gap-3">
         <div className="flex-1">
           <SelectionDropdown
-            options={signedOptions as any}
-            value={selectedSigned}
-            onChange={(v) => setSelectedSigned(v as any)}
-            placeholder={loading ? '불러오는 중…' : '서명상태 선택'}
+            options={vetOptions as any}
+            value={selectedVet}
+            onChange={(v) => setSelectedVet(v)}
+            placeholder="수의사 선택"
+          />
+        </div>
+        <div className="flex-1">
+          <SelectionDropdown
+            options={paidOptions as any}
+            value={selectedPaid}
+            onChange={(v) => setSelectedPaid(v as any)}
+            placeholder="결제 상태"
           />
         </div>
       </div>
 
-      <div className="px-7">
-        {grouped.map(([dateKey, items]) => (
-          <div key={dateKey} className="mb-5 mt-1">
-            <div className="flex justify-between items-center mb-3">
-              <h4 className="h4 text-black">{formatKoreanDate(dateKey)}</h4>
-              <h4 className="h4 text-black">{items.length}건</h4>
-            </div>
-
-            <div className="flex flex-col gap-3">
-              {items.map((t: any) => {
-                const start = t.startTime ?? t.start_time;
-                const end   = t.endTime   ?? t.end_time;
-                const slot  = t.reservationTime ?? t.reservation_time;
-                const timeRange = toTimeRange(start, end, slot);
-
-                const petName = t.pet?.name ?? t.petInfo?.name ?? '반려동물';
-                const subjectKo = subjectMapping[t.subject as keyof typeof subjectMapping] ?? '진료';
-                const info    = makeInfo(t);
-
-                return (
-                  <TreatmentSlideCard
-                    key={t.treatmentId}
-                    time={timeRange}
-                    department={subjectKo}
-                    petName={petName}
-                    petInfo={info}
-                    isAuthorized={true}
-                    is_signed={!!(t.isCompleted ?? t.is_completed)}
-                    onClick={() => onCardClick(t.treatmentId)}
-                  />
-                );
-              })}
-            </div>
+      {/* 리스트 */}
+      <div className="px-7 mt-4">
+        {loading ? (
+          <p className="p text-gray-500">불러오는 중…</p>
+        ) : error ? (
+          <p className="p text-red-500">{error}</p>
+        ) : grouped.length === 0 ? (
+          <div className="flex items-center justify-center h-40">
+            <p className="h4 text-gray-500">표시할 결제 건이 없습니다.</p>
           </div>
-        ))}
+        ) : (
+          grouped.map(([dateKey, items]) => (
+            <div key={dateKey} className="mb-6 mt-1">
+              <div className="flex justify-between items-center mb-3">
+                <h4 className="h4 text-black">{formatKoreanDate(dateKey)}</h4>
+                <h4 className="h4 text-black">{items.length}건</h4>
+              </div>
+
+              <div className="flex flex-col gap-3">
+                {items.map((p) => {
+                  const rawSubject = p.subject ?? '진료';
+                  const deptKo =
+                    (subjectMapping as any)[rawSubject as keyof typeof subjectMapping] ||
+                    rawSubject ||
+                    '진료';
+                  return (
+                    <StaffPaymentCard
+                      key={p.paymentId}
+                      vetName={`${p.vet?.name ?? ''} 수의사님`}
+                      department={deptKo}
+                      petName={p.pet?.name ?? '반려동물'}
+                      petInfo={makeInfo(p)}
+                      time={getTimeText(p)}
+                      isPaid={!!p.isCompleted}
+                      onClick={() => onCardClick(p)}   // 완료면 확인 모달, 아니면 입력 모달
+                    />
+                  );
+                })}
+              </div>
+            </div>
+          ))
+        )}
       </div>
+
+      {/* 금액 입력 모달 */}
+      {modalOpen && current && (
+        <ModalOnLayout onClose={() => setModalOpen(false)}>
+          <ModalTemplate title="결제 금액 입력" onClose={() => setModalOpen(false)}>
+            <div className="space-y-4">
+              <div className="bg-gray-50 rounded-2xl px-4 py-3 space-y-3">
+                <div>
+                  <h4 className="h4 text-black m-0">진료 일자 및 시간</h4>
+                  <p className="p text-black mt-1">
+                    {[modalDateText, modalTime].filter(Boolean).join(' ') || '-'}
+                  </p>
+                </div>
+                <div>
+                  <h4 className="h4 text-black m-0">담당 수의사</h4>
+                  <p className="p text-black mt-1">{modalVet}</p>
+                </div>
+                <div>
+                  <h4 className="h4 text-black m-0">반려동물</h4>
+                  <p className="p text-black mt-1">
+                    {modalPetName} {modalPetInfo ? `(${modalPetInfo})` : ''}
+                  </p>
+                </div>
+              </div>
+
+              <div>
+                <label className="p block text-black mb-1">결제 금액(원)</label>
+                <input
+                  type="number"
+                  inputMode="numeric"
+                  className="w-full h-12 bg-white border-1 rounded-[12px] border-gray-400 px-4 text-black"
+                  placeholder="예) 35000"
+                  value={amountInput}
+                  onChange={(e) => setAmountInput(e.target.value)}
+                />
+              </div>
+
+              <div className="flex gap-3">
+                <Button color="gray" text="취소" onClick={() => setModalOpen(false)} />
+                <Button color="green" text={saving ? '저장 중…' : '저장'} onClick={saveAmount} />
+              </div>
+            </div>
+          </ModalTemplate>
+        </ModalOnLayout>
+      )}
+
+      {/* 결제 완료 확인 모달 */}
+      {confirmOpen && confirmPayload && (
+        <ModalOnLayout onClose={() => setConfirmOpen(false)}>
+          <ModalTemplate title="결제 완료" onClose={() => setConfirmOpen(false)}>
+            <div className="space-y-4">
+              <div className="bg-gray-50 rounded-2xl px-4 py-3 space-y-3">
+                <div>
+                  <h4 className="h4 text-black m-0">진료 일자 및 시간</h4>
+                  <p className="p text-black mt-1">
+                    {[confirmPayload.dateText, confirmPayload.timeText].filter(Boolean).join(' ')}
+                  </p>
+                </div>
+                <div>
+                  <h4 className="h4 text-black m-0">담당 수의사</h4>
+                  <p className="p text-black mt-1">{confirmPayload.vet}</p>
+                </div>
+                <div>
+                  <h4 className="h4 text-black m-0">반려동물</h4>
+                  <p className="p text-black mt-1">{confirmPayload.petText}</p>
+                </div>
+                <div className="pt-1">
+                  <h4 className="h4 text-black m-0">결제 완료 시간</h4>
+                  <p className="p text-black mt-1">{confirmPayload.paidAt}</p>
+                </div>
+                <div>
+                  <h4 className="h4 text-black m-0">결제 금액</h4>
+                  <p className="p text-black mt-1">
+                    {confirmPayload.amount != null ? formatKRW(confirmPayload.amount) : '-'}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex justify-end">
+                <Button color="green" text="확인" onClick={() => setConfirmOpen(false)} />
+              </div>
+            </div>
+          </ModalTemplate>
+        </ModalOnLayout>
+      )}
     </>
   );
 }

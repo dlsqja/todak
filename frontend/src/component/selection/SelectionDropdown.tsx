@@ -1,83 +1,123 @@
-// src/component/selection/SelectionDropdown.tsx
-import React, { useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import DropdownArrow from '@/component/icon/Dropdown_Arrow';
 
-interface DropdownProps {
-  id?: string; // ✅ 각 드롭다운을 구분할 ID
-  options: Array<{ value: string; label: string }>;
+interface OptionType {
+  value: string;
+  label: string;
+  description?: string;
+  photo?: string;
+}
+
+interface FilterDropdownProps {
+  options: OptionType[]; // 배열 타입 명시
   placeholder?: string;
   value: string;
   onChange: (value: string) => void;
-
-  // ✅ (선택) 상위에서 "현재 활성 드롭다운"을 제어하려면 이 두 개를 넘겨줘!
-  activeId?: string | null;
-  setActiveId?: (id: string | null) => void;
-
-  // (선택) 클래스 커스텀용
-  className?: string;
+  dropdownId: string; // 각 드롭다운을 구분할 수 있는 ID 추가
+  activeDropdown: string | null; // 현재 활성화된 드롭다운 추적
+  setActiveDropdown: (id: string | null) => void; // 활성화된 드롭다운 변경 함수
 }
 
 export default function SelectionDropdown({
-  id,
-  options,
-  placeholder = '',
+  options = [], // options 기본값을 빈 배열로 설정
+  placeholder = '전체',
   value,
   onChange,
-  activeId,
-  setActiveId,
-  className = '',
-}: DropdownProps) {
-  const ref = useRef<HTMLDivElement>(null);
-  const isControlled = typeof activeId !== 'undefined' && typeof setActiveId === 'function';
-  const isActive = isControlled ? activeId === id : false;
+  dropdownId,
+  activeDropdown,
+  setActiveDropdown,
+}: FilterDropdownProps) {
+  const [open, setOpen] = useState(false);
 
-  // 바깥 클릭 시 비활성 표시
-  useEffect(() => {
-    if (!isControlled) return;
-    const onDown = (e: MouseEvent) => {
-      if (!ref.current) return;
-      if (!ref.current.contains(e.target as Node)) setActiveId!(null);
-    };
-    document.addEventListener('mousedown', onDown);
-    return () => document.removeEventListener('mousedown', onDown);
-  }, [isControlled, setActiveId]);
+  // options가 배열인지 확인
+  const validOptions = Array.isArray(options) ? options : [];
 
+  const selectedOption = validOptions.find((opt) => opt.value === value);
+
+  // 사진이나 설명이 있을 경우 true
+  const hasDetail = selectedOption?.photo || selectedOption?.description;
+
+  const toggleDropdown = () => {
+  if (activeDropdown === dropdownId) {
+    setOpen(!open); // 현재 열려 있는 드롭다운이면 토글
+  } else {
+    setActiveDropdown(dropdownId); // 다른 드롭다운을 클릭했을 때 열기
+    setOpen(true); // 현재 드롭다운을 열기
+  }
+};
+
+  // 드롭다운이 열릴 때, activeDropdown이 변경되면 자동으로 다른 드롭다운은 닫히게 됩니다
   return (
-    <div
-      ref={ref}
-      className={`relative ${className}`}
-      onMouseDown={() => isControlled && id && setActiveId!(id)} // 클릭 순간 활성 인식
-      onFocusCapture={() => isControlled && id && setActiveId!(id)} // 키보드 포커스 활성 인식
-    >
-      <select
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        onBlur={() => isControlled && activeId === id && setActiveId!(null)} // 포커스 빠지면 비활성
-        className={`w-full border bg-white h-12 appearance-none rounded-2xl px-4 py-2
-          focus:outline-none focus:ring-0
-          ${isActive ? 'border-green-300 border-2' : 'border-gray-400'}
-          ${value === '' ? 'text-gray-500' : 'text-black'}
+    <div className="relative w-full">
+      {/* 선택된 항목 */}
+      <button
+        onClick={toggleDropdown}
+        className={`
+          w-full 
+          ${hasDetail ? 'h-16' : 'h-12'} 
+          rounded-2xl border border-gray-300 px-4 
+          flex items-center justify-between bg-white
+          focus:outline-none focus:ring-0 focus:border-green-300 focus:border-2
+          transition-colors duration-200
+          ${open ? 'border-green-300' : 'border-gray-300'}
         `}
-        aria-expanded={isActive ? true : undefined}
       >
-        {placeholder !== '' && (
-          <option value="" disabled hidden className="text-gray-500">
-            {placeholder}
-          </option>
-        )}
-        {/* 선택 해제 옵션 */}
-        <option value="" className="text-black">
-          선택
-        </option>
-        {options.map((opt) => (
-          <option key={opt.value} value={opt.value} className="text-black bg-white">
-            {opt.label}
-          </option>
-        ))}
-      </select>
-      <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 z-5 text-gray-500">
-        <DropdownArrow width={24} height={24} stroke="currentColor" />
-      </span>
+        <div className="flex items-center gap-3 text-left">
+          {selectedOption?.photo && (
+            <img
+              src={selectedOption.photo}
+              alt="profile"
+              className="w-10 h-10 rounded-full object-cover"
+            />
+          )}
+          <div className="flex flex-col">
+            <p className="p">{selectedOption?.label ?? placeholder}</p>
+            {selectedOption?.description && (
+              <p className="caption text-gray-500">{selectedOption.description}</p>
+            )}
+          </div>
+        </div>
+        <span className="text-gray-400">
+          <DropdownArrow width={24} height={24} stroke="currentColor" />
+        </span>
+      </button>
+
+      {/* 옵션 리스트 */}
+      {open && (
+        <ul className="absolute z-10 mt-2 w-full bg-white border border-gray-300 rounded-2xl overflow-hidden shadow-lg">
+          {validOptions.map((opt) => {
+            const hasOptDetail = opt.photo || opt.description;
+            return (
+              <li
+                key={opt.value}
+                onClick={() => {
+                  onChange(opt.value);
+                  setOpen(false);
+                  setActiveDropdown(null); // 드롭다운 선택 후 닫기
+                }}
+                className={`
+                  flex items-center gap-3 px-4 py-3 hover:bg-gray-100 cursor-pointer
+                  ${!hasOptDetail ? 'h-12' : ''}
+                `}
+              >
+                {opt.photo && (
+                  <img
+                    src={opt.photo}
+                    alt="profile"
+                    className="w-10 h-10 rounded-full object-cover"
+                  />
+                )}
+                <div className="flex flex-col">
+                  <p className="p">{opt.label}</p>
+                  {opt.description && (
+                    <p className="caption text-gray-500">{opt.description}</p>
+                  )}
+                </div>
+              </li>
+            );
+          })}
+        </ul>
+      )}
     </div>
   );
 }

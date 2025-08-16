@@ -1,24 +1,23 @@
 import apiClient from '@/plugins/axios';
-import type {
-  RawStaffPayment,
-  StaffPayment,
-  StaffPayRequest,
-} from '@/types/Staff/staffpaymentType';
+import type { RawStaffPayment, StaffPayment, StaffPayRequest } from '@/types/Staff/staffpaymentType';
 import { mapStaffPayment } from '@/types/Staff/staffpaymentType';
 
-/** 결제 건 조회 (해당 병원) - GET /staffs/pay/ */
+// ✅ 결제 건 목록 조회 (병원 별도 파라미터 없음)
 export const getStaffPayments = async (): Promise<StaffPayment[]> => {
-  const res = await apiClient.get('/staffs/pay/', {
-    // 4xx는 메시지 확인을 위해 그대로 throw 하도록 기본 동작 유지
-  });
+  const res = await apiClient.get('/staffs/pay'); // /payments/hospitals 아님!
   const raw: RawStaffPayment[] = res.data?.data ?? res.data ?? [];
   return Array.isArray(raw) ? raw.map(mapStaffPayment) : [];
 };
 
-/** 결제 진행 - POST /staffs/pay/ */
+// ✅ 결제 진행 (카카오)
 export const postStaffPay = async <TResp = unknown>(
   payload: StaffPayRequest,
 ): Promise<TResp> => {
-  const res = await apiClient.post('/staffs/pay/', payload);
+  // 서버 스펙: KakaoPayRequest { payment_id, total_amount }
+  const body = {
+    payment_id: payload.paymentId,
+    total_amount: payload.totalAmount,
+  };
+  const res = await apiClient.post('/staffs/pay', body); // 끝에 슬래시( / ) 붙이지 마!
   return (res.data?.data ?? res.data) as TResp;
 };

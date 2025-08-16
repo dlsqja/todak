@@ -2,9 +2,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import '@/styles/main.css';
 import { useNavigate } from 'react-router-dom';
-// (원하면 이 카드 컴포넌트로 대체해서 사용 가능)
-// import OwnerTreatmentSimpleCard from '@/component/card/OwnerTreatmentSimpleCard';
-
 import { getStaffHospitalDetail } from '@/services/api/Staff/staffhospital';
 import { getStaffHospitalReservations } from '@/services/api/Staff/staffreservation';
 import { timeMapping, toLocalHHmm } from '@/utils/timeMapping';
@@ -15,9 +12,24 @@ import { FiChevronRight } from 'react-icons/fi';
 type HomeCardItem = {
   reservationId?: number;
   vet_name: string;
-  time: string; // "HH:mm"
-  pet: string; // 펫 이름
-  petinfo: string; // "강아지 / 3세 / 여(중성화)"
+  time: string;
+  pet: string;
+  petinfo: string;
+};
+
+const DEBUG = true;
+
+// 안전 경로 접근 util: get(r, 'pet.species')
+const getIn = (obj: any, path: string) =>
+  path.split('.').reduce((a, k) => (a == null ? a : a[k]), obj);
+
+// 후보 키들 중 첫 번째로 값이 있는 키/값 반환
+const pickFirst = (obj: any, keys: string[]) => {
+  for (const k of keys) {
+    const v = getIn(obj, k);
+    if (v != null && String(v).trim() !== '') return { key: k, value: v };
+  }
+  return { key: '', value: undefined };
 };
 
 const toHHmm = (val: unknown): string => {
@@ -40,7 +52,6 @@ const isRequested = (r: any) => String(r?.status ?? '').toUpperCase() === 'REQUE
 
 export default function StaffHome() {
   const navigate = useNavigate();
-
   const [loading, setLoading] = useState(true);
   const [cards, setCards] = useState<HomeCardItem[]>([]);
 
@@ -50,54 +61,87 @@ export default function StaffHome() {
       try {
         setLoading(true);
 
-        // 1) 내 병원
         const hospital = await getStaffHospitalDetail();
         if (!alive) return;
+        DEBUG && console.groupCollapsed('[StaffHome] fetch');
+        DEBUG && console.log('hospital:', hospital);
 
-        // 2) 해당 병원의 예약 (REQUESTED만)
         const list = await getStaffHospitalReservations(hospital?.hospitalId, {
           status: 'REQUESTED' as any,
         });
         if (!alive) return;
 
+        DEBUG && console.log('raw reservations len:', Array.isArray(list) ? list.length : 0);
+        DEBUG && console.log('sample[0..2]:', Array.isArray(list) ? list.slice(0, 3) : list);
+        (window as any)._staffHomeRaw = list;
+
         const mapped: HomeCardItem[] = (Array.isArray(list) ? list : [])
-          .filter(isRequested)
-          .map((r: any) => {
-            // 시간
-            const time = toHHmm(r?.reservationTime ?? r?.time ?? r?.slot ?? r?.startTime);
-            // 수의사명
-            const vetName = r?.vetName ?? r?.vet?.name ?? '알 수 없음';
-            // 펫 이름
-            const petName = r?.pet?.name ?? r?.petName ?? '반려동물';
-            // 펫 상세 (종 / 나이 / 성별)
-            const speciesRaw = r?.pet?.species ?? r?.petSpecies;
-            const speciesLabel = speciesRaw
-              ? speciesMapping[String(speciesRaw) as keyof typeof speciesMapping] ?? String(speciesRaw)
-              : undefined;
+  .filter(isRequested)
+  .map((r: any, idx: number) => {
+    // 시간
+    const time = toHHmm(
+      r?.reservationTime != null ? r.reservationTime
+      : r?.startTime != null ? r.startTime
+      : r?.time != null ? r.time
+      : r?.slot
+    );
 
-            const ageRaw = r?.pet?.age ?? r?.petAge;
-            const ageLabel = typeof ageRaw === 'number' ? `${ageRaw}세` : undefined;
+    // 수의사/펫 기본
+    const vetName = (r?.vetName != null && String(r.vetName)) || (r?.vet?.name ?? '알 수 없음');
+    const petName = (r?.pet?.name != null && String(r.pet.name)) || (r?.petName ?? '반려동물');
 
-            const genderRaw = r?.pet?.gender ?? r?.petGender;
-            const genderLabel = genderRaw
-              ? genderMapping[String(genderRaw) as keyof typeof genderMapping] ?? String(genderRaw)
-              : undefined;
+    // --- petinfo 조립 (종 / 나이 / 성별[+중성화]) ---
+    // species
+    const rawSpecies = r?.pet?.species;
+    const speciesKey = rawSpecies != null ? String(rawSpecies).toUpperCase() : '';
+    const speciesLabel =
+      (speciesKey && (speciesMapping as any)[speciesKey]) ||
+      (rawSpecies != null ? String(rawSpecies) : '');
 
-            const petinfo = [speciesLabel, ageLabel, genderLabel].filter(Boolean).join(' / ');
+    // age
+    const rawAge = r?.pet?.age;
+    const ageLabel = (rawAge != null && String(rawAge) !== '') ? `${Number(rawAge)}세` : '';
 
-            return {
-              reservationId: r?.reservationId ?? r?.id,
-              vet_name: vetName,
-              time: time || '-',
-              pet: petName,
-              petinfo: petinfo || '',
-            };
-          })
-          // 시간 기준 오름차순
-          .sort((a, b) => toMinutes(a.time || '00:00') - toMinutes(b.time || '00:00'));
+    // gender
+    const rawGender = r?.pet?.gender;
+    const genderKey = rawGender != null ? String(rawGender).toUpperCase() : '';
+    let genderLabel =
+      (genderKey && (genderMapping as any)[genderKey]) ||
+      (rawGender != null ? String(rawGender) : '');
+
+    // neutered(있으면 표시)
+    const neutered =
+      r?.pet?.isNeutered ?? r?.pet?.neutered ?? r?.pet?.neutralized;
+    if (genderLabel && neutered) genderLabel += '(중성화)';
+
+    const petinfo = [speciesLabel, ageLabel, genderLabel].filter(Boolean).join(' / ');
+
+    // 가벼운 디버그 (필요 없으면 지워도 됨)
+    if (idx < 3) {
+      console.debug('[StaffHome] card sample', {
+        petName,
+        speciesLabel,
+        ageLabel,
+        genderLabel,
+        time,
+      });
+    }
+
+    return {
+      reservationId: r?.reservationId ?? r?.id,
+      vet_name: vetName,
+      time: time || '-',
+      pet: petName,
+      petinfo: petinfo || '-', // 정보가 일부 비어도 최소한 대시
+    };
+  })
+  .sort((a, b) => toMinutes(a.time || '00:00') - toMinutes(b.time || '00:00'));
 
         setCards(mapped);
-      } catch {
+        DEBUG && console.groupEnd();
+        (window as any)._staffHomeCards = mapped;
+      } catch (e) {
+        DEBUG && console.error('[StaffHome] fetch error:', e);
         setCards([]);
       } finally {
         if (alive) setLoading(false);
@@ -106,7 +150,7 @@ export default function StaffHome() {
     return () => {
       alive = false;
     };
-  }, []);
+  }, []); 
 
   const handleClickCard = (reservationId?: number) => {
     if (!reservationId) return;
