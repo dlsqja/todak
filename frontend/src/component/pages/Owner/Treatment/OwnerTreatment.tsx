@@ -23,7 +23,7 @@ export default function OwnerTreatment() {
   // 시작시간이 “진짜로” 없는지 체크
   const hasNoRealStartTime = (item: any): boolean => {
     const info = item?.treatmentInfo ?? item?.treatementInfo ?? {};
-    const v = info?.startTime ?? item?.startTime ?? item?.start_time ?? null;
+    const v = info?.endTime ?? item?.endTime ?? item?.end_time ?? null;
 
     if (v == null) return true;
     if (v instanceof Date) return isNaN(v.getTime());
