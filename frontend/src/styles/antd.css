@@ -1,0 +1,12 @@
+/* src/styles/antd.css */
+.tw-select-green.ant-select:not(.ant-select-disabled):hover .ant-select-selector {
+  border-color: #afcf7e; /* green-300 */
+}
+
+.tw-select-green.ant-select-focused .ant-select-selector,
+.tw-select-green.ant-select-open .ant-select-selector {
+  border-color: #afcf7e !important;              /* 포커스/열림 */
+  /* box-shadow: 0 0 0 2px rgba(134,239,172,0.35) !important; 아웃라인 glow */
+}
+
+ .tw-select-green .ant-select-selector { border-color: #afcf7e; }

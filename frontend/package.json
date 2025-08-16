@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.11",
+    "antd": "^5.27.0",
     "axios": "^1.11.0",
     "cookies-next": "^6.1.0",
     "framer-motion": "^12.23.12",
