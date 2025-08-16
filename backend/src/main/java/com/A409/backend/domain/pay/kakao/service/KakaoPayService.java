@@ -19,10 +19,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.time.LocalDateTime;
+import java.util.*;
 
 // KakaoPayClient.java
 @Service
@@ -130,16 +128,21 @@ public class KakaoPayService {
         }
         payment.setIsCompleted(true);
         payment.setTid(res.getBody().getTid());
+        Long amount = Integer.toUnsignedLong(res.getBody().getAmount().getTotal());
+        payment.setAmount(amount);
+//        System.out.println("결제시간:" + res.getBody().getApproved_at());
+        payment.setCompleteTime(LocalDateTime.now());
         paymentRepository.save(payment);
     }
 
     @Transactional
-    public List<Payment> getPaymentList(Long hospitalId) {
+    public List<PaymentResponse> getPaymentList(Long hospitalId) {
         Hospital hospital = hospitalRepository.findById(hospitalId)
                 .orElseThrow(() -> new CustomException(ErrorCode.HOSPITAL_NOT_FOUND));
         List<Payment> list = paymentRepository.findByHospital(hospital);
+        List<PaymentResponse> paymentResponses = list.stream().map(PaymentResponse::toResponse).toList();
 
-        return list;
+        return paymentResponses;
     }
 }
 
