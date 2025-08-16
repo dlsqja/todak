@@ -5,6 +5,7 @@ import StaffReservationDetail from '@/component/pages/Staff/Reservation/StaffRes
 import StaffPayment from '@/component/pages/Staff/Payment/StaffPayment';
 import StaffMypage from '@/component/pages/Staff/Mypage/StaffMypage';
 import StaffHomeGuide from '@/component/pages/Staff/Home/StaffHomeGuide';
+import StaffPaymentDetail from '@/component/pages/Staff/Payment/StaffPaymentDetail';
 
 import StaffHospitalInfo from '@/component/pages/Staff/StaffHospital/StaffHospitalInfo';
 import StaffHospitalVet from '@/component/pages/Staff/StaffHospital/StaffHospitalVet';
@@ -20,6 +21,7 @@ const staffRoutes = {
     { path: 'hospital', element: <StaffHospitalHome /> },
     { path: 'reservation', element: <StaffReservation /> },
     { path: 'payment', element: <StaffPayment /> },
+    { path: 'payment/:paymentId', element: <StaffPaymentDetail /> },
     { path: 'mypage', element: <StaffMypage /> },
   ],
 };
