@@ -5,7 +5,7 @@ let warned404Once = false;
 
 /** ✅ 내 병원 정보 조회: 404는 '미연결'로 간주해 null 반환 */
 export const getHospitalMine = async (): Promise<HospitalDetail | null> => {
-  const res = await apiClient.get('/hospitals', {
+  const res = await apiClient.get('/vets/hospitals', {
     // 404는 throw하지 않도록
     validateStatus: (s) => s < 500,
   });
@@ -33,5 +33,5 @@ export const updateHospitalMine = async (payload: HospitalUpdateRequest): Promis
     if (payload[k] !== undefined) body[k] = payload[k];
   });
 
-  await apiClient.patch('/hospitals', body);
+  await apiClient.patch('/vets/hospitals', body);
 };

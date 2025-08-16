@@ -5,13 +5,14 @@ import StaffMyPageIcon from '@/component/icon/MyPageIcon';
 import StaffReservationManagementIcon from '@/component/icon/ReservationManagementIcon';
 import StaffVetManagementIcon from '@/component/icon/VetManagementIcon';
 import StaffHomeIcon from '@/component/icon/HomeIcon';
+import { authAPI } from '@/services/api/auth';
 
 const menuList = [
   { name: '홈', icon: StaffHomeIcon, path: '/staff/home' },
   { name: '병원 관리', icon: StaffHospitalIcon, path: '/staff/hospital' },
   { name: '예약 관리', icon: StaffReservationManagementIcon, path: '/staff/reservation' },
   { name: '결제 관리', icon: StaffVetManagementIcon, path: '/staff/payment' },
-  { name: '마이', icon: StaffMyPageIcon, path: '/staff/mypage' },
+  { name: '로그아웃', icon: StaffMyPageIcon, path: 'logout' },
 ];
 
 const BottomMenuBar: React.FC = () => {
@@ -19,8 +20,14 @@ const BottomMenuBar: React.FC = () => {
   const navigate = useNavigate();
 
   // 메뉴 클릭 핸들러
-  const handleClick = (path: string) => {
-    if (location.pathname !== path) {
+  const handleClick = async (path: string) => {
+    if (path === 'logout') {
+      const isLogout = confirm('로그아웃 하시겠습니까?');
+      if (isLogout) {
+        await authAPI.logout();
+        navigate('/auth/');
+      }
+    } else if (location.pathname !== path) {
       navigate(path);
     }
   };
