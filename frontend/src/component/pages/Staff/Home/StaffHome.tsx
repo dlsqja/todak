@@ -63,16 +63,16 @@ export default function StaffHome() {
 
         const hospital = await getStaffHospitalDetail();
         if (!alive) return;
-        DEBUG && console.groupCollapsed('[StaffHome] fetch');
-        DEBUG && console.log('hospital:', hospital);
+        // DEBUG && console.groupCollapsed('[StaffHome] fetch');
+        // DEBUG && console.log('hospital:', hospital);
 
         const list = await getStaffHospitalReservations(hospital?.hospitalId, {
           status: 'REQUESTED' as any,
         });
         if (!alive) return;
 
-        DEBUG && console.log('raw reservations len:', Array.isArray(list) ? list.length : 0);
-        DEBUG && console.log('sample[0..2]:', Array.isArray(list) ? list.slice(0, 3) : list);
+        // DEBUG && console.log('raw reservations len:', Array.isArray(list) ? list.length : 0);
+        // DEBUG && console.log('sample[0..2]:', Array.isArray(list) ? list.slice(0, 3) : list);
         (window as any)._staffHomeRaw = list;
 
         const mapped: HomeCardItem[] = (Array.isArray(list) ? list : [])
@@ -116,17 +116,6 @@ export default function StaffHome() {
 
     const petinfo = [speciesLabel, ageLabel, genderLabel].filter(Boolean).join(' / ');
 
-    // 가벼운 디버그 (필요 없으면 지워도 됨)
-    if (idx < 3) {
-      console.debug('[StaffHome] card sample', {
-        petName,
-        speciesLabel,
-        ageLabel,
-        genderLabel,
-        time,
-      });
-    }
-
     return {
       reservationId: r?.reservationId ?? r?.id,
       vet_name: vetName,
@@ -138,10 +127,10 @@ export default function StaffHome() {
   .sort((a, b) => toMinutes(a.time || '00:00') - toMinutes(b.time || '00:00'));
 
         setCards(mapped);
-        DEBUG && console.groupEnd();
+        // DEBUG && console.groupEnd();
         (window as any)._staffHomeCards = mapped;
       } catch (e) {
-        DEBUG && console.error('[StaffHome] fetch error:', e);
+        // DEBUG && console.error('[StaffHome] fetch error:', e);
         setCards([]);
       } finally {
         if (alive) setLoading(false);

@@ -212,7 +212,7 @@ export default function StaffReservationDetail() {
               <h4 className="h4">증상</h4>
               {hasPhoto && (
                 <div className="flex gap-2">
-                  <ImageInputBox src={`${photoUrl}${detail.photo}`} stroke="border border-gray-300" />
+                  <ImageInputBox src={`${photoUrl}${detail.photo}`} stroke="border border-green-200" />
                 </div>
               )}
               <p className="p whitespace-pre-wrap">{detail.description || '-'}</p>

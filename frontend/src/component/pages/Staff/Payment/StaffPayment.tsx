@@ -129,8 +129,8 @@ export default function StaffPayment() {
         setRows(safeList);
 
         if (DEBUG) {
-          console.groupCollapsed('[StaffPayment] fetched');
-          console.log('raw length:', safeList.length);
+          // console.groupCollapsed('[StaffPayment] fetched');
+          // console.log('raw length:', safeList.length);
           const table = safeList.map((p) => {
             const rawDatePart = String(p.startTime ?? '').split(/[ T]/)[0] || '';
             const localYMD = getDateKey(p);
@@ -152,12 +152,12 @@ export default function StaffPayment() {
               subject: p.subject ?? '',
             };
           });
-          console.table(table);
+          // console.table(table);
           (window as any)._staffPayments = safeList;
-          console.groupEnd();
+          // console.groupEnd();
         }
       } catch (e: any) {
-        console.error('[StaffPayment] fetch error:', e);
+        // console.error('[StaffPayment] fetch error:', e);
         if (!alive) return;
         setError(e?.response?.data?.message || e?.message || '결제 목록을 불러오지 못했어요.');
         setRows([]);
@@ -289,7 +289,7 @@ export default function StaffPayment() {
       setModalOpen(false);
       setConfirmOpen(true);
     } catch (e) {
-      console.warn('[StaffPayment] postStaffPay failed. Local-only update…', e);
+      // console.warn('[StaffPayment] postStaffPay failed. Local-only update…', e);
 
       const nowIso = new Date().toISOString();
       setRows((prev) =>
