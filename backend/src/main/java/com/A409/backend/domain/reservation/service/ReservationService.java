@@ -147,7 +147,7 @@ public class ReservationService {
                     Map<String, Object> map = new HashMap<>();
                     map.put("reservationId", reservation.getReservationId());
                     map.put("owner", OwnerResponse.toResponse(reservation.getOwner()));
-                    map.put("petName", reservation.getPet().getName());
+                    map.put("pet", PetResponse.toResponse(reservation.getPet()));
                     map.put("vetName", reservation.getVet().getName());
                     map.put("reservationDay", reservation.getReservationDay());
                     map.put("reservationTime", reservation.getReservationTime());

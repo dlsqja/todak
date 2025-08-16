@@ -6,6 +6,8 @@ import com.A409.backend.domain.user.owner.entity.Owner;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "payment")
 @Getter
@@ -37,5 +39,11 @@ public class Payment {
     @Column(name = "is_completed", nullable = false)
     @Builder.Default
     private Boolean isCompleted=false;
+
+    @Column(name = "complete_time", nullable = true)
+    private LocalDateTime completeTime;
+
+    @Column(name = "amount", nullable = true)
+    private Long amount;
 
 }
