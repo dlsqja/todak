@@ -35,8 +35,8 @@ export default function MainPage() {
       <div className="flex items-center mb-7">
         <img src="images/todoc_logo.png" alt="logo" className="w-30 h-40" />
       </div>
-      <h3 className="h3 text-brown-300 text-center">바쁜 현대인들을 위한</h3>
-      <h3 className="h3 text-brown-300 text-center mb-5">반려동물 비대면 의료 서비스</h3>
+      {/* <h3 className="h3 text-brown-300 text-center">바쁜 현대인들을 위한</h3> */}
+      {/* <h3 className="h3 text-brown-300 text-center mb-5">반려동물 비대면 의료 서비스</h3> */}
 
       <div className="w-full px-10">
         <button
