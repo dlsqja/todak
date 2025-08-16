@@ -1,3 +1,4 @@
+// src/component/pages/Vet/VetHospital.tsx
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '@/styles/main.css';
@@ -24,48 +25,44 @@ export default function VetHospital() {
   const [profile, setProfile] = useState('');
 
   useEffect(() => {
-  (async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const h = await getHospitalMine();
+    (async () => {
+      try {
+        setLoading(true);
+        setError(null);
 
-      if (!h) {
-        // 404 등으로 병원 정보가 없을 때
-        setName('');
-        setAddress('');
-        setContact('');
-        setProfile('');
-        setError('현재 계정에 연결된 병원 정보를 찾을 수 없어요. 병원 연결 후 다시 시도해주세요.');
-        return;
+        const h = await getHospitalMine(); // ⬅️ 404면 null 반환
+        if (!h) {
+          setName('');
+          setAddress('');
+          setContact('');
+          setProfile('');
+          setError('현재 계정에 연결된 병원 정보를 찾을 수 없어요. 병원 연결 후 다시 시도해주세요.');
+          return;
+        }
+
+        setName(h.name ?? '');
+        setAddress(h.location ?? '');
+        setContact(h.contact ?? '');
+        setProfile(h.profile ?? '');
+      } catch (e) {
+        console.error(e);
+        setError('병원 정보를 불러오지 못했어요. 잠시 후 다시 시도해주세요.');
+      } finally {
+        setLoading(false);
       }
-
-      setName(h.name ?? '');
-      setAddress(h.location ?? '');
-      setContact(h.contact ?? '');
-      setProfile(h.profile ?? '');
-    } catch (e) {
-      console.error(e);
-      setError('병원 정보를 불러오지 못했어요. 잠시 후 다시 시도해주세요.');
-    } finally {
-      setLoading(false);
-    }
-  })();
-}, []);
-
+    })();
+  }, []);
 
   const handleSubmit = async () => {
     try {
       setSaving(true);
       setError(null);
-
       await updateHospitalMine({
-        name, // 기존 값
-        location: address, // 백엔드 키는 location (UI 라벨은 "위치")
-        contact, // 기존 값
-        profile, // 수정한 값
+        name,
+        location: address,
+        contact,
+        profile,
       });
-
       alert('수정 완료!');
       navigate('/vet/hospital');
     } catch (e) {
@@ -80,16 +77,12 @@ export default function VetHospital() {
     <>
       <SimpleHeader text="병원 정보" />
       <div className="flex flex-col gap-6 px-7 mt-11">
-        {/* 병원코드: API에 없으므로 고정 ‘—’로 표기 */}
-
         <Input id="name" label="병원 이름" value={name} disabled />
         <Input id="address" label="위치" value={address} disabled />
         <Input id="contact" label="전화번호" value={contact} disabled />
 
         <div className="flex flex-col">
-          <label htmlFor="profile" className="mb-2 block h4 text-black">
-            병원 소개글
-          </label>
+          <label htmlFor="profile" className="mb-2 block h4 text-black">병원 소개글</label>
           <textarea
             id="profile"
             value={profile}
