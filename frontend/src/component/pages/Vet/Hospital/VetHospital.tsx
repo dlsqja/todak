@@ -1,5 +1,4 @@
-// src/component/pages/Vet/VetHospital.tsx
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '@/styles/main.css';
 import Input from '@/component/input/Input';
@@ -24,13 +23,19 @@ export default function VetHospital() {
   // 수정 가능
   const [profile, setProfile] = useState('');
 
+  // ✅ StrictMode에서 이펙트 2번 실행 방지
+  const fetchedOnceRef = useRef(false);
+
   useEffect(() => {
+    if (fetchedOnceRef.current) return;
+    fetchedOnceRef.current = true;
+
     (async () => {
       try {
         setLoading(true);
         setError(null);
 
-        const h = await getHospitalMine(); // ⬅️ 404면 null 반환
+        const h = await getHospitalMine(); // 404면 null
         if (!h) {
           setName('');
           setAddress('');
@@ -57,12 +62,14 @@ export default function VetHospital() {
     try {
       setSaving(true);
       setError(null);
+
       await updateHospitalMine({
         name,
         location: address,
         contact,
         profile,
       });
+
       alert('수정 완료!');
       navigate('/vet/hospital');
     } catch (e) {
