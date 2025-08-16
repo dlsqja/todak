@@ -18,25 +18,19 @@ export default function OwnerReservationDetail() {
   const { isRejected, selectedPetId, selectedTab } = useLocation().state || {};
   const [rejectDetail, setRejectDetail] = useState<{ reason: string }>();
 
-  //반려인 경우 반려사유 get 요청
+  // 반려인 경우 반려사유 get 요청 + 상세 조회
   useEffect(() => {
-    if (reservationId) {
-      if (isRejected) {
-        const getRejectDetail = async () => {
-          const rejectDetail = await getReservationRejectDetail(Number(reservationId));
-          setRejectDetail(rejectDetail);
-        };
-        getRejectDetail();
-      }
+    if (!reservationId) return;
 
-      // 상세 정보 조회
-      const reservationDetail = async (reservationId: number) => {
-        const detail = await getReservationDetail(Number(reservationId));
-        setDetail(detail);
-        console.log('detail:', detail);
-      };
-      reservationDetail(Number(reservationId));
-    }
+    (async () => {
+      if (isRejected) {
+        const reject = await getReservationRejectDetail(Number(reservationId));
+        setRejectDetail(reject);
+      }
+      const d = await getReservationDetail(Number(reservationId));
+      setDetail(d);
+      console.log('detail:', d);
+    })();
   }, [reservationId]);
 
   const getStatusColor = (status: string) => {
@@ -65,7 +59,9 @@ export default function OwnerReservationDetail() {
           })
         }
       />
+
       <section className="flex flex-col gap-6 mt-4 px-7">
+        {/* 상단 정보 */}
         <div className="flex justify-between border-b-1 border-gray-100 pb-4 py-3 ">
           <div className="flex flex-col gap-2">
             <div className="h4">{detail.pet.name}</div>
@@ -80,6 +76,9 @@ export default function OwnerReservationDetail() {
             </button>
           </div>
         </div>
+
+
+        {/* 수의사 / 병원 / 예약 희망 시간 */}
         <div className="flex flex-col border-b-1 border-gray-100 pb-4 gap-2">
           <div className="h4">수의사</div>
           <div className="p">{detail.vetName} 수의사</div>
@@ -94,6 +93,15 @@ export default function OwnerReservationDetail() {
             {detail.reservationDay} | <span className="p">{timeMapping[detail.reservationTime]}</span>
           </div>
         </div>
+
+        {/* ⬇️ 반려 사유 카드: 상단으로 이동 + 공통 카드 스타일 */}
+        {isRejected && rejectDetail && (
+          <div className="bg-white rounded-[12px] shadow-[0px_5px_15px_rgba(0,0,0,0.08)] px-5 py-4 space-y-2">
+            <div className="h4">반려 사유</div>
+            <p className="p text-black leading-relaxed whitespace-pre-wrap">{rejectDetail.reason}</p>
+          </div>
+        )}
+        {/* 증상 */}
         <div className="flex flex-col border-b-1 border-gray-100 pb-4 gap-2 ">
           <div className="h4">증상</div>
           {detail.photo && (
@@ -103,12 +111,6 @@ export default function OwnerReservationDetail() {
           )}
           <div className="p">{detail.description}</div>
         </div>
-        {isRejected && rejectDetail && (
-          <div className="flex flex-col pb-4 gap-2">
-            <div className="h3 text-red-400">반려 사유</div>
-            <div className="p text-black">{rejectDetail.reason}</div>
-          </div>
-        )}
       </section>
     </div>
   );

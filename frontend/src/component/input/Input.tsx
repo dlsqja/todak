@@ -35,10 +35,10 @@ export default function Input({
             disabled={disabled}
             placeholder={placeholder}
             className={`w-full h-12 block border-1 rounded-[12px]
-                         border-gray-400 py-4 px-5 p text-black 
-                         placeholder:text-gray-500 focus:outline-none focus:border-green-300 focus:border-2 bg-white
-                         ${className}
-                         ${disabled ? 'bg-gray-200 text-gray-500 cursor-not-allowed' : ''}`}
+              border-gray-400 py-4 px-5 p text-black
+              placeholder:text-gray-500 focus:outline-none focus:border-green-300 focus:border-2
+              bg-white disabled:bg-gray-200 disabled:text-gray-500 disabled:cursor-not-allowed
+              ${className}`}
           />
         </div>
       </div>

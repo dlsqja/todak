@@ -111,15 +111,22 @@ export default function OwnerTreatmentDetail() {
             {detail.reservationDay} | <span className="p">{timeMapping[detail.reservationTime]}</span>
           </div>
         </div>
-        <div className="flex flex-col border-b-1 border-gray-100 pb-4 gap-2 ">
-          <div className="h4">증상</div>
-          {detail.photo && (
-            <div>
-              {!detail.photo && <ImageInputBox src={`${photoUrl}${detail.photo}`} stroke="border-5 border-green-200" />}
-            </div>
-          )}
-          <div className="p">{detail.description}</div>
-        </div>
+        {/* 증상 */}
+<div className="flex flex-col border-b-1 border-gray-100 pb-4 gap-2 ">
+  <div className="h4">증상</div>
+
+  {typeof detail.photo === 'string' && detail.photo.trim() !== '' && (
+    <div>
+      <ImageInputBox
+        src={`${photoUrl}${detail.photo}`}
+        stroke="border-5 border-green-200"
+      />
+    </div>
+  )}
+
+  <div className="p">{detail.description}</div>
+</div>
+
         {isRejected && rejectDetail && (
           <div className="flex flex-col pb-4 gap-2">
             <div className="h3 text-red-400">반려 사유</div>

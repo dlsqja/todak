@@ -6,6 +6,7 @@ import { getTreatments } from '@/services/api/Owner/ownertreatment';
 import type { Pet } from '@/types/Owner/ownerpetType';
 import { subjectMapping } from '@/utils/subjectMapping';
 
+// 그대로 사용
 type Subject = 'DENTAL' | 'DERMATOLOGY' | 'ORTHOPEDICS' | 'OPHTHALMOLOGY';
 
 interface OwnerPetTabRecordProps {
@@ -34,6 +35,18 @@ async function buildHospitalMap() {
   }
 }
 
+// 느슨한 날짜 파서: "YYYY-MM-DD HH:mm:ss.ssssss" 같은 포맷도 파싱
+const toMillisLoose = (v?: unknown): number => {
+  if (!v) return 0;
+  const s = String(v).trim();
+  if (!s) return 0;
+  // 공백 → T, 마이크로초 → 밀리초 3자리, TZ 없으면 Z(UTC) 부여
+  let iso = s.replace(' ', 'T').replace(/\.(\d{3})\d+$/, '.$1');
+  if (/T/.test(iso) && !/(Z|[+\-]\d{2}:?\d{2})$/i.test(iso)) iso += 'Z';
+  const d = new Date(iso);
+  return Number.isNaN(d.getTime()) ? 0 : d.getTime();
+};
+
 export default function OwnerPetTabRecord({ selectedPet }: OwnerPetTabRecordProps) {
   const [selectedSubject, setSelectedSubject] = useState('');
   const [selectedDate, setSelectedDate] = useState('');
@@ -50,20 +63,36 @@ export default function OwnerPetTabRecord({ selectedPet }: OwnerPetTabRecordProp
           buildHospitalMap(), // Map<reservationId, hospitalName>
         ]);
 
-        const matched = treats.find((e) => e.petResponse.petId === selectedPet.petId);
-        const rows: UIRecord[] = (matched?.treatments ?? []).map((t: any) => {
-          const day = t?.reservationDay ?? (t?.treatmentInfo?.startTime ? t.treatmentInfo.startTime.slice(0, 10) : '');
+        const matched = treats.find((e) => e.petResponse?.petId === selectedPet.petId);
 
-          return {
+        // 1) UI 레코드 + 정렬용 키 생성
+        const withSortKey = (matched?.treatments ?? []).map((t: any) => {
+          const start = t?.treatmentInfo?.startTime;
+          const end = t?.treatmentInfo?.endTime;
+          const day =
+            t?.reservationDay ?? (typeof start === 'string' ? start.slice(0, 10) : '');
+
+          // 정렬용 timestamp: startTime > endTime > day(자정) 우선
+          const sortKey =
+            toMillisLoose(start) ||
+            toMillisLoose(end) ||
+            (day ? toMillisLoose(`${day}T00:00:00`) : 0);
+
+          const row: UIRecord = {
             id: t.reservationId,
             vetName: t.vetName,
             subject: t.subject,
             treatmentDay: day,
             hospitalName: t.hospitalName ?? hospitalMap.get(t.reservationId) ?? '-', // 보강
           };
+          return { row, sortKey };
         });
 
-        setRecords(rows);
+        // 2) 최신 먼저(내림차순) 정렬
+        withSortKey.sort((a, b) => b.sortKey - a.sortKey);
+
+        // 3) UIRecord만 추출해 상태 반영
+        setRecords(withSortKey.map((x) => x.row));
       } catch (e) {
         console.error('진료 내역 불러오기 실패:', e);
       }
