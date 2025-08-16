@@ -56,7 +56,7 @@ export default function VetInfoPage() {
     profile?: string;
     photo?: string;
   };
-  console.log(hospital);
+  // console.log(hospital);
   const [hospitalInfo, setHospitalInfo] = useState<typeof hospital | undefined>(hospital);
   const passedVet = location.state?.vet as VetPublic | undefined;
 
@@ -64,7 +64,7 @@ export default function VetInfoPage() {
   const [closingHours, setClosingHours] = useState<number[]>([]); // 0~47
   const selectedTime = useTimeStore((s) => s.selectedTime);
 
-  // ✅ 수의사 없으면 병원의 첫 번째 수의사로
+  // 수의사 없으면 병원의 첫 번째 수의사로
   useEffect(() => {
     if (vet?.vetId) return;
     if (!hospital?.hospitalId) return;
@@ -79,7 +79,7 @@ export default function VetInfoPage() {
     })();
   }, [hospital?.hospitalId, vet?.vetId]);
 
-  // ✅ 병원 상세 보강 (profile 누락 시 /public/hospitals에서 매칭)
+  // 병원 상세 보강 (profile 누락 시 /public/hospitals에서 매칭)
   useEffect(() => {
     if (!hospital?.hospitalId) return;
     if (hospital?.profile) {
@@ -99,7 +99,7 @@ export default function VetInfoPage() {
     })();
   }, [hospital?.hospitalId, hospital?.profile]);
 
-  // ✅ 선택된 수의사의 closing-hours(0~47) 로드
+  // 선택된 수의사의 closing-hours(0~47) 로드
   useEffect(() => {
     if (!vet?.vetId) return;
     (async () => {
@@ -113,7 +113,7 @@ export default function VetInfoPage() {
     })();
   }, [vet?.vetId]);
 
-  // ✅ 오늘 근무시간 + closing 제외한 사용 가능 슬롯 계산(숫자/문자 모두 대응)
+  // 오늘 근무시간 + closing 제외한 사용 가능 슬롯 계산(숫자/문자 모두 대응)
   const todayRange = useMemo(() => {
     const wh: WorkingHourResponse[] | undefined = vet?.workingHours;
     if (!wh || wh.length === 0) return null;
@@ -172,12 +172,12 @@ export default function VetInfoPage() {
 
         {/* 헤더 정보 */}
         <div>
-          <h4 className="p text-gray-500">{hospitalInfo?.name}</h4>
+          <h4 className="h4 text-gray-500">{hospitalInfo?.name}</h4>
           <h3 className="h3">{vet?.name || '수의사 이름'}</h3>
-          <h4 className="p text-black">
+          <h4 className="h4 text-gray-500">
             {todayRange?.startText && todayRange?.endText ? (
               <>
-                진료 가능 시간 : ({daymapping[dayMap[new Date().getDay()]]}) {todayRange.startText} ~{' '}
+                진료 가능 시간  ({daymapping[dayMap[new Date().getDay()]]}) {todayRange.startText} ~{' '}
                 {todayRange.endText}
               </>
             ) : null}

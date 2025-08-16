@@ -20,7 +20,7 @@ export default function OwnerTreatment() {
 
   const [treatmentData, setTreatmentData] = useState<OwnerTreatmentsByPet[]>([]);
 
-  // 시작시간이 “진짜로” 없는지 체크
+  // 시작시간이 “진짜로” 없는지 체크 (기존 그대로 둠: 사용 안 함)
   const hasNoRealStartTime = (item: any): boolean => {
     const info = item?.treatmentInfo ?? item?.treatementInfo ?? {};
     const v = info?.endTime ?? item?.endTime ?? item?.end_time ?? null;
@@ -39,7 +39,28 @@ export default function OwnerTreatment() {
     return isNaN(d.getTime());
   };
 
-  // 정렬용: 예약시간을 분 단위로 (오름차순)
+  // ✅ 종료시간이 “진짜로” 없는지 체크(이걸로 필터링)
+  const hasNoRealEndTime = (item: any): boolean => {
+    const info = item?.treatmentInfo ?? item?.treatementInfo ?? {};
+    const v = info?.endTime ?? item?.endTime ?? item?.end_time ?? null;
+
+    if (v == null) return true;
+    if (v instanceof Date) return isNaN(v.getTime());
+    if (typeof v === 'number') {
+      // 0~47 슬롯 값은 '실제 종료시각 아님'으로 간주
+      if (v >= 0 && v <= 47) return true;
+      const d = new Date(v);
+      return isNaN(d.getTime());
+    }
+    const s = String(v).trim();
+    if (!s) return true;
+    // "YYYY-MM-DD HH:mm:ss.ssssss" 대응
+    const norm = s.replace(' ', 'T').replace(/\.\d+$/, '');
+    const d = new Date(norm);
+    return isNaN(d.getTime());
+  };
+
+  // 정렬용: 예약시간을 분 단위로 (오름차순 코멘트는 기존 그대로 유지)
   const toMinutes = (v: any): number => {
     if (typeof v === 'number') return v * 30; // 0~47 슬롯
     const s = String(v ?? '');
@@ -60,8 +81,8 @@ export default function OwnerTreatment() {
         .map((petTreatment) => ({
           ...petTreatment,
           treatments: petTreatment.treatments
-            .filter((item) => hasNoRealStartTime(item)) // 시작 안 한 것만
-            .sort((a, b) => toMinutes(b.reservationTime) - toMinutes(a.reservationTime)), // ⬅️ 시간 오름차순
+            .filter((item) => hasNoRealEndTime(item)) // ✅ 종료 안 한 것만
+            .sort((a, b) => toMinutes(b.reservationTime) - toMinutes(a.reservationTime)), // ⬅️ 시간 오름차순(기존 로직 유지)
         }))
         .filter((pt) => (pt.treatments?.length ?? 0) > 0); // 비어있으면 그룹 제거
       setTreatmentData(sortedData);

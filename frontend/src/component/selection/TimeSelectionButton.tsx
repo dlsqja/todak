@@ -1,15 +1,12 @@
 // src/component/selection/TimeSelectionButton.tsx
-
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTimeStore } from '@/store/timeStore'
 
 interface TimeSelectionButtonProps {
   start_time: string            // "HH:mm"
   end_time: string              // "HH:mm"
-  /** workingHours - closingHours 로 계산된 실제 '선택 가능' 슬롯(HH:mm) */
-  available_times?: string[]
-  /** 닫힌 시간 등 '선택 불가'로 표시할 슬롯(HH:mm) — 옵션 */
-  disabled_times?: string[]
+  available_times?: string[]    // workingHours - closingHours 로 계산된 실제 '선택 가능' 슬롯(HH:mm)
+  disabled_times?: string[]     // 닫힌 시간 등 '선택 불가' 슬롯(HH:mm)
 }
 
 const timeList = Array.from({ length: 48 }, (_, i) => {
@@ -32,6 +29,70 @@ export default function TimeSelectionButton({
   const selectedTime = useTimeStore((state) => state.selectedTime)
   const setSelectedTime = useTimeStore((state) => state.setSelectedTime)
 
+  // =========================
+  // 🖱️ 마우스 드래그 가로 스크롤
+  // =========================
+  const containerRef = useRef<HTMLDivElement>(null)
+  const isDownRef = useRef(false)
+  const movedRef = useRef(false)                 // 클릭과 드래그 구분
+  const startXRef = useRef(0)
+  const startScrollLeftRef = useRef(0)
+  const [dragging, setDragging] = useState(false)
+  const DRAG_THRESHOLD = 5
+
+  useEffect(() => {
+    const el = containerRef.current
+    if (!el) return
+
+    let pointerId: number | null = null
+
+    const onPointerDown = (e: PointerEvent) => {
+      isDownRef.current = true
+      movedRef.current = false
+      startXRef.current = e.clientX
+      startScrollLeftRef.current = el.scrollLeft
+      setDragging(true)
+      pointerId = e.pointerId
+    }
+
+    const onPointerMove = (e: PointerEvent) => {
+      if (!isDownRef.current) return
+      const dx = e.clientX - startXRef.current
+      if (!movedRef.current && Math.abs(dx) > DRAG_THRESHOLD) {
+        movedRef.current = true
+        if (pointerId != null) el.setPointerCapture?.(pointerId)
+      }
+      if (movedRef.current) {
+        el.scrollLeft = startScrollLeftRef.current - dx
+        e.preventDefault() // 텍스트 선택 방지
+      }
+    }
+
+    const endDrag = () => {
+      if (!isDownRef.current) return
+      isDownRef.current = false
+      setDragging(false)
+      if (pointerId != null) el.releasePointerCapture?.(pointerId)
+      pointerId = null
+      setTimeout(() => { movedRef.current = false }, 0)
+    }
+
+    el.addEventListener('pointerdown', onPointerDown, { passive: true })
+    el.addEventListener('pointermove', onPointerMove)
+    el.addEventListener('pointerup', endDrag)
+    el.addEventListener('pointerleave', endDrag)
+    el.addEventListener('pointercancel', endDrag)
+
+    return () => {
+      el.removeEventListener('pointerdown', onPointerDown)
+      el.removeEventListener('pointermove', onPointerMove)
+      el.removeEventListener('pointerup', endDrag)
+      el.removeEventListener('pointerleave', endDrag)
+      el.removeEventListener('pointercancel', endDrag)
+    }
+  }, [])
+  // =========================
+
   // 현재 시간
   const now = new Date()
   const nowTotal = now.getHours() * 60 + now.getMinutes()
@@ -44,14 +105,15 @@ export default function TimeSelectionButton({
   const validStart = Math.max(startTotal, nowTotal)
 
   // 1) 근무시간 범위 + 현재 이후만 우선 보여줄 전체 슬롯
+  //    👉 근무 종료시는 "미포함"이므로 '< endTotal' 로 필터링!
   const fullRangeSlots = useMemo(() => {
     return timeList.filter((time) => {
       const total = toMinutes(time)
-      return total >= validStart && total <= endTotal
+      return total >= validStart && total < endTotal   // ★ end 미포함
     })
   }, [validStart, endTotal])
 
-  // 2) 선택 가능/불가 판정
+  // 2) 선택 가능/불가 판정 (closing-hours 반영)
   const availableSet = useMemo(
     () => new Set((available_times ?? []).map(String)),
     [available_times]
@@ -62,10 +124,9 @@ export default function TimeSelectionButton({
   )
 
   const isDisabled = (hhmm: string) => {
-    // 명시적 비활성화 우선
     if (disabledSet.has(hhmm)) return true
-    // available_times가 넘어오면 그 목록에 없는 것도 비활성화
     if (available_times && available_times.length > 0) {
+      // workingHours에서 closing-hours 뺀 결과만 선택 가능
       return !availableSet.has(hhmm)
     }
     return false
@@ -78,9 +139,21 @@ export default function TimeSelectionButton({
     }
   }, [selectedTime, fullRangeSlots, setSelectedTime])
 
+  // 클릭 핸들러(드래그 후 오작동 방지)
+  const handleTimeClick = (time: string, disabled: boolean, selected: boolean) => {
+    if (movedRef.current) return // 드래그였다면 클릭 무시
+    if (!disabled) setSelectedTime(selected ? '' : time)
+  }
+
   return (
     <div>
-      <div className="flex gap-2 hide-scrollbar overflow-x-auto whitespace-nowrap py-2 focus:outline-none hover:outline-none">
+      <div
+        ref={containerRef}
+        className={[
+          'flex gap-2 hide-scrollbar overflow-x-auto whitespace-nowrap py-2 focus:outline-none hover:outline-none',
+          dragging ? 'cursor-grabbing select-none' : 'cursor-grab'
+        ].join(' ')}
+      >
         {fullRangeSlots.length === 0 ? (
           <div>선택 가능한 시간이 없습니다.</div>
         ) : (
@@ -93,9 +166,7 @@ export default function TimeSelectionButton({
                 key={time}
                 type="button"
                 disabled={disabled}
-                onClick={() => {
-                  if (!disabled) setSelectedTime(selected ? '' : time)
-                }}
+                onClick={() => handleTimeClick(time, disabled, selected)}
                 className={[
                   'px-4 py-2 rounded-3xl transition border',
                   disabled

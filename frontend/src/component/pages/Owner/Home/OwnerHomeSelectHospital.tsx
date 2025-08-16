@@ -63,75 +63,143 @@ export default function SelectHospitalPage() {
 
   // 최근 방문 병원(항상 위에 표시)
   useEffect(() => {
-    if (!pet?.petId) return;
+  if (!pet?.petId) return;
 
-    (async () => {
-      try {
-        // 진료 완료된 목록을 조회
-        const buckets: OwnerTreatmentsByPet[] = await getTreatments();
-        // 현재 선택한 동물의 진료 완료된 목록만 필터링
-        const bucket = buckets.find((b) => b.petResponse?.petId === pet.petId);
-        // 거기서 reservation 목록만 조회
-        const items: OwnerTreatmentItem[] = bucket?.treatments ?? [];
-        // console.log('items:', items);
+  (async () => {
+    try {
+      // ✅ 병원 풀리스트 준비: state 비어있으면 한 번만 API로 가져와서 매칭에 사용!!!
+      const hospitalList =
+        hospitals.length > 0 ? hospitals : await getPublicHospitals();
 
-        // 최신 10개만 후보로(상세 N+1 방지)
-        const candidates = items
-          .map((t) => ({ t, ts: getSortTimestamp(t) }))
-          .filter((x) => x.ts > 0)
-          .sort((a, b) => b.ts - a.ts)
-          .slice(0, 10)
-          .map((x) => x.t);
+      // 진료 완료된 목록을 조회
+      const buckets: OwnerTreatmentsByPet[] = await getTreatments();
+      const bucket = buckets.find((b) => b.petResponse?.petId === pet.petId);
+      const items: OwnerTreatmentItem[] = bucket?.treatments ?? [];
 
-        // hospitalName 없으면 예약 상세로 보강
-        const enriched = await Promise.all(
-          candidates.map(async (t) => {
-            // console.log('t:', t);
-            let hospitalName = (t as any).hospitalName ?? '';
-            // console.log('hospitalName:', hospitalName);
-            if (!hospitalName) {
-              try {
-                const detail = await getReservationDetail(t.reservationId);
-                // 상세에서 병원명 확보
-                hospitalName = (detail as any)?.hospitalName ?? '';
-                // console.log('hospitalName:', hospitalName);
-              } catch {
-                // 상세 실패는 스킵
-              }
+      const candidates = items
+        .map((t) => ({ t, ts: getSortTimestamp(t) }))
+        .filter((x) => x.ts > 0)
+        .sort((a, b) => b.ts - a.ts)
+        .slice(0, 10)
+        .map((x) => x.t);
+
+      // 🔎 이름 비교 보정(공백/대소문자 무시)
+      const sameName = (a = '', b = '') =>
+        a.replace(/\s+/g, '').toLowerCase() === b.replace(/\s+/g, '').toLowerCase();
+
+      const enriched = await Promise.all(
+        candidates.map(async (t) => {
+          let hospitalName = (t as any).hospitalName ?? '';
+
+          if (!hospitalName) {
+            try {
+              const detail = await getReservationDetail(t.reservationId);
+              hospitalName = (detail as any)?.hospitalName ?? '';
+            } catch {
+              // 상세 실패는 스킵
             }
+          }
 
-            // 이름만 확보해도 표시 가능. id/location은 public 목록 매칭으로 보강
-            const match = hospitalName ? hospitals.find((h) => h.name === hospitalName) : undefined;
-            // console.log('match:', match);
+          // ✅ 여기서 hospitalList로 매칭 → ID/주소 보강!!!
+          const match = hospitalName
+            ? hospitalList.find((h) => sameName(h.name, hospitalName))
+            : undefined;
 
-            return {
-              hospitalName,
-              hospitalId: match?.hospitalId,
-              location: match?.location ?? '',
-            };
-          }),
-        );
+          return {
+            hospitalName,
+            hospitalId: match?.hospitalId,
+            location: match?.location ?? '',
+          };
+        }),
+      );
 
-        // 병원명 있는 것만 최신순 유니크
-        const seen = new Set<string>();
-        const uniq = enriched
-          .filter((e) => e.hospitalName)
-          .filter((e) => (seen.has(e.hospitalName) ? false : (seen.add(e.hospitalName), true)))
-          .slice(0, 5);
+      const seen = new Set<string>();
+      const uniq = enriched
+        .filter((e) => e.hospitalName)
+        .filter((e) => (seen.has(e.hospitalName) ? false : (seen.add(e.hospitalName), true)))
+        .slice(0, 5);
 
-        const recentHospitals: RecentHospital[] = uniq.map((e) => ({
-          hospitalId: e.hospitalId,
-          name: e.hospitalName,
-          location: e.location,
-        }));
+      const recentHospitals: RecentHospital[] = uniq.map((e) => ({
+        hospitalId: e.hospitalId, // ✅ 이제 채워짐!!!
+        name: e.hospitalName,
+        location: e.location,
+      }));
 
-        setRecents(recentHospitals);
-      } catch (e) {
-        console.warn('최근 방문 병원 구성 실패:', e);
-        setRecents([]);
-      }
-    })();
-  }, [pet?.petId, hospitals]);
+      setRecents(recentHospitals);
+    } catch (e) {
+      console.warn('최근 방문 병원 구성 실패:', e);
+      setRecents([]);
+    }
+  })();
+}, [pet?.petId, hospitals]);useEffect(() => {
+  if (!pet?.petId) return;
+
+  (async () => {
+    try {
+      // 병원 풀리스트 준비: state 비어있으면 한 번만 API로 가져와서 매칭에 사용!!!
+      const hospitalList =
+        hospitals.length > 0 ? hospitals : await getPublicHospitals();
+
+      // 진료 완료된 목록을 조회
+      const buckets: OwnerTreatmentsByPet[] = await getTreatments();
+      const bucket = buckets.find((b) => b.petResponse?.petId === pet.petId);
+      const items: OwnerTreatmentItem[] = bucket?.treatments ?? [];
+
+      const candidates = items
+        .map((t) => ({ t, ts: getSortTimestamp(t) }))
+        .filter((x) => x.ts > 0)
+        .sort((a, b) => b.ts - a.ts)
+        .slice(0, 10)
+        .map((x) => x.t);
+
+      // 🔎 이름 비교 보정(공백/대소문자 무시)
+      const sameName = (a = '', b = '') =>
+        a.replace(/\s+/g, '').toLowerCase() === b.replace(/\s+/g, '').toLowerCase();
+
+      const enriched = await Promise.all(
+        candidates.map(async (t) => {
+          let hospitalName = (t as any).hospitalName ?? '';
+
+          if (!hospitalName) {
+            try {
+              const detail = await getReservationDetail(t.reservationId);
+              hospitalName = (detail as any)?.hospitalName ?? '';
+            } catch {
+              // 상세 실패는 스킵
+            }
+          }
+
+          const match = hospitalName
+            ? hospitalList.find((h) => sameName(h.name, hospitalName))
+            : undefined;
+
+          return {
+            hospitalName,
+            hospitalId: match?.hospitalId,
+            location: match?.location ?? '',
+          };
+        }),
+      );
+
+      const seen = new Set<string>();
+      const uniq = enriched
+        .filter((e) => e.hospitalName)
+        .filter((e) => (seen.has(e.hospitalName) ? false : (seen.add(e.hospitalName), true)))
+        .slice(0, 5);
+
+      const recentHospitals: RecentHospital[] = uniq.map((e) => ({
+        hospitalId: e.hospitalId,
+        name: e.hospitalName,
+        location: e.location,
+      }));
+
+      setRecents(recentHospitals);
+    } catch (e) {
+      console.warn('최근 방문 병원 구성 실패:', e);
+      setRecents([]);
+    }
+  })();
+}, [pet?.petId, hospitals]);
 
   // 무한스크롤 - 최근 방문한 병원
   useEffect(() => {

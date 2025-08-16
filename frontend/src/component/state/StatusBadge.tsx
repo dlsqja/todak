@@ -36,7 +36,7 @@ const statusConfig = {
       className: 'bg-green-300 text-green-100',
     },
     false: {
-      text: '미결제',
+      text: '결제 대기',
       className: 'bg-green-200 text-brown-300',
     },
   },
@@ -48,7 +48,7 @@ const StatusBadge: React.FC<StatusBadgeProps> = ({ statusKey, type }) => {
     className: 'bg-gray-200 text-gray-600',
   };
 
-  return <span className={`caption px-5 py-1 rounded-full ${config.className}`}>{config.text}</span>;
+  return <span className={`caption px-4 py-1 rounded-full ${config.className}`}>{config.text}</span>;
 };
 
 export default StatusBadge;

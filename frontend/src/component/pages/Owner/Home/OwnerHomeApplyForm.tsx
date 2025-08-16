@@ -158,7 +158,7 @@ export default function ApplyFormPage() {
       <BackHeader text="진료 신청서 작성" />
 
       <div className="flex-1 overflow-y-auto px-7 py-6 flex flex-col gap-6">
-        <TimeSelectionDropdown label="진료 희망 시간" start_time={startTime || '09:00'} end_time={endTime || '18:00'} />
+        <TimeSelectionDropdown label="진료 희망 시간" start_time={startTime || '09:00'} end_time={endTime || '18:00'} disabled/>
 
         {/* 반려동물 정보 */}
         <div>
