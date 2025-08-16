@@ -7,6 +7,7 @@ import Input from '@/component/input/Input';
 import Button from '@/component/button/Button';
 import SelectionDropdown from '@/component/selection/SelectionDropdown';
 
+import { Select } from 'antd';
 import { registerPet } from '@/services/api/Owner/ownerpet'; // ✅ API import
 
 export default function OwnerPetRegister() {
@@ -18,7 +19,7 @@ export default function OwnerPetRegister() {
   const [weight, setWeight] = useState('');
   const [gender, setGender] = useState(''); // 성별 + 중성화 여부
   const [type, setType] = useState('');
-  const [activeDropdownId, setActiveDropdownId] = useState<string | null>(null);
+  // const [activeDropdownId, setActiveDropdownId] = useState<string | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement | null>(null); // file input에 접근하기 위한 ref
 
@@ -31,7 +32,7 @@ export default function OwnerPetRegister() {
     '성별 없음': 'NON',
   };
 
-  const typeMap = { 강아지: 'DOG', 고양이: 'CAT', 기타: 'OTHER' }; // `DOG`, `CAT`, `OTHER`
+  const typeMap = { 강아지: 'DOG', 고양이: 'CAT', 기타: 'OTHER' };
 
   // SelectionDropdown용 옵션 배열
   const genderOptions = [
@@ -136,35 +137,32 @@ export default function OwnerPetRegister() {
             />
           </div>
 
+          {/* 드롭다운 antd 스타일로변경 */}
           <div className="flex gap-4">
             <div className="flex flex-col w-full">
-              <label htmlFor="gender" className="h4 mb-2 text-black">
-                성별
-              </label>
-              <SelectionDropdown
-                id="gender"
-                options={genderOptions}
-                placeholder="성별을 선택해주세요"
-                value={gender}
-                onChange={setGender}
-                activeId={activeDropdownId}
-                setActiveId={setActiveDropdownId}
-              />
-            </div>
+            <label htmlFor="gender" className="h4 mb-2 text-black">성별</label>
+            <Select
+              id="gender"
+              className="w-full tw-select-green"
+              placeholder="성별을 선택해주세요"
+              value={gender || undefined}    
+              onChange={(v) => setGender(v)}
+              options={genderOptions}
+              allowClear
+            />
+          </div>
           </div>
 
-          <div className="flex flex-col">
-            <label htmlFor="type" className="h4 mb-2 text-black">
-              종
-            </label>
-            <SelectionDropdown
+          <div className="flex flex-col w-full">
+            <label htmlFor="type" className="h4 mb-2 text-black">종</label>
+            <Select
               id="type"
-              options={typeOptions}
+              className="w-full tw-select-green"
               placeholder="반려동물 종을 선택해주세요"
-              value={type}
-              onChange={setType}
-              activeId={activeDropdownId}
-              setActiveId={setActiveDropdownId}
+              value={type || undefined}
+              onChange={(v) => setType(v)}
+              options={typeOptions}
+              allowClear
             />
           </div>
         </div>
