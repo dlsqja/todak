@@ -183,6 +183,13 @@ export default function VetRTC() {
     webRtcPeerRef.current = webRtcPeer;
   };
 
+  function handleEndClick() {
+    const isEnd = confirm('진료를 종료하시겠습니까?');
+    if (isEnd) {
+      endCall();
+    }
+  }
+
   return (
     <div className="h-full bg-gray-50 flex flex-col rounded-2xl">
       <SimpleHeader text="비대면 진료 중..." />
@@ -210,9 +217,9 @@ export default function VetRTC() {
         {/* 컨트롤 버튼들 */}
         <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2">
           <div className="flex gap-8 justify-center items-center">
-            <MikeIcon fill="#F0F0F0" iconFill="#B3B3B3" stroke="inherit" width={52} height={52} />
-            <CallingEndIcon fill="#D14D72" stroke="white" width={52} height={52} onClick={endCall} />
-            <SpeakerIcon fill="#F0F0F0" iconFill="#B3B3B3" stroke="inherit" width={52} height={52} />
+            {/* <MikeIcon fill="#F0F0F0" iconFill="#B3B3B3" stroke="inherit" width={52} height={52} /> */}
+            <CallingEndIcon fill="#D14D72" stroke="white" width={52} height={52} onClick={handleEndClick} />
+            {/* <SpeakerIcon fill="#F0F0F0" iconFill="#B3B3B3" stroke="inherit" width={52} height={52} /> */}
           </div>
         </div>
       </div>
