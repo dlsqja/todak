@@ -202,20 +202,34 @@ export default function VetMypage() {
       </div>
 
       <br />
-      <div className="px-7">
-        <Button text={saving ? '수정 중…' : '수정하기'} onClick={handleSubmit} color="green" />
-      </div>
+      <motion.div
+        className="px-7"
+        initial={{ opacity: 0, y: 10 }}   // 애니메이션 초기 상태
+        animate={{ opacity: 1, y: 0 }}    // 애니메이션 종료 상태
+        transition={{ duration: 0.3 }}    // 애니메이션 지속 시간
+      >
+        <Button
+          text={saving ? '수정 중…' : '수정하기'}
+          onClick={handleSubmit}
+          color="green"
+        />
+      </motion.div>
 
-      <div className="flex justify-center gap-2 mt-2 px-7">
+      <motion.div
+        className="flex justify-center gap-2 mt-2 px-7"
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3, delay: 0.2 }}  // 살짝 늦게 등장
+      >
         <motion.button
           className="h4 text-center text-gray-500 cursor-pointer"
           onClick={handleLogout}
-          whileHover={{ scale: 1.05 }}
+          whileHover={{ scale: 1.05 }}               // hover 효과
           transition={{ duration: 0.2 }}
         >
           로그 아웃
         </motion.button>
-      </div>
+      </motion.div>
     </>
   );
 }
