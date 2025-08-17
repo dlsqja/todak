@@ -493,12 +493,12 @@ export default function StaffPayment() {
               <div className="flex gap-3">
                 <Button
                   color="gray"
-                  text="아니오, 다시 작성하겠습니다"
+                  text="취소"
                   onClick={() => setPayConfirmOpen(false)}
                 />
                 <Button
                   color="green"
-                  text={saving ? '결제 중…' : '예, 결제하겠습니다'}
+                  text={saving ? '결제 중…' : '확정'}
                   onClick={performPayment}
                 />
               </div>
