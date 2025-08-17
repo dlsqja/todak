@@ -7,7 +7,6 @@ import Input from '@/component/input/Input';
 import Button from '@/component/button/Button';
 import SelectionDropdown from '@/component/selection/SelectionDropdown';
 
-import { Select } from 'antd';
 import { registerPet } from '@/services/api/Owner/ownerpet'; // ✅ API import
 
 export default function OwnerPetRegister() {
@@ -15,11 +14,13 @@ export default function OwnerPetRegister() {
 
   const [image, setImage] = useState<File | null>(null); // File 객체로 저장
   const [name, setName] = useState('');
-  const [age, setAge] = useState('');
-  const [weight, setWeight] = useState('');
-  const [gender, setGender] = useState(''); // 성별 + 중성화 여부
+  const [age, setAge] = useState('');          // 문자열 유지
+  const [weight, setWeight] = useState('');    // 문자열 유지
+  const [gender, setGender] = useState('');    // 성별 + 중성화 여부
   const [type, setType] = useState('');
-  // const [activeDropdownId, setActiveDropdownId] = useState<string | null>(null);
+
+  // ▼ 드롭다운 동시 오픈 방지용 전역 상태
+  const [activeDropdownId, setActiveDropdownId] = useState<string | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement | null>(null); // file input에 접근하기 위한 ref
 
@@ -61,27 +62,84 @@ export default function OwnerPetRegister() {
     setImage(null); // 선택된 이미지 제거
   };
 
+  // ===== 나이: 양수 정수만 허용 (1~100) =====
+  const sanitizeAgeInput = (v: string) => v.replace(/[^\d]/g, '');
+  const handleAgeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setAge(sanitizeAgeInput(e.target.value));
+  };
+  const validateAndNormalizeAge = (ageStr: string): number | null => {
+    const s = (ageStr ?? '').trim();
+    if (!/^\d+$/.test(s)) return null;
+    const num = parseInt(s, 10);
+    if (!Number.isFinite(num)) return null;
+    if (num < 1 || num > 100) return null;
+    return num;
+  };
+
+  // ===== 몸무게: 입력 정리(소수 한 자리) + 유효성(0~200) =====
+  const sanitizeWeightInput = (v: string) => {
+    const noMinus = v.replace(/-/g, '');
+    let cleaned = noMinus.replace(/[^\d.]/g, '');
+    const firstDot = cleaned.indexOf('.');
+    if (firstDot !== -1) {
+      cleaned = cleaned.slice(0, firstDot + 1) + cleaned.slice(firstDot + 1).replace(/\./g, '');
+    }
+    const [i = '', d] = cleaned.split('.');
+    if (d === undefined) return i;     // 정수만
+    if (d === '') return `${i}.`;      // 입력 중 '2.' 유지
+    return `${i}.${d.slice(0, 1)}`;    // 소수 1자리
+  };
+  const handleWeightChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setWeight(sanitizeWeightInput(e.target.value));
+  };
+  const validateAndNormalizeWeight = (weightStr: unknown): number | null => {
+    const s = String(weightStr ?? '').trim();
+    if (!s) return null;
+    if (!/^\d+(\.\d)?$/.test(s)) return null;      // 정수 또는 소수 1자리
+    const num = Number.parseFloat(s);
+    if (!Number.isFinite(num)) return null;
+    if (num < 0 || num > 200) return null;
+    return Math.round(num * 10) / 10;              // 소수 1자리 고정
+  };
+
   const handleSubmit = async () => {
+    // ✅ 유효성 검사 (OwnerPetEdit과 동일 규칙)
+    const normalizedAge = validateAndNormalizeAge(age);
+    if (normalizedAge === null) {
+      alert('나이는 1~100 사이의 양수 정수만 입력할 수 있어요.\n예) 6, 12, 100');
+      return;
+    }
+    setAge(String(normalizedAge));
+
+    const normalizedWeight = validateAndNormalizeWeight(weight);
+    if (normalizedWeight === null) {
+      alert('몸무게는 0 이상 200 이하의 숫자로 입력해주세요.\n예) 3 또는 3.5 (소수 한 자리까지)');
+      return;
+    }
+    const weightFixed = Number(Math.round(normalizedWeight * 10) / 10);
+    setWeight(weightFixed.toFixed(1)); // UI 표시 보정
+
     try {
-      // genderMap을 통해 결합된 성별 + 중성화 여부 처리
+      // genderMap/typeMap 변환
       const genderValue = genderMap[gender];
-      const typeValue = typeMap[type]; // type도 변환
-      console.log('type', type);
+      const typeValue = typeMap[type];
+
+      // **페이로드 키는 원본 그대로** 유지
       const petRequest = {
         name,
-        age: parseInt(age),
-        gender: genderValue, // 변환된 gender 값
-        species: typeValue, // 변환된 type 값
-        weight: parseFloat(weight),
+        age: normalizedAge,        // 정제된 값 사용
+        gender: genderValue,
+        species: typeValue,
+        weight: weightFixed,       // 정제된 값 사용
       };
 
-      console.log('Pet Request:', petRequest); // 요청 값 확인
+      // console.log('Pet Request:', petRequest);
 
       await registerPet({ petRequest, photo: image }); // ✅ API 호출
       alert('등록되었습니다');
       navigate(-1);
     } catch (err) {
-      console.error('❌ 등록 실패:', err);
+      // console.error('❌ 등록 실패:', err);
       alert('등록에 실패했습니다. 다시 시도해주세요.');
     }
   };
@@ -127,42 +185,48 @@ export default function OwnerPetRegister() {
           />
 
           <div className="flex gap-4">
-            <Input id="age" label="나이" placeholder="0" value={age} onChange={(e) => setAge(e.target.value)} />
+            <Input
+              id="age"
+              label="나이"
+              placeholder="0"
+              value={age}
+              onChange={handleAgeChange}               // ✅ 유효성 포함
+            />
             <Input
               id="weight"
               label="체중(kg)"
               placeholder="0.0"
               value={weight}
-              onChange={(e) => setWeight(e.target.value)}
+              onChange={handleWeightChange}            // ✅ 유효성 포함
             />
           </div>
 
-          {/* 드롭다운 antd 스타일로변경 */}
+          {/* 드롭다운 (SelectionDropdown 적용) */}
           <div className="flex gap-4">
             <div className="flex flex-col w-full">
-            <label htmlFor="gender" className="h4 mb-2 text-black">성별</label>
-            <Select
-              id="gender"
-              className="w-full tw-select-green"
-              placeholder="성별을 선택해주세요"
-              value={gender || undefined}    
-              onChange={(v) => setGender(v)}
-              options={genderOptions}
-              allowClear
-            />
-          </div>
+              <label htmlFor="gender" className="h4 mb-2 text-black">성별</label>
+              <SelectionDropdown
+                dropdownId="gender"
+                options={genderOptions}
+                placeholder="성별을 선택해주세요"
+                value={gender}
+                onChange={(v) => setGender(v)}
+                activeDropdown={activeDropdownId}
+                setActiveDropdown={setActiveDropdownId}
+              />
+            </div>
           </div>
 
           <div className="flex flex-col w-full">
             <label htmlFor="type" className="h4 mb-2 text-black">종</label>
-            <Select
-              id="type"
-              className="w-full tw-select-green"
-              placeholder="반려동물 종을 선택해주세요"
-              value={type || undefined}
-              onChange={(v) => setType(v)}
+            <SelectionDropdown
+              dropdownId="type"
               options={typeOptions}
-              allowClear
+              placeholder="반려동물 종을 선택해주세요"
+              value={type}
+              onChange={(v) => setType(v)}
+              activeDropdown={activeDropdownId}
+              setActiveDropdown={setActiveDropdownId}
             />
           </div>
         </div>
