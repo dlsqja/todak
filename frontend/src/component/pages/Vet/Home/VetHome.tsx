@@ -458,15 +458,19 @@ export default function VetHome() {
           />
         ) : reviewData.length === 0 ? (
           /* ★ 텍스트만 간결히 */
-          <p className="h4 text-gray-500 py-6">현재 검토할 진료 기록이 없습니다.</p>
-        ) : (
-          <TreatmentSlideList
-            data={reviewData}
-            loading={reviewLoading}
-            onCardClick={(id) => navigate(`/vet/records/detail/${id}`)}
-          />
-        )}
-      </motion.div>
+          <div className="w-full flex items-center justify-center py-6">
+      <p className="h4 text-gray-500 text-center">
+        현재 검토할 진료 기록이 없습니다.
+      </p>
+    </div>
+  ) : (
+    <TreatmentSlideList
+      data={reviewData}
+      loading={reviewLoading}
+      onCardClick={(id) => navigate(`/vet/records/detail/${id}`)}
+    />
+  )}
+</motion.div>
 
       {modalOpen && (
         <VetReservationDetailModal
