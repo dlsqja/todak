@@ -19,6 +19,7 @@ export default function OwnerPetEdit() {
   const [selectedImage, setSelectedImage] = useState('');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isDefaultImage, setIsDefaultImage] = useState(false);
+  const [updatePhoto, setUpdatePhoto] = useState(false);
 
   const [name, setName] = useState('');
   const [age, setAge] = useState('');
@@ -83,6 +84,7 @@ export default function OwnerPetEdit() {
       setSelectedImage(imageUrl);
       setSelectedFile(file);
       setIsDefaultImage(false);
+      setUpdatePhoto(false);
     }
     event.target.value = ''; // Reset file input
   };
@@ -96,6 +98,7 @@ export default function OwnerPetEdit() {
       setSelectedImage('');
       setSelectedFile(null);
       setIsDefaultImage(true);
+      setUpdatePhoto(true);
     }
   };
 
@@ -107,6 +110,7 @@ export default function OwnerPetEdit() {
         gender: String(gender),
         species: type,
         weight: parseFloat(weight),
+        updatePhoto: updatePhoto,
       };
 
       console.log('Pet Request:', petRequest); // 로그로 요청값 확인

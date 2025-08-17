@@ -42,6 +42,8 @@ export default function VetMypage() {
   // 업로드/미리보기
   const [profileImage, setProfileImage] = useState<File | null>(null);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [updateImage, setUpdateImage] = useState(false);
+
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleLogout = async () => {
@@ -56,6 +58,7 @@ export default function VetMypage() {
   const handleRemoveImage = () => {
     setProfileImage(null);
     setPreviewImage(null);
+    setUpdateImage(true);
     // setPhotoRaw(''); // 전송값 비움(기본이미지는 저장 안 함)
     setPhotoSrc(DEFAULT_PHOTO); // 화면은 기본 이미지
   };
@@ -63,6 +66,7 @@ export default function VetMypage() {
   // 파일 선택 -> 미리보기 세팅
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
+    setUpdateImage(false);
     if (!file) return;
     const reader = new FileReader();
     reader.onload = (e) => setPreviewImage((e.target?.result as string) || null);
@@ -118,6 +122,7 @@ export default function VetMypage() {
         name: vetName.trim(),
         license: license.trim(),
         profile: profile.trim() || '',
+        updatePhoto: updateImage,
       };
       formData.append('vetUpdateRequest', new Blob([JSON.stringify(vetRequestData)], { type: 'application/json' }));
 
@@ -204,27 +209,23 @@ export default function VetMypage() {
       <br />
       <motion.div
         className="px-7"
-        initial={{ opacity: 0, y: 10 }}   // 애니메이션 초기 상태
-        animate={{ opacity: 1, y: 0 }}    // 애니메이션 종료 상태
-        transition={{ duration: 0.3 }}    // 애니메이션 지속 시간
+        initial={{ opacity: 0, y: 10 }} // 애니메이션 초기 상태
+        animate={{ opacity: 1, y: 0 }} // 애니메이션 종료 상태
+        transition={{ duration: 0.3 }} // 애니메이션 지속 시간
       >
-        <Button
-          text={saving ? '수정 중…' : '수정하기'}
-          onClick={handleSubmit}
-          color="green"
-        />
+        <Button text={saving ? '수정 중…' : '수정하기'} onClick={handleSubmit} color="green" />
       </motion.div>
 
       <motion.div
         className="flex justify-center gap-2 mt-2 px-7"
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3, delay: 0.2 }}  // 살짝 늦게 등장
+        transition={{ duration: 0.3, delay: 0.2 }} // 살짝 늦게 등장
       >
         <motion.button
           className="h4 text-center text-gray-500 cursor-pointer"
           onClick={handleLogout}
-          whileHover={{ scale: 1.05 }}               // hover 효과
+          whileHover={{ scale: 1.05 }} // hover 효과
           transition={{ duration: 0.2 }}
         >
           로그 아웃
