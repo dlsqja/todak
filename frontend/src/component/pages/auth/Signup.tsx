@@ -106,7 +106,7 @@ function SignupPage() {
             }`}
             onClick={() => {
               setSelected(idx);
-              console.log('로그인하고자 하는 역할:', label);
+              // console.log('로그인하고자 하는 역할:', label);
             }}
           >
             {label}
