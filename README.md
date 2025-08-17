@@ -1,6 +1,8 @@
 # 토닥
 > 반려인의 병원 방문 번거로움을 해결하기 위한 비대면 의료 서비스
 
+![alt text](image.png)
+
 # ✅현재 진행상황
 - [토닥](https://i13a409.p.ssafy.io/)
 - [Swagger](http://i13a409.p.ssafy.io:8081/api/v1/swagger-ui/index.html#/)
