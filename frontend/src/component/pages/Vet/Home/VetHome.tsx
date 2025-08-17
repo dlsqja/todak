@@ -375,66 +375,70 @@ export default function VetHome() {
       </motion.h3>
 
       <motion.div
-        ref={hScrollRef}
-        className={`overflow-x-auto overflow-visible snap-x snap-mandatory scroll-smooth hide-scrollbar mx-7 pt-3 pb-6 ${
-          draggingX ? 'cursor-grabbing select-none' : 'cursor-grab'
-        }`}
-        initial={{ opacity: 0 }}
+  ref={hScrollRef}
+  className={`overflow-x-auto overflow-visible snap-x snap-mandatory scroll-smooth hide-scrollbar mx-7 pt-3 pb-6 ${
+    draggingX ? 'cursor-grabbing select-none' : 'cursor-grab'
+  }`}
+  initial={{ opacity: 0 }}
+  animate={{ opacity: 1 }}
+  transition={{ delay: 0.3, duration: 0.3 }}
+>
+  {loadingList ? (
+    <div className="w-max flex gap-4 h-full p-3">
+      <motion.div
+        className="h-24 rounded-2xl bg-gray-100"
+        style={{ width: CARD_WIDTH }}
+        initial={{ opacity: 0.4 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 0.3, duration: 0.3 }}
-      >
-        <div className="w-max flex gap-4 h-full p-3">
-          {loadingList ? (
-            <>
-              <motion.div
-                className="h-24 rounded-2xl bg-gray-100"
-                style={{ width: CARD_WIDTH }}
-                initial={{ opacity: 0.4 }}
-                animate={{ opacity: 1 }}
-                transition={{ repeat: Infinity, repeatType: 'reverse', duration: 0.8 }}
-              />
-              <motion.div
-                className="h-24 rounded-2xl bg-gray-100"
-                style={{ width: CARD_WIDTH }}
-                initial={{ opacity: 0.4 }}
-                animate={{ opacity: 1 }}
-                transition={{ repeat: Infinity, repeatType: 'reverse', duration: 0.8, delay: 0.15 }}
-              />
-            </>
-          ) : reservationCards.length === 0 ? (
-            /* ★ 오너 홈과 같은 문구 + 사이즈만 컴팩트하게 */
-            <div className="flex items-center justify-center py-6 basis-full shrink-0">
-    <div className="flex flex-col items-center gap-2 text-center">
-      <img src="/images/sad_dog.png" alt="nodata" className="w-16 h-16 mx-auto" />
-      <p className="h4 text-gray-500">현재 비대면 진료 예정 항목이 없습니다.</p>
+        transition={{ repeat: Infinity, repeatType: 'reverse', duration: 0.8 }}
+      />
+      <motion.div
+        className="h-24 rounded-2xl bg-gray-100"
+        style={{ width: CARD_WIDTH }}
+        initial={{ opacity: 0.4 }}
+        animate={{ opacity: 1 }}
+        transition={{ repeat: Infinity, repeatType: 'reverse', duration: 0.8, delay: 0.15 }}
+      />
     </div>
-  </div>
-          ) : (
-            reservationCards.map((r, i) => (
-              <motion.div
-                key={`${r.id}-${i}`}
-                className="cursor-pointer"
-                style={{ minWidth: CARD_WIDTH }}
-                initial={{ opacity: 0, scale: 0.98, y: 6 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                transition={{ duration: 0.25, delay: 0.3 + i * 0.05 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={() => {
-                  if (movedXRef.current) return;
-                  openDetailModal(r.id, r.petPhotoUrl);
-                }}
-              >
-                <OwnerTreatmentSimpleCard
-                  time={r.time}
-                  department={r.department}
-                  petName={r.petName}
-                  petInfo={r.petInfo}
-                />
-              </motion.div>
-            ))
-          )}
+  ) : reservationCards.length === 0 ? (
+    // ✅ 빈 상태: 가로 row 대신 래퍼 폭을 사용
+    <div className="w-full p-3">
+      <div className="flex items-center justify-center py-6 rounded-2xl">
+        <div className="flex flex-col items-center gap-2 text-center">
+          <img src="/images/sad_dog.png" alt="nodata" className="w-16 h-16 mx-auto" />
+          <p className="h4 text-gray-500">현재 비대면 진료 예정 항목이 없습니다.</p>
         </div>
-      </motion.div>
+      </div>
+    </div>
+  ) : (
+    // ✅ 아이템 있을 때만 가로 row 렌더
+    <div className="w-max flex gap-4 h-full p-3">
+      {reservationCards.map((r, i) => (
+        <motion.div
+          key={`${r.id}-${i}`}
+          className="cursor-pointer"
+          style={{ minWidth: CARD_WIDTH }}
+          initial={{ opacity: 0, scale: 0.98, y: 6 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          transition={{ duration: 0.25, delay: 0.3 + i * 0.05 }}
+          whileTap={{ scale: 0.98 }}
+          onClick={() => {
+            if (movedXRef.current) return;
+            openDetailModal(r.id, r.petPhotoUrl);
+          }}
+        >
+          <OwnerTreatmentSimpleCard
+            time={r.time}
+            department={r.department}
+            petName={r.petName}
+            petInfo={r.petInfo}
+          />
+        </motion.div>
+      ))}
+    </div>
+  )}
+</motion.div>
+
 
       {/* 기록 검토 섹션 */}
       <motion.h3 className="mx-7 h3" {...fadeIn(0.2)}>
