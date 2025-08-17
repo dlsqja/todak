@@ -135,23 +135,23 @@ export default function VetSignup() {
         profile: profileError,
         photo: '',
       });
-      console.log('유효성 검사 실패');
+      // console.log('유효성 검사 실패');
       return;
     }
 
     // 유효성 검사 통과 시 진행
-    console.log('유효성 검사 통과');
+    // console.log('유효성 검사 통과');
 
     setIsLoading(true);
 
     // authId 확인
     const urlParams = window.location.pathname.split('/');
     const authId = urlParams[3];
-    console.log('pathname', urlParams);
-    console.log('authId', authId);
+    // console.log('pathname', urlParams);
+    // console.log('authId', authId);
 
     if (!authId) {
-      console.log('authId from useParams:', authId);
+      // console.log('authId from useParams:', authId);
       alert('인증 정보가 없습니다. 다시 로그인해주세요.');
       setIsLoading(false);
       return;

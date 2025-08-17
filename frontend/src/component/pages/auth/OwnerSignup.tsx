@@ -266,22 +266,22 @@ export default function OwnerSignup() {
         phone: phoneError,
         birth: birthError,
       });
-      console.log('유효성 검사 실패');
+      // console.log('유효성 검사 실패');
       return;
     }
 
     // 유효성 검사 통과 시 진행
-    console.log('유효성 검사 통과');
+    // console.log('유효성 검사 통과');
     setIsLoading(true);
 
     // URL에서 authId 가져오기 (카카오 로그인 후 전달받은 값)
     const urlParams = window.location.pathname.split('/');
     const authId = urlParams[3];
-    console.log('pathname', urlParams);
-    console.log('authId', authId);
+    // console.log('pathname', urlParams);
+    // console.log('authId', authId);
 
     if (!authId) {
-      console.log('authId', authId);
+      // console.log('authId', authId);
       alert('인증 정보가 없습니다. 다시 로그인해주세요.');
       return;
     }
@@ -296,7 +296,7 @@ export default function OwnerSignup() {
       },
       authId,
     );
-    console.log('response.message', response.message);
+    // console.log('response.message', response.message);
 
     if (response.message === '성공') {
       alert('반려인 가입이 완료되었습니다!');
