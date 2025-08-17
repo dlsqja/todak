@@ -403,12 +403,12 @@ export default function VetHome() {
             </>
           ) : reservationCards.length === 0 ? (
             /* ★ 오너 홈과 같은 문구 + 사이즈만 컴팩트하게 */
-            <div className="min-w-full flex items-center justify-center py-6">
-              <div className="flex flex-col items-center gap-2">
-                <img src="/images/sad_dog.png" alt="nodata" className="w-16 h-16" />
-                <p className="h4 text-gray-500">현재 비대면 진료 예정 항목이 없습니다.</p>
-              </div>
-            </div>
+            <div className="flex items-center justify-center py-6 basis-full shrink-0">
+    <div className="flex flex-col items-center gap-2 text-center">
+      <img src="/images/sad_dog.png" alt="nodata" className="w-16 h-16 mx-auto" />
+      <p className="h4 text-gray-500">현재 비대면 진료 예정 항목이 없습니다.</p>
+    </div>
+  </div>
           ) : (
             reservationCards.map((r, i) => (
               <motion.div
