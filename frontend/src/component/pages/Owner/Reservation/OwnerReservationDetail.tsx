@@ -106,7 +106,7 @@ export default function OwnerReservationDetail() {
           <div className="h4">증상</div>
           {detail.photo && (
             <div>
-              <ImageInputBox src={`${imageUrl}${detail.photo}`} stroke="border-5 border-green-400" />
+              <ImageInputBox src={`${imageUrl}${detail.photo}`} stroke="border-5 border-green-200" />
             </div>
           )}
           <div className="p">{detail.description}</div>

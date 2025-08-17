@@ -8,6 +8,74 @@ import { getReservationDetail } from '@/services/api/Owner/ownerreservation';
 import type { TreatmentResponse } from '@/types/Owner/ownertreatmentType';
 import { toTimeRange } from '@/utils/timeMapping';
 
+// ★ 요약문 애니메이션 (AiSummaryForVet과 동일한 딜레이/이징/건너뛰기)
+const AnimatedSummary: React.FC<{ text: string }> = ({ text }) => {
+  const [revealed, setRevealed] = React.useState(false);
+  const [skipAll, setSkipAll] = React.useState(false);
+  const charGrid = React.useMemo(() => text.split('\n').map((line) => Array.from(line)), [text]);
+
+  React.useEffect(() => {
+    setSkipAll(false);
+    setRevealed(false);
+    const t = setTimeout(() => setRevealed(true), 30);
+    return () => clearTimeout(t);
+  }, [text]);
+
+  const isEmptySummary =
+    !text || text === '요약 내용이 없습니다.' || text === '요약된 진료 내용이 없습니다.';
+
+  return (
+    <>
+      <div className="flex justify-end -mt-2">
+        {!isEmptySummary && !skipAll && (
+          <button
+            onClick={() => {
+              setSkipAll(true);
+              setRevealed(true);
+            }}
+            className="caption text-gray-400 hover:text-gray-600 underline"
+          >
+            건너뛰기
+          </button>
+        )}
+      </div>
+
+      <div
+        className="p text-black !leading-6 !tracking-tight whitespace-pre-wrap"
+        aria-live="polite"
+        aria-atomic="false"
+      >
+        {charGrid.map((chars, rowIndex) => (
+          <div key={`row-${rowIndex}`} className="inline-block w-full align-top">
+            {chars.length === 0 ? (
+              <br />
+            ) : (
+              chars.map((ch, colIndex) => {
+                const delayMs = (rowIndex + colIndex) * 18; // 동일 스텝 지연!!!!
+                const style: React.CSSProperties = skipAll
+                  ? { opacity: 1, transform: 'translate(0,0)' }
+                  : {
+                      opacity: revealed ? 1 : 0,
+                      transform: revealed ? 'translate(0,0)' : 'translate(10px,10px)',
+                      transitionProperty: 'opacity, transform',
+                      transitionDuration: '260ms',
+                      transitionTimingFunction: 'cubic-bezier(0.22,1,0.36,1)',
+                      transitionDelay: `${delayMs}ms`,
+                    };
+                return (
+                  <span key={`c-${rowIndex}-${colIndex}`} style={style}>
+                    {ch === ' ' ? '\u00A0' : ch}
+                  </span>
+                );
+              })
+            )}
+          </div>
+        ))}
+      </div>
+    </>
+  );
+};
+
 export default function TreatmentDetailPage() {
   const { id } = useParams();
   const [record, setRecord] = useState<TreatmentResponse | null>(null);
@@ -18,20 +86,8 @@ export default function TreatmentDetailPage() {
   const navigate = useNavigate();
   const petId = useLocation().state?.petId;
 
-  // (위치 이동) 요약문 애니메이션 훅 — 모든 렌더에서 항상 실행되도록 상단에 둠
+  // 요약문 텍스트
   const summaryText = record?.aiSummary || '요약된 진료 내용이 없습니다.';
-  const [revealed, setRevealed] = useState(false);
-  const [skipAll, setSkipAll] = useState(false);
-  const charGrid = useMemo(
-    () => summaryText.split('\n').map((line) => Array.from(line)),
-    [summaryText]
-  );
-  useEffect(() => {
-    setSkipAll(false);
-    setRevealed(false);
-    const t = setTimeout(() => setRevealed(true), 30);
-    return () => clearTimeout(t);
-  }, [summaryText]);
 
   // ✅ 통일 파서: DB문자열은 앞 10자리, ISO 오프셋 없으면 Z 붙여 UTC로 간주 후 로컬 Y-M-D
   const getLocalYMD = (v?: unknown): string => {
@@ -170,53 +226,8 @@ export default function TreatmentDetailPage() {
             </div>
           </div>
 
-          {/* 요약문 애니메이션 + 건너뛰기 */}
-          <div className="flex justify-end -mt-2">
-            {!skipAll && summaryText && summaryText !== '요약 내용이 없습니다.' && (
-              <button
-                onClick={() => {
-                  setSkipAll(true);
-                  setRevealed(true);
-                }}
-                className="caption text-gray-400 hover:text-gray-600 underline"
-              >
-                건너뛰기
-              </button>
-            )}
-          </div>
-
-          <div
-            className="p text-black !leading-6 !tracking-tight whitespace-pre-wrap"
-            aria-live="polite"
-            aria-atomic="false"
-          >
-            {charGrid.map((chars, rowIndex) => (
-              <div key={`row-${rowIndex}`} className="inline-block w-full align-top">
-                {chars.length === 0 ? (
-                  <br />
-                ) : (
-                  chars.map((ch, colIndex) => {
-                    const delayMs = (rowIndex + colIndex) * 18;
-                    const style: React.CSSProperties = skipAll
-                      ? { opacity: 1, transform: 'translate(0,0)' }
-                      : {
-                          opacity: revealed ? 1 : 0,
-                          transform: revealed ? 'translate(0,0)' : 'translate(10px,10px)',
-                          transitionProperty: 'opacity, transform',
-                          transitionDuration: '260ms',
-                          transitionTimingFunction: 'cubic-bezier(0.22,1,0.36,1)',
-                          transitionDelay: `${delayMs}ms`,
-                        };
-                    return (
-                      <span key={`c-${rowIndex}-${colIndex}`} style={style}>
-                        {ch === ' ' ? '\u00A0' : ch}
-                      </span>
-                    );
-                  })
-                )}
-              </div>
-            ))}
-          </div>
+          {/* 요약문 애니메이션 (AiSummaryForVet과 동일) */}
+          <AnimatedSummary text={summaryText} />
 
           <p className="caption text-center text-gray-500 border border-gray-100 bg-gray-100 rounded-[12px] py-2 px-3">
             본 요약문은 AI로 생성되었으며 수의사의 확인 절차를 통해

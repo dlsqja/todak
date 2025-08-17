@@ -4,7 +4,7 @@ import type { VetTreatmentDetail, VetTreatmentListResponse } from '@/types/Vet/v
 /** 🟢 수의사 진료기록 목록 (GET /treatments/vets/history) */
 export const getVetTreatments = async (type: 0 | 1 | 2 = 2): Promise<any[]> => {
   const res = await apiClient.get('/treatments/vets/history', { params: { type } });
-  console.log('res:', res);
+  // console.log('res:', res);
   return res.data?.data ?? res.data ?? [];
 };
 
@@ -17,7 +17,7 @@ export const getVetTreatmentDetail = async (treatmentId: number): Promise<VetTre
 // 비대면 진료 목록 조회
 export const getVetTreatmentList = async (): Promise<VetTreatmentListResponse[]> => {
   const res = await apiClient.get('/treatments/vets/history?type=0');
-  console.log('res:', res);
+  // console.log('res:', res);
   return res.data?.data ?? res.data;
 };
 

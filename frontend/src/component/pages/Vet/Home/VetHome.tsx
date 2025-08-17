@@ -369,7 +369,7 @@ export default function VetHome() {
         </div>
       </motion.div>
 
-      {/* 예정 목록 섹션 */}
+       {/* 예정 목록 섹션 */}
       <motion.h3 className="mx-7 h3 mt-11" {...fadeIn(0.25)}>
         비대면 진료 예정 목록
       </motion.h3>
@@ -401,6 +401,14 @@ export default function VetHome() {
                 transition={{ repeat: Infinity, repeatType: 'reverse', duration: 0.8, delay: 0.15 }}
               />
             </>
+          ) : reservationCards.length === 0 ? (
+            /* ★ 오너 홈과 같은 문구 + 사이즈만 컴팩트하게 */
+            <div className="min-w-full flex items-center justify-center py-6">
+              <div className="flex flex-col items-center gap-2">
+                <img src="/images/sad_dog.png" alt="nodata" className="w-16 h-16" />
+                <p className="h4 text-gray-500">현재 비대면 진료 예정 항목이 없습니다.</p>
+              </div>
+            </div>
           ) : (
             reservationCards.map((r, i) => (
               <motion.div
@@ -438,11 +446,22 @@ export default function VetHome() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.25, duration: 0.3 }}
       >
-        <TreatmentSlideList
-          data={reviewData}
-          loading={reviewLoading}
-          onCardClick={(id) => navigate(`/vet/records/detail/${id}`)}
-        />
+        {reviewLoading ? (
+          <TreatmentSlideList
+            data={reviewData}
+            loading={reviewLoading}
+            onCardClick={(id) => navigate(`/vet/records/detail/${id}`)}
+          />
+        ) : reviewData.length === 0 ? (
+          /* ★ 텍스트만 간결히 */
+          <p className="h4 text-gray-500 py-6">현재 검토할 진료 기록이 없습니다.</p>
+        ) : (
+          <TreatmentSlideList
+            data={reviewData}
+            loading={reviewLoading}
+            onCardClick={(id) => navigate(`/vet/records/detail/${id}`)}
+          />
+        )}
       </motion.div>
 
       {modalOpen && (

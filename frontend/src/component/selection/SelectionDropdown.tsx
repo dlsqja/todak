@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'; // ★ useEffect 추가
+import React, { useState, useEffect } from 'react';
 import DropdownArrow from '@/component/icon/Dropdown_Arrow';
 
 interface OptionType {
@@ -13,9 +13,14 @@ interface FilterDropdownProps {
   placeholder?: string;
   value: string;
   onChange: (value: string) => void;
+
+  // ▼ 전역으로 하나만 열리게 하는 컨트롤 (기존과 동일)
   dropdownId: string;
   activeDropdown: string | null;
   setActiveDropdown: (id: string | null) => void;
+
+  // ▼ 새로 추가(선택): 몇 개까지만 보이고 스크롤할지. 기본 6
+  maxVisible?: number;
 }
 
 export default function SelectionDropdown({
@@ -26,23 +31,29 @@ export default function SelectionDropdown({
   dropdownId,
   activeDropdown,
   setActiveDropdown,
+  maxVisible = 6,
 }: FilterDropdownProps) {
   const [open, setOpen] = useState(false);
   const selectedOption = options.find((opt) => opt.value === value);
 
   // 사진이나 설명이 있을 경우 true
-  const hasDetail = selectedOption?.photo || selectedOption?.description;
+  const hasDetail = !!(selectedOption?.photo || selectedOption?.description);
 
-  // ★ 다른 드롭다운이 활성화되면 이 드롭다운 자동 닫기
+  // 옵션이 많은지(스크롤 필요 여부)
+  const needsScroll = options.length > maxVisible;
+
+  // 항목 높이 추정: 상세가 하나라도 있으면 64px, 아니면 48px 기준
+  const anyDetailedItem = options.some((opt) => opt.photo || opt.description);
+  const rowHeight = anyDetailedItem ? 64 : 48;
+  const listMaxHeightPx = maxVisible * rowHeight;
+
+  // 다른 드롭다운이 활성화되면 이 드롭다운 자동 닫기
   useEffect(() => {
-    if (activeDropdown !== dropdownId && open) {
-      setOpen(false);
-    }
+    if (activeDropdown !== dropdownId && open) setOpen(false);
   }, [activeDropdown, dropdownId, open]);
 
   const toggleDropdown = () => {
     if (activeDropdown === dropdownId) {
-      // ★ 자기 자신을 닫을 때 전역도 null로 해제하여 일관성 유지
       if (open) {
         setOpen(false);
         setActiveDropdown(null);
@@ -61,9 +72,9 @@ export default function SelectionDropdown({
       <button
         onClick={toggleDropdown}
         className={`
-          w-full 
-          ${hasDetail ? 'h-16' : 'h-12'} 
-          rounded-2xl border border-gray-300 px-4 
+          w-full
+          ${hasDetail ? 'h-16' : 'h-12'}
+          rounded-2xl border px-4
           flex items-center justify-between bg-white
           focus:outline-none focus:ring-0 focus:border-green-300 focus:border-2
           transition-colors duration-200
@@ -92,16 +103,23 @@ export default function SelectionDropdown({
 
       {/* 옵션 리스트 */}
       {open && (
-        <ul className="absolute z-10 mt-2 w-full bg-white border border-gray-300 rounded-2xl overflow-hidden shadow-lg">
+        <ul
+          className={`
+            absolute z-10 mt-2 w-full bg-white border border-gray-300
+            rounded-2xl overflow-hidden shadow-lg
+            ${needsScroll ? 'overflow-y-auto' : ''}
+          `}
+          style={needsScroll ? { maxHeight: `${listMaxHeightPx}px` } : undefined}
+        >
           {options.map((opt) => {
-            const hasOptDetail = opt.photo || opt.description;
+            const hasOptDetail = !!(opt.photo || opt.description);
             return (
               <li
                 key={opt.value}
                 onClick={() => {
                   onChange(opt.value);
                   setOpen(false);
-                  setActiveDropdown(null); // 선택 후 닫기(원래 있던 코드 유지)
+                  setActiveDropdown(null);
                 }}
                 className={`
                   flex items-center gap-3 px-4 py-3 hover:bg-gray-100 cursor-pointer

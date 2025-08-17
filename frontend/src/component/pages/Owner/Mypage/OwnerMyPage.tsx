@@ -320,37 +320,43 @@ export default function OwnerMyPage() {
         <div>
           <label className="block h4 text-black mb-2">생년월일</label>
           <div className="flex gap-2">
-            <SelectionDropdown
-              id="birth-year"
-              options={yearOptions}
-              placeholder="년도"
-              value={birthYear}
-              onChange={(value) => handleBirthChange('year', value)}
-              activeId={activeDropdownId}
-              setActiveId={setActiveDropdownId}
-              className="flex-1"
-            />
-            <SelectionDropdown
-              id="birth-month"
-              options={getMonthOptions()}
-              placeholder="월"
-              value={birthMonth}
-              onChange={(value) => handleBirthChange('month', value)}
-              activeId={activeDropdownId}
-              setActiveId={setActiveDropdownId}
-              className="flex-1"
-            />
-            <SelectionDropdown
-              id="birth-day"
-              options={getDayOptions()}
-              placeholder="일"
-              value={birthDay}
-              onChange={(value) => handleBirthChange('day', value)}
-              activeId={activeDropdownId}
-              setActiveId={setActiveDropdownId}
-              className="flex-1"
-            />
-          </div>
+  <div className="flex-1">
+    <SelectionDropdown
+      dropdownId="birth-year"
+      options={yearOptions}
+      placeholder="년도"
+      value={birthYear}
+      onChange={(value) => handleBirthChange('year', value)}
+      activeDropdown={activeDropdownId}
+      setActiveDropdown={setActiveDropdownId}
+    />
+  </div>
+
+  <div className="flex-1">
+    <SelectionDropdown
+      dropdownId="birth-month"
+      options={getMonthOptions()}
+      placeholder="월"
+      value={birthMonth}
+      onChange={(value) => handleBirthChange('month', value)}
+      activeDropdown={activeDropdownId}
+      setActiveDropdown={setActiveDropdownId}
+    />
+  </div>
+
+  <div className="flex-1">
+    <SelectionDropdown
+      dropdownId="birth-day"
+      options={getDayOptions()}
+      placeholder="일"
+      value={birthDay}
+      onChange={(value) => handleBirthChange('day', value)}
+      activeDropdown={activeDropdownId}
+      setActiveDropdown={setActiveDropdownId}
+    />
+  </div>
+</div>
+
           {errors.birth && <p className="text-red-500 caption mt-1 ml-2">{errors.birth}</p>}
         </div>
         <div>

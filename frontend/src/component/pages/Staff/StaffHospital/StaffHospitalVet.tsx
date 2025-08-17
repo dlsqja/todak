@@ -196,66 +196,79 @@ export default function StaffHospitalVet() {
         </div>
 
         {/* 전체 설정 */}
-        <div className="space-y-2">
-          <label className="block h4 text-black">전체 설정</label>
-          <div className="flex w-full items-center gap-3">
-            <div className="flex-1 min-w-0">
-              <div className="min-w-[112px]">
-                <SelectionDropdown
-                  id="all-start"
-                  options={TIME_OPTIONS}
-                  placeholder="시작"
-                  value={allStart}
-                  onChange={setAllStart}
-                />
-              </div>
-            </div>
-            <div className="flex-1 min-w-0">
-              <div className="min-w-[112px]">
-                <SelectionDropdown
-                  id="all-end"
-                  options={TIME_OPTIONS}
-                  placeholder="끝"
-                  value={allEnd}
-                  onChange={setAllEnd}
-                />
-              </div>
-            </div>
-            <div className="flex-none">
-              <div className="min-w-[112px]">
-                <Button color="lightgreen" text="전체 적용" onClick={applyAll} />
-              </div>
-            </div>
-          </div>
-        </div>
+<div className="space-y-2">
+  <label className="block h4 text-black">전체 설정</label>
+  <div className="flex w-full items-center gap-3">
+    <div className="flex-1 min-w-0">
+      <div className="min-w-[112px]">
+        <SelectionDropdown
+          options={TIME_OPTIONS}
+          placeholder="시작"
+          value={allStart}
+          onChange={setAllStart}
+          dropdownId="all-start"
+          activeDropdown={activeSelectId}
+          setActiveDropdown={setActiveSelectId}
+        />
+      </div>
+    </div>
+    <div className="flex-1 min-w-0">
+      <div className="min-w-[112px]">
+        <SelectionDropdown
+          options={TIME_OPTIONS}
+          placeholder="끝"
+          value={allEnd}
+          onChange={setAllEnd}
+          dropdownId="all-end"
+          activeDropdown={activeSelectId}
+          setActiveDropdown={setActiveSelectId}
+        />
+      </div>
+    </div>
+    <div className="flex-none">
+      <div className="min-w-[112px]">
+        <Button color="lightgreen" text="전체 적용" onClick={applyAll} />
+      </div>
+    </div>
+  </div>
+</div>
 
         {/* 요일별 설정 */}
-        <div className="space-y-4">
-          <label className="block h4 text-black">요일별 설정</label>
-          {DAYS_EN.map((day) => (
-            <div key={day} className="flex items-center gap-3">
-              <span className="w-6 text-black h4">{DAYS_KO[day]}</span>
-              <div className="flex-1">
-                <SelectionDropdown
-                  id={`${day}-start`}
-                  options={TIME_OPTIONS}
-                  placeholder="시작 시간"
-                  value={byDay[day].start}
-                  onChange={(v) => setByDay((prev) => ({ ...prev, [day]: { ...prev[day], start: v } }))}
-                />
-              </div>
-              <div className="flex-1">
-                <SelectionDropdown
-                  id={`${day}-end`}
-                  options={TIME_OPTIONS}
-                  placeholder="종료 시간"
-                  value={byDay[day].end}
-                  onChange={(v) => setByDay((prev) => ({ ...prev, [day]: { ...prev[day], end: v } }))}
-                />
-              </div>
-            </div>
-          ))}
-        </div>
+<div className="space-y-4">
+  <label className="block h4 text-black">요일별 설정</label>
+  {DAYS_EN.map((day) => (
+    <div key={day} className="flex items-center gap-3">
+      <span className="w-6 text-black h4">{DAYS_KO[day]}</span>
+      <div className="flex-1">
+        <SelectionDropdown
+          options={TIME_OPTIONS}
+          placeholder="시작 시간"
+          value={byDay[day].start}
+          onChange={(v) =>
+            setByDay((prev) => ({ ...prev, [day]: { ...prev[day], start: v } }))
+          }
+          dropdownId={`${day}-start`}
+          activeDropdown={activeSelectId}
+          setActiveDropdown={setActiveSelectId}
+        />
+      </div>
+      <div className="flex-1">
+        <SelectionDropdown
+          options={TIME_OPTIONS}
+          placeholder="종료 시간"
+          value={byDay[day].end}
+          onChange={(v) =>
+            setByDay((prev) => ({ ...prev, [day]: { ...prev[day], end: v } }))
+          }
+          dropdownId={`${day}-end`}
+          activeDropdown={activeSelectId}
+          setActiveDropdown={setActiveSelectId}
+        />
+      </div>
+    </div>
+  ))}
+</div>
+
 
         <div className="pt-4">
           <Button color="green" text={saving ? '등록 중...' : '등록하기'} onClick={handleSave} />

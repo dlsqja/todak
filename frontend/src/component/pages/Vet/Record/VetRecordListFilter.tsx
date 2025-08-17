@@ -89,6 +89,7 @@ interface Props {
   onCardClick: (id: number) => void;
 }
 
+
 export default function VetRecordListFilter({ data = [], onCardClick }: Props) {
   const [selectedSigned, setSelectedSigned] =
     useState<'ALL' | 'true' | 'false'>('ALL');
@@ -97,7 +98,7 @@ export default function VetRecordListFilter({ data = [], onCardClick }: Props) {
   const [base, setBase] = useState<any[]>([]);
   const [enriched, setEnriched] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
-
+const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   // ▶ 데이터 로드: props.data가 비어 있으면 type=2(전체 진료) 로드
   useEffect(() => {
     let alive = true;
@@ -182,11 +183,14 @@ export default function VetRecordListFilter({ data = [], onCardClick }: Props) {
       <div className="px-7 flex gap-3">
         <div className="flex-1">
           <SelectionDropdown
-            options={signedOptions as any}
-            value={selectedSigned}
-            onChange={(v) => setSelectedSigned(v as any)}
-            placeholder={loading ? '불러오는 중…' : '서명상태 선택'}
-          />
+  options={signedOptions as any}
+  value={selectedSigned}
+  onChange={(v) => setSelectedSigned(v as any)}
+  placeholder={loading ? '불러오는 중…' : '서명상태 선택'}
+  dropdownId="signed"                       // 🔹 고유 id
+  activeDropdown={activeDropdown}           // 🔹 전역 활성 id
+  setActiveDropdown={setActiveDropdown}     // 🔹 setter
+/>
         </div>
       </div>
 

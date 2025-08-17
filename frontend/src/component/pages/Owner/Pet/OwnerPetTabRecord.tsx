@@ -17,8 +17,8 @@ type UIRecord = {
   id: number;
   vetName: string;
   hospitalName?: string;
-  subject: Subject;
-  treatmentDay: string;
+  subject: Subject | string;
+  treatmentDay: string; // YYYY-MM-DD
 };
 
 // 필요할 때만 ownerreservation을 동적 로드
@@ -27,7 +27,9 @@ async function buildHospitalMap() {
     const { getReservations } = await import('@/services/api/Owner/ownerreservation');
     const resGroups = await getReservations(); // [{ petResponse, reservations }, ...]
     const map = new Map<number, string>();
-    resGroups?.forEach((g: any) => g?.reservations?.forEach((r: any) => map.set(r.reservationId, r.hospitalName)));
+    resGroups?.forEach((g: any) =>
+      g?.reservations?.forEach((r: any) => map.set(r.reservationId, r.hospitalName)),
+    );
     return map;
   } catch (e) {
     console.warn('병원명 맵 생성 실패, 병원명 미표시로 진행:', e);
@@ -35,17 +37,45 @@ async function buildHospitalMap() {
   }
 }
 
-// 느슨한 날짜 파서: "YYYY-MM-DD HH:mm:ss.ssssss" 같은 포맷도 파싱
+// 정렬/존재 체크용: 문자열 "YYYY-MM-DD HH:mm:ss.ssssss"도 안전 파싱
 const toMillisLoose = (v?: unknown): number => {
-  if (!v) return 0;
+  if (v == null) return 0;
   const s = String(v).trim();
   if (!s) return 0;
-  // 공백 → T, 마이크로초 → 밀리초 3자리, TZ 없으면 Z(UTC) 부여
   let iso = s.replace(' ', 'T').replace(/\.(\d{3})\d+$/, '.$1');
   if (/T/.test(iso) && !/(Z|[+\-]\d{2}:?\d{2})$/i.test(iso)) iso += 'Z';
   const d = new Date(iso);
   return Number.isNaN(d.getTime()) ? 0 : d.getTime();
 };
+
+// 상세 페이지와 동일한 규칙의 YYYY-MM-DD 변환기
+const getLocalYMD = (v?: unknown): string => {
+  if (v == null) return '';
+  if (typeof v === 'number' || v instanceof Date) {
+    const d = new Date(v as any);
+    if (Number.isNaN(d.getTime())) return '';
+    const yy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    return `${yy}-${mm}-${dd}`;
+  }
+  const raw = String(v).trim();
+  if (!raw) return '';
+  const m = raw.match(/^(\d{4}-\d{2}-\d{2})\b/);
+  if (m) return m[1]; // 문자열이면 앞 10자리만(타임존 보정 금지)
+  let iso = raw.replace(' ', 'T').replace(/\.(\d{3})\d+$/, '.$1');
+  if (/T/.test(iso) && !/(Z|[+\-]\d{2}:?\d{2})$/i.test(iso)) iso += 'Z';
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return '';
+  const yy = d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  return `${yy}-${mm}-${dd}`;
+};
+
+// 시작/종료 시각이 하나라도 있으면 "실제 진료"로 간주
+const hasRealTreatmentTime = (start?: unknown, end?: unknown): boolean =>
+  toMillisLoose(start) > 0 || toMillisLoose(end) > 0;
 
 export default function OwnerPetTabRecord({ selectedPet }: OwnerPetTabRecordProps) {
   const [selectedSubject, setSelectedSubject] = useState('');
@@ -53,48 +83,64 @@ export default function OwnerPetTabRecord({ selectedPet }: OwnerPetTabRecordProp
   const [records, setRecords] = useState<UIRecord[]>([]);
   const navigate = useNavigate();
 
+  // 👇 추가: 드롭다운 동시 오픈 방지용 전역 상태
+  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+
   useEffect(() => {
     if (!selectedPet?.petId) return;
 
     const fetchData = async () => {
       try {
         const [treats, hospitalMap] = await Promise.all([
-          getTreatments(), // [{ petResponse, treatments }]
-          buildHospitalMap(), // Map<reservationId, hospitalName>
+          getTreatments(),          // [{ petResponse, treatments }]
+          buildHospitalMap(),       // Map<reservationId, hospitalName>
         ]);
 
         const matched = treats.find((e) => e.petResponse?.petId === selectedPet.petId);
 
-        // 1) UI 레코드 + 정렬용 키 생성
-        const withSortKey = (matched?.treatments ?? []).map((t: any) => {
-          const start = t?.treatmentInfo?.startTime;
-          const end = t?.treatmentInfo?.endTime;
-          const day =
-            t?.reservationDay ?? (typeof start === 'string' ? start.slice(0, 10) : '');
+        const withSortKey =
+          (matched?.treatments ?? [])
+            .map((t: any) => {
+              const info = t?.treatmentInfo ?? t?.treatementInfo ?? t;
+              const start =
+                info?.startTime ?? info?.start_time ?? t?.startTime ?? t?.start_time;
+              const end =
+                info?.endTime ?? info?.end_time ?? t?.endTime ?? t?.end_time;
 
-          // 정렬용 timestamp: startTime > endTime > day(자정) 우선
-          const sortKey =
-            toMillisLoose(start) ||
-            toMillisLoose(end) ||
-            (day ? toMillisLoose(`${day}T00:00:00`) : 0);
+              if (!hasRealTreatmentTime(start, end)) return null;
 
-          const row: UIRecord = {
-            id: t.reservationId,
-            vetName: t.vetName,
-            subject: t.subject,
-            treatmentDay: day,
-            hospitalName: t.hospitalName ?? hospitalMap.get(t.reservationId) ?? '-', // 보강
-          };
-          return { row, sortKey };
-        });
+              const dayYMD =
+                getLocalYMD(start) ||
+                getLocalYMD(end) ||
+                getLocalYMD(t?.reservationDay) ||
+                getLocalYMD(t?.reservation_day) ||
+                '-';
 
-        // 2) 최신 먼저(내림차순) 정렬
+              const sortKey =
+                toMillisLoose(start) ||
+                toMillisLoose(end) ||
+                (dayYMD !== '-' ? toMillisLoose(`${dayYMD}T00:00:00`) : 0);
+
+              const row: UIRecord = {
+                id:
+                  t?.reservationId ??
+                  t?.reservation_id ??
+                  t?.reservation?.reservationId ??
+                  t?.id,
+                vetName: t.vetName,
+                subject: t.subject,
+                treatmentDay: dayYMD,
+                hospitalName: t.hospitalName ?? hospitalMap.get(t.reservationId) ?? '-',
+              };
+              return { row, sortKey };
+            })
+            .filter(Boolean) as Array<{ row: UIRecord; sortKey: number }>;
+
         withSortKey.sort((a, b) => b.sortKey - a.sortKey);
-
-        // 3) UIRecord만 추출해 상태 반영
         setRecords(withSortKey.map((x) => x.row));
       } catch (e) {
         console.error('진료 내역 불러오기 실패:', e);
+        setRecords([]);
       }
     };
 
@@ -103,18 +149,19 @@ export default function OwnerPetTabRecord({ selectedPet }: OwnerPetTabRecordProp
 
   const handleClickDetail = (reservationId: number) => {
     navigate(`/owner/pet/treatment/detail/${reservationId}`, {
-      state: {
-        returnTab: '진료 내역',
-        petId: selectedPet?.petId,
-      },
+      state: { returnTab: '진료 내역', petId: selectedPet?.petId },
     });
   };
 
   const filtered = records.filter(
-    (t) => (!selectedSubject || t.subject === selectedSubject) && (!selectedDate || t.treatmentDay === selectedDate),
+    (t) =>
+      (!selectedSubject || t.subject === (selectedSubject as any)) &&
+      (!selectedDate || t.treatmentDay === selectedDate),
   );
 
-  const uniqueDates = Array.from(new Set(records.map((t) => t.treatmentDay))).filter(Boolean);
+  const uniqueDates = Array.from(new Set(records.map((t) => t.treatmentDay))).filter(
+    (d) => !!d && d !== '-',
+  );
 
   return (
     <div className="space-y-6">
@@ -124,45 +171,44 @@ export default function OwnerPetTabRecord({ selectedPet }: OwnerPetTabRecordProp
             value={selectedSubject}
             onChange={setSelectedSubject}
             options={[
-              // { value: '', label: '전체 과목' },
               { value: 'DENTAL', label: '치과' },
               { value: 'DERMATOLOGY', label: '피부과' },
               { value: 'ORTHOPEDICS', label: '정형외과' },
               { value: 'OPHTHALMOLOGY', label: '안과' },
             ]}
             placeholder="과목 필터"
+            // 👇 새 props
+            dropdownId="subjectDropdown"
+            activeDropdown={activeDropdown}
+            setActiveDropdown={setActiveDropdown}
           />
         </div>
         <div className="w-1/2">
           <SelectionDropdown
             value={selectedDate}
             onChange={setSelectedDate}
-            options={[
-              // { value: '', label: '전체 날짜' },
-              ...uniqueDates.map((d) => ({ value: d, label: d })),
-            ]}
+            options={[...uniqueDates.map((d) => ({ value: d, label: d }))]}
             placeholder="날짜 필터"
+            // 👇 새 props
+            dropdownId="dateDropdown"
+            activeDropdown={activeDropdown}
+            setActiveDropdown={setActiveDropdown}
           />
         </div>
       </div>
 
       <div className="space-y-4">
         {filtered.length === 0 && <p className="text-center text-gray-400">진료 내역이 없습니다.</p>}
-        {filtered.map(
-          (t) => (
-            console.log(t),
-            (
-              <TreatmentRecordCard
-                key={t.id}
-                doctorName={t.vetName}
-                hospitalName={t.hospitalName}
-                treatmentDate={t.treatmentDay}
-                department={subjectMapping[t.subject] ?? t.subject}
-                onClickDetail={() => handleClickDetail(t.id)}
-              />
-            )
-          ),
-        )}
+        {filtered.map((t) => (
+          <TreatmentRecordCard
+            key={t.id}
+            doctorName={t.vetName}
+            hospitalName={t.hospitalName}
+            treatmentDate={t.treatmentDay}
+            department={subjectMapping[t.subject as Subject] ?? (t.subject as string)}
+            onClickDetail={() => handleClickDetail(t.id)}
+          />
+        ))}
       </div>
     </div>
   );

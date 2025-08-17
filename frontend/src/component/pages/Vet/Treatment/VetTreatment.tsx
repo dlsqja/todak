@@ -138,38 +138,51 @@ export default function VetTreatment() {
     })();
   }, []);
 
+  const isEmpty = rows.length === 0;
+
   return (
     <div>
       <SimpleHeader text="비대면 진료" />
       <div className="px-7 py-1 space-y-4 max-h-full overflow-y-auto hide-scrollbar">
-        {rows.map(({ base, reservationTimeLabel }, index) => {
-          // ✅ 유틸 없이 인라인 처리!!!
-          const raw = base.petInfo.photo || '';
-          const photoUrl =
-            /^https?:\/\//i.test(raw) || /^data:image\//i.test(raw)
-              ? raw
-              : `${(import.meta.env.VITE_PHOTO_URL ?? '').replace(/\/+$/, '')}/${String(raw).replace(/^\/+/, '')}`;
+        {isEmpty ? (
+          // 오너 페이지와 동일 형식의 빈 상태 UI
+          <div className="flex-1 flex items-center justify-center px-7 mt-60">
+            <div className="flex flex-col items-center gap-2">
+              <img src="/images/sad_dog.png" alt="nodata" className="w-20 h-20" />
+              <p className="h4 text-gray-500">현재 비대면 진료 예정 항목이 없습니다.</p>
+            </div>
+          </div>
+        ) : (
+          rows.map(({ base, reservationTimeLabel }, index) => {
+            const raw = base.petInfo.photo || '';
+            const photoUrl =
+              /^https?:\/\//i.test(raw) || /^data:image\//i.test(raw)
+                ? raw
+                : `${(import.meta.env.VITE_PHOTO_URL ?? '').replace(/\/+$/, '')}/${String(raw).replace(/^\/+/, '')}`;
 
-          return (
-            <VetRemoteTreatmentCard
-              key={index}
-              petName={base.petInfo.name}
-              petInfo={`${speciesMapping[base.petInfo.species]} / ${genderMapping[base.petInfo.gender]} / ${
-                base.petInfo.age
-              }세`}
-              department={subjectMapping[base.subject]}
-              time={reservationTimeLabel}
-              photo={photoUrl} // ⬅️ 여기만 이렇게!!!
-              onDetailClick={() => handleDetailClick(base.reservationId)}
-              onTreatClick={() => handleRTCClick(base.treatmentId)}
-              buttonText="진료 하기"
-            />
-          );
-        })}
+            return (
+              <VetRemoteTreatmentCard
+                key={index}
+                petName={base.petInfo.name}
+                petInfo={`${speciesMapping[base.petInfo.species]} / ${genderMapping[base.petInfo.gender]} / ${base.petInfo.age}세`}
+                department={subjectMapping[base.subject]}
+                time={reservationTimeLabel}
+                photo={photoUrl}
+                onDetailClick={() => handleDetailClick(base.reservationId)}
+                onTreatClick={() => handleRTCClick(base.treatmentId)}
+                buttonText="진료 하기"
+              />
+            );
+          })
+        )}
       </div>
 
       {modalOpen && (
-        <VetReservationDetailModal onClose={() => setModalOpen(false)} detail={modalDetail} loading={modalLoading} />
+        <VetReservationDetailModal
+          onClose={() => setModalOpen(false)}
+          detail={modalDetail}
+          loading={modalLoading}
+        />
       )}
     </div>
   );
