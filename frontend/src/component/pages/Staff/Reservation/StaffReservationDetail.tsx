@@ -64,7 +64,7 @@ export default function StaffReservationDetail() {
       try {
         setLoading(true);
         const data = await getStaffReservationDetail(reservationId);
-        console.log('data:', data);
+        // console.log('data:', data);
         if (!alive) return;
         setDetail(data);
       } catch {

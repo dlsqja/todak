@@ -73,15 +73,7 @@ const getTimeText = (p: StaffPayment) => {
 };
 // 통화 포맷
 const formatKRW = (v: number) => v.toLocaleString('ko-KR') + '원';
-// 지금 시간(로컬) 간단 포맷
-const nowYmdHm = () => {
-  const d = new Date();
-  return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())} ${pad2(d.getHours())}:${pad2(
-    d.getMinutes(),
-  )}`;
-};
 
-// Debugging flag: true or false
 const DEBUG = true;
 
 const paidOptions = [
@@ -107,7 +99,10 @@ export default function StaffPayment() {
   const [amountInput, setAmountInput] = useState<string>('');
   const [saving, setSaving] = useState(false);
 
-  // 확인 모달
+  // 1차 확인(결제할래?) 모달
+  const [payConfirmOpen, setPayConfirmOpen] = useState(false);
+
+  // 결제 완료 확인 모달
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [confirmPayload, setConfirmPayload] = useState<{
     dateText: string;
@@ -140,7 +135,7 @@ export default function StaffPayment() {
               paymentId: p.paymentId,
               startTime: p.startTime ?? '',
               endTime: p.endTime ?? '',
-              completeTime: p.completeTime ?? '', // ✅ 추가
+              completeTime: p.completeTime ?? '',
               reservationDay: p.reservationDay ?? '',
               reservationTime: p.reservationTime ?? '',
               rawDatePart,
@@ -167,9 +162,7 @@ export default function StaffPayment() {
         if (alive) setLoading(false);
       }
     })();
-    return () => {
-      alive = false;
-    };
+    return () => { alive = false; };
   }, []);
 
   // 수의사 드롭다운 옵션 (ALL + 유니크)
@@ -189,11 +182,14 @@ export default function StaffPayment() {
   const makeInfo = (p: StaffPayment) => {
     const rawSpecies = p.pet?.species ?? '';
     const speciesCand =
-      (speciesMapping as any)[String(rawSpecies).toUpperCase()] ?? (speciesMapping as any)[rawSpecies] ?? rawSpecies;
+      (speciesMapping as any)[String(rawSpecies).toUpperCase()] ??
+      (speciesMapping as any)[rawSpecies] ??
+      rawSpecies;
     const speciesKo = speciesCand || '반려동물';
     const agePart = p.pet?.age != null ? `${p.pet?.age}세` : '';
     const rawSubject = p.subject ?? '진료';
-    const subjectKo = (subjectMapping as any)[rawSubject as keyof typeof subjectMapping] || rawSubject;
+    const subjectKo =
+      (subjectMapping as any)[rawSubject as keyof typeof subjectMapping] || rawSubject;
     return [speciesKo, agePart, subjectKo].filter(Boolean).join(' | ');
   };
 
@@ -218,8 +214,7 @@ export default function StaffPayment() {
     }
 
     const entries = Array.from(map.entries()).sort((a, b) => {
-      const ka = a[0],
-        kb = b[0];
+      const ka = a[0], kb = b[0];
       if (ka === '날짜 미정') return 1;
       if (kb === '날짜 미정') return -1;
       return kb.localeCompare(ka);
@@ -257,17 +252,20 @@ export default function StaffPayment() {
     }
   };
 
-  // 금액 저장 → 확인 모달
-  const saveAmount = async () => {
+  // ===== 1차 확인(결제할래?) → 예 누르면 실제 결제 실행 =====
+  const openPayConfirm = () => {
     const n = Number(String(amountInput).replace(/[^\d]/g, ''));
     if (!Number.isFinite(n) || n <= 0) {
       alert('올바른 금액(원)을 입력해주세요.');
       return;
     }
     if (!current) return;
+    setPayConfirmOpen(true);
+  };
 
-    const isConfirm = confirm(`${n}원 결제 진행하시겠습니까?`);
-    if (!isConfirm) return;
+  const performPayment = async () => {
+    const n = Number(String(amountInput).replace(/[^\d]/g, ''));
+    if (!Number.isFinite(n) || n <= 0 || !current) return;
 
     try {
       setSaving(true);
@@ -276,19 +274,25 @@ export default function StaffPayment() {
       const nowIso = new Date().toISOString();
       setRows((prev) =>
         prev.map((it) =>
-          it.paymentId === current.paymentId ? { ...it, amount: n, isCompleted: true, completeTime: nowIso } : it,
-        ),
+          it.paymentId === current.paymentId
+            ? { ...it, amount: n, isCompleted: true, completeTime: nowIso }
+            : it
+        )
       );
 
       const dateText = formatKoreanDate(getDateKey(current));
       const timeText = getTimeText(current);
       const vet = current.vet?.name || '-';
-      const petText = (current.pet?.name || '반려동물') + (makeInfo(current) ? ` (${makeInfo(current)})` : '');
+      const petText =
+        (current.pet?.name || '반려동물') + (makeInfo(current) ? ` (${makeInfo(current)})` : '');
       const paidAt = `${ymdLocalFromServer(nowIso)} ${hhmmLocalFromServer(nowIso)}`;
 
       const payload = { dateText, timeText, vet, petText, amount: n, paidAt };
       setConfirmPayload(payload);
+
+      // 모달 전환: 입력모달 닫고 → 1차확인 닫고 → 완료모달 열기
       setModalOpen(false);
+      setPayConfirmOpen(false);
       setConfirmOpen(true);
     } catch (e) {
       // console.warn('[StaffPayment] postStaffPay failed. Local-only update…', e);
@@ -296,19 +300,24 @@ export default function StaffPayment() {
       const nowIso = new Date().toISOString();
       setRows((prev) =>
         prev.map((it) =>
-          it.paymentId === current.paymentId ? { ...it, amount: n, isCompleted: true, completeTime: nowIso } : it,
-        ),
+          it.paymentId === current.paymentId
+            ? { ...it, amount: n, isCompleted: true, completeTime: nowIso }
+            : it
+        )
       );
 
       const dateText = formatKoreanDate(getDateKey(current));
       const timeText = getTimeText(current);
       const vet = current.vet?.name || '-';
-      const petText = (current.pet?.name || '반려동물') + (makeInfo(current) ? ` (${makeInfo(current)})` : '');
+      const petText =
+        (current.pet?.name || '반려동물') + (makeInfo(current) ? ` (${makeInfo(current)})` : '');
       const paidAt = `${ymdLocalFromServer(nowIso)} ${hhmmLocalFromServer(nowIso)}`;
 
       const payload = { dateText, timeText, vet, petText, amount: n, paidAt };
       setConfirmPayload(payload);
+
       setModalOpen(false);
+      setPayConfirmOpen(false);
       setConfirmOpen(true);
     } finally {
       setSaving(false);
@@ -321,6 +330,12 @@ export default function StaffPayment() {
   const modalVet = current?.vet?.name || '-';
   const modalPetName = current?.pet?.name || '반려동물';
   const modalPetInfo = current ? makeInfo(current) : '';
+
+  // 1차 확인 모달에서 보여줄 금액 포맷
+  const amountPreview =
+    Number.isFinite(Number(String(amountInput).replace(/[^\d]/g, '')))
+      ? formatKRW(Number(String(amountInput).replace(/[^\d]/g, '')))
+      : '-';
 
   return (
     <>
@@ -374,7 +389,9 @@ export default function StaffPayment() {
                 {items.map((p) => {
                   const rawSubject = p.subject ?? '진료';
                   const deptKo =
-                    (subjectMapping as any)[rawSubject as keyof typeof subjectMapping] || rawSubject || '진료';
+                    (subjectMapping as any)[rawSubject as keyof typeof subjectMapping] ||
+                    rawSubject ||
+                    '진료';
                   return (
                     <StaffPaymentCard
                       key={p.paymentId}
@@ -384,7 +401,7 @@ export default function StaffPayment() {
                       petInfo={makeInfo(p)}
                       time={getTimeText(p)}
                       isPaid={!!p.isCompleted}
-                      onClick={() => onCardClick(p)} // 완료면 확인 모달, 아니면 입력 모달
+                      onClick={() => onCardClick(p)}   // 완료면 확인 모달, 아니면 입력 모달
                     />
                   );
                 })}
@@ -402,7 +419,9 @@ export default function StaffPayment() {
               <div className="bg-gray-50 rounded-2xl px-4 py-3 space-y-3">
                 <div>
                   <h4 className="h4 text-black m-0">진료 일자 및 시간</h4>
-                  <p className="p text-black mt-1">{[modalDateText, modalTime].filter(Boolean).join(' ') || '-'}</p>
+                  <p className="p text-black mt-1">
+                    {[modalDateText, modalTime].filter(Boolean).join(' ') || '-'}
+                  </p>
                 </div>
                 <div>
                   <h4 className="h4 text-black m-0">담당 수의사</h4>
@@ -430,7 +449,58 @@ export default function StaffPayment() {
 
               <div className="flex gap-3">
                 <Button color="gray" text="취소" onClick={() => setModalOpen(false)} />
-                <Button color="green" text={saving ? '결제 중…' : '결제'} onClick={saveAmount} />
+                <Button
+                  color="green"
+                  text={saving ? '결제 중…' : '결제'}
+                  onClick={openPayConfirm}
+                />
+              </div>
+            </div>
+          </ModalTemplate>
+        </ModalOnLayout>
+      )}
+
+      {/* 1차 결제 확인 모달 */}
+      {payConfirmOpen && current && (
+        <ModalOnLayout onClose={() => setPayConfirmOpen(false)}>
+          <ModalTemplate title="결제 확인" onClose={() => setPayConfirmOpen(false)}>
+            <div className="space-y-4">
+              <div className="bg-gray-50 rounded-2xl px-4 py-3 space-y-3">
+                <div>
+                  <h4 className="h4 text-black m-0">결제 금액</h4>
+                  <p className="p text-black mt-1">{amountPreview}</p>
+                </div>
+                <div>
+                  <h4 className="h4 text-black m-0">진료 일자 및 시간</h4>
+                  <p className="p text-black mt-1">
+                    {[modalDateText, modalTime].filter(Boolean).join(' ') || '-'}
+                  </p>
+                </div>
+                <div>
+                  <h4 className="h4 text-black m-0">담당 수의사</h4>
+                  <p className="p text-black mt-1">{modalVet}</p>
+                </div>
+                <div>
+                  <h4 className="h4 text-black m-0">반려동물</h4>
+                  <p className="p text-black mt-1">
+                    {modalPetName} {modalPetInfo ? `(${modalPetInfo})` : ''}
+                  </p>
+                </div>
+              </div>
+
+              <p className="p text-black">정말 이 금액으로 결제하시겠습니까?</p>
+
+              <div className="flex gap-3">
+                <Button
+                  color="gray"
+                  text="아니오, 다시 작성하겠습니다"
+                  onClick={() => setPayConfirmOpen(false)}
+                />
+                <Button
+                  color="green"
+                  text={saving ? '결제 중…' : '예, 결제하겠습니다'}
+                  onClick={performPayment}
+                />
               </div>
             </div>
           </ModalTemplate>
