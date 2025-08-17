@@ -6,4 +6,5 @@ import lombok.Data;
 public class VetUpdateRequest {
     private String name;
     private String profile;
+    private boolean updatePhoto = false;
 }

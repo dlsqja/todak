@@ -71,7 +71,12 @@ public class PetService {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-
+        } else if (petRequest.getUpdatePhoto()) {
+            String photoUrl = findPet.getPhoto();
+            if (photoUrl != null) {
+                s3Uploader.deleteFile(photoUrl);
+                findPet.setPhoto(null);
+            }
         }
 
         petRepository.save(findPet);
