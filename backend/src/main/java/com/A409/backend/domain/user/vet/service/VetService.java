@@ -110,6 +110,12 @@ public class VetService {
             } catch(IOException e){
                 throw new RuntimeException(e);
             }
+        } else if (vetUpdateRequest.isUpdatePhoto()) {
+            String photoUrl = findVet.getPhoto();
+            if (photoUrl != null) {
+                findVet.setPhoto(null);
+                s3Uploader.deleteFile(photoUrl);
+            }
         }
 
         vetRepository.save(findVet);
