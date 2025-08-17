@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+// src/component/pages/Owner/PetTab/OwnerPetTabRecord.tsx
+import React, { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import SelectionDropdown from '@/component/selection/SelectionDropdown';
 import TreatmentRecordCard from '@/component/card/TreatmentRecordCard';
@@ -78,12 +79,12 @@ const hasRealTreatmentTime = (start?: unknown, end?: unknown): boolean =>
   toMillisLoose(start) > 0 || toMillisLoose(end) > 0;
 
 export default function OwnerPetTabRecord({ selectedPet }: OwnerPetTabRecordProps) {
-  const [selectedSubject, setSelectedSubject] = useState('');
-  const [selectedDate, setSelectedDate] = useState('');
+  const [selectedSubject, setSelectedSubject] = useState(''); // '' = 전체
+  const [selectedDate, setSelectedDate] = useState('');       // '' = 전체
   const [records, setRecords] = useState<UIRecord[]>([]);
   const navigate = useNavigate();
 
-  // 👇 추가: 드롭다운 동시 오픈 방지용 전역 상태
+  // 드롭다운 동시 오픈 방지용 전역 상태
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
 
   useEffect(() => {
@@ -159,8 +160,29 @@ export default function OwnerPetTabRecord({ selectedPet }: OwnerPetTabRecordProp
       (!selectedDate || t.treatmentDay === selectedDate),
   );
 
-  const uniqueDates = Array.from(new Set(records.map((t) => t.treatmentDay))).filter(
-    (d) => !!d && d !== '-',
+  const uniqueDates = useMemo(
+    () =>
+      Array.from(new Set(records.map((t) => t.treatmentDay))).filter(
+        (d) => !!d && d !== '-',
+      ),
+    [records]
+  );
+
+  // 🔸 여기서 “전체” 옵션을 직접 추가
+  const subjectOptions = useMemo(
+    () => [
+      { value: '', label: '전체 과목' }, // 전체
+      { value: 'DENTAL', label: '치과' },
+      { value: 'DERMATOLOGY', label: '피부과' },
+      { value: 'ORTHOPEDICS', label: '정형외과' },
+      { value: 'OPHTHALMOLOGY', label: '안과' },
+    ],
+    []
+  );
+
+  const dateOptions = useMemo(
+    () => [{ value: '', label: '전체 날짜' }, ...uniqueDates.map((d) => ({ value: d, label: d }))],
+    [uniqueDates]
   );
 
   return (
@@ -168,16 +190,10 @@ export default function OwnerPetTabRecord({ selectedPet }: OwnerPetTabRecordProp
       <div className="flex gap-4 w-full">
         <div className="w-1/2">
           <SelectionDropdown
-            value={selectedSubject}
+            value={selectedSubject}                  // ''이면 전체
             onChange={setSelectedSubject}
-            options={[
-              { value: 'DENTAL', label: '치과' },
-              { value: 'DERMATOLOGY', label: '피부과' },
-              { value: 'ORTHOPEDICS', label: '정형외과' },
-              { value: 'OPHTHALMOLOGY', label: '안과' },
-            ]}
-            placeholder="과목 필터"
-            // 👇 새 props
+            options={subjectOptions}                 // ← 전체 포함
+            placeholder="전체 과목"
             dropdownId="subjectDropdown"
             activeDropdown={activeDropdown}
             setActiveDropdown={setActiveDropdown}
@@ -185,11 +201,10 @@ export default function OwnerPetTabRecord({ selectedPet }: OwnerPetTabRecordProp
         </div>
         <div className="w-1/2">
           <SelectionDropdown
-            value={selectedDate}
+            value={selectedDate}                     // ''이면 전체
             onChange={setSelectedDate}
-            options={[...uniqueDates.map((d) => ({ value: d, label: d }))]}
-            placeholder="날짜 필터"
-            // 👇 새 props
+            options={dateOptions}                    // ← 전체 포함
+            placeholder="전체 날짜"
             dropdownId="dateDropdown"
             activeDropdown={activeDropdown}
             setActiveDropdown={setActiveDropdown}
