@@ -113,8 +113,8 @@ public class VetService {
         } else if (vetUpdateRequest.isUpdatePhoto()) {
             String photoUrl = findVet.getPhoto();
             if (photoUrl != null) {
-                findVet.setPhoto(null);
                 s3Uploader.deleteFile(photoUrl);
+                findVet.setPhoto(null);
             }
         }
 

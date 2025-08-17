@@ -13,6 +13,7 @@ public class PetRequest {
     private Gender gender;
     private Integer age;
     private Float weight;
+    private Boolean updatePhoto;
 
     public Pet toEntity() {
         return Pet.builder()
