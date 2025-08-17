@@ -201,6 +201,8 @@ export default function SelectHospitalPage() {
   })();
 }, [pet?.petId, hospitals]);
 
+const hospitalsCacheRef = useRef<HospitalPublic[] | null>(null);
+
   // 무한스크롤 - 최근 방문한 병원
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -269,54 +271,64 @@ export default function SelectHospitalPage() {
 
   // 검색 시 자동완성과 병원 목록을 함께 가져옴
   const debouncedSearch = useMemo(() => {
-    let t: number | undefined;
-    return (q: string) => {
-      if (t) window.clearTimeout(t);
-      t = window.setTimeout(async () => {
-        try {
-          const keyword = q.trim();
-          // 직전 요청 취소
-          abortRef.current?.abort();
-          abortRef.current = new AbortController();
+  let t: number | undefined;
+  return (q: string) => {
+    if (t) window.clearTimeout(t);
+    t = window.setTimeout(async () => {
+      try {
+        const keyword = q.trim();
+        abortRef.current?.abort();
+        abortRef.current = new AbortController();
 
-          if (!keyword) {
-            setSuggests([]);
-            setHospitals([]); // 검색어 없으면 병원 목록도 초기화
-            setVisibleSuggestCount(6);
-            setVisibleHospitalCount(6);
-            return;
-          }
-
-          // 자동완성과 전체 병원 목록을 병렬로 가져옴
-          const [suggestResults, hospitalList] = await Promise.all([
-            autocompleteHospitals(keyword, { signal: abortRef.current.signal }),
-            getPublicHospitals(),
-          ]);
-
-          // 검색 결과 정렬
-          const sortedSuggests = suggestResults.sort((a, b) => a.name.localeCompare(b.name));
-          setSuggests(sortedSuggests);
-          setVisibleSuggestCount(6);
-
-          // 병원 목록도 검색어로 필터링하여 정렬
-          const filteredHospitals = hospitalList
-            .filter(
-              (h) =>
-                h.name.toLowerCase().includes(keyword.toLowerCase()) ||
-                h.location.toLowerCase().includes(keyword.toLowerCase()),
-            )
-            .sort((a, b) => a.name.localeCompare(b.name));
-          setHospitals(filteredHospitals);
-          setVisibleHospitalCount(6);
-        } catch (e: any) {
-          if (e?.name === 'CanceledError' || e?.name === 'AbortError') return;
-          console.warn('검색 실패:', e);
+        if (!keyword) {
           setSuggests([]);
           setHospitals([]);
+          setVisibleSuggestCount(6);
+          setVisibleHospitalCount(6);
+          return;
         }
-      }, 250);
-    };
-  }, []);
+
+        // 1) 자동완성
+        const suggestResults = await autocompleteHospitals(keyword, { signal: abortRef.current.signal });
+        const sortedSuggests = suggestResults.sort((a, b) => a.name.localeCompare(b.name));
+
+        // 2) 병원 풀리스트(캐시)
+        if (!hospitalsCacheRef.current) {
+          hospitalsCacheRef.current = await getPublicHospitals();
+        }
+        const all = hospitalsCacheRef.current;
+
+        const kw = keyword.toLowerCase();
+        const normalized = (s: string) => s.replace(/\s+/g, '').toLowerCase();
+
+        // suggests에 이미 있는 병원 id / 이름 세트
+        const suggestIdSet = new Set(sortedSuggests.map(s => s.hospitalId).filter(Boolean) as number[]);
+        const suggestNameSet = new Set(sortedSuggests.map(s => normalized(s.name)));
+
+        // 3) 풀리스트 필터링 + 중복 제거
+        const filteredHospitals = all
+          .filter(h =>
+            (h.name.toLowerCase().includes(kw) || h.location.toLowerCase().includes(kw)) &&
+            !suggestIdSet.has(h.hospitalId) &&
+            !suggestNameSet.has(normalized(h.name))
+          )
+          .sort((a, b) => a.name.localeCompare(b.name));
+
+        setSuggests(sortedSuggests);
+        setVisibleSuggestCount(6);
+
+        setHospitals(filteredHospitals);
+        setVisibleHospitalCount(6);
+      } catch (e: any) {
+        if (e?.name === 'CanceledError' || e?.name === 'AbortError') return;
+        console.warn('검색 실패:', e);
+        setSuggests([]);
+        setHospitals([]);
+      }
+    }, 250);
+  };
+}, []);
+
 
   useEffect(() => {
     debouncedSearch(search);
