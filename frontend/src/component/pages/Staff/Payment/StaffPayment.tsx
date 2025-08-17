@@ -39,12 +39,12 @@ const ymdLocalFromServer = (s?: string | null) => {
   if (!d) return '';
   return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
 };
-// YYYY-MM-DD → "YYYY년 M월 D일"
+
 const formatKoreanDate = (ymd: string) => {
   if (!ymd) return '날짜 미정';
   const [y, m, d] = ymd.split('-').map((v) => parseInt(v, 10));
   if (!y || !m || !d) return ymd;
-  return `${y}년 ${m}월 ${d}일`;
+  return `${y}-${pad2(m)}-${pad2(d)}`;
 };
 // 진료 날짜키: startTime(로컬 변환) 우선, 없으면 reservationDay
 const getDateKey = (p: StaffPayment): string => {

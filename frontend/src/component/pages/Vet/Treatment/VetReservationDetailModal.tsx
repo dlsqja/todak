@@ -24,7 +24,6 @@ interface Props {
   detail: StaffReservationItem | null;
   loading?: boolean;
   fallbackPetPhoto?: string;
-  
 }
 
 const VetReservationDetailModal: React.FC<Props> = ({ onClose, detail, loading }) => {
@@ -37,20 +36,18 @@ const VetReservationDetailModal: React.FC<Props> = ({ onClose, detail, loading }
 
   const toUrl = (raw?: unknown): string => {
     const s = String(raw ?? "").trim();
-    if (!s) return "";                                     // 빈 값은 그대로 반환 → ImageInputBox가 폴백!!!
-    if (/^https?:\/\//i.test(s) || /^data:image\//i.test(s)) return s; // 이미 절대/데이터 URL이면 통과!!!
+    if (!s) return "";
+    if (/^https?:\/\//i.test(s) || /^data:image\//i.test(s)) return s;
     const base = (import.meta as any).env?.VITE_PHOTO_URL ?? "";
-    if (!base) return s.startsWith("/") ? s : `/${s}`;     // base 없으면 루트 기준!!!
+    if (!base) return s.startsWith("/") ? s : `/${s}`;
     return `${String(base).replace(/\/+$/, "")}/${s.replace(/^\/+/, "")}`;
   };
 
-  // ✅ (2) 리스트의 petInfo 사진도 상대경로일 수 있으니 절대 URL로 변환!!!
   const petPhotoUrl = toUrl(detail?.pet?.photo);
 
-  // ⬇️ "실제 로드 가능한" 증상 사진인지 모달에서만 검사 (상대경로도 커버하도록 수정)!!!
   const [symptomPhotoOk, setSymptomPhotoOk] = useState(false);
   useEffect(() => {
-    const url = toUrl(detail?.photo); // ← 여기 포인트!!! 상대/절대 모두 toUrl로 정규화!!!
+    const url = toUrl(detail?.photo);
     if (!url) {
       setSymptomPhotoOk(false);
       return;
@@ -65,6 +62,18 @@ const VetReservationDetailModal: React.FC<Props> = ({ onClose, detail, loading }
     };
   }, [detail?.photo]);
 
+  // ★★★ 추가: 증상 사진 풀스크린 뷰어 상태/핸들러
+  const [photoOpen, setPhotoOpen] = useState(false);
+  const symptomUrl = toUrl(detail?.photo);
+
+  useEffect(() => {
+    if (!photoOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setPhotoOpen(false);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [photoOpen]);
 
   return (
     <ModalOnLayout onClose={onClose}>
@@ -78,7 +87,7 @@ const VetReservationDetailModal: React.FC<Props> = ({ onClose, detail, loading }
           <div className="p text-center text-gray-500">예약 정보를 불러오지 못했습니다.</div>
         ) : (
           <div className="space-y-6">
-            {/* ✅ 프로필(항상 표시) — 리스트의 petInfo 사진을 절대 URL로 변환해 상자에 표시!!! */}
+            {/* 프로필 */}
             <div className="flex items-center gap-4">
               <ImageInputBox src={petPhotoUrl} />
               <div className="flex-1">
@@ -89,10 +98,24 @@ const VetReservationDetailModal: React.FC<Props> = ({ onClose, detail, loading }
               </div>
             </div>
 
-            {/* 증상: 사진이 실제로 로드 가능할 때만 이미지 박스 렌더 */}
+            {/* 증상 */}
             <div>
               <h4 className="h4 mb-2">증상</h4>
-              {symptomPhotoOk && <ImageInputBox src={toUrl(detail.photo)} />} {/* ← 여기서도 toUrl!!! */}
+
+              {/* ★★★ 클릭하여 크게 보기: 래퍼에 onClick, 커서/호버만 추가! */}
+              {symptomPhotoOk && (
+                <div
+                  onClick={() => setPhotoOpen(true)}
+                  className="inline-block cursor-zoom-in hover:opacity-95 transition"
+                  aria-label="증상 사진 크게 보기"
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && setPhotoOpen(true)}
+                >
+                  <ImageInputBox src={symptomUrl} />
+                </div>
+              )}
+
               <p className={`p whitespace-pre-wrap ${symptomPhotoOk ? 'mt-3' : ''}`}>
                 {detail.description || '작성된 증상이 없습니다.'}
               </p>
@@ -100,6 +123,28 @@ const VetReservationDetailModal: React.FC<Props> = ({ onClose, detail, loading }
           </div>
         )}
       </ModalTemplate>
+
+      {/* ★★★ 풀스크린 사진 뷰어 오버레이 */}
+      {photoOpen && symptomPhotoOk && (
+        <div
+          className="fixed inset-0 z-[999] bg-black/80 flex items-center justify-center p-4"
+          onClick={() => setPhotoOpen(false)}
+        >
+          <img
+            src={symptomUrl}
+            alt="증상 사진 확대"
+            className="max-w-[95vw] max-h-[90vh] object-contain rounded-xl shadow-2xl"
+            onClick={(e) => e.stopPropagation()} // 이미지 클릭은 닫히지 않도록!
+          />
+          <button
+            onClick={() => setPhotoOpen(false)}
+            className="absolute top-4 right-4 rounded-full bg-white/90 px-3 py-1 text-black text-sm shadow"
+            aria-label="닫기"
+          >
+            닫기
+          </button>
+        </div>
+      )}
     </ModalOnLayout>
   );
 };

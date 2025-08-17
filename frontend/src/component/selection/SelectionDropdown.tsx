@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react'; // ★ useEffect 추가
 import DropdownArrow from '@/component/icon/Dropdown_Arrow';
 
 interface OptionType {
@@ -9,17 +9,17 @@ interface OptionType {
 }
 
 interface FilterDropdownProps {
-  options: OptionType[]; // 배열 타입 명시
+  options: OptionType[];
   placeholder?: string;
   value: string;
   onChange: (value: string) => void;
-  dropdownId: string; // 각 드롭다운을 구분할 수 있는 ID 추가
-  activeDropdown: string | null; // 현재 활성화된 드롭다운 추적
-  setActiveDropdown: (id: string | null) => void; // 활성화된 드롭다운 변경 함수
+  dropdownId: string;
+  activeDropdown: string | null;
+  setActiveDropdown: (id: string | null) => void;
 }
 
 export default function SelectionDropdown({
-  options = [], // options 기본값을 빈 배열로 설정
+  options,
   placeholder = '전체',
   value,
   onChange,
@@ -28,25 +28,33 @@ export default function SelectionDropdown({
   setActiveDropdown,
 }: FilterDropdownProps) {
   const [open, setOpen] = useState(false);
-
-  // options가 배열인지 확인
-  const validOptions = Array.isArray(options) ? options : [];
-
-  const selectedOption = validOptions.find((opt) => opt.value === value);
+  const selectedOption = options.find((opt) => opt.value === value);
 
   // 사진이나 설명이 있을 경우 true
   const hasDetail = selectedOption?.photo || selectedOption?.description;
 
-  const toggleDropdown = () => {
-  if (activeDropdown === dropdownId) {
-    setOpen(!open); // 현재 열려 있는 드롭다운이면 토글
-  } else {
-    setActiveDropdown(dropdownId); // 다른 드롭다운을 클릭했을 때 열기
-    setOpen(true); // 현재 드롭다운을 열기
-  }
-};
+  // ★ 다른 드롭다운이 활성화되면 이 드롭다운 자동 닫기
+  useEffect(() => {
+    if (activeDropdown !== dropdownId && open) {
+      setOpen(false);
+    }
+  }, [activeDropdown, dropdownId, open]);
 
-  // 드롭다운이 열릴 때, activeDropdown이 변경되면 자동으로 다른 드롭다운은 닫히게 됩니다
+  const toggleDropdown = () => {
+    if (activeDropdown === dropdownId) {
+      // ★ 자기 자신을 닫을 때 전역도 null로 해제하여 일관성 유지
+      if (open) {
+        setOpen(false);
+        setActiveDropdown(null);
+      } else {
+        setOpen(true);
+      }
+    } else {
+      setActiveDropdown(dropdownId);
+      setOpen(true);
+    }
+  };
+
   return (
     <div className="relative w-full">
       {/* 선택된 항목 */}
@@ -85,7 +93,7 @@ export default function SelectionDropdown({
       {/* 옵션 리스트 */}
       {open && (
         <ul className="absolute z-10 mt-2 w-full bg-white border border-gray-300 rounded-2xl overflow-hidden shadow-lg">
-          {validOptions.map((opt) => {
+          {options.map((opt) => {
             const hasOptDetail = opt.photo || opt.description;
             return (
               <li
@@ -93,7 +101,7 @@ export default function SelectionDropdown({
                 onClick={() => {
                   onChange(opt.value);
                   setOpen(false);
-                  setActiveDropdown(null); // 드롭다운 선택 후 닫기
+                  setActiveDropdown(null); // 선택 후 닫기(원래 있던 코드 유지)
                 }}
                 className={`
                   flex items-center gap-3 px-4 py-3 hover:bg-gray-100 cursor-pointer
