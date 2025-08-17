@@ -63,6 +63,7 @@ public class PetService {
         findPet.setName(petRequest.getName());
         findPet.setGender(petRequest.getGender());
         findPet.setSpecies(petRequest.getSpecies());
+        findPet.setWeight(petRequest.getWeight());
 
         if(photo != null){
             try{
