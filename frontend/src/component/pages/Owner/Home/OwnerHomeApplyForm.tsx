@@ -34,6 +34,7 @@ export default function ApplyFormPage() {
   const [owner, setOwner] = useState<OwnerResponse | null>(null);
   const [ownerLoading, setOwnerLoading] = useState(false);
   const [ownerError, setOwnerError] = useState<string | null>(null);
+  const [activeDropdownId, setActiveDropdownId] = useState<string | null>(null);
 
   const navigate = useNavigate();
 
@@ -164,7 +165,7 @@ export default function ApplyFormPage() {
         <div>
           <h4 className="h4 mb-2">반려동물 정보</h4>
           <div className="flex gap-4 items-center">
-            <ImageInputBox src={buildPhotoUrl(pet?.photo ?? pet?.profileImage)} stroke="border-5 border-green-400" />
+            <ImageInputBox src={buildPhotoUrl(pet?.photo ?? pet?.profileImage)} stroke="border-5 border-green-200" />
             <div className="flex flex-col gap-1">
               <p className="h4">{pet?.name || '반려동물 이름'}</p>
               <p className="p text-gray-500">{`${speciesLabel} | ${pet?.age ?? '나이'}세 | ${genderLabel}`}</p>
@@ -228,16 +229,19 @@ export default function ApplyFormPage() {
           </div>
 
           <Dropdown
-            placeholder="진료받을 과를 선택해주세요."
-            options={[
-              { value: 'DENTAL', label: '치과' },
-              { value: 'OPHTHALMOLOGY', label: '안과' },
-              { value: 'ORTHOPEDICS', label: '정형외과' },
-              { value: 'DERMATOLOGY', label: '피부과' },
-            ]}
-            value={selectedDepartment}
-            onChange={(value) => setSelectedDepartment(value)}
-          />
+  placeholder="진료받을 과를 선택해주세요."
+  options={[
+    { value: 'DENTAL',        label: '치과' },
+    { value: 'OPHTHALMOLOGY', label: '안과' },
+    { value: 'ORTHOPEDICS',   label: '정형외과' },
+    { value: 'DERMATOLOGY',   label: '피부과' },
+  ]}
+  value={selectedDepartment}
+  onChange={(value) => setSelectedDepartment(value)}
+  dropdownId="applyform-department"          // ✅ 고유 id
+  activeDropdown={activeDropdownId}          // ✅ 현재 열린 드롭다운 id
+  setActiveDropdown={setActiveDropdownId}    // ✅ setter
+/>
 
           <textarea
             ref={symptomRef}

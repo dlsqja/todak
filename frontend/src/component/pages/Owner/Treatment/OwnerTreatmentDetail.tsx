@@ -25,7 +25,7 @@ export default function OwnerTreatmentDetail() {
   useEffect(() => {
     const { treatmentId } = location.state || {};
     setTreatmentId(treatmentId);
-    console.log('treatmentId:', treatmentId);
+    // console.log('treatmentId:', treatmentId);
     if (reservationId) {
       if (isRejected) {
         const getRejectDetail = async () => {
@@ -39,7 +39,7 @@ export default function OwnerTreatmentDetail() {
       const reservationDetail = async (reservationId: number) => {
         const detail = await getReservationDetail(Number(reservationId));
         setDetail(detail);
-        console.log('detail:', detail);
+        // console.log('detail:', detail);
       };
       reservationDetail(Number(reservationId));
     }

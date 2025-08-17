@@ -165,12 +165,22 @@ export default function StaffHome() {
       <h3 className="mx-7 h3 mt-11">{title}</h3>
 
       <div className="overflow-x-auto overflow-visible snap-x snap-mandatory scroll-smooth hide-scrollbar mx-7 pt-3 pb-6">
-        <div className="w-max flex gap-4 h-full p-3">
+        <div
+  className={`flex gap-4 h-full p-3 ${cards.length === 0 ? 'w-full' : 'w-max'}`}
+>
+
           {loading ? (
-            <div className="p text-gray-500">불러오는 중…</div>
-          ) : cards.length === 0 ? (
-            <div className="h4 text-gray-500">대기 중인 예약이 없습니다</div>
-          ) : (
+  <div className="p text-gray-500">불러오는 중…</div>
+) : cards.length === 0 ? (
+  <div className="w-full flex items-center justify-center py-6">
+    <p className="h4 text-gray-500 text-center">대기 중인 예약이 없습니다</p>
+  </div>
+) : (
+
+
+
+
+
             cards.map((reservation) => (
               <button
                 key={reservation.reservationId ?? `${reservation.vet_name}-${reservation.time}-${reservation.pet}`}

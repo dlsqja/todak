@@ -29,7 +29,7 @@ export default function OwnerReservationDetail() {
       }
       const d = await getReservationDetail(Number(reservationId));
       setDetail(d);
-      console.log('detail:', d);
+      // console.log('detail:', d);
     })();
   }, [reservationId]);
 
