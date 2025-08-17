@@ -80,6 +80,7 @@ public class HospitalController {
         Long hospitalId = user.getId();
 
         Long hospitalIdByVetId = vetService.getHospitalIdByVetId(vetId);
+        System.out.println("hospital_id:" + hospitalId + " vet_hospital_id:" + hospitalIdByVetId);
         if(hospitalId!=hospitalIdByVetId) {
             throw new CustomException(ErrorCode.ACCESS_DENIED);
         }
