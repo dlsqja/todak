@@ -76,7 +76,9 @@ const formatKRW = (v: number) => v.toLocaleString('ko-KR') + '원';
 // 지금 시간(로컬) 간단 포맷
 const nowYmdHm = () => {
   const d = new Date();
-  return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())} ${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
+  return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())} ${pad2(d.getHours())}:${pad2(
+    d.getMinutes(),
+  )}`;
 };
 
 // Debugging flag: true or false
@@ -165,7 +167,9 @@ export default function StaffPayment() {
         if (alive) setLoading(false);
       }
     })();
-    return () => { alive = false; };
+    return () => {
+      alive = false;
+    };
   }, []);
 
   // 수의사 드롭다운 옵션 (ALL + 유니크)
@@ -185,14 +189,11 @@ export default function StaffPayment() {
   const makeInfo = (p: StaffPayment) => {
     const rawSpecies = p.pet?.species ?? '';
     const speciesCand =
-      (speciesMapping as any)[String(rawSpecies).toUpperCase()] ??
-      (speciesMapping as any)[rawSpecies] ??
-      rawSpecies;
+      (speciesMapping as any)[String(rawSpecies).toUpperCase()] ?? (speciesMapping as any)[rawSpecies] ?? rawSpecies;
     const speciesKo = speciesCand || '반려동물';
     const agePart = p.pet?.age != null ? `${p.pet?.age}세` : '';
     const rawSubject = p.subject ?? '진료';
-    const subjectKo =
-      (subjectMapping as any)[rawSubject as keyof typeof subjectMapping] || rawSubject;
+    const subjectKo = (subjectMapping as any)[rawSubject as keyof typeof subjectMapping] || rawSubject;
     return [speciesKo, agePart, subjectKo].filter(Boolean).join(' | ');
   };
 
@@ -217,7 +218,8 @@ export default function StaffPayment() {
     }
 
     const entries = Array.from(map.entries()).sort((a, b) => {
-      const ka = a[0], kb = b[0];
+      const ka = a[0],
+        kb = b[0];
       if (ka === '날짜 미정') return 1;
       if (kb === '날짜 미정') return -1;
       return kb.localeCompare(ka);
@@ -264,6 +266,9 @@ export default function StaffPayment() {
     }
     if (!current) return;
 
+    const isConfirm = confirm(`${n}원 결제 진행하시겠습니까?`);
+    if (!isConfirm) return;
+
     try {
       setSaving(true);
       await postStaffPay({ paymentId: current.paymentId, totalAmount: n } as any);
@@ -271,17 +276,14 @@ export default function StaffPayment() {
       const nowIso = new Date().toISOString();
       setRows((prev) =>
         prev.map((it) =>
-          it.paymentId === current.paymentId
-            ? { ...it, amount: n, isCompleted: true, completeTime: nowIso }
-            : it
-        )
+          it.paymentId === current.paymentId ? { ...it, amount: n, isCompleted: true, completeTime: nowIso } : it,
+        ),
       );
 
       const dateText = formatKoreanDate(getDateKey(current));
       const timeText = getTimeText(current);
       const vet = current.vet?.name || '-';
-      const petText =
-        (current.pet?.name || '반려동물') + (makeInfo(current) ? ` (${makeInfo(current)})` : '');
+      const petText = (current.pet?.name || '반려동물') + (makeInfo(current) ? ` (${makeInfo(current)})` : '');
       const paidAt = `${ymdLocalFromServer(nowIso)} ${hhmmLocalFromServer(nowIso)}`;
 
       const payload = { dateText, timeText, vet, petText, amount: n, paidAt };
@@ -294,17 +296,14 @@ export default function StaffPayment() {
       const nowIso = new Date().toISOString();
       setRows((prev) =>
         prev.map((it) =>
-          it.paymentId === current.paymentId
-            ? { ...it, amount: n, isCompleted: true, completeTime: nowIso }
-            : it
-        )
+          it.paymentId === current.paymentId ? { ...it, amount: n, isCompleted: true, completeTime: nowIso } : it,
+        ),
       );
 
       const dateText = formatKoreanDate(getDateKey(current));
       const timeText = getTimeText(current);
       const vet = current.vet?.name || '-';
-      const petText =
-        (current.pet?.name || '반려동물') + (makeInfo(current) ? ` (${makeInfo(current)})` : '');
+      const petText = (current.pet?.name || '반려동물') + (makeInfo(current) ? ` (${makeInfo(current)})` : '');
       const paidAt = `${ymdLocalFromServer(nowIso)} ${hhmmLocalFromServer(nowIso)}`;
 
       const payload = { dateText, timeText, vet, petText, amount: n, paidAt };
@@ -375,9 +374,7 @@ export default function StaffPayment() {
                 {items.map((p) => {
                   const rawSubject = p.subject ?? '진료';
                   const deptKo =
-                    (subjectMapping as any)[rawSubject as keyof typeof subjectMapping] ||
-                    rawSubject ||
-                    '진료';
+                    (subjectMapping as any)[rawSubject as keyof typeof subjectMapping] || rawSubject || '진료';
                   return (
                     <StaffPaymentCard
                       key={p.paymentId}
@@ -387,7 +384,7 @@ export default function StaffPayment() {
                       petInfo={makeInfo(p)}
                       time={getTimeText(p)}
                       isPaid={!!p.isCompleted}
-                      onClick={() => onCardClick(p)}   // 완료면 확인 모달, 아니면 입력 모달
+                      onClick={() => onCardClick(p)} // 완료면 확인 모달, 아니면 입력 모달
                     />
                   );
                 })}
@@ -405,9 +402,7 @@ export default function StaffPayment() {
               <div className="bg-gray-50 rounded-2xl px-4 py-3 space-y-3">
                 <div>
                   <h4 className="h4 text-black m-0">진료 일자 및 시간</h4>
-                  <p className="p text-black mt-1">
-                    {[modalDateText, modalTime].filter(Boolean).join(' ') || '-'}
-                  </p>
+                  <p className="p text-black mt-1">{[modalDateText, modalTime].filter(Boolean).join(' ') || '-'}</p>
                 </div>
                 <div>
                   <h4 className="h4 text-black m-0">담당 수의사</h4>
@@ -435,7 +430,7 @@ export default function StaffPayment() {
 
               <div className="flex gap-3">
                 <Button color="gray" text="취소" onClick={() => setModalOpen(false)} />
-                <Button color="green" text={saving ? '저장 중…' : '저장'} onClick={saveAmount} />
+                <Button color="green" text={saving ? '결제 중…' : '결제'} onClick={saveAmount} />
               </div>
             </div>
           </ModalTemplate>
