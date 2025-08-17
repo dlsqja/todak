@@ -30,13 +30,13 @@ function SignupPage() {
     const role = urlParams.get('role');
     const authId = urlParams.get('authId');
 
-    console.log('=== 로그인 결과 디버깅 ===');
-    console.log('success:', success);
-    console.log('token:', token);
-    console.log('error:', error);
-    console.log('role:', role);
-    console.log('authId:', authId);
-    console.log('전체 URL:', window.location.href);
+    // console.log('=== 로그인 결과 디버깅 ===');
+    // console.log('success:', success);
+    // console.log('token:', token);
+    // console.log('error:', error);
+    // console.log('role:', role);
+    // console.log('authId:', authId);
+    // console.log('전체 URL:', window.location.href);
 
     if (success === 'true' && token) {
       // 토큰 저장

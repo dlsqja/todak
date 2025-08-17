@@ -334,9 +334,8 @@ export default function OwnerSignup() {
         </div>
         <div>
           <label className="block h4 text-black mb-2">생년월일</label>
-          <div className="flex gap-2">
-            <div className="flex gap-2">
-  <div className="flex-1">
+          <div className="grid grid-cols-3 gap-2 w-full">
+  <div className="min-w-0">
     <SelectionDropdown
       dropdownId="birth-year"
       options={yearOptions}
@@ -348,7 +347,7 @@ export default function OwnerSignup() {
     />
   </div>
 
-  <div className="flex-1">
+  <div className="min-w-0">
     <SelectionDropdown
       dropdownId="birth-month"
       options={getMonthOptions()}
@@ -360,7 +359,7 @@ export default function OwnerSignup() {
     />
   </div>
 
-  <div className="flex-1">
+  <div className="min-w-0">
     <SelectionDropdown
       dropdownId="birth-day"
       options={getDayOptions()}
@@ -372,12 +371,10 @@ export default function OwnerSignup() {
     />
   </div>
 </div>
+{errors.birth && <p className="text-red-500 caption mt-1 ml-2">{errors.birth}</p>}
 
           </div>
-          {errors.birth && <p className="text-red-500 caption mt-1 ml-2">{errors.birth}</p>}
         </div>
-      </div>
-      <br />
       <div className="px-7 mt-6">
         <Button text={isLoading ? '등록 중...' : '등록하기'} onClick={handleSubmit} color="green" />
       </div>
