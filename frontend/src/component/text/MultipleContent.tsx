@@ -7,21 +7,23 @@
 import React from 'react';
 
 interface MultipleContentProps {
-    title: string;
-    contents: string[];
+  title: string;
+  contents: string[];
 }
 
 const MultiContent: React.FC<MultipleContentProps> = ({ title, contents }) => {
-    return (
-        <div style={{ padding: '10px', borderRadius: '8px' }}>
-            <h2 style={{ fontWeight: 'bold', marginBottom: '15px' }}>{title}</h2>
-            <ul>
-                {contents.map((content, index) => (
-                    <li key={index} style={{ marginBottom: '5px' }}>{content}</li> // 각 내용 항목의 간격 추가
-                ))}
-            </ul>
-        </div>
-    );
+  return (
+    <div className="py-2">
+      <h4 className="h4">{title}</h4> {/* 제목과 내용 간의 간격을 15px로 설정 */}
+      <ul className="mt-2 space-y-[5px]"> {/* 각 항목 간 5px 간격 */}
+        {contents.map((content, index) => (
+          <li key={index} className="p">
+            {content}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
 };
 
 export default MultiContent;

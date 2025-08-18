@@ -1,0 +1,124 @@
+// src/component/pages/Vet/VetHospital.tsx
+import React, { useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import '@/styles/main.css';
+import Input from '@/component/input/Input';
+import Button from '@/component/button/Button';
+import SimpleHeader from '@/component/header/SimpleHeader';
+import { motion } from 'framer-motion'; // ✅ 추가
+
+import { getHospitalMine, updateHospitalMine } from '@/services/api/Vet/vethospital';
+import type { HospitalDetail } from '@/types/Vet/vethospitalType';
+
+export default function VetHospital() {
+  const navigate = useNavigate();
+
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // 표시 전용(수정 불가)
+  const [name, setName] = useState('');
+  const [address, setAddress] = useState('');
+  const [contact, setContact] = useState('');
+
+  // 수정 가능
+  const [profile, setProfile] = useState('');
+
+  // ✅ StrictMode에서 이펙트 2번 실행 방지
+  const fetchedOnceRef = useRef(false);
+
+  useEffect(() => {
+    if (fetchedOnceRef.current) return;
+    fetchedOnceRef.current = true;
+
+    (async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const h = await getHospitalMine(); // 404면 null
+        if (!h) {
+          setName('');
+          setAddress('');
+          setContact('');
+          setProfile('');
+          setError('현재 계정에 연결된 병원 정보를 찾을 수 없어요. 병원 연결 후 다시 시도해주세요.');
+          return;
+        }
+
+        setName(h.name ?? '');
+        setAddress(h.location ?? '');
+        setContact(h.contact ?? '');
+        setProfile(h.profile ?? '');
+      } catch (e) {
+        console.error(e);
+        setError('병원 정보를 불러오지 못했어요. 잠시 후 다시 시도해주세요.');
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, []);
+
+  const handleSubmit = async () => {
+    try {
+      setSaving(true);
+      setError(null);
+
+      await updateHospitalMine({
+        name,
+        location: address,
+        contact,
+        profile,
+      });
+
+      alert('수정 완료!');
+      navigate('/vet/hospital');
+    } catch (e) {
+      console.error(e);
+      setError('수정에 실패했어요. 잠시 후 다시 시도해주세요.');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <>
+      <SimpleHeader text="병원 정보" />
+      <div className="flex flex-col gap-6 px-7 mt-11">
+        <Input id="name" label="병원 이름" value={name} disabled />
+        <Input id="address" label="위치" value={address} disabled />
+        <Input id="contact" label="전화번호" value={contact} disabled />
+
+        <div className="flex flex-col">
+          <label htmlFor="profile" className="mb-2 block h4 text-black">병원 소개글</label>
+          <textarea
+            id="profile"
+            value={profile}
+            onChange={(e) => setProfile(e.target.value)}
+            placeholder={loading ? '불러오는 중…' : '소개글을 입력해주세요'}
+            className="w-full h-30 bg-white block border-1 rounded-[12px] border-gray-400 px-5 pt-3 pb-3 text-black placeholder:text-gray-500 resize-none align-top whitespace-pre-wrap break-words scrollbar-hide"
+            disabled={loading}
+          />
+          {error && <p className="caption text-red-500 mt-1">{error}</p>}
+        </div>
+      </div>
+
+      <br />
+
+      {/* ✅ 1번코드와 동일한 motion 적용 구간 */}
+      <motion.div
+        className="px-7"
+        initial={{ opacity: 0, y: 10 }}   // 초기 상태
+        animate={{ opacity: 1, y: 0 }}    // 등장 상태
+        transition={{ duration: 0.3 }}    // 지속 시간
+      >
+        <Button
+          text={saving ? '수정 중…' : '수정하기'}
+          onClick={handleSubmit}
+          color="green"
+        />
+      </motion.div>
+    </>
+  );
+}

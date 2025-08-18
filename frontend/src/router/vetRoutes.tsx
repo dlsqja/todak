@@ -1,10 +1,13 @@
-import VetHome from '@/component/pages/Vet/VetHome';
+import VetHome from '@/component/pages/Vet/Home/VetHome';
 import MobileLayout from '@/layouts/MobileLayout';
 import VetMenuBar from '@/component/menubar/VetMenuBar';
-import VetHospital from '@/component/pages/Vet/VetHospital';
-import VetTreatment from '@/component/pages/Vet/VetTreatment';
-import VetRecord from '@/component/pages/Vet/VetRecord';
-import VetMyPage from '@/component/pages/Vet/VetMypage';
+import VetHospital from '@/component/pages/Vet/Hospital/VetHospital';
+import VetTreatment from '@/component/pages/Vet/Treatment/VetTreatment';
+import VetRecord from '@/component/pages/Vet/Record/VetRecordHome';
+import VetRecordDetail from '@/component/pages/Vet/Record/VetRecordDetail';
+import VetMyPage from '@/component/pages/Vet/Mypage/VetMypage';
+import VetHomeGuide from '@/component/pages/Vet/Home/VetHomeGuide';
+import VetRTC from '@/RTC/VetRTC';
 
 const vetRoutes = {
   path: '/vet',
@@ -17,5 +20,16 @@ const vetRoutes = {
     { path: 'mypage', element: <VetMyPage /> },
   ],
 };
+const vetRoutesWithoutMenu = {
+  path: '/vet',
+  element: <MobileLayout />,
+  children: [
+    { path: 'home/guide', element: <VetHomeGuide /> },
 
-export default vetRoutes;
+    // { path: 'treatment/detail/:reservationId', element: <VetTreatmentDetail /> },
+    { path: 'treatment/rtc/', element: <VetRTC /> },
+    { path: 'records/detail/:treatmentId', element: <VetRecordDetail /> },
+  ],
+};
+
+export default { vetRoutes, vetRoutesWithoutMenu };

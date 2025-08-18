@@ -6,6 +6,7 @@
   --color-green-100: #fdfcfb;
   --color-green-200: #e9f1d7;
   --color-green-300: #afcf7e;
+  --color-green-400: #9bc53d;
 
   --color-pink-100: #ffc8c8;
   --color-pink-200: #d14d72;
@@ -14,6 +15,7 @@
   --color-brown-200: #5c4b3b;
   --color-brown-300: #3b271c;
 
+  --color-gray-50: #fafaf9;
   --color-gray-100: #f0f0f0;
   --color-gray-200: #f0f0f0;
   --color-gray-300: #e5e5e5;
@@ -23,7 +25,7 @@
   --font-display: 'PretendardVariable', sans-serif;
   --font-body: 'PretendardVariable', sans-serif;
 
-  --shadow-menu-bar: 0px 0px 10px 5px rgba(0, 0, 0, 0.1);
+  --shadow-menu-bar: 0px -3px 5px 0px rgba(0, 0, 0, 0.03);
 }
 
 @font-face {

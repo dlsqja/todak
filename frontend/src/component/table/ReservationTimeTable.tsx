@@ -1,8 +1,10 @@
+// src/component/table/ReservationTimeTable.tsx
 import React from "react";
 
 interface ReservationData {
   time: string;
   records: {
+    reservationId?: number;   // ✅ 추가: 상세 이동용 식별자
     doctor: string;
     pet: string;
     owner: string;
@@ -12,6 +14,7 @@ interface ReservationData {
 interface ReservationTimeTableProps {
   data: ReservationData[];
   onRowClick?: (record: {
+    reservationId?: number;   // ✅ 함께 전달
     time: string;
     doctor: string;
     pet: string;
@@ -33,10 +36,11 @@ const ReservationTimeTable: React.FC<ReservationTimeTableProps> = ({
           <div>
             {group.records.map((record, rIdx) => (
               <div
-                key={rIdx}
+                key={record.reservationId ?? `${group.time}-${rIdx}`}  // ✅ 키 안정성
                 className="grid grid-cols-4 gap-4 items-center text-center px-2 py-1 cursor-pointer hover:bg-gray-100 rounded-[8px] transition-colors"
                 onClick={() =>
                   onRowClick?.({
+                    reservationId: record.reservationId, // ✅ 핵심
                     time: group.time,
                     doctor: record.doctor,
                     pet: record.pet,

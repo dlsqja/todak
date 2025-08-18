@@ -8,15 +8,17 @@ interface Props {
 export default function TabGroupPet({ selected, onSelect }: Props) {
   const tabs = ['상세 정보', '진료 내역'];
   return (
-    <div className="flex justify-center gap-30">
+    <div className="flex justify-center gap-15">
       {tabs.map((tab) => (
-        <button
+        <div
           key={tab}
           onClick={() => onSelect(tab)}
-          className={`h4 ${selected === tab ? 'h4 border-b-2 border-black text-center' : 'h4 text-gray-500'}`}
+          className={`w-20 h-9 cursor-pointer h4 ${
+            selected === tab ? 'h4 text-center border-b-2 border-black' : 'h4 text-center text-gray-500'
+          }`}
         >
           {tab}
-        </button>
+        </div>
       ))}
     </div>
   );

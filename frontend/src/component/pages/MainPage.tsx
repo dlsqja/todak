@@ -1,56 +1,51 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import KakaoLogin from '@/component/icon/kakao_login.png';
+import Button from '@/component/button/Button';
+import { useNavigate } from 'react-router-dom';
 
-function HomePage() {
-  const [selected, setSelected] = useState(0);
-  const navList = ['반려인', '수의사', '병원 관계자']; // 0 : 반려인, 1 : 수의사, 2 : 병원 관계자
+export default function MainPage() {
   const navigate = useNavigate();
-
-  const roleToPath = {
-    0: '/owner/home',
-    1: '/vet/home',
-    2: '/staff/home',
-  };
-
-  // 카카오 로그인 후 이동
-  const handleKakaoLogin = () => {
-    // 실제 카카오 로그인 API를 연동한다면,
-    // 로그인 성공 콜백에서 navigate(roleToPath[selected])를 호출
-    navigate(roleToPath[selected as keyof typeof roleToPath]);
+  const handleStart = () => {
+    navigate('/auth');
   };
 
   return (
-    <div>
-      <div className="flex flex-col items-center justify-center">
-        <h3 className="h3">화면 하단에서 본인의 역할을</h3>
-        <h3 className="h3">선택하여 이용해주세요</h3>
+    <div
+      className="flex flex-col items-center justify-center px-7 min-h-screen"
+      style={{
+        background: 'linear-gradient(-45deg, #afcf7e, #c8e6a0, #e9f1d7, #fdfcfb)',
+        backgroundRepeat: 'no-repeat',
+        backgroundSize: '400% 400%',
+        position: 'relative',
+        animation: 'backgroundChange 4s ease-in-out infinite',
+      }}
+    >
+      <style>{`
+        @keyframes backgroundChange {
+          0% {
+            background-position: 0% 50%;
+          }
+          50% {
+            background-position: 100% 50%;
+          }
+          100% {
+            background-position: 0% 50%;
+          }
+        }
+      `}</style>
+
+      <div className="flex items-center mb-7">
+        <img src="images/todoc_logo.png" alt="logo" className="w-30 h-40" />
       </div>
-      <nav className="px-5 w-full flex justify-center gap-12 mt-11 border-b-2 border-gray-100">
-        {navList.map((label, idx) => (
-          <span
-            key={label}
-            className={`pb-2 h4 cursor-pointer border-b-2 ${
-              selected === idx ? 'text-black border-gray-black' : 'text-gray-600 border-transparent'
-            }`}
-            onClick={() => {
-              setSelected(idx);
-              console.log('로그인하고자 하는 역할:', label);
-            }}
-          >
-            {label}
-          </span>
-        ))}
-      </nav>
+      <h3 className="h3 text-brown-300 text-center">바쁜 현대인들을 위한</h3>
+      <h3 className="h3 text-brown-300 text-center mb-5">반려동물 비대면 진료 서비스</h3>
 
-      <br />
-
-      {/* 카카오 로그인 버튼 */}
-      <div className="flex justify-center">
-        <img src={KakaoLogin} alt="kakao_login" className="object-center cursor-pointer" onClick={handleKakaoLogin} />
+      <div className="w-full px-10">
+        <button
+          className="w-full h-13 rounded-[12px] bg-green-300 text-green-100 h4 cursor-pointer shadow-lg hover:bg-green-400 transition-shadow duration-200"
+          onClick={handleStart}
+        >
+          시작하기
+        </button>
       </div>
     </div>
   );
 }
-
-export default HomePage;

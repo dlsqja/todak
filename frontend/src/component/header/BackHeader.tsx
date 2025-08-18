@@ -19,15 +19,11 @@ const BackHeader: React.FC<BackHeaderProps> = ({ text, onBack }) => {
   };
 
   return (
-    <div className="relative w-full h-12 bg-green-100 flex items-center justify-between px-4">
-      <button
-        onClick={handleBack}
-        className="left-4 text-2xl text-black cursor-pointer"
-        aria-label="뒤로가기"
-      >
+    <div className="sticky top-0 z-50 w-full h-16 bg-gray-50 flex items-center justify-between px-4">
+      <button onClick={handleBack} className="left-4 text-3xl text-black cursor-pointer" aria-label="뒤로가기">
         <FiChevronLeft />
       </button>
-      <div className="absolute left-1/2 transform -translate-x-1/2 h4 text-black">{text}</div>
+      <div className="absolute left-1/2 transform -translate-x-1/2 h3 text-black">{text}</div>
     </div>
   );
 };
