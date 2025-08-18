@@ -12,6 +12,7 @@ import com.A409.backend.global.enums.ErrorCode;
 import com.A409.backend.global.exception.CustomException;
 import com.A409.backend.global.util.RandomCodeGenerator;
 import com.A409.backend.global.util.uploader.S3Uploader;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -62,6 +63,7 @@ public class PetService {
         findPet.setName(petRequest.getName());
         findPet.setGender(petRequest.getGender());
         findPet.setSpecies(petRequest.getSpecies());
+        findPet.setWeight(petRequest.getWeight());
 
         if(photo != null){
             try{
@@ -70,7 +72,12 @@ public class PetService {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-
+        } else if (petRequest.getUpdatePhoto()) {
+            String photoUrl = findPet.getPhoto();
+            if (photoUrl != null) {
+                s3Uploader.deleteFile(photoUrl);
+                findPet.setPhoto(null);
+            }
         }
 
         petRepository.save(findPet);
@@ -130,5 +137,18 @@ public class PetService {
         ownerPetRepository.save(ownerPet);
     }
 
+    @Transactional
+    public void disconnectPet(Long ownerId, Long petId){
+        if(!ownerPetRepository.existsByOwner_OwnerIdAndPet_PetId(ownerId, petId)) {
+            throw new CustomException(ErrorCode.RESOURCE_NOT_FOUND);
+        }
+        ownerPetRepository.deleteByPet_petId(petId); //수정
+    }
 
+    public String getPetCode(Long ownerId, Long petId){
+        if(!ownerPetRepository.existsByOwner_OwnerIdAndPet_PetId(ownerId, petId)) {
+            throw new CustomException(ErrorCode.RESOURCE_NOT_FOUND);
+        }
+        return petRepository.findPetByPetId(petId).orElseThrow(() -> new CustomException(ErrorCode.RESOURCE_NOT_FOUND)).getPetCode();
+    }
 }

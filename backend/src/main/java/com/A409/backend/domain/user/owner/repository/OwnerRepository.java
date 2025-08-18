@@ -8,4 +8,5 @@ import java.util.Optional;
 
 public interface OwnerRepository extends JpaRepository<Owner, Long> {
     Optional<Owner> findByAuth(Auth auth);
+    Optional<Owner> findByAuthAuthId(Long authId);
 }

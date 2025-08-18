@@ -16,6 +16,7 @@ import com.A409.backend.global.enums.ErrorCode;
 import com.A409.backend.global.exception.CustomException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,6 +56,19 @@ public class HospitalService {
         hospitalRepository.save(hospital);
 
     }
+
+    @Transactional
+    public HospitalResponse getHospitalDetailByVetId(Long vetId) {
+        Vet vet = vetRepository.findById(vetId).orElseThrow(()->new CustomException(ErrorCode.USER_NOT_FOUND));
+        return getHospitalDetail(vet.getHospital().getHospitalId());
+    }
+
+    @Transactional
+    public void updateHospitalByVetId(Long vetId, HospitalRequest hospitalRequest){
+        Vet vet = vetRepository.findById(vetId).orElseThrow(()->new CustomException(ErrorCode.USER_NOT_FOUND));
+        updateHospital(vet.getHospital().getHospitalId(), hospitalRequest);
+    }
+
 
     public List<StaffResponse> getHospitalStaffs(Long hospitalId){
 

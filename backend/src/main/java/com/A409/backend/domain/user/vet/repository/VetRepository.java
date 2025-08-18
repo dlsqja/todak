@@ -12,4 +12,5 @@ public interface VetRepository extends JpaRepository<Vet,Long> {
     List<Vet> findVetsByHospital_HospitalId(Long hospitalId);
     Optional<Vet> findVetByVetId(Long vetId);
     Optional<Vet> findByAuth(Auth auth);
+    Optional<Vet> findByAuthAuthId(Long authId);
 }

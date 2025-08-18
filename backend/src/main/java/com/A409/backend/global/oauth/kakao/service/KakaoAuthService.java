@@ -25,7 +25,7 @@ public class KakaoAuthService {
         String tokenUrl = "https://kauth.kakao.com/oauth/token";
 
         // TODO::배포시 수정
-        String redirectUrl = "http://i13a409.p.ssafy.io:8081/api/v1/public/login/" + roleStr;
+        String redirectUrl = "https://i13a409.p.ssafy.io/api/v1/public/login/" + roleStr;
         //String redirectUrl = "http://localhost:8080/api/v1/public/login/" + roleStr;
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("grant_type", "authorization_code");
@@ -44,7 +44,6 @@ public class KakaoAuthService {
                 request,
                 Map.class
         );
-        log.info("token response: {}", response.getBody());
 
         return (String) response.getBody().get("access_token");
 
@@ -66,8 +65,6 @@ public class KakaoAuthService {
                 request,
                 Map.class
         );
-
-        log.info("user info response: {}", response.getBody());
 
         return response.getBody();
     }

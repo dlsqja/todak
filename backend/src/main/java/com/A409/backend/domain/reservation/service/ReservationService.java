@@ -13,8 +13,10 @@ import com.A409.backend.domain.reservation.entity.Rejection;
 import com.A409.backend.domain.reservation.entity.Reservation;
 import com.A409.backend.domain.reservation.repository.RejectionRepository;
 import com.A409.backend.domain.reservation.repository.ReservationRepository;
+import com.A409.backend.domain.treatment.entity.FirstTreatment;
 import com.A409.backend.domain.treatment.entity.Treatment;
 import com.A409.backend.domain.treatment.entity.TreatmentResponse;
+import com.A409.backend.domain.treatment.repository.FirstTreatmentRepository;
 import com.A409.backend.domain.treatment.repository.TreatmentRepository;
 import com.A409.backend.domain.user.owner.dto.OwnerResponse;
 import com.A409.backend.domain.user.owner.entity.Owner;
@@ -41,13 +43,21 @@ public class ReservationService {
     private final TreatmentRepository treatmentRepository;
     private final RejectionRepository rejectionRepository;
     private final PetService petService;
-
+    private final FirstTreatmentRepository firstTreatmentRepository;
 
     public void createReservation(Long ownerId, ReservationReqeust reservationReqeust, MultipartFile photo) {
         Owner owner = Owner.builder().ownerId(ownerId).build();
 
         Reservation reservation = reservationReqeust.toEntity();
         reservation.setOwner(owner);
+
+        Long hospitalId = reservation.getHospital().getHospitalId();
+        Long petId = reservation.getPet().getPetId();
+        //TODO:: 최초 진료 기록 추가
+        if(firstTreatmentRepository.existsByHospital_HospitalIdAndPet_PetId(hospitalId,petId)){
+            reservation.setIsRevisit(true);
+        }
+
 
         if(photo != null){
             try{
@@ -137,7 +147,7 @@ public class ReservationService {
                     Map<String, Object> map = new HashMap<>();
                     map.put("reservationId", reservation.getReservationId());
                     map.put("owner", OwnerResponse.toResponse(reservation.getOwner()));
-                    map.put("petName", reservation.getPet().getName());
+                    map.put("pet", PetResponse.toResponse(reservation.getPet()));
                     map.put("vetName", reservation.getVet().getName());
                     map.put("reservationDay", reservation.getReservationDay());
                     map.put("reservationTime", reservation.getReservationTime());
@@ -187,12 +197,19 @@ public class ReservationService {
                         .pet(reservation.getPet())
                         .reservation(reservation)
                         .hospital(reservation.getHospital())
-                        .isCompleted(false)
                         .owner(reservation.getOwner())
                         .vet(reservation.getVet())
                         .build();
         treatmentRepository.save(treatment);
         reservationRepository.save(reservation);
+        if(!firstTreatmentRepository.existsByOwner_OwnerIdAndPet_PetId(reservation.getOwner().getOwnerId(),reservation.getPet().getPetId())){
+            FirstTreatment firstTreatment = FirstTreatment.builder()
+                    .hospital(reservation.getHospital())
+                    .pet(reservation.getPet())
+                    .owner(reservation.getOwner())
+                    .build();
+            firstTreatmentRepository.save(firstTreatment);
+        }
     }
     public void rejectReservation(Long hospitalId, Long reservationId, RejectionRequest rejectionRequest) {
 
@@ -213,6 +230,10 @@ public class ReservationService {
     }
 
     public RejectionResponse getRejection(Long hospitalId, Long reservationId) {
+
+        return RejectionResponse.toResponse(rejectionRepository.findByReservation_ReservationId(reservationId));
+    }
+    public RejectionResponse rejectionResponseByOwner(Long reservationId){
 
         return RejectionResponse.toResponse(rejectionRepository.findByReservation_ReservationId(reservationId));
     }

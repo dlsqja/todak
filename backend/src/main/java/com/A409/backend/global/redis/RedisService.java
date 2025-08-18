@@ -23,6 +23,8 @@ public class RedisService {
         redisTemplate.opsForValue().set(cacheKey, value);
     }
 
+
+
     public void setByKeyWithTTL(String cacheKey,Object value,Long ttl){
         redisTemplate.opsForValue().set(cacheKey, value, ttl, TimeUnit.MINUTES);
     }
@@ -34,5 +36,9 @@ public class RedisService {
             redisTemplate.delete(keys);
             System.out.println("자정 closingHours 삭제");
         }
+    }
+
+    public void deleteByKey(String cacheKey){
+        redisTemplate.delete(cacheKey);
     }
 }

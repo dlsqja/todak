@@ -11,6 +11,7 @@ import org.kurento.client.KurentoClient;
 import org.kurento.client.MediaPipeline;
 import org.kurento.client.WebRtcEndpoint;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
@@ -25,6 +26,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public class SignalHandler extends TextWebSocketHandler {
 
     private final KurentoClient kurentoClient;
+
+    private final RestTemplate restTemplate = new RestTemplate();
 
     // 방 ID -> Pipeline
     private final Map<String, MediaPipeline> pipelines = new ConcurrentHashMap<>();
@@ -111,7 +114,12 @@ public class SignalHandler extends TextWebSocketHandler {
         System.out.println("cleanup:" + ws.getId());
 
         // 1) 참가자 맵에서 본인 endpoint 꺼내서 해제
-        WebRtcEndpoint endpoint = roomParticipants.get(sessionId).remove(ws.getId());
+        Map<String, WebRtcEndpoint> sessionEndpoint = roomParticipants.get(sessionId);
+
+        // 해당 session이 존재하지 않으면 return
+        if (sessionEndpoint == null) return;
+
+        WebRtcEndpoint endpoint = sessionEndpoint.remove(ws.getId());
         if (endpoint != null) {
             try { endpoint.release(); } catch (Exception ignore) {}
         }
@@ -121,7 +129,8 @@ public class SignalHandler extends TextWebSocketHandler {
         if (wrap != null) wrap.close();   // 내부적으로 pipeline 은 남아 있음
 
         // 3) 방에 남은 인원이 없는지 확인
-        if (roomParticipants.get(sessionId).isEmpty()) {
+
+        if (sessionEndpoint.isEmpty()) {
             // pipeline 해제 후 맵 제거
             MediaPipeline pipeline = pipelines.remove(sessionId);
             if (pipeline != null) {

@@ -1,9 +1,11 @@
 package com.A409.backend.domain.websocket.dto;
 
+import lombok.Getter;
 import org.kurento.client.MediaPipeline;
 import org.kurento.client.WebRtcEndpoint;
 import org.springframework.web.socket.WebSocketSession;
 
+@Getter
 public class SessionWrapper {
 
     private final WebSocketSession wsSession;
@@ -16,18 +18,6 @@ public class SessionWrapper {
         this.wsSession = wsSession;
         this.pipeline = pipeline;
         this.webRtc = webRtc;
-    }
-
-    public WebSocketSession getWsSession() {
-        return wsSession;
-    }
-
-    public MediaPipeline getPipeline() {
-        return pipeline;
-    }
-
-    public WebRtcEndpoint getWebRtc() {
-        return webRtc;
     }
 
     public void close() {

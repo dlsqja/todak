@@ -1,6 +1,9 @@
 package com.A409.backend.global.security.jwt;
 
+import com.A409.backend.global.enums.ErrorCode;
 import com.A409.backend.global.enums.Role;
+import com.A409.backend.global.exception.CustomException;
+import com.A409.backend.global.redis.RedisService;
 import com.A409.backend.global.security.model.User;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.FilterChain;
@@ -16,12 +19,14 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
 @Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
+    private final RedisService redisService;
 
     @Value("${api.version}")
     private String VERSION;
@@ -29,33 +34,60 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String path = request.getRequestURI();
-        log.info(path);
 
         if (isPermitAllPath(path)) {
             filterChain.doFilter(request, response);
             return;
         }
 
+        String token = null;
         String authHeader = request.getHeader("Authorization");
 
-        if(authHeader != null && authHeader.startsWith("Bearer ")) {
-            String token = authHeader.substring(7);
-            if(jwtService.validateToken(token)){
-                Long id = jwtService.getUserId(token);
-                String username = jwtService.getUsername(token);
-                String role = jwtService.getRole(token);
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            token = authHeader.substring(7);
+        }
 
-                User user = User.builder()
-                        .id(id)
-                        .username(username)
-                        .role(Role.valueOf(role))
-                        .password(null)
-                        .build();
+        if (token == null) {
+            jakarta.servlet.http.Cookie[] cookies = request.getCookies();
 
-                UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
-                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+            if (cookies != null) {
+                for (jakarta.servlet.http.Cookie c : cookies) {
+
+                    if ("ACCESSTOKEN".equals(c.getName())) {
+                        String v = c.getValue();
+                        if (v != null && !v.isBlank()) {
+                            token = v;
+                            break;
+                        }
+                    }
+                }
             }
         }
+        if(token != null && jwtService.validateToken(token)){
+            Long id = jwtService.getUserId(token);
+            String username = jwtService.getUsername(token);
+            String role = jwtService.getRole(token);
+            log.info("sender id : {}, role : {} url : {}",id,role,path);
+            String cacheKey = "blacklist:" + id;
+            List<String> cachedTokens = (List<String>) redisService.getByKey(cacheKey);
+
+            if(cachedTokens!=null&&cachedTokens.contains(token)){
+                throw new CustomException(ErrorCode.ACCESS_DENIED);
+            }
+
+
+
+            User user = User.builder()
+                    .id(id)
+                    .username(username)
+                    .role(Role.valueOf(role))
+                    .password(null)
+                    .build();
+
+            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+            SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+        }
+
         filterChain.doFilter(request, response);
     }
 

@@ -26,6 +26,11 @@ services:
       - KAKAO_CLIENT_ID=${KAKAO_ID}
       - KAKAO_CLIENT_SECRET=${KAKAO_SECRET}
       - GMS_API_KEY=${GMS_KEY}
+      - KAKAOPAY_HOST=${KAKAOPAY_HOST}
+      - KAKAOPAY_ADMIN-KEY=${KAKAOPAY_DEV_KEY}
+      - KAKAOPAY_CID=${KAKAOPAY_DEV_CID}
+    volumes:
+      - ./audio/:/tmp/audio
 
   ec2-db:
     image: mysql:8.0
@@ -147,6 +152,8 @@ services:
     container_name: kurento-server
     ports:
       - "8888:8888"
+    volumes:
+      - ./audio/:/tmp/audio
     restart: unless-stopped
 
   coturn:
