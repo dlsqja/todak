@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -47,7 +48,7 @@ public class KakaoPayService {
         body.put("cid", props.getCid());                      // TCSUBSCRIP
         body.put("partner_order_id", req.getPartnerOrderId()); // 필수
         body.put("partner_user_id",  req.getPartnerUserId());  // 필수
-        body.put("item_name", "정기결제 0원 인증");
+        body.put("item_name", "토닥 자동결제 등록");
         body.put("quantity", "1");
         body.put("total_amount", "0");                         // ✅ 0원
         body.put("tax_free_amount", "0");
@@ -119,7 +120,7 @@ public class KakaoPayService {
         body.put("sid", sid);
         body.put("partner_order_id", "sub-" + owner.getOwnerId());
         body.put("partner_user_id",  owner.getOwnerId());
-        body.put("item_name", hospital.getName() + "진료비");
+        body.put("item_name", hospital.getName());
         body.put("quantity", 1L);
         body.put("total_amount", req.getTotal_amount());
         body.put("tax_free_amount", 0);
@@ -133,8 +134,9 @@ public class KakaoPayService {
         payment.setTid(res.getBody().getTid());
         Long amount = Integer.toUnsignedLong(res.getBody().getAmount().getTotal());
         payment.setAmount(amount);
-//        System.out.println("결제시간:" + res.getBody().getApproved_at());
-        payment.setCompleteTime(LocalDateTime.now());
+//        System.out.println("결제시간: "+  LocalDateTime.parse(res.getBody().getApproved_at()));
+//        System.out.println("서버시간: "+  LocalDateTime.now());
+        payment.setCompleteTime(LocalDateTime.parse(res.getBody().getApproved_at()));
         paymentRepository.save(payment);
     }
 
