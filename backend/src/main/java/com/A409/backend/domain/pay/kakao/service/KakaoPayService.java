@@ -5,6 +5,7 @@ import com.A409.backend.domain.hospital.repository.HospitalRepository;
 import com.A409.backend.domain.pay.kakao.dto.*;
 import com.A409.backend.domain.pay.kakao.entity.Payment;
 import com.A409.backend.domain.pay.kakao.repository.PaymentRepository;
+import com.A409.backend.domain.reservation.service.ReservationService;
 import com.A409.backend.domain.user.owner.entity.Owner;
 import com.A409.backend.domain.user.owner.repository.OwnerRepository;
 import com.A409.backend.global.enums.ErrorCode;
@@ -32,6 +33,7 @@ public class KakaoPayService {
     private final RedisService redisService;
     private final PaymentRepository paymentRepository;
     private final HospitalRepository hospitalRepository;
+    private final ReservationService reservationService;
 
     public KakaoReadyResponse readyZero(KakaoReadyRequest req) {
         String url = props.getHost() + "/v1/payment/ready";
@@ -92,6 +94,7 @@ public class KakaoPayService {
         owner.setSID(sid);
         ownerRepository.save(owner);
         redisService.deleteByKey(redisKey);
+        reservationService.saveReservation(ownerId);
     }
 
     @Transactional
