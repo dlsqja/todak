@@ -116,6 +116,10 @@ public class AIClient {
             String AIResult = sendChatRequest(result);
             log.info("AI 텍스트 요약/분석 추출: "+AIResult);
             treatmentService.saveAISummary(treatmentId, AIResult);
+
+            boolean isDelete = file.delete();
+            if (isDelete)
+                log.info("요약 완료된 녹음 파일 삭제 완료");
         }  catch (Exception e) {
             e.printStackTrace();
         }
