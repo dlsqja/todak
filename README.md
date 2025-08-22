@@ -79,7 +79,7 @@
 
 ### 원무
 - **수납** : 진료 종료 후 결제 금액 입력 → 자동 결제 요청
-<img width="400" height="658" alt="원무" src="images/원무.png" />
+<img src="/images/원무.gif" alt="예약 시간 설정 1" width="300">
 
 # 🛠기술 스택
 
