@@ -52,9 +52,9 @@
 - **신청서 작성** : 원하는 병원과 수의사를 검색 후 선택하고, 증상 입력
 - **자동 결제 수단 선택** : 카카오페이 결제를 통해 예약을 확정하고 승인 대기 상태로 전환
 <div class = "flex">
-<img src="/images/예약 신청1.gif" alt="예약 신청1" width="300">
-<img src="/images/예약 신청2.gif" alt="예약 신청2" width="300">
-<img src="/images/예약 신청3.gif" alt="예약 신청3" width="300">
+<img src="/images/예약 신청1.gif" alt="예약 신청1" width="165">
+<img src="/images/예약 신청2.gif" alt="예약 신청2" width="165">
+<img src="/images/예약 신청3.gif" alt="예약 신청3" width="165">
 </div>
 
 ## 2. 수의사
