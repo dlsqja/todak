@@ -51,7 +51,11 @@
 ## 2. 수의사
 ### 비대면 진료
 - **실시간 1:1진료** : Kurento 기반 WebRTC 기술을 활용하여 원격 화상 진료 지원
-<img width="200" height="658" alt="비대면 진료" src="images/비대면 진료.png" />
+<div class = "flex">
+<img src="/images/비대면진료1.gif" alt="비대면진료1" width="300">
+<img src="/images/비대면진료2.gif" alt="비대면진료2" width="300">
+</div>
+
 
 
 ### 진단서 검토
