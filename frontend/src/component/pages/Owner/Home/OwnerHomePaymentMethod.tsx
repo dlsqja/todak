@@ -41,7 +41,7 @@ export default function PaymentMethodPage() {
       <div className="px-7 py-6 flex-1 overflow-y-auto flex flex-col gap-4">
         <h2 className="h3">자동결제용 결제수단 등록</h2>
         <p className="text-gray-600  leading-6">
-          최초 1회 0원 인증만 진행하고,
+          최초 인증만 진행하고,
           <br />
           정기결제 키(SID)만 발급받습니다.
           <br />
