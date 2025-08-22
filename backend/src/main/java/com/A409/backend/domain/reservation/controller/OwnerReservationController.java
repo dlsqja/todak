@@ -36,9 +36,8 @@ public class OwnerReservationController {
             @RequestPart(value = "photo", required = false) MultipartFile photo
     ) {
 
-        reservationService.createReservation(user.getId(),reservationReqeust,photo);
-
-
+//        reservationService.createReservation(user.getId(),reservationReqeust,photo);
+        reservationService.createTempReservation(user.getId(),reservationReqeust,photo);
         return APIResponse.ofSuccess(null);
     }
 

@@ -23,6 +23,7 @@ import com.A409.backend.domain.user.owner.entity.Owner;
 import com.A409.backend.global.enums.ErrorCode;
 import com.A409.backend.global.enums.ReservationStatus;
 import com.A409.backend.global.exception.CustomException;
+import com.A409.backend.global.redis.RedisService;
 import com.A409.backend.global.util.uploader.S3Uploader;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +31,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -44,6 +46,7 @@ public class ReservationService {
     private final RejectionRepository rejectionRepository;
     private final PetService petService;
     private final FirstTreatmentRepository firstTreatmentRepository;
+    private final RedisService redisService;
 
     public void createReservation(Long ownerId, ReservationReqeust reservationReqeust, MultipartFile photo) {
         Owner owner = Owner.builder().ownerId(ownerId).build();
@@ -69,6 +72,44 @@ public class ReservationService {
 
         }
         reservationRepository.save(reservation);
+    }
+
+    // redis에 temp로 저장.
+    public void createTempReservation(Long ownerId, ReservationReqeust reservationReqeust, MultipartFile photo) {
+        Owner owner = Owner.builder().ownerId(ownerId).build();
+
+        Reservation reservation = reservationReqeust.toEntity();
+        reservation.setOwner(owner);
+
+        Long hospitalId = reservation.getHospital().getHospitalId();
+        Long petId = reservation.getPet().getPetId();
+        //TODO:: 최초 진료 기록 추가
+        if(firstTreatmentRepository.existsByHospital_HospitalIdAndPet_PetId(hospitalId,petId)){
+            reservation.setIsRevisit(true);
+        }
+
+        if(photo != null){
+            try{
+                String url = s3Uploader.upload(photo,"reservation");
+                reservation.setPhoto(url);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+        }
+        String cacheKey = "reservation" + ownerId;
+        reservation.setReservationDay(null);
+        redisService.setByKey(cacheKey, reservation);
+//        reservationRepository.save(reservation);
+    }
+
+    @Transactional
+    public void saveReservation(Long ownerId) {
+        String cacheKey = "reservation" + ownerId;
+        Reservation reservation = (Reservation)redisService.getByKey(cacheKey);
+        reservation.setReservationDay(LocalDate.now());
+        reservationRepository.save(reservation);
+        redisService.deleteByKey(cacheKey);
     }
 
     public List<Map<String, Object>> getReservations(Long ownerId) {
