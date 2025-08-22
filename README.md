@@ -61,11 +61,9 @@
 ### 비대면 진료
 - **실시간 1:1진료** : Kurento 기반 WebRTC 기술을 활용하여 원격 화상 진료 지원
 <div class = "flex">
-<img src="/images/비대면진료1.gif" alt="비대면진료1" width="300">
-<img src="/images/비대면진료2.gif" alt="비대면진료2" width="245">
+<img src="/images/비대면진료1.gif" alt="비대면진료1" width="245">
+<img src="/images/비대면진료2.gif" alt="비대면진료2" width="200">
 </div>
-
-
 
 ### 진단서 검토
 - **STT → text 변환** : Whisper-1을 이용해 비대면 진료 중 음성을 텍스트 파일로 변환
@@ -73,22 +71,24 @@
 - **수의사 검증** : 수의사의 검토 절차를 통해 수정, 승인
 <img width="200" height="658" alt="진단서 검토" src="images/진단서 검토.png" />
 
-
 ## 3. 병원 관계자
 ### 진료 일정 관리
 - **예약 시간 설정** : 버튼 토클 방식으로 진료 가능/불가 시간 설정
 <div class = "flex">
-<img src="/images/예약 시간 설정 1.gif" alt="예약 시간 설정 1" width="300">
-<img src="/images/예약 시간 설정 2.gif" alt="예약 시간 설정 2" width="300">
+<img src="/images/예약 시간 설정 1.gif" alt="예약 시간 설정 1" width="200">
+<img src="/images/예약 시간 설정 2.gif" alt="예약 시간 설정 2" width="200">
 </div>
 
 ### 예약 관리
 - **신청 목록 확인** : 전체 예약 내역을 조회하고, 내용을 검토한 뒤 승인 또는 반려 처리 가능
-<img width="400" height="658" alt="예약 관리" src="" />
+<div class = "flex">
+<img src="/images/예약승인.gif" alt="예약 승인" width="200" height="658">
+<img src="/images/예약반려.gif" alt="예약 반려" width="200" height="658">
+</div>
 
-### 원무
+### 결제 관리
 - **수납** : 진료 종료 후 결제 금액 입력 → 자동 결제 요청
-<img src="/images/원무.gif" alt="예약 시간 설정 1" width="300">
+<img src="/images/원무.gif" alt="예약 시간 설정 1" width="200">
 
 # 🛠기술 스택
 
