@@ -26,10 +26,12 @@
 
 # ⚡주요 기능
 > 토닥은 반려인, 수의사 , 병원 관계자 3가지의 사용자 유형이 존재
-<img width="200" height="658" alt="반려인홈" src="https://github.com/user-attachments/assets/4a5e2ea1-ad05-4e8d-9534-8dad1ac528ed" />
-<img width="200" height="658" alt="수의사 홈" src="https://github.com/user-attachments/assets/cc48c082-c850-4550-bc68-f4e50e214a95" />
-<img width="200" height="658" alt="병원관계자 홈" src="https://github.com/user-attachments/assets/6c284f22-a363-4e61-ba32-70167a6dc0d6" />
-
+<div class=flex>
+<img width="200" height="658" alt="반려인 홈" src="images/반려인 홈.png" />
+<img width="200" height="658" alt="수의사 홈" src="images/수의사 홈.png" />
+<img width="200" height="658" alt="병원관계자 홈" src="images/병원관계자 홈.png" />
+</div
+ 
 ## 1. 반려인
 ### 진료 내역 조회
 - **예약 요약 제공** : 작성했던 진료 신청서 내용을 요약해 어떤 진료 내역인지 한눈에 확인 가능
