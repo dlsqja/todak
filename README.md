@@ -112,94 +112,42 @@
 # 📂폴더 구조
 - Frontend
 ```
-src/
- └── component/
-     ├── button/
-     │    ├── Button.tsx
-     │    └── CopyButton.tsx
-     ├── card/
-     │    ├── OwnerTreatmentSimpleCard.tsx
-     │    ├── PetProfileCard.tsx
-     │    ├── RemoteTreatmentCard.tsx
-     │    ├── SearchListItem.tsx
-     │    ├── TreatmentRecordCard.tsx
-     │    ├── TreatmentSlideCard.tsx
-     │    └── TreatmentSlideList.tsx
-     ├── header/
-     │    ├── BackHeader.tsx
-     │    └── SimpleHeader.tsx
-     ├── icon/
-     │    ├── AnimalIcon.tsx
-     │    ├── Dropdown_Arrow.tsx
-     │    ├── HomelIcon.tsx
-     │    ├── HospitalIcon.tsx
-     │    ├── kakao_login.png
-     │    ├── MyPageIcon.tsx
-     │    ├── PlusIcon.tsx
-     │    ├── RecordIcon.tsx
-     │    ├── ReservationIcon.tsx
-     │    ├── ReservationManagementIcon.tsx
-     │    ├── TreatmentIcon.tsx
-     │    └── VetManagementIcon.tsx
-     ├── menubar/
-     │    ├── OwnerMenuBar.tsx
-     │    ├── StaffMenuBar.tsx
-     │    └── VetMenuBar.tsx
-     ├── navbar/
-     │    ├── TabGroupPet.tsx
-     │    ├── TabGroupRoles.tsx
-     │    ├── TabGroupTime.tsx
-     │    ├── TabGroupTreatList.tsx
-     │    └── TabGroupWaiting.tsx
-     ├── pages/
-     │    ├── Owner/
-     │    │    ├── OwnerHome.tsx
-     │    │    ├── OwnerHomeApplyForm.tsx
-     │    │    ├── OwnerHomeSelectHospital.tsx
-     │    │    ├── OwnerHomeSelectVet.tsx
-     │    │    ├── OwnerHomeVetInfo.tsx
-     │    │    ├── OwnerPetEdit.tsx
-     │    │    ├── OwnerPetHome.tsx
-     │    │    ├── OwnerPetRegister.tsx
-     │    │    └── petMockList.ts
-     │    ├── Reservation/
-     │    │    ├── OwnerReservationDetail.tsx
-     │    │    └── OwnerReservationHome.tsx
-     │    └── Treatment/
-     │         ├── OwnerTreatment.tsx
-     │         ├── OwnerTreatmentDetail.tsx
-     │         ├── OwnerMyPage.tsx
-     │         └── OwnerTreatment.tsx
-     ├── selection/
-     │    ├── FilterDropdown.tsx
-     │    ├── SelectionDropdown.tsx
-     │    ├── TimeSelectionButton.tsx
-     │    ├── TimeSelectionDropdown.tsx
-     ├── state/
-     │    ├── StatusBadge.tsx
-     │    └── ReservationTimeTable.tsx
-     ├── table/
-     │    └── ReservationTimeTable.tsx
-     ├── template/
-     │    ├── AiSummaryForVet.tsx
-     │    └── ModalTemplate.tsx
-     ├── text/
-     │    ├── ImageContent.tsx
-     │    ├── MultipleContent.tsx
-     │    ├── MultipleContentApi.tsx
-     │    ├── SingleContent.tsx
-     │    ├── SummaryContent.tsx
-     │    └── TreatmentListContent.tsx
- ├── fonts/
- ├── layouts/
- ├── router/
- ├── RTC/
- ├── store/
- ├── styles/
- ├── App.css
- ├── App.tsx
- ├── index.css
- └── main.tsx
+Todak/
+├── frontend/                 # React 기반 프론트엔드
+│   ├── src/                  # 소스코드
+│   │   ├── component/        # 공통/페이지별 컴포넌트
+│   │   │   │   ├── auth/     # 인증 관련 페이지
+│   │   │   │   ├── Owner/    # 반려인 페이지
+│   │   │   │   ├── Staff/    # 직원 페이지
+│   │   │   │   ├── Vet/      # 수의사 페이지
+│   │   ├── assets/           # 이미지, 폰트 등 정적 리소스
+│   │   ├── types/            # TypeScript 타입 정의
+│   │   │   ├── Owner/        # 반려동물 주인 관련 타입
+│   │   │   ├── Staff/        # 직원 관련 타입
+│   │   │   ├── Vet/          # 수의사 관련 타입
+│   │   │   └── auth.ts       # 인증 관련 타입
+│   │   ├── services/         # API 서비스 로직
+│   │   │   └── api/          # API 호출 함수들
+│   │   ├── router/           # 라우팅 설정
+│   │   ├── layouts/          # 레이아웃 컴포넌트
+│   │   ├── store/            # 상태 관리 (Zustand)
+│   │   ├── RTC/              # 실시간 통신 (WebRTC)
+│   │   ├── utils/            # 유틸리티 함수
+│   │   ├── styles/           # CSS 스타일
+│   │   ├── plugins/          # 플러그인 설정 (axios 등)
+│   │   └── ...               # 기타 src 하위 파일
+│   ├── public/               # 정적 파일 (이미지, favicon 등)
+│   ├── dist/                 # 빌드된 파일들
+│   ├── package.json          # 프론트엔드 의존성/스크립트
+│   ├── vite.config.ts        # Vite 설정
+│   ├── tailwind.config.js    # Tailwind CSS 설정
+│   ├── Dockerfile            # 프론트엔드 도커파일
+│   ├── Jenkinsfile           # CI/CD 파이프라인 설정
+│   ├── nginx.conf            # Nginx 설정
+│   └── ...                   # 기타 설정 파일 (tsconfig, eslint 등)
+│
+├── README.md                 # 프로젝트 설명서
+└── ...                       # 기타 파일/폴더
  ```
 - Backend
 ```
