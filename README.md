@@ -30,48 +30,49 @@
 <img width="200" height="658" alt="반려인 홈" src="images/반려인 홈.png" />
 <img width="200" height="658" alt="수의사 홈" src="images/수의사 홈.png" />
 <img width="200" height="658" alt="병원관계자 홈" src="images/병원관계자 홈.png" />
-</div
- 
+</div>
+
+
 ## 1. 반려인
 ### 진료 내역 조회
 - **예약 요약 제공** : 작성했던 진료 신청서 내용을 요약해 어떤 진료 내역인지 한눈에 확인 가능
 - **AI 요약 진단서** : 수의사의 검증을 거친 AI 요약 진단서 보관
-<img width="238" height="506" alt="진료 내역 조회" src="https://github.com/user-attachments/assets/f5ce8ee5-8c27-4d58-89b0-2f90f7143cf9" />
+<img width="200" height="658" alt="진료 내역 조회" src="https://github.com/user-attachments/assets/f5ce8ee5-8c27-4d58-89b0-2f90f7143cf9" />
 
 ### 예약 신청
 - **신청서 작성** : 원하는 병원과 수의사를 검색 후 선택하고, 증상 입력
 - **자동 결제 수단 선택** : 카카오페이 결제를 통해 예약을 확정하고 승인 대기 상태로 전환
-<img width="238" height="506" alt="예약신청1" src="https://github.com/user-attachments/assets/51494d92-f505-49e6-adc0-2530ec0b5ac9" />
-<img width="238" height="506" alt="예약신청2" src="https://github.com/user-attachments/assets/180fadff-1e2b-41ec-bc79-19496e421d2c" />
-<img width="238" height="506" alt="예약신청4" src="https://github.com/user-attachments/assets/eea017a5-9175-4a7c-99e1-d1e5cf3637a0" />
-
-
+<div class=flex>
+<img width="200" height="658" alt="예약신청1" src="images/예약신청1.png" />
+<img width="200" height="658" alt="예약신청2" src="images/예약신청2.png" />
+<img width="200" height="658" alt="예약신청4" src="images/예약신청3.png" />
+</div>
 
 ## 2. 수의사
 ### 비대면 진료
 - **실시간 1:1진료** : Kurento 기반 WebRTC 기술을 활용하여 원격 화상 진료 지원
-<img width="238" height="506" alt="실시간 진료" src="https://github.com/user-attachments/assets/a16e916e-270d-4b31-8747-a47c1518d436" />
+<img width="200" height="658" alt="비대면 진료" src="images/비대면 진료.png" />
 
 
 ### 진단서 검토
 - **STT → text 변환** : Whisper-1을 이용해 비대면 진료 중 음성을 텍스트 파일로 변환
 - **AI text 요약** : 의료 용어가 많은 텍스트를 ChatGPT 4.1을 통해 핵심 내용 요약
 - **수의사 검증** : 수의사의 검토 절차를 통해 수정, 승인
-<img width="238" height="506" alt="진단서 검토" src="https://github.com/user-attachments/assets/3e756511-2eef-4781-8cdb-de38b3a0281f" />
+<img width="200" height="658" alt="진단서 검토" src="images/진단서 검토.png" />
 
 
 ## 3. 병원 관계자
 ### 진료 일정 관리
 - **예약 시간 설정** : 버튼 토클 방식으로 진료 가능/불가 시간 설정
-<img width="475" height="506" alt="예약 시간 설정" src="https://github.com/user-attachments/assets/d996a5f8-6154-4a18-a105-3fd9e1f1659e" />
+<img width="400" height="658" alt="예약 시간 설정" src="images/예약 시간 설정.png" />
 
 ### 예약 관리
 - **신청 목록 확인** : 전체 예약 내역을 조회하고, 내용을 검토한 뒤 승인 또는 반려 처리 가능
-<img width="475" height="506" alt="예약 관리" src="https://github.com/user-attachments/assets/61472b53-def7-4812-9f11-c5ca2fb69c10" />
+<img width="400" height="658" alt="예약 관리" src="images/예약 관리.png" />
 
 ### 원무
 - **수납** : 진료 종료 후 결제 금액 입력 → 자동 결제 요청
-<img width="475" height="506" alt="원무" src="https://github.com/user-attachments/assets/2d803ad7-06e9-4580-bb84-b1d7c3e79983" />
+<img width="400" height="658" alt="원무" src="images/원무.png" />
 
 # 🛠기술 스택
 
