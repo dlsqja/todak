@@ -37,9 +37,9 @@
 ### 반려동물 관리
 - **프로필 등록** : 반려동물의 정보를 프로필 형태로 등록하여 정보 열람 및 관리
 <div class = "flex">
-<img src="/images/동물등록1.gif" alt="예약 신청1" width="300">
-<img src="/images/동물등록2.gif" alt="예약 신청2" width="300">
-<img src="/images/동물등록3.gif" alt="예약 신청3" width="300">
+<img src="/images/동물등록1.gif" alt="예약 신청1" width="200">
+<img src="/images/동물등록2.gif" alt="예약 신청2" width="200">
+<img src="/images/동물등록3.gif" alt="예약 신청3" width="200">
 </div>
 
   
@@ -62,7 +62,7 @@
 - **실시간 1:1진료** : Kurento 기반 WebRTC 기술을 활용하여 원격 화상 진료 지원
 <div class = "flex">
 <img src="/images/비대면진료1.gif" alt="비대면진료1" width="300">
-<img src="/images/비대면진료2.gif" alt="비대면진료2" width="300">
+<img src="/images/비대면진료2.gif" alt="비대면진료2" width="245">
 </div>
 
 
