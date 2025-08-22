@@ -24,14 +24,11 @@
     - 병원에 방문하지 않고 관찰 진료 필요
     - 시간, 공간에 제약 없이 진료 필요
 
-### 서비스 화면
-![alt text](images/목업.png)
-
 # ⚡주요 기능
 > 토닥은 반려인, 수의사 , 병원 관계자 3가지의 사용자 유형이 존재
-<img width="309" height="658" alt="반려인홈" src="https://github.com/user-attachments/assets/4a5e2ea1-ad05-4e8d-9534-8dad1ac528ed" />
-<img width="309" height="658" alt="수의사 홈" src="https://github.com/user-attachments/assets/cc48c082-c850-4550-bc68-f4e50e214a95" />
-<img width="309" height="658" alt="병원관계자 홈" src="https://github.com/user-attachments/assets/6c284f22-a363-4e61-ba32-70167a6dc0d6" />
+<img width="200" height="658" alt="반려인홈" src="https://github.com/user-attachments/assets/4a5e2ea1-ad05-4e8d-9534-8dad1ac528ed" />
+<img width="200" height="658" alt="수의사 홈" src="https://github.com/user-attachments/assets/cc48c082-c850-4550-bc68-f4e50e214a95" />
+<img width="200" height="658" alt="병원관계자 홈" src="https://github.com/user-attachments/assets/6c284f22-a363-4e61-ba32-70167a6dc0d6" />
 
 ## 1. 반려인
 ### 진료 내역 조회
@@ -44,7 +41,6 @@
 - **자동 결제 수단 선택** : 카카오페이 결제를 통해 예약을 확정하고 승인 대기 상태로 전환
 <img width="238" height="506" alt="예약신청1" src="https://github.com/user-attachments/assets/51494d92-f505-49e6-adc0-2530ec0b5ac9" />
 <img width="238" height="506" alt="예약신청2" src="https://github.com/user-attachments/assets/180fadff-1e2b-41ec-bc79-19496e421d2c" />
-<img width="238" height="506" alt="예약신청3" src="https://github.com/user-attachments/assets/5d2c7c5e-e95f-4911-8072-597347a807f1" />
 <img width="238" height="506" alt="예약신청4" src="https://github.com/user-attachments/assets/eea017a5-9175-4a7c-99e1-d1e5cf3637a0" />
 
 
