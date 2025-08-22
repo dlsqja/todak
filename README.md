@@ -37,9 +37,9 @@
 ### 반려동물 관리
 - **프로필 등록** : 반려동물의 정보를 프로필 형태로 등록하여 정보 열람 및 관리
 <div class = "flex">
-<img src="/images/동물등록1.gif" alt="예약 신청1" width="165">
-<img src="/images/동물등록2.gif" alt="예약 신청2" width="165">
-<img src="/images/동물등록3.gif" alt="예약 신청3" width="165">
+<img src="/images/동물등록1.gif" alt="예약 신청1" width="200" height="658">
+<img src="/images/동물등록2.gif" alt="예약 신청2" width="200" height="658">
+<img src="/images/동물등록3.gif" alt="예약 신청3" width="200" height="658">
 </div>
 
   
@@ -52,9 +52,9 @@
 - **신청서 작성** : 원하는 병원과 수의사를 검색 후 선택하고, 증상 입력
 - **자동 결제 수단 선택** : 카카오페이 결제를 통해 예약을 확정하고 승인 대기 상태로 전환
 <div class = "flex">
-<img src="/images/예약 신청1.gif" alt="예약 신청1" width="165">
-<img src="/images/예약 신청2.gif" alt="예약 신청2" width="165">
-<img src="/images/예약 신청3.gif" alt="예약 신청3" width="165">
+<img src="/images/예약 신청1.gif" alt="예약 신청1" width="200" height="658">
+<img src="/images/예약 신청2.gif" alt="예약 신청2" width="200" height="658">
+<img src="/images/예약 신청3.gif" alt="예약 신청3" width="200" height="658">
 </div>
 
 ## 2. 수의사
@@ -84,7 +84,7 @@
 
 ### 예약 관리
 - **신청 목록 확인** : 전체 예약 내역을 조회하고, 내용을 검토한 뒤 승인 또는 반려 처리 가능
-<img width="400" height="658" alt="예약 관리" src="images/예약 관리.png" />
+<img width="400" height="658" alt="예약 관리" src="" />
 
 ### 원무
 - **수납** : 진료 종료 후 결제 금액 입력 → 자동 결제 요청
