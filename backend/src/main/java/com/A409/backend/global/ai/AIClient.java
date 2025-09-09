@@ -2,6 +2,8 @@ package com.A409.backend.global.ai;
 
 import com.A409.backend.domain.treatment.service.TreatmentService;
 import com.A409.backend.global.exception.CustomException;
+import com.A409.backend.global.rabbitmq.FailureRepository;
+import com.A409.backend.global.rabbitmq.SttRequestProducer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -36,6 +38,8 @@ public class AIClient {
     private final ObjectMapper objectMapper;
     private final TreatmentService treatmentService;
     private final OkHttpClient client;
+    private final SttRequestProducer sttRequestProducer;
+    private final FailureRepository failureRepository;
 
     @Value("${gms.api.key}")
     private String GMS_KEY;
@@ -87,43 +91,58 @@ public class AIClient {
 
     @Async
     public void uploadAudio(Long treatmentId, File file) {
+        final int maxTry = 3;
+        boolean sttSuccess = false;
+
         try {
-            RequestBody requestBody = new MultipartBody.Builder()
-                    .setType(MultipartBody.FORM)
-                    .addFormDataPart("model", "whisper-1")
-                    .addFormDataPart("file", file.getName(),
-                            RequestBody.create(Files.readAllBytes(file.toPath())))
-//                    .addFormDataPart("file", file.getOriginalFilename(),
-//                            RequestBody.create(file.getBytes()))
-                    .build();
+            for (int i = 1; i <= maxTry; i++) {
+                try {
+                    RequestBody requestBody = new MultipartBody.Builder()
+                            .setType(MultipartBody.FORM)
+                            .addFormDataPart("model", "whisper-1")
+                            .addFormDataPart("file", file.getName(),
+                                    RequestBody.create(Files.readAllBytes(file.toPath())))
+                            .build();
 
-            log.info(GMS_KEY);
-            Request request = new Request.Builder()
-                    .url(AUDIO_URL)
-                    .post(requestBody)
-                    .addHeader("Authorization", "Bearer " + GMS_KEY)
-                    .build();
-            Response response = client.newCall(request).execute();
+                    Request request = new Request.Builder()
+                            .url(AUDIO_URL)
+                            .post(requestBody)
+                            .addHeader("Authorization", "Bearer " + GMS_KEY)
+                            .build();
 
-            ObjectMapper mapper = new ObjectMapper();
-            String body = response.body().string();
+                    Response response = client.newCall(request).execute();
+                    if (response.body() == null) throw new IllegalStateException("Empty STT response body");
+                    String body = response.body().string();
 
-            JsonNode jsonNode = mapper.readTree(body);
-            String result = jsonNode.get("text").asText();
-            log.info("음성 텍스트 추출: "+result);
-            treatmentService.saveResult(treatmentId, result);
+                    ObjectMapper mapper = new ObjectMapper();
+                    JsonNode jsonNode = mapper.readTree(body);
+                    if (jsonNode == null || jsonNode.get("text") == null) {
+                        throw new IllegalStateException("STT response has no 'text' field: " + body);
+                    }
 
-            String AIResult = sendChatRequest(result);
-            log.info("AI 텍스트 요약/분석 추출: "+AIResult);
-            treatmentService.saveAISummary(treatmentId, AIResult);
+                    String result = jsonNode.get("text").asText();
+                    log.info("음성 텍스트 추출: {}", result);
 
-            boolean isDelete = file.delete();
-            if (isDelete)
-                log.info("요약 완료된 녹음 파일 삭제 완료");
-        }  catch (Exception e) {
-            e.printStackTrace();
+                    treatmentService.saveResult(treatmentId,result);
+
+                    STTData sttData = new STTData(treatmentId, result);
+                    String sttDataString = objectMapper.writeValueAsString(sttData);
+                    sttRequestProducer.sendSttRequest(sttDataString);
+
+                    sttSuccess = true;
+                    break;
+                } catch (Exception e) {
+                    log.warn("STT 시도 실패 {}: {}", i, e.getMessage());
+                    try { Thread.sleep(1000L * i); } catch (InterruptedException ignored) {}
+                }
+            }
+        } finally {
+            if (!sttSuccess) {
+                failureRepository.insertFailure("STT", treatmentId);
+            }
         }
     }
+
 }
 
 
